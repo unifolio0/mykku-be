@@ -14,7 +14,7 @@ class DailyMessageComment(
     @JoinColumn(name = "daily_message_id")
     val dailyMessage: DailyMessage,
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "parent_comment_id")
     val parentComment: DailyMessageComment? = null,
 ) {

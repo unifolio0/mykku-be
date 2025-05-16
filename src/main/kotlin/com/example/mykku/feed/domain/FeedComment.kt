@@ -14,7 +14,7 @@ class FeedComment(
     @JoinColumn(name = "feed_id")
     val feed: Feed,
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "parent_comment_id")
     val parentComment: FeedComment? = null,
 ) {

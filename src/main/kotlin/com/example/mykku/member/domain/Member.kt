@@ -24,6 +24,6 @@ class Member(
     val saveFeeds: List<SaveFeed> = mutableListOf(),
 
     @OneToMany(mappedBy = "member")
-    val saveDailyMessage: List<SaveDailyMessage> = mutableListOf(),
+    val saveDailyMessages: List<SaveDailyMessage> = mutableListOf(),
 ) {
 }

@@ -17,9 +17,6 @@ class Feed(
     @Column(name = "comment_count")
     val commentCount: Int = 0,
 
-    @Column(name = "image")
-    val images: String? = null,
-
     @ManyToOne
     @JoinColumn(name = "board_id")
     val board: Board,
@@ -31,7 +28,7 @@ class Feed(
     val feedComments: List<FeedComment> = mutableListOf(),
 
     @OneToMany(mappedBy = "feed")
-    val feedTag: List<FeedTag> = mutableListOf(),
+    val feedTags: List<FeedTag> = mutableListOf(),
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
