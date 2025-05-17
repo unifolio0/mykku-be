@@ -8,7 +8,7 @@ class TagImage(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
-    @Column(name = "url")
+    @Column(name = "url", nullable = false)
     var url: String,
 
     @ManyToOne

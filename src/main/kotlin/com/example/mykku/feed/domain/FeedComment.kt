@@ -9,10 +9,10 @@ class FeedComment(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
-    @Column(name = "content")
+    @Column(name = "content", nullable = false)
     var content: String,
 
-    @Column(name = "like_count")
+    @Column(name = "like_count", nullable = false)
     var likeCount: Int = 0,
 
     @ManyToOne

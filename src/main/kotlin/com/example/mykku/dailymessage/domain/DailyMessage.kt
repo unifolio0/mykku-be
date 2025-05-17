@@ -8,7 +8,7 @@ class DailyMessage(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
-    @Column(name = "content")
+    @Column(name = "content", nullable = false)
     var content: String,
 
     @OneToMany(mappedBy = "dailyMessage", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
