@@ -31,12 +31,12 @@ class Feed(
     val member: Member,
 
     @OneToMany(mappedBy = "feed", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    val feedImages: MutableList<FeedImage> = mutableListOf(),
+    var feedImages: MutableList<FeedImage> = mutableListOf(),
 
     @OneToMany(mappedBy = "feed", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    val feedComments: MutableList<FeedComment> = mutableListOf(),
+    var feedComments: MutableList<FeedComment> = mutableListOf(),
 
     @OneToMany(mappedBy = "feed", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    val feedTags: MutableList<FeedTag> = mutableListOf(),
+    var feedTags: MutableList<FeedTag> = mutableListOf(),
 ) {
 }

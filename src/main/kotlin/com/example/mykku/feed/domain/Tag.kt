@@ -18,9 +18,9 @@ class Tag(
     var isContest: Boolean = false,
 
     @OneToMany(mappedBy = "tag", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    val feeds: MutableList<FeedTag> = mutableListOf(),
+    var feeds: MutableList<FeedTag> = mutableListOf(),
 
     @OneToMany(mappedBy = "tag", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    val tagImages: MutableList<TagImage> = mutableListOf(),
+    var tagImages: MutableList<TagImage> = mutableListOf(),
 ) {
 }

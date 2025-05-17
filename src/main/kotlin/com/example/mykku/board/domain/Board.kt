@@ -10,9 +10,9 @@ class Board(
     var id: Long? = null,
 
     @Column(name = "title", nullable = false)
-    val title: String,
+    var title: String,
 
     @OneToMany(mappedBy = "board", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    val feeds: MutableList<Feed> = mutableListOf(),
+    var feeds: MutableList<Feed> = mutableListOf(),
 ) {
 }
