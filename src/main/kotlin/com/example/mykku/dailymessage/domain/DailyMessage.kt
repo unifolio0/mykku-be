@@ -1,5 +1,6 @@
 package com.example.mykku.dailymessage.domain
 
+import com.example.mykku.common.BaseEntity
 import jakarta.persistence.*
 
 @Entity
@@ -13,5 +14,5 @@ class DailyMessage(
 
     @OneToMany(mappedBy = "dailyMessage", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
     var comments: MutableList<DailyMessageComment> = mutableListOf(),
-) {
+) : BaseEntity() {
 }

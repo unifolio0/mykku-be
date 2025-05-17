@@ -1,5 +1,6 @@
 package com.example.mykku.feed.domain
 
+import com.example.mykku.common.BaseEntity
 import jakarta.persistence.*
 
 @Entity
@@ -22,5 +23,5 @@ class Tag(
 
     @OneToMany(mappedBy = "tag", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
     var tagImages: MutableList<TagImage> = mutableListOf(),
-) {
+) : BaseEntity() {
 }

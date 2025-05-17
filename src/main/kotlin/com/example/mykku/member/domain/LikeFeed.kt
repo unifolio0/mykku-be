@@ -1,5 +1,6 @@
 package com.example.mykku.member.domain
 
+import com.example.mykku.common.BaseEntity
 import com.example.mykku.feed.domain.Feed
 import jakarta.persistence.*
 
@@ -16,5 +17,5 @@ class LikeFeed(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feed_id")
     val feed: Feed,
-) {
+) : BaseEntity() {
 }

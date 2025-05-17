@@ -1,5 +1,6 @@
 package com.example.mykku.member.domain
 
+import com.example.mykku.common.BaseEntity
 import com.example.mykku.dailymessage.domain.DailyMessageComment
 import jakarta.persistence.*
 
@@ -16,5 +17,5 @@ class LikeDailyMessageComment(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "daily_message_comment_id")
     val dailyMessageComment: DailyMessageComment,
-) {
+) : BaseEntity() {
 }

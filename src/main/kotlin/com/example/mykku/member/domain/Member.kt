@@ -1,5 +1,6 @@
 package com.example.mykku.member.domain
 
+import com.example.mykku.common.BaseEntity
 import jakarta.persistence.*
 
 @Entity
@@ -21,5 +22,5 @@ class Member(
 
     @OneToMany(mappedBy = "member", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
     val saveDailyMessages: MutableList<SaveDailyMessage> = mutableListOf(),
-) {
+) : BaseEntity() {
 }

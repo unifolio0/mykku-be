@@ -1,5 +1,6 @@
 package com.example.mykku.board.domain
 
+import com.example.mykku.common.BaseEntity
 import com.example.mykku.feed.domain.Feed
 import jakarta.persistence.*
 
@@ -14,5 +15,5 @@ class Board(
 
     @OneToMany(mappedBy = "board", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
     var feeds: MutableList<Feed> = mutableListOf(),
-) {
+) : BaseEntity() {
 }
