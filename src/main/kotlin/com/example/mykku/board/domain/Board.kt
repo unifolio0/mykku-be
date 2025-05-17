@@ -5,13 +5,14 @@ import jakarta.persistence.*
 
 @Entity
 class Board(
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Long? = null,
+
     @Column(name = "title")
     val title: String,
 
-    @OneToMany(mappedBy = "board")
+    @OneToMany(mappedBy = "board", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
     val feeds: List<Feed> = mutableListOf(),
 ) {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0
 }

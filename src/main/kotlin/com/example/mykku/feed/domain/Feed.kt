@@ -5,32 +5,33 @@ import jakarta.persistence.*
 
 @Entity
 class Feed(
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Long? = null,
+
     @Column(name = "title")
-    val title: String,
+    var title: String,
 
     @Column(name = "content")
-    val content: String,
+    var content: String,
 
     @Column(name = "like_count")
-    val likeCount: Int = 0,
+    var likeCount: Int = 0,
 
     @Column(name = "comment_count")
-    val commentCount: Int = 0,
+    var commentCount: Int = 0,
 
     @ManyToOne
     @JoinColumn(name = "board_id")
     val board: Board,
 
-    @OneToMany(mappedBy = "feed")
+    @OneToMany(mappedBy = "feed", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
     val feedImages: List<FeedImage> = mutableListOf(),
 
-    @OneToMany(mappedBy = "feed")
+    @OneToMany(mappedBy = "feed", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
     val feedComments: List<FeedComment> = mutableListOf(),
 
-    @OneToMany(mappedBy = "feed")
+    @OneToMany(mappedBy = "feed", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
     val feedTags: List<FeedTag> = mutableListOf(),
 ) {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0
 }

@@ -4,14 +4,15 @@ import jakarta.persistence.*
 
 @Entity
 class FeedImage(
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Long? = null,
+
     @Column(name = "url")
-    val url: String,
+    var url: String,
 
     @ManyToOne
     @JoinColumn(name = "feed_id")
     val feed: Feed,
 ) {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0
 }

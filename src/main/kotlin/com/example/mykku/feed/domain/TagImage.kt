@@ -4,14 +4,15 @@ import jakarta.persistence.*
 
 @Entity
 class TagImage(
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Long? = null,
+
     @Column(name = "url")
-    val url: String,
+    var url: String,
 
     @ManyToOne
     @JoinColumn(name = "tag_id")
     val tag: Tag,
 ) {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0
 }

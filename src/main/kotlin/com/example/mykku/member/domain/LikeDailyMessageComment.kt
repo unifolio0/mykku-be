@@ -5,6 +5,10 @@ import jakarta.persistence.*
 
 @Entity
 class LikeDailyMessageComment(
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Long? = null,
+
     @ManyToOne
     @JoinColumn(name = "member_id")
     val member: Member,
@@ -13,7 +17,4 @@ class LikeDailyMessageComment(
     @JoinColumn(name = "daily_message_comment_id")
     val dailyMessageComment: DailyMessageComment,
 ) {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0
 }

@@ -5,6 +5,10 @@ import jakarta.persistence.*
 
 @Entity
 class SaveDailyMessage(
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Long? = null,
+
     @ManyToOne
     @JoinColumn(name = "member_id")
     val member: Member,
@@ -13,7 +17,4 @@ class SaveDailyMessage(
     @JoinColumn(name = "daily_message_id")
     val dailyMessage: DailyMessage,
 ) {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0
 }

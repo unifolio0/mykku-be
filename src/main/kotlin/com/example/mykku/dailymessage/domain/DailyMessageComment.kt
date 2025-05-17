@@ -4,11 +4,15 @@ import jakarta.persistence.*
 
 @Entity
 class DailyMessageComment(
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Long? = null,
+
     @Column(name = "content")
-    val content: String,
+    var content: String,
 
     @Column(name = "like_count")
-    val likeCount: Int = 0,
+    var likeCount: Int = 0,
 
     @ManyToOne
     @JoinColumn(name = "daily_message_id")
@@ -18,7 +22,4 @@ class DailyMessageComment(
     @JoinColumn(name = "parent_comment_id")
     val parentComment: DailyMessageComment? = null,
 ) {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0
 }

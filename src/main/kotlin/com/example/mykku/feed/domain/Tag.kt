@@ -4,22 +4,23 @@ import jakarta.persistence.*
 
 @Entity
 class Tag(
-    @Column(name = "title")
-    val title: String,
-
-    @Column(name = "is_event")
-    val isEvent: Boolean = false,
-
-    @Column(name = "is_contest")
-    val isContest: Boolean = false,
-
-    @OneToMany(mappedBy = "tag")
-    val feeds: List<FeedTag> = mutableListOf(),
-
-    @OneToMany(mappedBy = "tag")
-    val tagImages: List<TagImage> = mutableListOf(),
-) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0
+    var id: Long? = null,
+
+    @Column(name = "title")
+    var title: String,
+
+    @Column(name = "is_event")
+    var isEvent: Boolean = false,
+
+    @Column(name = "is_contest")
+    var isContest: Boolean = false,
+
+    @OneToMany(mappedBy = "tag", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
+    val feeds: List<FeedTag> = mutableListOf(),
+
+    @OneToMany(mappedBy = "tag", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
+    val tagImages: List<TagImage> = mutableListOf(),
+) {
 }

@@ -5,6 +5,10 @@ import jakarta.persistence.*
 
 @Entity
 class LikeFeed(
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Long? = null,
+
     @ManyToOne
     @JoinColumn(name = "member_id")
     val member: Member,
@@ -13,7 +17,4 @@ class LikeFeed(
     @JoinColumn(name = "feed_id")
     val feed: Feed,
 ) {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0
 }
