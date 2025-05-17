@@ -15,15 +15,15 @@ class DailyMessageComment(
     @Column(name = "like_count", nullable = false)
     var likeCount: Int = 0,
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "daily_message_id")
     val dailyMessage: DailyMessage,
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_comment_id")
     val parentComment: DailyMessageComment? = null,
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     val member: Member,
 ) {

@@ -11,7 +11,7 @@ class FeedImage(
     @Column(name = "url", nullable = false)
     var url: String,
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feed_id")
     val feed: Feed,
 ) {

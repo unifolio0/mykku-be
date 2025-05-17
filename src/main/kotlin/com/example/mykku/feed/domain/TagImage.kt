@@ -11,7 +11,7 @@ class TagImage(
     @Column(name = "url", nullable = false)
     var url: String,
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tag_id")
     val tag: Tag,
 ) {
