@@ -12,6 +12,6 @@ class DailyMessage(
     var content: String,
 
     @OneToMany(mappedBy = "dailyMessage", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    val comments: List<DailyMessageComment> = mutableListOf(),
+    val comments: MutableList<DailyMessageComment> = mutableListOf(),
 ) {
 }

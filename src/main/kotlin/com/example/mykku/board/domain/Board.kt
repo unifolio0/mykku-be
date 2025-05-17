@@ -13,6 +13,6 @@ class Board(
     val title: String,
 
     @OneToMany(mappedBy = "board", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    val feeds: List<Feed> = mutableListOf(),
+    val feeds: MutableList<Feed> = mutableListOf(),
 ) {
 }

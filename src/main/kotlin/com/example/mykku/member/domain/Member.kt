@@ -17,9 +17,9 @@ class Member(
     var followingCount: Int = 0,
 
     @OneToMany(mappedBy = "member", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    val saveFeeds: List<SaveFeed> = mutableListOf(),
+    val saveFeeds: MutableList<SaveFeed> = mutableListOf(),
 
     @OneToMany(mappedBy = "member", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    val saveDailyMessages: List<SaveDailyMessage> = mutableListOf(),
+    val saveDailyMessages: MutableList<SaveDailyMessage> = mutableListOf(),
 ) {
 }

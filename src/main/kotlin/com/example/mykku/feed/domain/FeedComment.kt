@@ -1,5 +1,6 @@
 package com.example.mykku.feed.domain
 
+import com.example.mykku.member.domain.Member
 import jakarta.persistence.*
 
 @Entity
@@ -21,5 +22,9 @@ class FeedComment(
     @ManyToOne
     @JoinColumn(name = "parent_comment_id")
     val parentComment: FeedComment? = null,
+
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    val member: Member,
 ) {
 }

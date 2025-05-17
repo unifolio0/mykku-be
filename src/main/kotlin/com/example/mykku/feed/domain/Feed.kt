@@ -1,6 +1,7 @@
 package com.example.mykku.feed.domain
 
 import com.example.mykku.board.domain.Board
+import com.example.mykku.member.domain.Member
 import jakarta.persistence.*
 
 @Entity
@@ -25,13 +26,17 @@ class Feed(
     @JoinColumn(name = "board_id")
     val board: Board,
 
-    @OneToMany(mappedBy = "feed", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    val feedImages: List<FeedImage> = mutableListOf(),
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    val member: Member,
 
     @OneToMany(mappedBy = "feed", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    val feedComments: List<FeedComment> = mutableListOf(),
+    val feedImages: MutableList<FeedImage> = mutableListOf(),
 
     @OneToMany(mappedBy = "feed", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    val feedTags: List<FeedTag> = mutableListOf(),
+    val feedComments: MutableList<FeedComment> = mutableListOf(),
+
+    @OneToMany(mappedBy = "feed", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
+    val feedTags: MutableList<FeedTag> = mutableListOf(),
 ) {
 }
