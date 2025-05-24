@@ -2,6 +2,7 @@ package com.example.mykku.feed.domain
 
 import jakarta.persistence.*
 
+@Entity
 class ContestWinner(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,12 +17,11 @@ class ContestWinner(
     @Column(name = "acceptance_speech")
     var acceptanceSpeech: String,
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tag_id")
-    val tag: Tag,
+    @Column(name = "image", nullable = false)
+    var image: String,
 
-    @OneToMany(mappedBy = "contestWinner", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "feed_id")
-    val feeds: MutableList<Feed> = mutableListOf(),
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "contest_id")
+    val contest: Contest,
 ) {
 }

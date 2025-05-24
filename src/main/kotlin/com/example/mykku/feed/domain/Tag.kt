@@ -2,7 +2,6 @@ package com.example.mykku.feed.domain
 
 import com.example.mykku.common.domain.BaseEntity
 import jakarta.persistence.*
-import java.time.LocalDateTime
 
 @Entity
 class Tag(
@@ -18,9 +17,6 @@ class Tag(
 
     @Column(name = "is_contest", nullable = false)
     var isContest: Boolean = false,
-
-    @Column(name = "expired_at", nullable = false)
-    var expiredAt: LocalDateTime,
 
     @OneToMany(mappedBy = "tag", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "feed_tag_id")
