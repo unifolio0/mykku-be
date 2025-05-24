@@ -14,6 +14,7 @@ class Board(
     var title: String,
 
     @OneToMany(mappedBy = "board", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    var feeds: MutableList<Feed> = mutableListOf(),
+    @JoinColumn(name = "feed_id")
+    val feeds: MutableList<Feed> = mutableListOf(),
 ) : BaseEntity() {
 }

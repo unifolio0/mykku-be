@@ -23,9 +23,11 @@ class Tag(
     var expiredAt: LocalDateTime,
 
     @OneToMany(mappedBy = "tag", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    var feeds: MutableList<FeedTag> = mutableListOf(),
+    @JoinColumn(name = "feed_tag_id")
+    val feeds: MutableList<FeedTag> = mutableListOf(),
 
     @OneToMany(mappedBy = "tag", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    var tagImages: MutableList<TagImage> = mutableListOf(),
+    @JoinColumn(name = "tag_image_id")
+    val tagImages: MutableList<TagImage> = mutableListOf(),
 ) : BaseEntity() {
 }

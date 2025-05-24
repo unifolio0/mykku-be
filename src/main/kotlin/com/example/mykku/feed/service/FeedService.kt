@@ -1,17 +1,17 @@
 package com.example.mykku.feed.service
 
-import com.example.mykku.feed.dto.EventPreviewResponse
-import com.example.mykku.feed.repository.TagRepository
+import com.example.mykku.feed.dto.FeedPreviewResponse
+import com.example.mykku.feed.repository.FeedRepository
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
 @Service
 class FeedService(
-    private val tagRepository: TagRepository,
+    private val feedRepository: FeedRepository,
 ) {
-    fun getProcessingEvents(): List<EventPreviewResponse> {
-        return tagRepository.getByEventPreviews(LocalDateTime.now())
-            .map { tag -> EventPreviewResponse(tag) }
+    fun getFeedPreviews(): List<FeedPreviewResponse> {
+        feedRepository.findAll()
+            .map { feed -> FeedPreviewResponse(feed) }
             .take(5)
+        return emptyList()
     }
 }

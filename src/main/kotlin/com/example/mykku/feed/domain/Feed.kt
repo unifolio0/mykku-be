@@ -32,12 +32,15 @@ class Feed(
     val member: Member,
 
     @OneToMany(mappedBy = "feed", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    var feedImages: MutableList<FeedImage> = mutableListOf(),
+    @JoinColumn(name = "feed_image_id")
+    val feedImages: MutableList<FeedImage> = mutableListOf(),
 
     @OneToMany(mappedBy = "feed", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    var feedComments: MutableList<FeedComment> = mutableListOf(),
+    @JoinColumn(name = "feed_comment_id")
+    val feedComments: MutableList<FeedComment> = mutableListOf(),
 
     @OneToMany(mappedBy = "feed", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    var feedTags: MutableList<FeedTag> = mutableListOf(),
+    @JoinColumn(name = "feed_tag_id")
+    val feedTags: MutableList<FeedTag> = mutableListOf(),
 ) : BaseEntity() {
 }

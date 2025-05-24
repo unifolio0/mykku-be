@@ -17,6 +17,7 @@ class DailyMessage(
     var date: LocalDate,
 
     @OneToMany(mappedBy = "dailyMessage", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    var comments: MutableList<DailyMessageComment> = mutableListOf(),
+    @JoinColumn(name = "daily_message_comment_id")
+    val comments: MutableList<DailyMessageComment> = mutableListOf(),
 ) : BaseEntity() {
 }
