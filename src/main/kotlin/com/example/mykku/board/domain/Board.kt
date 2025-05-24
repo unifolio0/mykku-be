@@ -1,6 +1,6 @@
 package com.example.mykku.board.domain
 
-import com.example.mykku.common.BaseEntity
+import com.example.mykku.common.domain.BaseEntity
 import com.example.mykku.feed.domain.Feed
 import jakarta.persistence.*
 
