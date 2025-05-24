@@ -1,0 +1,18 @@
+package com.example.mykku.feed.repository
+
+import com.example.mykku.feed.domain.Tag
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
+import java.time.LocalDateTime
+
+interface TagRepository : JpaRepository<Tag, Long> {
+    @Query(
+        """
+            SELECT t
+            FROM Tag t
+            WHERE t.isEvent = true
+            AND t.expiredAt > :dateTime
+        """
+    )
+    fun getByEventPreviews(dateTime: LocalDateTime): List<Tag>
+}
