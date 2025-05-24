@@ -8,7 +8,7 @@ import jakarta.persistence.*
 class Board(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null,
+    val id: Long = 0,
 
     @Column(name = "title", nullable = false)
     var title: String,

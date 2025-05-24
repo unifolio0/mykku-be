@@ -7,7 +7,7 @@ import jakarta.persistence.*
 class FeedImage(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null,
+    val id: Long = 0,
 
     @Column(name = "url", nullable = false)
     var url: String,

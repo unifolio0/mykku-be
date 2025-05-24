@@ -8,7 +8,7 @@ import java.time.LocalDate
 class DailyMessage(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null,
+    val id: Long = 0,
 
     @Column(name = "content", nullable = false)
     var content: String,
