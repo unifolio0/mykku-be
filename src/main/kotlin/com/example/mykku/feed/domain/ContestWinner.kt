@@ -1,12 +1,12 @@
 package com.example.mykku.feed.domain
 
 import jakarta.persistence.*
+import java.util.*
 
 @Entity
 class ContestWinner(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    val id: UUID = UUID.randomUUID(),
 
     @Column(name = "rank", nullable = false)
     var rank: Int,

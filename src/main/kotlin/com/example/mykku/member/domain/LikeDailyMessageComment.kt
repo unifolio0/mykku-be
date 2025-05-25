@@ -3,12 +3,12 @@ package com.example.mykku.member.domain
 import com.example.mykku.common.domain.BaseEntity
 import com.example.mykku.dailymessage.domain.DailyMessageComment
 import jakarta.persistence.*
+import java.util.*
 
 @Entity
 class LikeDailyMessageComment(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    val id: UUID = UUID.randomUUID(),
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")

@@ -2,12 +2,12 @@ package com.example.mykku.feed.domain
 
 import com.example.mykku.common.domain.BaseEntity
 import jakarta.persistence.*
+import java.util.*
 
 @Entity
 class FeedImage(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    val id: UUID = UUID.randomUUID(),
 
     @Column(name = "url", nullable = false)
     var url: String,

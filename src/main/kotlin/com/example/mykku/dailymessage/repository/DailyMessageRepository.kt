@@ -5,8 +5,9 @@ import com.example.mykku.exception.ErrorCode
 import com.example.mykku.exception.MykkuException
 import org.springframework.data.jpa.repository.JpaRepository
 import java.time.LocalDate
+import java.util.*
 
-interface DailyMessageRepository : JpaRepository<DailyMessage, Long> {
+interface DailyMessageRepository : JpaRepository<DailyMessage, UUID> {
     fun findByDate(date: LocalDate): DailyMessage?
 
     fun getByDate(date: LocalDate): DailyMessage {

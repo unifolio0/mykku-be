@@ -3,12 +3,12 @@ package com.example.mykku.feed.domain
 import com.example.mykku.common.domain.BaseEntity
 import com.example.mykku.member.domain.Member
 import jakarta.persistence.*
+import java.util.*
 
 @Entity
 class FeedComment(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    val id: UUID = UUID.randomUUID(),
 
     @Column(name = "content", nullable = false)
     var content: String,

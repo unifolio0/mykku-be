@@ -6,7 +6,7 @@ import jakarta.persistence.*
 @Entity
 class Member(
     @Id
-    var id: String,
+    val id: String,
 
     @Column(name = "nickname", nullable = false)
     var nickname: String,
@@ -18,11 +18,9 @@ class Member(
     var followingCount: Int = 0,
 
     @OneToMany(mappedBy = "member", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "save_feed_id")
     val saveFeeds: MutableList<SaveFeed> = mutableListOf(),
 
     @OneToMany(mappedBy = "member", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "save_daily_message_id")
     val saveDailyMessages: MutableList<SaveDailyMessage> = mutableListOf(),
 ) : BaseEntity() {
 }
