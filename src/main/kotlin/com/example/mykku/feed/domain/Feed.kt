@@ -11,16 +11,16 @@ class Feed(
     @Id
     val id: UUID = UUID.randomUUID(),
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "title")
     var title: String,
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "content")
     var content: String,
 
-    @Column(name = "like_count", nullable = false)
+    @Column(name = "like_count")
     var likeCount: Int = 0,
 
-    @Column(name = "comment_count", nullable = false)
+    @Column(name = "comment_count")
     var commentCount: Int = 0,
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -10,7 +10,7 @@ class Board(
     @Id
     val id: UUID = UUID.randomUUID(),
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "title")
     var title: String,
 
     @OneToMany(mappedBy = "board", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)

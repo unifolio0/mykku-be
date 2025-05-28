@@ -8,13 +8,13 @@ class Member(
     @Id
     val id: String,
 
-    @Column(name = "nickname", nullable = false)
+    @Column(name = "nickname")
     var nickname: String,
 
-    @Column(name = "follower_count", nullable = false)
+    @Column(name = "follower_count")
     var followerCount: Int = 0,
 
-    @Column(name = "following_count", nullable = false)
+    @Column(name = "following_count")
     var followingCount: Int = 0,
 
     @OneToMany(mappedBy = "member", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)

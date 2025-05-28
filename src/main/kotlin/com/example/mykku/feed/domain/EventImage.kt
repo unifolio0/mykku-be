@@ -1,19 +1,18 @@
 package com.example.mykku.feed.domain
 
-import com.example.mykku.common.domain.BaseEntity
 import jakarta.persistence.*
 import java.util.*
 
 @Entity
-class TagImage(
+class EventImage(
     @Id
     val id: UUID = UUID.randomUUID(),
 
-    @Column(name = "url", nullable = false)
+    @Column(name = "url")
     var url: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tag_id")
-    val tag: Tag,
-) : BaseEntity() {
+    @JoinColumn(name = "event_id")
+    val event: Event,
+) {
 }

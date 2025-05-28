@@ -1,5 +1,6 @@
 package com.example.mykku.feed.domain
 
+import com.example.mykku.common.domain.BaseEntity
 import jakarta.persistence.*
 import java.util.*
 
@@ -8,7 +9,7 @@ class ContestWinner(
     @Id
     val id: UUID = UUID.randomUUID(),
 
-    @Column(name = "rank", nullable = false)
+    @Column(name = "rank")
     var rank: Int,
 
     @Column(name = "description")
@@ -17,11 +18,11 @@ class ContestWinner(
     @Column(name = "acceptance_speech")
     var acceptanceSpeech: String,
 
-    @Column(name = "image", nullable = false)
+    @Column(name = "image")
     var image: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "contest_id")
     val contest: Contest,
-) {
+) : BaseEntity() {
 }

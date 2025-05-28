@@ -10,10 +10,10 @@ class DailyMessage(
     @Id
     val id: UUID = UUID.randomUUID(),
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "content")
     var content: String,
 
-    @Column(name = "date", nullable = false)
+    @Column(name = "date")
     var date: LocalDate,
 
     @OneToMany(mappedBy = "dailyMessage", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)

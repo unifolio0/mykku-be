@@ -10,10 +10,10 @@ class FeedComment(
     @Id
     val id: UUID = UUID.randomUUID(),
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "content")
     var content: String,
 
-    @Column(name = "like_count", nullable = false)
+    @Column(name = "like_count")
     var likeCount: Int = 0,
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -27,5 +27,4 @@ class FeedComment(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     val member: Member,
-) : BaseEntity() {
-}
+) : BaseEntity()

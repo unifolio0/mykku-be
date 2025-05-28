@@ -1,27 +1,27 @@
 package com.example.mykku.feed.domain
 
 import com.example.mykku.common.domain.BaseEntity
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import jakarta.persistence.*
 import java.util.*
 
 @Entity
-class Tag(
+@Table(name = "tags")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+@JsonSubTypes(
+    JsonSubTypes.Type(value = BasicTag::class, name = "TAG"),
+    JsonSubTypes.Type(value = EventTag::class, name = "EVENT_TAG"),
+    JsonSubTypes.Type(value = ContestTag::class, name = "CONTEST_TAG")
+)
+abstract class Tag(
     @Id
     val id: UUID = UUID.randomUUID(),
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "title")
     var title: String,
-
-    @Column(name = "is_event", nullable = false)
-    var isEvent: Boolean = false,
-
-    @Column(name = "is_contest", nullable = false)
-    var isContest: Boolean = false,
-
-    @OneToMany(mappedBy = "tag", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    val feeds: MutableList<FeedTag> = mutableListOf(),
-
-    @OneToMany(mappedBy = "tag", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    val tagImages: MutableList<TagImage> = mutableListOf(),
 ) : BaseEntity() {
+    abstract fun getTagType(): String
 }
