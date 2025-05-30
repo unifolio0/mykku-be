@@ -10,6 +10,6 @@ class SaveFeedReader(
     private val saveFeedRepository: SaveFeedRepository,
 ) {
     fun isSaved(member: Member, feed: Feed): Boolean {
-        TODO("Not yet implemented")
+        return saveFeedRepository.existsByMemberAndFeed(member, feed)
     }
 }

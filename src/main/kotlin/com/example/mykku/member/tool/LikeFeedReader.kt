@@ -10,6 +10,6 @@ class LikeFeedReader(
     private val likeFeedRepository: LikeFeedRepository,
 ) {
     fun isLiked(member: Member, feed: Feed): Boolean {
-        TODO("Not yet implemented")
+        return likeFeedRepository.existsByMemberAndFeed(member, feed)
     }
 }
