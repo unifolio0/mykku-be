@@ -1,11 +1,11 @@
-package com.example.mykku.feed.service
+package com.example.mykku.feed.tool
 
 import com.example.mykku.feed.dto.FeedPreviewResponse
 import com.example.mykku.feed.repository.FeedRepository
 import org.springframework.stereotype.Service
 
 @Service
-class FeedService(
+class FeedReader(
     private val feedRepository: FeedRepository,
 ) {
     fun getFeedPreviews(): List<FeedPreviewResponse> {
