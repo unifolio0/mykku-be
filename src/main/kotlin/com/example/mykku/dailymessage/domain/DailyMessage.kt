@@ -7,6 +7,7 @@ import java.time.LocalDate
 @Entity
 class DailyMessage(
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
     @Column(name = "content")

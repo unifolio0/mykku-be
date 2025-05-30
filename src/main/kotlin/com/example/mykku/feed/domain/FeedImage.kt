@@ -5,6 +5,7 @@ import jakarta.persistence.*
 @Entity
 class FeedImage(
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
     @Column(name = "url")

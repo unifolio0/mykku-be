@@ -7,6 +7,7 @@ import jakarta.persistence.*
 @Entity
 class SaveDailyMessage(
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)

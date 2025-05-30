@@ -6,6 +6,7 @@ import jakarta.persistence.*
 @Entity
 class ContestWinner(
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
     @Column(name = "rank")

@@ -7,6 +7,7 @@ import jakarta.persistence.*
 @Entity
 class FeedComment(
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
     @Column(name = "content")

@@ -8,6 +8,7 @@ import jakarta.persistence.*
 @Entity
 class Feed(
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
     @Column(name = "title")

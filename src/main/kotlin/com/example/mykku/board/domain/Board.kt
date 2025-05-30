@@ -7,6 +7,7 @@ import jakarta.persistence.*
 @Entity
 class Board(
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
     @Column(name = "title")

@@ -17,6 +17,7 @@ import java.time.LocalDateTime
 )
 abstract class BasicEvent(
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
     @Column(name = "title")

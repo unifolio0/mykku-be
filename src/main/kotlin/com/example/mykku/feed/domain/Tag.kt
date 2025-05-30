@@ -17,6 +17,7 @@ import jakarta.persistence.*
 )
 abstract class Tag(
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
     @Column(name = "title")

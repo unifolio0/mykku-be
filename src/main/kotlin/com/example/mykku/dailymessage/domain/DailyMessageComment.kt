@@ -7,6 +7,7 @@ import jakarta.persistence.*
 @Entity
 class DailyMessageComment(
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
     @Column(name = "content")
