@@ -11,10 +11,9 @@ class FeedReader(
     private val feedRepository: FeedRepository,
 ) {
     fun getFeedPreviews(): List<FeedPreviewResponse> {
-        feedRepository.findAll()
+        return feedRepository.findAll()
             .map { feed -> FeedPreviewResponse(feed) }
             .take(5)
-        return emptyList()
     }
 
     fun getFeedsByFollower(members: List<Member>): List<Feed> {
