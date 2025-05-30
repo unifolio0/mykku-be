@@ -13,8 +13,8 @@ import java.util.*
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes(
-    JsonSubTypes.Type(value = EventTag::class, name = "EVENT"),
-    JsonSubTypes.Type(value = ContestTag::class, name = "CONTEST")
+    JsonSubTypes.Type(value = Event::class, name = "EVENT"),
+    JsonSubTypes.Type(value = Contest::class, name = "CONTEST")
 )
 abstract class BasicEvent(
     @Id
