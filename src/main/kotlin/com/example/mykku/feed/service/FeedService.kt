@@ -2,7 +2,6 @@ package com.example.mykku.feed.service
 
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.dto.AuthorResponse
-import com.example.mykku.feed.dto.CommentPreviewResponse
 import com.example.mykku.feed.dto.FeedResponse
 import com.example.mykku.feed.dto.FeedsResponse
 import com.example.mykku.feed.tool.FeedReader
@@ -31,27 +30,10 @@ class FeedService(
         val isLiked = likeFeedReader.isLiked(feed.member, feed)
         val isSaved = saveFeedReader.isSaved(feed.member, feed)
         return FeedResponse(
-            id = feed.id!!,
+            feed = feed,
             author = authorResponse,
-            board = feed.board.title,
-            createdAt = feed.createdAt,
-            title = feed.title,
-            content = feed.content,
-            images = feed.feedImages.map { it.url },
-            tags = feed.feedTags.map { it.tag.title },
-            likeCount = feed.likeCount,
             isLiked = isLiked,
             isSaved = isSaved,
-            commentCount = feed.commentCount,
-            comment = feed.feedComments.firstOrNull()?.let { comment ->
-                CommentPreviewResponse(
-                    profileImage = comment.member.profileImage,
-                    content = comment.content,
-                )
-            } ?: CommentPreviewResponse(
-                profileImage = "",
-                content = "",
-            )
         )
     }
 }
