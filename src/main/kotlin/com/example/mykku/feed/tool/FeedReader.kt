@@ -17,7 +17,7 @@ class FeedReader(
         return emptyList()
     }
 
-    fun getFeedsByFollower(memberId: List<Member>): List<Feed> {
-        return feedRepository.findAllByMemberIn(memberId)
+    fun getFeedsByFollower(members: List<Member>): List<Feed> {
+        return feedRepository.findAllByMemberIn(members)
     }
 }
