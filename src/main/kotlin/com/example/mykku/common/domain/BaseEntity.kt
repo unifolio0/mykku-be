@@ -1,4 +1,4 @@
-package com.example.mykku.common
+package com.example.mykku.common.domain
 
 import jakarta.persistence.Column
 import jakarta.persistence.EntityListeners

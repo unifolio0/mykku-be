@@ -1,18 +1,22 @@
 package com.example.mykku.dailymessage.domain
 
-import com.example.mykku.common.BaseEntity
+import com.example.mykku.common.domain.BaseEntity
 import jakarta.persistence.*
+import java.time.LocalDate
+import java.util.*
 
 @Entity
 class DailyMessage(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null,
+    val id: UUID = UUID.randomUUID(),
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "content")
     var content: String,
 
+    @Column(name = "date")
+    var date: LocalDate,
+
     @OneToMany(mappedBy = "dailyMessage", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    var comments: MutableList<DailyMessageComment> = mutableListOf(),
+    val comments: MutableList<DailyMessageComment> = mutableListOf(),
 ) : BaseEntity() {
 }

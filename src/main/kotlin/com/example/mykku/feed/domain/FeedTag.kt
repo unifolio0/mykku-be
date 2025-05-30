@@ -1,13 +1,13 @@
 package com.example.mykku.feed.domain
 
-import com.example.mykku.common.BaseEntity
+import com.example.mykku.common.domain.BaseEntity
 import jakarta.persistence.*
+import java.util.*
 
 @Entity
 class FeedTag(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null,
+    val id: UUID = UUID.randomUUID(),
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feed_id")

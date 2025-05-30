@@ -1,14 +1,14 @@
 package com.example.mykku.member.domain
 
-import com.example.mykku.common.BaseEntity
+import com.example.mykku.common.domain.BaseEntity
 import com.example.mykku.dailymessage.domain.DailyMessage
 import jakarta.persistence.*
+import java.util.*
 
 @Entity
 class SaveDailyMessage(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null,
+    val id: UUID = UUID.randomUUID(),
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")

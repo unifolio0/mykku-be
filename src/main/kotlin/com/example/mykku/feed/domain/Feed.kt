@@ -1,26 +1,26 @@
 package com.example.mykku.feed.domain
 
 import com.example.mykku.board.domain.Board
-import com.example.mykku.common.BaseEntity
+import com.example.mykku.common.domain.BaseEntity
 import com.example.mykku.member.domain.Member
 import jakarta.persistence.*
+import java.util.*
 
 @Entity
 class Feed(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null,
+    val id: UUID = UUID.randomUUID(),
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "title")
     var title: String,
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "content")
     var content: String,
 
-    @Column(name = "like_count", nullable = false)
+    @Column(name = "like_count")
     var likeCount: Int = 0,
 
-    @Column(name = "comment_count", nullable = false)
+    @Column(name = "comment_count")
     var commentCount: Int = 0,
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -32,12 +32,12 @@ class Feed(
     val member: Member,
 
     @OneToMany(mappedBy = "feed", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    var feedImages: MutableList<FeedImage> = mutableListOf(),
+    val feedImages: MutableList<FeedImage> = mutableListOf(),
 
     @OneToMany(mappedBy = "feed", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    var feedComments: MutableList<FeedComment> = mutableListOf(),
+    val feedComments: MutableList<FeedComment> = mutableListOf(),
 
     @OneToMany(mappedBy = "feed", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    var feedTags: MutableList<FeedTag> = mutableListOf(),
+    val feedTags: MutableList<FeedTag> = mutableListOf(),
 ) : BaseEntity() {
 }

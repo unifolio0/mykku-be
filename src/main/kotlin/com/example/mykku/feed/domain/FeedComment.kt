@@ -1,19 +1,19 @@
 package com.example.mykku.feed.domain
 
-import com.example.mykku.common.BaseEntity
+import com.example.mykku.common.domain.BaseEntity
 import com.example.mykku.member.domain.Member
 import jakarta.persistence.*
+import java.util.*
 
 @Entity
 class FeedComment(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null,
+    val id: UUID = UUID.randomUUID(),
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "content")
     var content: String,
 
-    @Column(name = "like_count", nullable = false)
+    @Column(name = "like_count")
     var likeCount: Int = 0,
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -27,5 +27,4 @@ class FeedComment(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     val member: Member,
-) : BaseEntity() {
-}
+) : BaseEntity()
