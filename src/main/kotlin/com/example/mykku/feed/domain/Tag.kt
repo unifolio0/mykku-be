@@ -4,7 +4,6 @@ import com.example.mykku.common.domain.BaseEntity
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import jakarta.persistence.*
-import java.util.*
 
 @Entity
 @Table(name = "tags")
@@ -18,7 +17,7 @@ import java.util.*
 )
 abstract class Tag(
     @Id
-    val id: UUID = UUID.randomUUID(),
+    val id: Long? = null,
 
     @Column(name = "title")
     var title: String,

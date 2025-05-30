@@ -1,12 +1,11 @@
 package com.example.mykku.feed.domain
 
 import jakarta.persistence.*
-import java.util.*
 
 @Entity
 class FeedImage(
     @Id
-    val id: UUID = UUID.randomUUID(),
+    val id: Long? = null,
 
     @Column(name = "url")
     var url: String,

@@ -9,7 +9,7 @@ data class ContestWinnersResponse(
     constructor(contest: Contest) : this(
         title = contest.title,
         winners = contest.contestWinners
-            .map { winner -> ContestWinnerResponse(winner.id, winner.image, winner.rank) }
+            .map { winner -> ContestWinnerResponse(winner) }
             .sortedBy { it.rank }
     )
 }

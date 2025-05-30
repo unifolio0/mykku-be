@@ -3,12 +3,11 @@ package com.example.mykku.member.domain
 import com.example.mykku.common.domain.BaseEntity
 import com.example.mykku.dailymessage.domain.DailyMessage
 import jakarta.persistence.*
-import java.util.*
 
 @Entity
 class SaveDailyMessage(
     @Id
-    val id: UUID = UUID.randomUUID(),
+    val id: Long? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")

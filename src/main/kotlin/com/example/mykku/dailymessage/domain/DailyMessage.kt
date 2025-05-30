@@ -3,12 +3,11 @@ package com.example.mykku.dailymessage.domain
 import com.example.mykku.common.domain.BaseEntity
 import jakarta.persistence.*
 import java.time.LocalDate
-import java.util.*
 
 @Entity
 class DailyMessage(
     @Id
-    val id: UUID = UUID.randomUUID(),
+    val id: Long? = null,
 
     @Column(name = "content")
     var content: String,
