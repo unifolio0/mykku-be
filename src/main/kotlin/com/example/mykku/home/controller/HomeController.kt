@@ -1,33 +1,24 @@
 package com.example.mykku.home.controller
 
-import com.example.mykku.dailymessage.service.DailyMessageService
-import com.example.mykku.feed.service.ContestService
-import com.example.mykku.feed.service.FeedService
-import com.example.mykku.feed.service.TagService
+import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.home.dto.HomeResponse
+import com.example.mykku.home.service.HomeService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class HomeController(
-    private val dailyMessageService: DailyMessageService,
-    private val feedService: FeedService,
-    private val tagService: TagService,
-    private val contestService: ContestService,
+    private val homeService: HomeService,
 ) {
     @GetMapping("/api/home")
-    fun home(): ResponseEntity<HomeResponse> {
-        val todayDailyMessage = dailyMessageService.getTodayDailyMessage()
-        val events = tagService.getProcessingEventPreviews()
-        val feeds = feedService.getFeedPreviews()
-        val contests = contestService.getContestWinners()
-        val response = HomeResponse(
-            dailyMessage = todayDailyMessage.content,
-            events = events,
-            feeds = feeds,
-            contests = contests
+    fun home(): ResponseEntity<ApiResponse<HomeResponse>> {
+        val response = homeService.getHomeData()
+        return ResponseEntity.ok(
+            ApiResponse(
+                message = "홈 데이터 불러오기에 성공했습니다.",
+                data = response
+            )
         )
-        return ResponseEntity.ok(response)
     }
 }
