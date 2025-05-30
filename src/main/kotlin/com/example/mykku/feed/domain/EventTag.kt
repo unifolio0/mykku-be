@@ -13,5 +13,5 @@ class EventTag(
 ) : Tag(
     title = title
 ) {
-    override fun getTagType(): String = "EVENT_TAG"
+    override fun getType(): String = "EVENT_TAG"
 }

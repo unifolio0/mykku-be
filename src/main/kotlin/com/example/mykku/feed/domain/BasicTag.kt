@@ -10,5 +10,5 @@ class BasicTag(
 ) : Tag(
     title = title
 ) {
-    override fun getTagType(): String = "TAG"
+    override fun getType(): String = "TAG"
 }

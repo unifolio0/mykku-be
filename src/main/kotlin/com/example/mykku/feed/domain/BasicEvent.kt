@@ -4,24 +4,30 @@ import com.example.mykku.common.domain.BaseEntity
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import jakarta.persistence.*
+import java.time.LocalDateTime
 import java.util.*
 
 @Entity
-@Table(name = "tags")
+@Table(name = "basic_events")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes(
-    JsonSubTypes.Type(value = BasicTag::class, name = "TAG"),
-    JsonSubTypes.Type(value = EventTag::class, name = "EVENT_TAG"),
-    JsonSubTypes.Type(value = ContestTag::class, name = "CONTEST_TAG")
+    JsonSubTypes.Type(value = EventTag::class, name = "EVENT"),
+    JsonSubTypes.Type(value = ContestTag::class, name = "CONTEST")
 )
-abstract class Tag(
+abstract class BasicEvent(
     @Id
     val id: UUID = UUID.randomUUID(),
 
     @Column(name = "title")
     var title: String,
+
+    @Column(name = "expired_at")
+    var expiredAt: LocalDateTime,
+
+    @OneToMany(mappedBy = "basicEvent", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
+    val basicEventImages: MutableList<BasicEventImage> = mutableListOf(),
 ) : BaseEntity() {
     abstract fun getType(): String
 }

@@ -1,7 +1,9 @@
 package com.example.mykku.feed.dto
 
+import java.util.*
+
 data class FeedPreviewResponse(
-    val id: Long,
+    val id: UUID,
     val board: String,
     val title: String,
     val content: String,

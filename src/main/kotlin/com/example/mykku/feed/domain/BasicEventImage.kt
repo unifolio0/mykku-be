@@ -4,7 +4,7 @@ import jakarta.persistence.*
 import java.util.*
 
 @Entity
-class EventImage(
+class BasicEventImage(
     @Id
     val id: UUID = UUID.randomUUID(),
 
@@ -12,7 +12,7 @@ class EventImage(
     var url: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "event_id")
-    val event: Event,
+    @JoinColumn(name = "basic_event_id")
+    val basicEvent: BasicEvent,
 ) {
 }

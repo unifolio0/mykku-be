@@ -13,5 +13,5 @@ class ContestTag(
 ) : Tag(
     title = title
 ) {
-    override fun getTagType(): String = "CONTEST_TAG"
+    override fun getType(): String = "CONTEST_TAG"
 }
