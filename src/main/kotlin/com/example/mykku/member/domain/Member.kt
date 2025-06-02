@@ -11,6 +11,12 @@ class Member(
     @Column(name = "nickname")
     var nickname: String,
 
+    @Column(name = "role")
+    var role: String,
+
+    @Column(name = "profile_image")
+    var profileImage: String,
+
     @Column(name = "follower_count")
     var followerCount: Int = 0,
 

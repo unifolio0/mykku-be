@@ -2,10 +2,10 @@ package com.example.mykku.feed.tool
 
 import com.example.mykku.feed.dto.EventPreviewResponse
 import com.example.mykku.feed.repository.BasicEventRepository
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 
-@Service
+@Component
 class BasicEventReader(
     private val basicEventRepository: BasicEventRepository,
 ) {
