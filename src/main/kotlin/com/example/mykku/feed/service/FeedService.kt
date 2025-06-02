@@ -21,14 +21,14 @@ class FeedService(
         val follower = memberReader.getFollowerByMemberId(memberId)
         val feeds = feedReader.getFeedsByFollower(follower)
         return FeedsResponse(
-            feeds = feeds.map { feed -> getFeedResponse(feed) }
+            feeds = feeds.map { feed -> getFeedResponse(memberId, feed) }
         )
     }
 
-    private fun getFeedResponse(feed: Feed): FeedResponse {
+    private fun getFeedResponse(memberId: String, feed: Feed): FeedResponse {
         val authorResponse = AuthorResponse(feed.member)
-        val isLiked = likeFeedReader.isLiked(feed.member, feed)
-        val isSaved = saveFeedReader.isSaved(feed.member, feed)
+        val isLiked = likeFeedReader.isLiked(memberId, feed)
+        val isSaved = saveFeedReader.isSaved(memberId, feed)
         return FeedResponse(
             feed = feed,
             author = authorResponse,
