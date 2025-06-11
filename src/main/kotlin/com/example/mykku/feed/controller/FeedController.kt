@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController
 class FeedController(
     private val feedService: FeedService,
 ) {
-    @GetMapping("/api/{memberId}/feeds")
+    @GetMapping("/api/v1/{memberId}/feeds")
     fun getFeeds(@PathVariable memberId: String): ResponseEntity<ApiResponse<FeedsResponse>> {
         val feeds = feedService.getFeeds(memberId)
         return ResponseEntity.ok(
