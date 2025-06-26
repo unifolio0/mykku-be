@@ -12,6 +12,9 @@ class DailyMessage(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
+    @Column(name = "title")
+    var title: String,
+
     @Column(name = "content")
     var content: String,
 

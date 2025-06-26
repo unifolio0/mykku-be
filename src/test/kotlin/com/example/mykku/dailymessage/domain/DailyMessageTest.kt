@@ -12,7 +12,8 @@ class DailyMessageTest {
         assertThrows<MykkuException> {
             DailyMessage(
                 content = "a".repeat(DailyMessage.CONTENT_MAX_LENGTH + 1),
-                date = LocalDate.now()
+                date = LocalDate.now(),
+                title = "title"
             )
         }.apply {
             assert(this.errorCode == ErrorCode.DAILY_MESSAGE_CONTENT_TOO_LONG)
