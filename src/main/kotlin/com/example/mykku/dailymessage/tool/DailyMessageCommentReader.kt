@@ -16,10 +16,7 @@ class DailyMessageCommentReader(
     }
 
     fun getCommentByDailyMessageId(commentId: Long, dailyMessageId: Long): DailyMessageComment {
-        val comment = getComment(commentId)
-        if (comment.dailyMessage.id != dailyMessageId) {
-            throw MykkuException(ErrorCode.NOT_FOUND_COMMENT)
-        }
-        return comment
+        return dailyMessageCommentRepository.findByIdAndDailyMessageId(commentId, dailyMessageId)
+            ?: throw MykkuException(ErrorCode.NOT_FOUND_COMMENT)
     }
 }
