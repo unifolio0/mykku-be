@@ -13,6 +13,8 @@ enum class ErrorCode(val status: HttpStatus, val message: String) {
     // Daily Message
     NOT_FOUND_DAILY_MESSAGE(HttpStatus.NOT_FOUND, "하루 덕담을 찾을 수 없습니다"),
     DAILY_MESSAGE_CONTENT_TOO_LONG(HttpStatus.BAD_REQUEST, "하루 덕담은 ${DailyMessage.CONTENT_MAX_LENGTH}자 이하여야 합니다"),
+    NOT_FOUND_COMMENT(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다"),
+    FORBIDDEN_COMMENT_ACCESS(HttpStatus.FORBIDDEN, "댓글에 대한 권한이 없습니다"),
 
     // Feed
     FEED_CONTENT_TOO_LONG(HttpStatus.BAD_REQUEST, "피드 내용은 ${Feed.CONTENT_MAX_LENGTH}자 이하여야 합니다"),
@@ -27,6 +29,7 @@ enum class ErrorCode(val status: HttpStatus, val message: String) {
     BOARD_TITLE_TOO_LONG(HttpStatus.BAD_REQUEST, "게시판 제목은 ${Board.TITLE_MAX_LENGTH}자 이하여야 합니다"),
 
     // Member
+    NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다"),
     MEMBER_NICKNAME_TOO_LONG(HttpStatus.BAD_REQUEST, "닉네임은 ${Member.NICKNAME_MAX_LENGTH}자 이하여야 합니다"),
     MEMBER_NICKNAME_INVALID_FORMAT(HttpStatus.BAD_REQUEST, "닉네임은 한글, 영문, 숫자만 사용할 수 있습니다"),
 

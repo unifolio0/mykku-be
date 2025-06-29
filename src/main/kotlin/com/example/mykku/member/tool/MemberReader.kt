@@ -1,15 +1,24 @@
 package com.example.mykku.member.tool
 
+import com.example.mykku.exception.ErrorCode
+import com.example.mykku.exception.MykkuException
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.repository.FollowRepository
+import com.example.mykku.member.repository.MemberRepository
 import org.springframework.stereotype.Component
 
 @Component
 class MemberReader(
-    private val followRepository: FollowRepository
+    private val followRepository: FollowRepository,
+    private val memberRepository: MemberRepository
 ) {
     fun getFollowerByMemberId(memberId: String): List<Member> {
         return followRepository.findByFollowerId(memberId)
             .map { follow -> follow.following }
+    }
+
+    fun getMemberById(memberId: String): Member {
+        return memberRepository.findById(memberId)
+            .orElseThrow { throw MykkuException(ErrorCode.NOT_FOUND_MEMBER) }
     }
 }
