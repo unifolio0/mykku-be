@@ -1,7 +1,6 @@
 package com.example.mykku.dailymessage.service
 
 import com.example.mykku.dailymessage.domain.DailyMessage
-import com.example.mykku.dailymessage.domain.DailyMessageComment
 import com.example.mykku.dailymessage.domain.SortDirection
 import com.example.mykku.dailymessage.dto.CommentResponse
 import com.example.mykku.dailymessage.dto.DailyMessageResponse
@@ -32,10 +31,8 @@ class DailyMessageService(
 
     fun getDailyMessage(id: Long): DailyMessageResponse {
         val dailyMessage = dailyMessageReader.getDailyMessage(id)
-
-        val comments = dailyMessage.comments
-            .filter { it.parentComment == null }
-            .map { comment -> getCommentResponse(dailyMessage, comment) }
+        val repliesByParentId = getReplies(dailyMessage)
+        val comments = getCommentResponses(dailyMessage, repliesByParentId)
 
         return DailyMessageResponse(
             id = dailyMessage.id!!,
@@ -46,29 +43,40 @@ class DailyMessageService(
         )
     }
 
-    private fun getCommentResponse(
+    private fun getReplies(dailyMessage: DailyMessage): Map<Long?, List<ReplyResponse>> {
+        val repliesByParentId = dailyMessage.comments
+            .filter { it.parentComment != null }
+            .groupBy { it.parentComment!!.id }
+            .mapValues { (_, replies) ->
+                replies.map { reply ->
+                    ReplyResponse(
+                        id = reply.id!!,
+                        content = reply.content,
+                        likeCount = reply.likeCount,
+                        memberName = reply.member.nickname,
+                        createdAt = reply.createdAt
+                    )
+                }
+            }
+        return repliesByParentId
+    }
+
+    private fun getCommentResponses(
         dailyMessage: DailyMessage,
-        comment: DailyMessageComment
-    ): CommentResponse {
-        val replies = dailyMessage.comments
-            .filter { it.parentComment?.id == comment.id }
-            .map { reply ->
-                ReplyResponse(
-                    id = reply.id!!,
-                    content = reply.content,
-                    likeCount = reply.likeCount,
-                    memberName = reply.member.nickname,
-                    createdAt = reply.createdAt
+        repliesByParentId: Map<Long?, List<ReplyResponse>>
+    ): List<CommentResponse> {
+        val comments = dailyMessage.comments
+            .filter { it.parentComment == null }
+            .map { comment ->
+                CommentResponse(
+                    id = comment.id!!,
+                    content = comment.content,
+                    likeCount = comment.likeCount,
+                    memberName = comment.member.nickname,
+                    createdAt = comment.createdAt,
+                    replies = repliesByParentId[comment.id] ?: emptyList()
                 )
             }
-
-        return CommentResponse(
-            id = comment.id!!,
-            content = comment.content,
-            likeCount = comment.likeCount,
-            memberName = comment.member.nickname,
-            createdAt = comment.createdAt,
-            replies = replies
-        )
+        return comments
     }
 }
