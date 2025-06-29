@@ -28,8 +28,7 @@ class DailyMessageReader(
     }
 
     fun getDailyMessage(id: Long): DailyMessage {
-        return dailyMessageRepository.findById(id).orElseThrow {
-            MykkuException(ErrorCode.NOT_FOUND_DAILY_MESSAGE)
-        }
+        return dailyMessageRepository.findById(id)
+            .orElseThrow { MykkuException(ErrorCode.NOT_FOUND_DAILY_MESSAGE) }
     }
 }

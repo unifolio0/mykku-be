@@ -29,8 +29,7 @@ class DailyMessageCommentService(
         val member = memberReader.getMemberById(memberId)
 
         val parentComment = request.parentCommentId?.let { parentId ->
-            dailyMessage.comments.find { it.id == parentId }
-                ?: throw MykkuException(ErrorCode.NOT_FOUND_COMMENT)
+            dailyMessageCommentReader.getCommentByDailyMessageId(parentId, dailyMessageId)
         }
 
         val comment = dailyMessageCommentWriter.createComment(

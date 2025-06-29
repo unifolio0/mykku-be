@@ -19,6 +19,6 @@ class MemberReader(
 
     fun getMemberById(memberId: String): Member {
         return memberRepository.findById(memberId)
-            .orElseThrow { throw MykkuException(ErrorCode.NOT_FOUND_MEMBER) }
+            .orElseThrow { MykkuException(ErrorCode.NOT_FOUND_MEMBER) }
     }
 }
