@@ -39,4 +39,11 @@ class DailyMessageComment(
             throw MykkuException(ErrorCode.DAILY_MESSAGE_COMMENT_CONTENT_TOO_LONG)
         }
     }
+    
+    fun updateContent(newContent: String) {
+        if (newContent.length > CONTENT_MAX_LENGTH) {
+            throw MykkuException(ErrorCode.DAILY_MESSAGE_COMMENT_CONTENT_TOO_LONG)
+        }
+        this.content = newContent
+    }
 }
