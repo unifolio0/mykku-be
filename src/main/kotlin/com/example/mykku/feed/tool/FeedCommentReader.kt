@@ -12,6 +12,6 @@ class FeedCommentReader(
 ) {
     fun getFeedCommentById(feedCommentId: Long): FeedComment {
         return feedCommentRepository.findById(feedCommentId)
-            .orElseThrow { throw MykkuException(ErrorCode.FEED_COMMENT_NOT_FOUND) }
+            .orElseThrow { MykkuException(ErrorCode.FEED_COMMENT_NOT_FOUND) }
     }
 }

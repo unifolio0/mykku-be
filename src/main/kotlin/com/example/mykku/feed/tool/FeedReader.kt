@@ -24,6 +24,6 @@ class FeedReader(
 
     fun getFeedById(feedId: Long): Feed {
         return feedRepository.findById(feedId)
-            .orElseThrow { throw MykkuException(ErrorCode.FEED_NOT_FOUND) }
+            .orElseThrow { MykkuException(ErrorCode.FEED_NOT_FOUND) }
     }
 }
