@@ -9,13 +9,13 @@ import org.springframework.stereotype.Component
 class LikeFeedCommentReader(
     private val likeFeedCommentRepository: LikeFeedCommentRepository
 ) {
-    fun validateLikeFeedCommentExists(memberId: String, feedCommentId: Long) {
+    fun validateLikeFeedCommentNotExists(memberId: String, feedCommentId: Long) {
         if (likeFeedCommentRepository.existsByMemberIdAndFeedCommentId(memberId, feedCommentId)) {
             throw MykkuException(ErrorCode.LIKE_FEED_COMMENT_ALREADY_LIKED)
         }
     }
 
-    fun validateLikeFeedCommentNotExists(memberId: String, feedCommentId: Long) {
+    fun validateLikeFeedCommentExists(memberId: String, feedCommentId: Long) {
         if (!likeFeedCommentRepository.existsByMemberIdAndFeedCommentId(memberId, feedCommentId)) {
             throw MykkuException(ErrorCode.LIKE_FEED_COMMENT_NOT_FOUND)
         }

@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository
 @Repository
 interface LikeFeedRepository : JpaRepository<LikeFeed, Long> {
     fun existsByMemberIdAndFeed(memberId: String, feed: Feed): Boolean
+
     fun existsByMemberIdAndFeedId(memberId: String, feedId: Long): Boolean
+
     fun deleteByMemberIdAndFeedId(memberId: String, feedId: Long)
 }

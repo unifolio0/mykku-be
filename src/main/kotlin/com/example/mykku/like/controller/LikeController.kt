@@ -128,7 +128,7 @@ class LikeController(
         @RequestHeader("X-Member-Id") memberId: String,
         @PathVariable feedCommentId: Long
     ): ResponseEntity<ApiResponse<Unit>> {
-        likeService.unlikeFeedComment(memberId = memberId, dailyMessageCommentId = feedCommentId)
+        likeService.unlikeFeedComment(memberId = memberId, feedCommentId = feedCommentId)
         return ResponseEntity.noContent().build()
     }
 }

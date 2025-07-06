@@ -10,13 +10,13 @@ import org.springframework.stereotype.Component
 class LikeBoardReader(
     private val likeBoardRepository: LikeBoardRepository
 ) {
-    fun validateLikeBoardExists(memberId: String, boardId: Long) {
+    fun validateLikeBoardNotExists(memberId: String, boardId: Long) {
         if (likeBoardRepository.existsByMemberIdAndBoardId(memberId, boardId)) {
             throw MykkuException(ErrorCode.LIKE_BOARD_ALREADY_LIKED)
         }
     }
 
-    fun validateLikeBoardNotExists(memberId: String, boardId: Long) {
+    fun validateLikeBoardExists(memberId: String, boardId: Long) {
         if (!likeBoardRepository.existsByMemberIdAndBoardId(memberId, boardId)) {
             throw MykkuException(ErrorCode.LIKE_BOARD_NOT_FOUND)
         }

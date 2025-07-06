@@ -38,7 +38,7 @@ class LikeService(
 
     @Transactional
     fun likeBoard(request: LikeBoardRequest, memberId: String): LikeBoardResponse {
-        likeBoardReader.validateLikeBoardExists(memberId = memberId, boardId = request.boardId)
+        likeBoardReader.validateLikeBoardNotExists(memberId = memberId, boardId = request.boardId)
         val member = memberReader.getMemberById(memberId)
         val board = boardReader.getBoardById(request.boardId)
         val likeBoard = likeBoardWriter.createLikeBoard(board = board, member = member)
@@ -47,13 +47,13 @@ class LikeService(
 
     @Transactional
     fun unlikeBoard(memberId: String, boardId: Long) {
-        likeBoardReader.validateLikeBoardNotExists(memberId = memberId, boardId = boardId)
+        likeBoardReader.validateLikeBoardExists(memberId = memberId, boardId = boardId)
         likeBoardWriter.deleteLikeBoard(memberId = memberId, boardId = boardId)
     }
 
     @Transactional
     fun likeFeed(memberId: String, request: LikeFeedRequest): LikeFeedResponse {
-        likeFeedReader.validateLikeFeedExists(memberId = memberId, feedId = request.feedId)
+        likeFeedReader.validateLikeFeedNotExists(memberId = memberId, feedId = request.feedId)
         val member = memberReader.getMemberById(memberId)
         val feed = feedReader.getFeedById(request.feedId)
         val likeFeed = likeFeedWriter.createLikeFeed(feed = feed, member = member)
@@ -62,7 +62,7 @@ class LikeService(
 
     @Transactional
     fun unlikeFeed(memberId: String, feedId: Long) {
-        likeFeedReader.validateLikeFeedNotExists(memberId = memberId, feedId = feedId)
+        likeFeedReader.validateLikeFeedExists(memberId = memberId, feedId = feedId)
         likeFeedWriter.deleteLikeFeed(memberId = memberId, feedId = feedId)
     }
 
@@ -71,7 +71,7 @@ class LikeService(
         memberId: String,
         request: LikeDailyMessageCommentRequest
     ): LikeDailyMessageCommentResponse {
-        likeDailyMessageCommentReader.validateLikeDailyMessageCommentExists(
+        likeDailyMessageCommentReader.validateLikeDailyMessageCommentNotExists(
             memberId = memberId,
             dailyMessageCommentId = request.dailyMessageCommentId
         )
@@ -86,7 +86,7 @@ class LikeService(
 
     @Transactional
     fun unlikeDailyMessageComment(memberId: String, dailyMessageCommentId: Long) {
-        likeDailyMessageCommentReader.validateLikeDailyMessageCommentNotExists(
+        likeDailyMessageCommentReader.validateLikeDailyMessageCommentExists(
             memberId = memberId,
             dailyMessageCommentId = dailyMessageCommentId
         )
@@ -98,7 +98,7 @@ class LikeService(
 
     @Transactional
     fun likeFeedComment(memberId: String, request: LikeFeedCommentRequest): LikeFeedCommentResponse {
-        likeFeedCommentReader.validateLikeFeedCommentExists(
+        likeFeedCommentReader.validateLikeFeedCommentNotExists(
             memberId = memberId,
             feedCommentId = request.feedCommentId
         )
@@ -112,11 +112,11 @@ class LikeService(
     }
 
     @Transactional
-    fun unlikeFeedComment(memberId: String, dailyMessageCommentId: Long) {
-        likeFeedCommentReader.validateLikeFeedCommentNotExists(
+    fun unlikeFeedComment(memberId: String, feedCommentId: Long) {
+        likeFeedCommentReader.validateLikeFeedCommentExists(
             memberId = memberId,
-            feedCommentId = dailyMessageCommentId
+            feedCommentId = feedCommentId
         )
-        likeFeedCommentWriter.deleteLikeFeedComment(memberId = memberId, feedCommentId = dailyMessageCommentId)
+        likeFeedCommentWriter.deleteLikeFeedComment(memberId = memberId, feedCommentId = feedCommentId)
     }
 }

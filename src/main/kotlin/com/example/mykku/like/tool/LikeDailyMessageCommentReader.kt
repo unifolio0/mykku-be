@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 class LikeDailyMessageCommentReader(
     private val likeDailyMessageCommentRepository: LikeDailyMessageCommentRepository
 ) {
-    fun validateLikeDailyMessageCommentExists(memberId: String, dailyMessageCommentId: Long) {
+    fun validateLikeDailyMessageCommentNotExists(memberId: String, dailyMessageCommentId: Long) {
         if (likeDailyMessageCommentRepository.existsByMemberIdAndDailyMessageCommentId(
                 memberId,
                 dailyMessageCommentId
@@ -19,7 +19,7 @@ class LikeDailyMessageCommentReader(
         }
     }
 
-    fun validateLikeDailyMessageCommentNotExists(memberId: String, dailyMessageCommentId: Long) {
+    fun validateLikeDailyMessageCommentExists(memberId: String, dailyMessageCommentId: Long) {
         if (!likeDailyMessageCommentRepository.existsByMemberIdAndDailyMessageCommentId(
                 memberId,
                 dailyMessageCommentId

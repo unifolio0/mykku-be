@@ -14,13 +14,13 @@ class LikeFeedReader(
         return likeFeedRepository.existsByMemberIdAndFeed(memberId, feed)
     }
 
-    fun validateLikeFeedExists(memberId: String, feedId: Long) {
+    fun validateLikeFeedNotExists(memberId: String, feedId: Long) {
         if (likeFeedRepository.existsByMemberIdAndFeedId(memberId, feedId)) {
             throw MykkuException(ErrorCode.LIKE_FEED_ALREADY_LIKED)
         }
     }
 
-    fun validateLikeFeedNotExists(memberId: String, feedId: Long) {
+    fun validateLikeFeedExists(memberId: String, feedId: Long) {
         if (!likeFeedRepository.existsByMemberIdAndFeedId(memberId, feedId)) {
             throw MykkuException(ErrorCode.LIKE_FEED_NOT_FOUND)
         }
