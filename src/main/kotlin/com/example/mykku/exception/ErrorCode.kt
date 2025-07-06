@@ -27,6 +27,8 @@ enum class ErrorCode(val status: HttpStatus, val message: String) {
 
     // Board
     BOARD_TITLE_TOO_LONG(HttpStatus.BAD_REQUEST, "게시판 제목은 ${Board.TITLE_MAX_LENGTH}자 이하여야 합니다"),
+    BOARD_DUPLICATE_TITLE(HttpStatus.BAD_REQUEST, "이미 존재하는 게시판 제목입니다"),
+    BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "게시판을 찾을 수 없습니다"),
 
     // Member
     NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다"),
@@ -35,5 +37,8 @@ enum class ErrorCode(val status: HttpStatus, val message: String) {
 
     // Comment
     FEED_COMMENT_CONTENT_TOO_LONG(HttpStatus.BAD_REQUEST, "피드 댓글은 ${FeedComment.CONTENT_MAX_LENGTH}자 이하여야 합니다"),
-    DAILY_MESSAGE_COMMENT_CONTENT_TOO_LONG(HttpStatus.BAD_REQUEST, "하루 덕담 댓글은 ${DailyMessageComment.CONTENT_MAX_LENGTH}자 이하여야 합니다"),
+    DAILY_MESSAGE_COMMENT_CONTENT_TOO_LONG(
+        HttpStatus.BAD_REQUEST,
+        "하루 덕담 댓글은 ${DailyMessageComment.CONTENT_MAX_LENGTH}자 이하여야 합니다"
+    ),
 }

@@ -1,7 +1,6 @@
 package com.example.mykku.feed.dto
 
 import com.example.mykku.feed.domain.Feed
-import java.util.*
 
 data class FeedPreviewResponse(
     val id: Long,

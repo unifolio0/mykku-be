@@ -2,9 +2,9 @@ package com.example.mykku.feed.domain
 
 import com.example.mykku.board.domain.Board
 import com.example.mykku.common.domain.BaseEntity
-import com.example.mykku.member.domain.Member
 import com.example.mykku.exception.ErrorCode
 import com.example.mykku.exception.MykkuException
+import com.example.mykku.member.domain.Member
 import jakarta.persistence.*
 
 @Entity
@@ -27,7 +27,7 @@ class Feed(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
-    val board: Board,
+    var board: Board,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
