@@ -22,7 +22,7 @@ class ContestWinner(
     var image: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "contest_id")
-    val contest: Contest,
+    @JoinColumn(name = "event_id")
+    val event: Event,
 ) : BaseEntity() {
 }

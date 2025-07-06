@@ -1,13 +1,13 @@
 package com.example.mykku.feed.dto
 
-import com.example.mykku.feed.domain.BasicEvent
+import com.example.mykku.feed.domain.Event
 
 data class EventPreviewResponse(
     val id: Long,
     val images: List<String>
 ) {
-    constructor(event: BasicEvent) : this(
+    constructor(event: Event) : this(
         id = event.id!!,
-        images = event.basicEventImages.map { it.url }
+        images = event.eventImages.map { it.url }
     )
 }
