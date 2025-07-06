@@ -32,14 +32,4 @@ class Board(
             throw MykkuException(ErrorCode.BOARD_TITLE_TOO_LONG)
         }
     }
-
-    fun addFeed(feed: Feed) {
-        feeds.add(feed)
-        feed.board = this
-    }
-
-    fun removeFeed(feed: Feed) {
-        feeds.remove(feed)
-        feed.board = null
-    }
 }

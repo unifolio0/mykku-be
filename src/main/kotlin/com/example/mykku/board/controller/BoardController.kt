@@ -32,13 +32,15 @@ class BoardController(
             )
     }
 
-    @PutMapping("/api/v1/board")
+    @PutMapping("/api/v1/board/{id}")
     fun updateBoard(
         @RequestHeader("X-Member-Id") memberId: String,
+        @PathVariable id: Long,
         @RequestBody request: UpdateBoardRequest,
     ): ResponseEntity<ApiResponse<UpdateBoardResponse>> {
         val response = boardService.updateBoard(
             request = request,
+            boardId = id,
             memberId = memberId
         )
         return ResponseEntity.ok(

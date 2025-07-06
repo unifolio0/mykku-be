@@ -36,10 +36,11 @@ class BoardService(
 
     fun updateBoard(
         request: UpdateBoardRequest,
+        boardId: Long,
         memberId: String
     ): UpdateBoardResponse {
         boardReader.validateDuplicateTitle(title = request.title)
-        val beforeBoard = boardReader.getBoardById(id = request.id)
+        val beforeBoard = boardReader.getBoardById(id = boardId)
         val afterBoard = boardWriter.updateBoard(
             board = beforeBoard,
             title = request.title,
