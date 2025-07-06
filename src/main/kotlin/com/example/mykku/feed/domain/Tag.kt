@@ -3,21 +3,10 @@ package com.example.mykku.feed.domain
 import com.example.mykku.common.domain.BaseEntity
 import com.example.mykku.exception.ErrorCode
 import com.example.mykku.exception.MykkuException
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "tags")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
-@JsonSubTypes(
-    JsonSubTypes.Type(value = BasicTag::class, name = "TAG"),
-    JsonSubTypes.Type(value = EventTag::class, name = "EVENT_TAG"),
-    JsonSubTypes.Type(value = ContestTag::class, name = "CONTEST_TAG")
-)
-abstract class Tag(
+class Tag(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
@@ -38,6 +27,4 @@ abstract class Tag(
             throw MykkuException(ErrorCode.TAG_INVALID_FORMAT)
         }
     }
-
-    abstract fun getType(): String
 }

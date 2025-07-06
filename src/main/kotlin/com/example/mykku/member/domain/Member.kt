@@ -3,7 +3,9 @@ package com.example.mykku.member.domain
 import com.example.mykku.common.domain.BaseEntity
 import com.example.mykku.exception.ErrorCode
 import com.example.mykku.exception.MykkuException
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
 
 @Entity
 class Member(
@@ -24,12 +26,6 @@ class Member(
 
     @Column(name = "following_count")
     var followingCount: Int = 0,
-
-    @OneToMany(mappedBy = "member", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    val saveFeeds: MutableList<SaveFeed> = mutableListOf(),
-
-    @OneToMany(mappedBy = "member", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    val saveDailyMessages: MutableList<SaveDailyMessage> = mutableListOf(),
 ) : BaseEntity() {
     companion object {
         const val NICKNAME_MAX_LENGTH = 10
