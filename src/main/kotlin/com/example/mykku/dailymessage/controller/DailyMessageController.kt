@@ -33,7 +33,7 @@ class DailyMessageController(
         )
     }
 
-    @GetMapping("/api/v1/daily-messages/{id}")
+    @GetMapping("/api/v1/daily-message/{id}")
     fun getDailyMessage(
         @PathVariable id: Long
     ): ResponseEntity<ApiResponse<DailyMessageResponse>> {

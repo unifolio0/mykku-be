@@ -5,6 +5,7 @@ import com.example.mykku.feed.tool.EventReader
 import com.example.mykku.feed.tool.FeedReader
 import com.example.mykku.home.dto.HomeResponse
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class HomeService(
@@ -12,6 +13,7 @@ class HomeService(
     private val feedReader: FeedReader,
     private val eventReader: EventReader,
 ) {
+    @Transactional(readOnly = true)
     fun getHomeData(): HomeResponse {
         val todayDailyMessage = dailyMessageReader.getTodayDailyMessage()
         val events = eventReader.getProcessingEventPreviews()

@@ -58,7 +58,7 @@ class DailyMessageCommentService(
         val comment = dailyMessageCommentReader.getComment(commentId)
 
         if (comment.member.id != memberId) {
-            throw MykkuException(ErrorCode.FORBIDDEN_COMMENT_ACCESS)
+            throw MykkuException(ErrorCode.COMMENT_FORBIDDEN_ACCESS)
         }
 
         val updatedComment = dailyMessageCommentWriter.updateComment(

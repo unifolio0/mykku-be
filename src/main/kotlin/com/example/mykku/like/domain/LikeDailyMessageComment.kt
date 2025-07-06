@@ -1,11 +1,12 @@
-package com.example.mykku.member.domain
+package com.example.mykku.like.domain
 
 import com.example.mykku.common.domain.BaseEntity
-import com.example.mykku.feed.domain.Feed
+import com.example.mykku.dailymessage.domain.DailyMessageComment
+import com.example.mykku.member.domain.Member
 import jakarta.persistence.*
 
 @Entity
-class LikeFeed(
+class LikeDailyMessageComment(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
@@ -15,7 +16,7 @@ class LikeFeed(
     val member: Member,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "feed_id")
-    val feed: Feed,
+    @JoinColumn(name = "daily_message_comment_id")
+    val dailyMessageComment: DailyMessageComment,
 ) : BaseEntity() {
 }

@@ -5,10 +5,11 @@ import com.example.mykku.feed.dto.AuthorResponse
 import com.example.mykku.feed.dto.FeedResponse
 import com.example.mykku.feed.dto.FeedsResponse
 import com.example.mykku.feed.tool.FeedReader
-import com.example.mykku.member.tool.LikeFeedReader
+import com.example.mykku.like.tool.LikeFeedReader
 import com.example.mykku.member.tool.MemberReader
 import com.example.mykku.member.tool.SaveFeedReader
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class FeedService(
@@ -17,6 +18,7 @@ class FeedService(
     private val likeFeedReader: LikeFeedReader,
     private val saveFeedReader: SaveFeedReader
 ) {
+    @Transactional(readOnly = true)
     fun getFeeds(memberId: String): FeedsResponse {
         val follower = memberReader.getFollowerByMemberId(memberId)
         val feeds = feedReader.getFeedsByFollower(follower)

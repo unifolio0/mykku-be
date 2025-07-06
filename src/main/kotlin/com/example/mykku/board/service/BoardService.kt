@@ -6,9 +6,10 @@ import com.example.mykku.board.dto.UpdateBoardRequest
 import com.example.mykku.board.dto.UpdateBoardResponse
 import com.example.mykku.board.tool.BoardReader
 import com.example.mykku.board.tool.BoardWriter
-import com.example.mykku.member.tool.LikeBoardWriter
+import com.example.mykku.like.tool.LikeBoardWriter
 import com.example.mykku.member.tool.MemberReader
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class BoardService(
@@ -17,6 +18,7 @@ class BoardService(
     private val memberReader: MemberReader,
     private val likeBoardWriter: LikeBoardWriter
 ) {
+    @Transactional
     fun createBoard(
         request: CreateBoardRequest,
         memberId: String,
@@ -34,6 +36,7 @@ class BoardService(
         return CreateBoardResponse(board = board)
     }
 
+    @Transactional
     fun updateBoard(
         request: UpdateBoardRequest,
         boardId: Long,

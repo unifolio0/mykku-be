@@ -15,7 +15,7 @@ class DailyMessageReader(
 ) {
     fun getTodayDailyMessage(): DailyMessage {
         return dailyMessageRepository.findByDate(LocalDate.now())
-            ?: throw MykkuException(ErrorCode.NOT_FOUND_DAILY_MESSAGE)
+            ?: throw MykkuException(ErrorCode.DAILY_MESSAGE_NOT_FOUND)
     }
 
     fun getDailyMessages(date: LocalDate, limit: Int, sort: SortDirection): List<DailyMessage> {
@@ -29,6 +29,6 @@ class DailyMessageReader(
 
     fun getDailyMessage(id: Long): DailyMessage {
         return dailyMessageRepository.findById(id)
-            .orElseThrow { MykkuException(ErrorCode.NOT_FOUND_DAILY_MESSAGE) }
+            .orElseThrow { MykkuException(ErrorCode.DAILY_MESSAGE_NOT_FOUND) }
     }
 }

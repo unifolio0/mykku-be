@@ -12,11 +12,16 @@ class DailyMessageCommentReader(
 ) {
     fun getComment(commentId: Long): DailyMessageComment {
         return dailyMessageCommentRepository.findById(commentId)
-            .orElseThrow { MykkuException(ErrorCode.NOT_FOUND_COMMENT) }
+            .orElseThrow { MykkuException(ErrorCode.DAILY_MESSAGE_COMMENT_NOT_FOUND) }
     }
 
     fun getCommentByDailyMessageId(commentId: Long, dailyMessageId: Long): DailyMessageComment {
         return dailyMessageCommentRepository.findByIdAndDailyMessageId(commentId, dailyMessageId)
-            ?: throw MykkuException(ErrorCode.NOT_FOUND_COMMENT)
+            ?: throw MykkuException(ErrorCode.DAILY_MESSAGE_COMMENT_NOT_FOUND)
+    }
+
+    fun getDailyMessageCommentById(dailyMessageCommentId: Long): DailyMessageComment {
+        return dailyMessageCommentRepository.findById(dailyMessageCommentId)
+            .orElseThrow { MykkuException(ErrorCode.DAILY_MESSAGE_COMMENT_NOT_FOUND) }
     }
 }

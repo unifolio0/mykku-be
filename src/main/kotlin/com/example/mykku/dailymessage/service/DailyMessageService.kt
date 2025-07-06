@@ -8,12 +8,14 @@ import com.example.mykku.dailymessage.dto.DailyMessageSummaryResponse
 import com.example.mykku.dailymessage.dto.ReplyResponse
 import com.example.mykku.dailymessage.tool.DailyMessageReader
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
 @Service
 class DailyMessageService(
     private val dailyMessageReader: DailyMessageReader
 ) {
+    @Transactional(readOnly = true)
     fun getDailyMessages(date: LocalDate, limit: Int, sort: SortDirection): List<DailyMessageSummaryResponse> {
         val dailyMessages = dailyMessageReader.getDailyMessages(date, limit, sort)
 
@@ -29,6 +31,7 @@ class DailyMessageService(
         )
     }
 
+    @Transactional(readOnly = true)
     fun getDailyMessage(id: Long): DailyMessageResponse {
         val dailyMessage = dailyMessageReader.getDailyMessage(id)
         val repliesByParentId = getReplies(dailyMessage)
