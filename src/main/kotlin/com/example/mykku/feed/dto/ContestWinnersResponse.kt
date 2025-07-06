@@ -6,8 +6,8 @@ data class ContestWinnersResponse(
     val title: String,
     val winners: List<ContestWinnerResponse>,
 ) {
-    constructor(contest: Event) : this(
-        title = contest.title,
+    constructor(event: Event) : this(
+        title = event.title,
         winners = mutableListOf()
     )
 }

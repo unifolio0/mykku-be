@@ -7,12 +7,12 @@ import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 
 @Repository
-interface BasicEventRepository : JpaRepository<Event, Long> {
+interface EventRepository : JpaRepository<Event, Long> {
     @Query(
         """
-            SELECT be
-            FROM Event be
-            WHERE be.expiredAt > :dateTime
+            SELECT e
+            FROM Event e
+            WHERE e.expiredAt > :dateTime
         """
     )
     fun getByEventPreviews(dateTime: LocalDateTime): List<Event>
