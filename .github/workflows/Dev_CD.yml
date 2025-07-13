@@ -29,12 +29,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle (skip tests)
-        run: |
-          # Create dummy snippets directory to avoid asciidoctor error
-          mkdir -p build/generated-snippets
-          
-          # Build with documentation
-          ./gradlew clean bootJar -x test --info
+        run: ./gradlew clean bootJar -x test -x asciidoctor --info
 
       - name: Change artifact file name
         run: |

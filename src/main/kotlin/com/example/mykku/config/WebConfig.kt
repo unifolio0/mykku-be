@@ -14,7 +14,10 @@ class WebConfig : WebMvcConfigurer {
     }
 
     override fun addViewControllers(registry: ViewControllerRegistry) {
+        // RestDocs 생성 문서가 있으면 사용, 없으면 정적 문서 사용
         registry.addRedirectViewController("/docs", "/docs/index.html")
         registry.addRedirectViewController("/api-docs", "/docs/index.html")
+        // Fallback to static guide if RestDocs not available
+        registry.addViewController("/docs/static").setViewName("forward:/docs/api-guide.html")
     }
 }
