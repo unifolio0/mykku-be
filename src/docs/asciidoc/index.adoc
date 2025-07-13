@@ -1,0 +1,181 @@
+= MyKKU API Documentation
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+[[overview]]
+== 개요
+
+MyKKU API 문서입니다.
+
+=== 공통 응답 구조
+
+모든 API는 다음과 같은 공통 응답 구조를 가집니다:
+
+[source,json]
+----
+{
+  "message": "응답 메시지",
+  "data": {
+    // 응답 데이터
+  }
+}
+----
+
+=== HTTP 상태 코드
+
+|===
+| 상태 코드 | 설명
+
+| `200 OK`
+| 요청 성공
+
+| `400 Bad Request`
+| 잘못된 요청
+
+| `401 Unauthorized`
+| 인증 실패
+
+| `403 Forbidden`
+| 권한 없음
+
+| `404 Not Found`
+| 리소스를 찾을 수 없음
+
+| `500 Internal Server Error`
+| 서버 오류
+|===
+
+[[home-api]]
+== 홈 API
+
+=== 홈 데이터 조회
+
+operation::home[snippets='http-request,http-response,response-fields']
+
+[[feed-api]]
+== 피드 API
+
+=== 피드 목록 조회
+
+operation::feed-list[snippets='http-request,path-parameters,http-response,response-fields']
+
+[[board-api]]
+== 보드 API
+
+=== 게시판 생성
+
+operation::board-create[snippets='http-request,request-headers,request-fields,http-response,response-fields']
+
+=== 게시판 수정
+
+operation::board-update[snippets='http-request,path-parameters,request-headers,request-fields,http-response,response-fields']
+
+[[daily-message-api]]
+== 데일리 메시지 API
+
+=== 하루 덕담 목록 조회
+
+operation::daily-message-list[snippets='http-request,query-parameters,http-response,response-fields']
+
+=== 하루 덕담 상세 조회
+
+operation::daily-message-detail[snippets='http-request,path-parameters,http-response,response-fields']
+
+=== 하루 덕담 댓글 생성
+
+operation::daily-message-comment-create[snippets='http-request,path-parameters,request-headers,request-fields,http-response,response-fields']
+
+=== 하루 덕담 답글 생성
+
+operation::daily-message-reply-create[snippets='http-request,path-parameters,request-headers,request-fields,http-response,response-fields']
+
+=== 하루 덕담 댓글 수정
+
+operation::daily-message-comment-update[snippets='http-request,path-parameters,request-headers,request-fields,http-response,response-fields']
+
+[[like-api]]
+== 좋아요 API
+
+=== 좋아요한 게시판 목록 조회
+
+operation::like-board-list[snippets='http-request,request-headers,http-response,response-fields']
+
+=== 게시판 좋아요
+
+operation::like-board-create[snippets='http-request,request-headers,request-fields,http-response,response-fields']
+
+=== 게시판 좋아요 취소
+
+operation::like-board-delete[snippets='http-request,path-parameters,request-headers,http-response']
+
+=== 피드 좋아요
+
+operation::like-feed-create[snippets='http-request,request-headers,request-fields,http-response,response-fields']
+
+=== 피드 좋아요 취소
+
+operation::like-feed-delete[snippets='http-request,path-parameters,request-headers,http-response']
+
+=== 댓글 좋아요
+
+operation::like-comment-create[snippets='http-request,request-headers,request-fields,http-response,response-fields']
+
+=== 댓글 좋아요 취소
+
+operation::like-comment-delete[snippets='http-request,path-parameters,request-headers,http-response']
+
+=== 하루 덕담 댓글 좋아요
+
+operation::like-daily-message-comment-create[snippets='http-request,request-headers,request-fields,http-response,response-fields']
+
+=== 하루 덕담 댓글 좋아요 취소
+
+operation::like-daily-message-comment-delete[snippets='http-request,path-parameters,request-headers,http-response']
+
+[[error-api]]
+== 에러 응답
+
+MyKKU API는 에러 발생 시 일관된 형식의 에러 응답을 반환합니다.
+
+=== 에러 응답 구조
+
+모든 에러 응답은 다음과 같은 구조를 가집니다:
+
+[source,json]
+----
+{
+  "message": "에러 메시지"
+}
+----
+
+=== 400 Bad Request
+
+요청이 잘못된 경우 반환됩니다. 예: 중복된 데이터, 유효하지 않은 입력값 등
+
+operation::error-400[snippets='http-response,response-fields']
+
+예시:
+- 이미 존재하는 게시판 제목으로 생성 시도
+- 이미 좋아요한 피드에 다시 좋아요 시도
+- 입력값이 제한 길이를 초과하는 경우
+
+=== 404 Not Found
+
+요청한 리소스를 찾을 수 없는 경우 반환됩니다.
+
+operation::error-404[snippets='http-response,response-fields']
+
+예시:
+- 존재하지 않는 게시판 ID로 조회
+- 존재하지 않는 피드 ID로 조회
+- 삭제된 댓글에 접근 시도
+
+=== 500 Internal Server Error
+
+서버 내부 오류가 발생한 경우 반환됩니다.
+
+operation::error-500[snippets='http-response,response-fields']
