@@ -48,3 +48,7 @@ jobs:
 
       - name: Run tests
         run: ./gradlew test --no-daemon
+        
+      - name: Generate API documentation
+        if: success()
+        run: ./gradlew asciidoctor
