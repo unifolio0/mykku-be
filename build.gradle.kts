@@ -4,6 +4,7 @@ plugins {
     id("org.springframework.boot") version "3.4.5"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.jpa") version "1.9.25"
+    id("org.asciidoctor.jvm.convert") version "3.3.2"
 }
 
 group = "com.example"
@@ -19,6 +20,8 @@ repositories {
     mavenCentral()
 }
 
+val asciidoctorExt: Configuration by configurations.creating
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -29,7 +32,9 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
+    testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    asciidoctorExt("org.springframework.restdocs:spring-restdocs-asciidoctor")
 }
 
 kotlin {
@@ -46,4 +51,29 @@ allOpen {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    outputs.dir("build/generated-snippets")
+}
+
+tasks.asciidoctor {
+    dependsOn(tasks.test)
+    configurations(asciidoctorExt.name)
+    baseDirFollowsSourceFile()
+    inputs.dir("build/generated-snippets")
+}
+
+tasks.register("copyDocument", Copy::class) {
+    dependsOn(tasks.asciidoctor)
+    from("build/docs/asciidoc")
+    into("src/main/resources/static/docs")
+}
+
+tasks.build {
+    dependsOn(tasks.getByName("copyDocument"))
+}
+
+tasks.bootJar {
+    dependsOn(tasks.asciidoctor)
+    from("build/docs/asciidoc") {
+        into("static/docs")
+    }
 }
