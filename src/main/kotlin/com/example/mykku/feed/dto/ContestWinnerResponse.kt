@@ -10,6 +10,6 @@ data class ContestWinnerResponse(
     constructor(winner: ContestWinner) : this(
         id = winner.id!!,
         image = winner.image,
-        rank = winner.rank
+        rank = winner.winnerRank
     )
 }
