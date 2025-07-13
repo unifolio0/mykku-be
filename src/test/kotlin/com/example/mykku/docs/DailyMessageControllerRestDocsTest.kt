@@ -2,9 +2,11 @@ package com.example.mykku.docs
 
 import com.example.mykku.dailymessage.controller.DailyMessageController
 import com.example.mykku.dailymessage.domain.SortDirection
-import com.example.mykku.dailymessage.dto.*
+import com.example.mykku.dailymessage.dto.CommentResponse
+import com.example.mykku.dailymessage.dto.DailyMessageResponse
+import com.example.mykku.dailymessage.dto.DailyMessageSummaryResponse
+import com.example.mykku.dailymessage.dto.ReplyResponse
 import com.example.mykku.dailymessage.service.DailyMessageService
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -19,15 +21,18 @@ import org.springframework.http.MediaType
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.restdocs.RestDocumentationContextProvider
 import org.springframework.restdocs.RestDocumentationExtension
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
 import org.springframework.restdocs.operation.preprocess.Preprocessors.*
 import org.springframework.restdocs.payload.JsonFieldType
-import org.springframework.restdocs.payload.PayloadDocumentation.*
+import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
+import org.springframework.restdocs.payload.PayloadDocumentation.responseFields
 import org.springframework.restdocs.request.RequestDocumentation.*
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
 import java.time.LocalDate
@@ -198,11 +203,16 @@ class DailyMessageControllerRestDocsTest {
                         fieldWithPath("data.comments[].memberName").type(JsonFieldType.STRING).description("작성자 이름"),
                         fieldWithPath("data.comments[].createdAt").type(JsonFieldType.STRING).description("작성 일시"),
                         fieldWithPath("data.comments[].replies").type(JsonFieldType.ARRAY).description("답글 목록"),
-                        fieldWithPath("data.comments[].replies[].id").type(JsonFieldType.NUMBER).description("답글 ID").optional(),
-                        fieldWithPath("data.comments[].replies[].content").type(JsonFieldType.STRING).description("답글 내용").optional(),
-                        fieldWithPath("data.comments[].replies[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수").optional(),
-                        fieldWithPath("data.comments[].replies[].memberName").type(JsonFieldType.STRING).description("작성자 이름").optional(),
-                        fieldWithPath("data.comments[].replies[].createdAt").type(JsonFieldType.STRING).description("작성 일시").optional()
+                        fieldWithPath("data.comments[].replies[].id").type(JsonFieldType.NUMBER).description("답글 ID")
+                            .optional(),
+                        fieldWithPath("data.comments[].replies[].content").type(JsonFieldType.STRING)
+                            .description("답글 내용").optional(),
+                        fieldWithPath("data.comments[].replies[].likeCount").type(JsonFieldType.NUMBER)
+                            .description("좋아요 수").optional(),
+                        fieldWithPath("data.comments[].replies[].memberName").type(JsonFieldType.STRING)
+                            .description("작성자 이름").optional(),
+                        fieldWithPath("data.comments[].replies[].createdAt").type(JsonFieldType.STRING)
+                            .description("작성 일시").optional()
                     )
                 )
             )

@@ -7,7 +7,6 @@ import com.example.mykku.feed.dto.FeedPreviewResponse
 import com.example.mykku.home.controller.HomeController
 import com.example.mykku.home.dto.HomeResponse
 import com.example.mykku.home.service.HomeService
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -22,14 +21,17 @@ import org.springframework.http.MediaType
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.restdocs.RestDocumentationContextProvider
 import org.springframework.restdocs.RestDocumentationExtension
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
 import org.springframework.restdocs.operation.preprocess.Preprocessors.*
 import org.springframework.restdocs.payload.JsonFieldType
-import org.springframework.restdocs.payload.PayloadDocumentation.*
+import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
+import org.springframework.restdocs.payload.PayloadDocumentation.responseFields
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
 
@@ -165,7 +167,8 @@ class HomeControllerRestDocsTest {
                         fieldWithPath("data.dailyMessage").type(JsonFieldType.STRING).description("오늘의 메시지"),
                         fieldWithPath("data.events").type(JsonFieldType.ARRAY).description("이벤트 목록"),
                         fieldWithPath("data.events[].id").type(JsonFieldType.NUMBER).description("이벤트 ID"),
-                        fieldWithPath("data.events[].images").type(JsonFieldType.ARRAY).description("이벤트 배너 이미지 URL 목록"),
+                        fieldWithPath("data.events[].images").type(JsonFieldType.ARRAY)
+                            .description("이벤트 배너 이미지 URL 목록"),
                         fieldWithPath("data.feeds").type(JsonFieldType.ARRAY).description("인기 피드 목록"),
                         fieldWithPath("data.feeds[].id").type(JsonFieldType.NUMBER).description("피드 ID"),
                         fieldWithPath("data.feeds[].board").type(JsonFieldType.STRING).description("게시판 이름"),
@@ -177,7 +180,8 @@ class HomeControllerRestDocsTest {
                         fieldWithPath("data.contests[].title").type(JsonFieldType.STRING).description("콘테스트 제목"),
                         fieldWithPath("data.contests[].winners").type(JsonFieldType.ARRAY).description("콘테스트 수상자 목록"),
                         fieldWithPath("data.contests[].winners[].id").type(JsonFieldType.NUMBER).description("수상자 ID"),
-                        fieldWithPath("data.contests[].winners[].image").type(JsonFieldType.STRING).description("수상작 이미지 URL"),
+                        fieldWithPath("data.contests[].winners[].image").type(JsonFieldType.STRING)
+                            .description("수상작 이미지 URL"),
                         fieldWithPath("data.contests[].winners[].rank").type(JsonFieldType.NUMBER).description("순위")
                     )
                 )

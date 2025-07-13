@@ -3,7 +3,6 @@ package com.example.mykku.docs
 import com.example.mykku.like.controller.LikeController
 import com.example.mykku.like.dto.*
 import com.example.mykku.like.service.LikeService
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -12,23 +11,27 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.Mockito.`when`
 import org.mockito.Mockito.doNothing
+import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.http.MediaType
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.restdocs.RestDocumentationContextProvider
 import org.springframework.restdocs.RestDocumentationExtension
-import org.springframework.restdocs.headers.HeaderDocumentation.*
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*
+import org.springframework.restdocs.headers.HeaderDocumentation.headerWithName
+import org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
 import org.springframework.restdocs.operation.preprocess.Preprocessors.*
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.*
-import org.springframework.restdocs.request.RequestDocumentation.*
+import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
+import org.springframework.restdocs.request.RequestDocumentation.pathParameters
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
 
@@ -340,14 +343,16 @@ class LikeControllerRestDocsTest {
                         headerWithName("X-Member-Id").description("요청한 회원의 ID")
                     ),
                     requestFields(
-                        fieldWithPath("dailyMessageCommentId").type(JsonFieldType.NUMBER).description("좋아요할 하루 덕담 댓글 ID")
+                        fieldWithPath("dailyMessageCommentId").type(JsonFieldType.NUMBER)
+                            .description("좋아요할 하루 덕담 댓글 ID")
                     ),
                     responseFields(
                         fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                         fieldWithPath("data").type(JsonFieldType.OBJECT).description("좋아요 정보"),
                         fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("생성된 좋아요 ID"),
                         fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("회원 ID"),
-                        fieldWithPath("data.dailyMessageCommentId").type(JsonFieldType.NUMBER).description("하루 덕담 댓글 ID")
+                        fieldWithPath("data.dailyMessageCommentId").type(JsonFieldType.NUMBER)
+                            .description("하루 덕담 댓글 ID")
                     )
                 )
             )
@@ -363,7 +368,10 @@ class LikeControllerRestDocsTest {
 
         // when & then
         mockMvc.perform(
-            RestDocumentationRequestBuilders.delete("/api/v1/daily-message-comment/unlike/{dailyMessageCommentId}", dailyMessageCommentId)
+            RestDocumentationRequestBuilders.delete(
+                "/api/v1/daily-message-comment/unlike/{dailyMessageCommentId}",
+                dailyMessageCommentId
+            )
                 .header("X-Member-Id", memberId)
         )
             .andDo(MockMvcResultHandlers.print())
