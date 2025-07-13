@@ -32,7 +32,7 @@ sudo nohup java \
     -Dspring.profiles.active=dev \
     -Duser.timezone=Asia/Seoul \
     -Dserver.port=8080 \
-    -Ddd.service=debate-timer \
+    -Ddd.service=mykku \
     -Ddd.env=dev \
     -jar "$JAR_FILE" > "$LOG_FILE" 2>&1 &
 
