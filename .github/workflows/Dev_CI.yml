@@ -7,8 +7,6 @@ on:
 
 permissions:
   contents: read
-  checks: write
-  pull-requests: write
 
 jobs:
   test:
@@ -50,3 +48,7 @@ jobs:
 
       - name: Run tests
         run: ./gradlew test --no-daemon
+        
+      - name: Generate API documentation
+        if: success()
+        run: ./gradlew asciidoctor

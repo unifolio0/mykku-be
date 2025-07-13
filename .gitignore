@@ -38,3 +38,8 @@ out/
 
 ### Kotlin ###
 .kotlin
+
+### Generated API Documentation ###
+# Uncomment the line below if you want to generate docs locally but not commit them
+# src/main/resources/static/docs/index.html
+# src/main/resources/static/docs/images/

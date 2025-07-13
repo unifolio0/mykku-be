@@ -9,8 +9,8 @@ class ContestWinner(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    @Column(name = "rank")
-    var rank: Int,
+    @Column(name = "winner_rank")
+    var winnerRank: Int,
 
     @Column(name = "description")
     var description: String,

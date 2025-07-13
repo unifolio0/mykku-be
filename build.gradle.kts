@@ -70,6 +70,17 @@ tasks.register("copyDocument", Copy::class) {
     into("src/main/resources/static/docs")
 }
 
+tasks.register("generateDocs") {
+    group = "documentation"
+    description = "Generate API documentation from tests"
+    dependsOn(tasks.test, tasks.asciidoctor)
+    finalizedBy("copyDocument")
+    doLast {
+        println("API documentation generated at: src/main/resources/static/docs/")
+        println("Don't forget to commit the generated files!")
+    }
+}
+
 tasks.build {
     dependsOn(tasks.getByName("copyDocument"))
 }
