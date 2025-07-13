@@ -72,8 +72,5 @@ jobs:
           name: deploy-scripts
           path: ~/app/scripts
 
-      - name: Make script executable
-        run: chmod +x ~/app/scripts/replace-new-version.sh
-
       - name: Replace application to latest
-        run: ~/app/scripts/replace-new-version.sh  # Remove sudo if not needed
+        run: sudo sh ~/app/scripts/replace-new-version.sh
