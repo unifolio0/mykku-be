@@ -59,6 +59,9 @@ tasks.asciidoctor {
     configurations(asciidoctorExt.name)
     baseDirFollowsSourceFile()
     inputs.dir("build/generated-snippets")
+    doFirst {
+        file("build/generated-snippets").mkdirs()
+    }
 }
 
 tasks.register("copyDocument", Copy::class) {
