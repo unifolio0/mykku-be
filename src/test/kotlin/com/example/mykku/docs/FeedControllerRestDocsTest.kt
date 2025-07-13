@@ -1,13 +1,11 @@
 package com.example.mykku.docs
 
-import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.feed.controller.FeedController
 import com.example.mykku.feed.dto.AuthorResponse
 import com.example.mykku.feed.dto.CommentPreviewResponse
 import com.example.mykku.feed.dto.FeedResponse
 import com.example.mykku.feed.dto.FeedsResponse
 import com.example.mykku.feed.service.FeedService
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -19,20 +17,24 @@ import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.http.MediaType
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.restdocs.RestDocumentationContextProvider
 import org.springframework.restdocs.RestDocumentationExtension
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
 import org.springframework.restdocs.operation.preprocess.Preprocessors.*
 import org.springframework.restdocs.payload.JsonFieldType
-import org.springframework.restdocs.payload.PayloadDocumentation.*
-import org.springframework.restdocs.request.RequestDocumentation.*
+import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
+import org.springframework.restdocs.payload.PayloadDocumentation.responseFields
+import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
+import org.springframework.restdocs.request.RequestDocumentation.pathParameters
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import java.time.LocalDateTime
 
 @ExtendWith(MockitoExtension::class, RestDocumentationExtension::class)
@@ -158,7 +160,8 @@ class FeedControllerRestDocsTest {
                         fieldWithPath("data.feeds[].author").type(JsonFieldType.OBJECT).description("작성자 정보"),
                         fieldWithPath("data.feeds[].author.memberId").type(JsonFieldType.STRING).description("작성자 ID"),
                         fieldWithPath("data.feeds[].author.nickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
-                        fieldWithPath("data.feeds[].author.profileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지 URL").optional(),
+                        fieldWithPath("data.feeds[].author.profileImage").type(JsonFieldType.STRING)
+                            .description("작성자 프로필 이미지 URL").optional(),
                         fieldWithPath("data.feeds[].author.role").type(JsonFieldType.STRING).description("작성자 권한"),
                         fieldWithPath("data.feeds[].board").type(JsonFieldType.STRING).description("게시판 이름"),
                         fieldWithPath("data.feeds[].title").type(JsonFieldType.STRING).description("피드 제목"),
@@ -171,7 +174,8 @@ class FeedControllerRestDocsTest {
                         fieldWithPath("data.feeds[].isSaved").type(JsonFieldType.BOOLEAN).description("현재 사용자의 저장 여부"),
                         fieldWithPath("data.feeds[].createdAt").type(JsonFieldType.STRING).description("작성 일시"),
                         fieldWithPath("data.feeds[].comment").type(JsonFieldType.OBJECT).description("첫 댓글 미리보기"),
-                        fieldWithPath("data.feeds[].comment.profileImage").type(JsonFieldType.STRING).description("댓글 작성자 프로필 이미지"),
+                        fieldWithPath("data.feeds[].comment.profileImage").type(JsonFieldType.STRING)
+                            .description("댓글 작성자 프로필 이미지"),
                         fieldWithPath("data.feeds[].comment.content").type(JsonFieldType.STRING).description("댓글 내용")
                     )
                 )
