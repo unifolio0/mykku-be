@@ -11,10 +11,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Develop Branch
+      - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: "develop"
 
       - name: Setting dev-secret.yml
         run: |
@@ -25,15 +23,23 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
+          cache: 'gradle'
 
       - name: Make gradlew executable
         run: chmod +x gradlew
 
       - name: Build with Gradle (skip tests)
-        run: ./gradlew clean bootJar -x test --info
+        run: ./gradlew clean bootJar -x test -x asciidoctor --info
 
       - name: Change artifact file name
-        run: mv build/libs/*.jar build/libs/app.jar
+        run: |
+          # Find the built jar file (excluding plain jar)
+          JAR_FILE=$(find build/libs -name "*.jar" -not -name "*-plain.jar" | head -1)
+          if [ -z "$JAR_FILE" ]; then
+            echo "No JAR file found!"
+            exit 1
+          fi
+          mv "$JAR_FILE" build/libs/app.jar
 
       - name: Upload artifact file
         uses: actions/upload-artifact@v4
@@ -66,5 +72,8 @@ jobs:
           name: deploy-scripts
           path: ~/app/scripts
 
+      - name: Make script executable
+        run: chmod +x ~/app/scripts/replace-new-version.sh
+
       - name: Replace application to latest
-        run: sudo sh ~/app/scripts/replace-new-version.sh
+        run: ~/app/scripts/replace-new-version.sh  # Remove sudo if not needed
