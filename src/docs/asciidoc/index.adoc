@@ -49,6 +49,21 @@ MyKKU API 문서입니다.
 | 서버 오류
 |===
 
+[[auth-api]]
+== 인증 API
+
+=== 구글 로그인
+
+구글 OAuth 로그인 페이지로 리다이렉트합니다.
+
+operation::auth-google-login[snippets='http-request,http-response']
+
+=== 구글 로그인 콜백
+
+구글 OAuth 인증 후 콜백을 처리하고 JWT 토큰을 발급합니다.
+
+operation::auth-google-callback[snippets='http-request,query-parameters,http-response,response-fields']
+
 [[home-api]]
 == 홈 API
 
