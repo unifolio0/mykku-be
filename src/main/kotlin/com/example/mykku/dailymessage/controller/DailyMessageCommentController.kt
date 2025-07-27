@@ -1,10 +1,12 @@
 package com.example.mykku.dailymessage.controller
 
+import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.dailymessage.dto.CommentResponse
 import com.example.mykku.dailymessage.dto.CreateCommentRequest
 import com.example.mykku.dailymessage.dto.UpdateCommentRequest
 import com.example.mykku.dailymessage.service.DailyMessageCommentService
+import com.example.mykku.member.domain.Member
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -16,12 +18,12 @@ class DailyMessageCommentController(
     @PostMapping("/api/v1/daily-messages/{dailyMessageId}/comment")
     fun createComment(
         @PathVariable dailyMessageId: Long,
-        @RequestHeader("X-Member-Id") memberId: String,
         @RequestBody request: CreateCommentRequest,
+        @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<CommentResponse>> {
         val comment = dailyMessageCommentService.createComment(
             dailyMessageId = dailyMessageId,
-            memberId = memberId,
+            memberId = member.id,
             request = request,
         )
 
@@ -36,12 +38,12 @@ class DailyMessageCommentController(
     @PutMapping("/api/v1/daily-messages/comments/{commentId}")
     fun updateComment(
         @PathVariable commentId: Long,
-        @RequestHeader("X-Member-Id") memberId: String,
         @RequestBody request: UpdateCommentRequest,
+        @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<CommentResponse>> {
         val comment = dailyMessageCommentService.updateComment(
             commentId = commentId,
-            memberId = memberId,
+            memberId = member.id,
             request = request,
         )
 

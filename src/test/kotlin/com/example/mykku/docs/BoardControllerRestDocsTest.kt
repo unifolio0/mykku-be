@@ -1,5 +1,6 @@
 package com.example.mykku.docs
 
+import com.example.mykku.auth.resolver.TestMemberArgumentResolver
 import com.example.mykku.board.controller.BoardController
 import com.example.mykku.board.dto.CreateBoardRequest
 import com.example.mykku.board.dto.CreateBoardResponse
@@ -60,6 +61,7 @@ class BoardControllerRestDocsTest {
         mockMvc = MockMvcBuilders.standaloneSetup(boardController)
             .setControllerAdvice(GlobalExceptionHandler())
             .setMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
+            .setCustomArgumentResolvers(TestMemberArgumentResolver())
             .apply<StandaloneMockMvcBuilder>(
                 documentationConfiguration(restDocumentation)
                     .operationPreprocessors()
@@ -98,12 +100,12 @@ class BoardControllerRestDocsTest {
             logo = "https://example.com/board-logo.png"
         )
 
-        `when`(boardService.createBoard(request, memberId)).thenReturn(response)
+        `when`(boardService.createBoard(request, "member123")).thenReturn(response)
 
         // when & then
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/api/v1/board")
-                .header("X-Member-Id", memberId)
+                .header("Authorization", "Bearer jwt-token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
         )
@@ -114,7 +116,7 @@ class BoardControllerRestDocsTest {
                 document(
                     "board-create",
                     requestHeaders(
-                        headerWithName("X-Member-Id").description("요청한 회원의 ID")
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
                     ),
                     requestFields(
                         fieldWithPath("title").type(JsonFieldType.STRING).description("게시판 제목"),
@@ -146,12 +148,12 @@ class BoardControllerRestDocsTest {
             logo = "https://example.com/updated-logo.png"
         )
 
-        `when`(boardService.updateBoard(request, boardId, memberId)).thenReturn(response)
+        `when`(boardService.updateBoard(request, boardId, "member123")).thenReturn(response)
 
         // when & then
         mockMvc.perform(
             RestDocumentationRequestBuilders.put("/api/v1/board/{id}", boardId)
-                .header("X-Member-Id", memberId)
+                .header("Authorization", "Bearer jwt-token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
         )
@@ -165,7 +167,7 @@ class BoardControllerRestDocsTest {
                         parameterWithName("id").description("수정할 게시판 ID")
                     ),
                     requestHeaders(
-                        headerWithName("X-Member-Id").description("요청한 회원의 ID")
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
                     ),
                     requestFields(
                         fieldWithPath("title").type(JsonFieldType.STRING).description("게시판 제목"),
@@ -191,13 +193,13 @@ class BoardControllerRestDocsTest {
             logo = "https://example.com/board-logo.png"
         )
 
-        `when`(boardService.createBoard(request, memberId))
+        `when`(boardService.createBoard(request, "member123"))
             .thenThrow(MykkuException(ErrorCode.BOARD_DUPLICATE_TITLE))
 
         // when & then
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/api/v1/board")
-                .header("X-Member-Id", memberId)
+                .header("Authorization", "Bearer jwt-token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
         )
@@ -208,7 +210,7 @@ class BoardControllerRestDocsTest {
                 document(
                     "board-create-error-duplicate",
                     requestHeaders(
-                        headerWithName("X-Member-Id").description("요청한 회원의 ID")
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
                     ),
                     requestFields(
                         fieldWithPath("title").type(JsonFieldType.STRING).description("게시판 제목"),
@@ -231,13 +233,13 @@ class BoardControllerRestDocsTest {
             logo = "https://example.com/updated-logo.png"
         )
 
-        `when`(boardService.updateBoard(request, boardId, memberId))
+        `when`(boardService.updateBoard(request, boardId, "member123"))
             .thenThrow(MykkuException(ErrorCode.BOARD_NOT_FOUND))
 
         // when & then
         mockMvc.perform(
             RestDocumentationRequestBuilders.put("/api/v1/board/{id}", boardId)
-                .header("X-Member-Id", memberId)
+                .header("Authorization", "Bearer jwt-token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
         )
@@ -251,7 +253,7 @@ class BoardControllerRestDocsTest {
                         parameterWithName("id").description("수정할 게시판 ID")
                     ),
                     requestHeaders(
-                        headerWithName("X-Member-Id").description("요청한 회원의 ID")
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
                     ),
                     requestFields(
                         fieldWithPath("title").type(JsonFieldType.STRING).description("게시판 제목"),
