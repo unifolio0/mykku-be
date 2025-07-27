@@ -7,14 +7,17 @@ spring:
     username: ${secret.datasource.username}
     password: ${secret.datasource.password}
   jpa:
+    hibernate:
+      ddl-auto: none
+    defer-datasource-initialization: true
     show-sql: true
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
-    hibernate:
-      ddl-auto: update
-    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
 
 google:
   oauth:
