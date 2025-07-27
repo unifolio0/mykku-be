@@ -117,7 +117,7 @@ class LikeControllerRestDocsTest {
                 document(
                     "like-board-list",
                     requestHeaders(
-                        headerWithName("Authorization").description("요청한 회원의 ID")
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
                     ),
                     responseFields(
                         fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
@@ -157,7 +157,7 @@ class LikeControllerRestDocsTest {
                 document(
                     "like-board-create",
                     requestHeaders(
-                        headerWithName("Authorization").description("요청한 회원의 ID")
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
                     ),
                     requestFields(
                         fieldWithPath("boardId").type(JsonFieldType.NUMBER).description("즐겨찾기할 게시판 ID")
@@ -195,7 +195,7 @@ class LikeControllerRestDocsTest {
                         parameterWithName("boardId").description("즐겨찾기 취소할 게시판 ID")
                     ),
                     requestHeaders(
-                        headerWithName("Authorization").description("요청한 회원의 ID")
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
                     )
                 )
             )
@@ -228,7 +228,7 @@ class LikeControllerRestDocsTest {
                 document(
                     "like-feed-create",
                     requestHeaders(
-                        headerWithName("Authorization").description("요청한 회원의 ID")
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
                     ),
                     requestFields(
                         fieldWithPath("feedId").type(JsonFieldType.NUMBER).description("좋아요할 피드 ID")
@@ -266,7 +266,7 @@ class LikeControllerRestDocsTest {
                         parameterWithName("feedId").description("좋아요 취소할 피드 ID")
                     ),
                     requestHeaders(
-                        headerWithName("Authorization").description("요청한 회원의 ID")
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
                     )
                 )
             )
@@ -299,7 +299,7 @@ class LikeControllerRestDocsTest {
                 document(
                     "like-comment-create",
                     requestHeaders(
-                        headerWithName("Authorization").description("요청한 회원의 ID")
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
                     ),
                     requestFields(
                         fieldWithPath("feedCommentId").type(JsonFieldType.NUMBER).description("좋아요할 댓글 ID")
@@ -342,7 +342,7 @@ class LikeControllerRestDocsTest {
                 document(
                     "like-daily-message-comment-create",
                     requestHeaders(
-                        headerWithName("Authorization").description("요청한 회원의 ID")
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
                     ),
                     requestFields(
                         fieldWithPath("dailyMessageCommentId").type(JsonFieldType.NUMBER)
@@ -385,7 +385,7 @@ class LikeControllerRestDocsTest {
                         parameterWithName("dailyMessageCommentId").description("좋아요 취소할 하루 덕담 댓글 ID")
                     ),
                     requestHeaders(
-                        headerWithName("Authorization").description("요청한 회원의 ID")
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
                     )
                 )
             )
@@ -413,7 +413,7 @@ class LikeControllerRestDocsTest {
                         parameterWithName("feedCommentId").description("좋아요 취소할 댓글 ID")
                     ),
                     requestHeaders(
-                        headerWithName("Authorization").description("요청한 회원의 ID")
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
                     )
                 )
             )
