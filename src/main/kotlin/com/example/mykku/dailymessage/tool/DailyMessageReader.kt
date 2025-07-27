@@ -28,8 +28,6 @@ class DailyMessageReader(
     }
 
     fun getDailyMessage(id: Long): DailyMessage {
-        val findAll = dailyMessageRepository.findAll()
-        println(findAll.size)
         return dailyMessageRepository.findById(id)
             .orElseThrow { MykkuException(ErrorCode.DAILY_MESSAGE_NOT_FOUND) }
     }
