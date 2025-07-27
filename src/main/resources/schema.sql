@@ -1,7 +1,7 @@
 -- MySQL Schema for MYKKU Application
 
 -- Create Member table
-CREATE TABLE member (
+CREATE TABLE IF NOT EXISTS member (
     id VARCHAR(255) NOT NULL PRIMARY KEY,
     nickname VARCHAR(10) NOT NULL,
     role VARCHAR(255) NOT NULL,
@@ -16,7 +16,7 @@ CREATE TABLE member (
 );
 
 -- Create Board table
-CREATE TABLE board (
+CREATE TABLE IF NOT EXISTS board (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(16) NOT NULL,
     logo VARCHAR(255) NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE board (
 );
 
 -- Create Feed table
-CREATE TABLE feed (
+CREATE TABLE IF NOT EXISTS feed (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     content VARCHAR(1000) NOT NULL,
@@ -40,7 +40,7 @@ CREATE TABLE feed (
 );
 
 -- Create FeedImage table
-CREATE TABLE feed_image (
+CREATE TABLE IF NOT EXISTS feed_image (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     url VARCHAR(255) NOT NULL,
     feed_id BIGINT NOT NULL,
@@ -48,7 +48,7 @@ CREATE TABLE feed_image (
 );
 
 -- Create Tag table
-CREATE TABLE tag (
+CREATE TABLE IF NOT EXISTS tag (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(20) NOT NULL,
     created_at DATETIME(6) NOT NULL,
@@ -56,7 +56,7 @@ CREATE TABLE tag (
 );
 
 -- Create FeedTag table (Many-to-Many relationship between Feed and Tag)
-CREATE TABLE feed_tag (
+CREATE TABLE IF NOT EXISTS feed_tag (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     feed_id BIGINT NOT NULL,
     tag_id BIGINT NOT NULL,
@@ -67,7 +67,7 @@ CREATE TABLE feed_tag (
 );
 
 -- Create FeedComment table
-CREATE TABLE feed_comment (
+CREATE TABLE IF NOT EXISTS feed_comment (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     content VARCHAR(1000) NOT NULL,
     like_count INT DEFAULT 0,
@@ -82,7 +82,7 @@ CREATE TABLE feed_comment (
 );
 
 -- Create DailyMessage table
-CREATE TABLE daily_message (
+CREATE TABLE IF NOT EXISTS daily_message (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     content VARCHAR(42) NOT NULL,
@@ -92,7 +92,7 @@ CREATE TABLE daily_message (
 );
 
 -- Create DailyMessageComment table
-CREATE TABLE daily_message_comment (
+CREATE TABLE IF NOT EXISTS daily_message_comment (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     content VARCHAR(1000) NOT NULL,
     like_count INT DEFAULT 0,
@@ -107,7 +107,7 @@ CREATE TABLE daily_message_comment (
 );
 
 -- Create Follow table
-CREATE TABLE follow (
+CREATE TABLE IF NOT EXISTS follow (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     follower_id VARCHAR(255) NOT NULL,
     following_id VARCHAR(255) NOT NULL,
@@ -117,7 +117,7 @@ CREATE TABLE follow (
 );
 
 -- Create SaveFeed table
-CREATE TABLE save_feed (
+CREATE TABLE IF NOT EXISTS save_feed (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     member_id VARCHAR(255) NOT NULL,
     feed_id BIGINT NOT NULL,
@@ -129,7 +129,7 @@ CREATE TABLE save_feed (
 );
 
 -- Create SaveDailyMessage table
-CREATE TABLE save_daily_message (
+CREATE TABLE IF NOT EXISTS save_daily_message (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     member_id VARCHAR(255) NOT NULL,
     daily_message_id BIGINT NOT NULL,
@@ -141,7 +141,7 @@ CREATE TABLE save_daily_message (
 );
 
 -- Create LikeFeed table
-CREATE TABLE like_feed (
+CREATE TABLE IF NOT EXISTS like_feed (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     member_id VARCHAR(255) NOT NULL,
     feed_id BIGINT NOT NULL,
@@ -153,7 +153,7 @@ CREATE TABLE like_feed (
 );
 
 -- Create LikeFeedComment table
-CREATE TABLE like_feed_comment (
+CREATE TABLE IF NOT EXISTS like_feed_comment (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     member_id VARCHAR(255) NOT NULL,
     feed_comment_id BIGINT NOT NULL,
@@ -165,7 +165,7 @@ CREATE TABLE like_feed_comment (
 );
 
 -- Create LikeDailyMessageComment table
-CREATE TABLE like_daily_message_comment (
+CREATE TABLE IF NOT EXISTS like_daily_message_comment (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     member_id VARCHAR(255) NOT NULL,
     daily_message_comment_id BIGINT NOT NULL,
@@ -177,7 +177,7 @@ CREATE TABLE like_daily_message_comment (
 );
 
 -- Create LikeBoard table
-CREATE TABLE like_board (
+CREATE TABLE IF NOT EXISTS like_board (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     member_id VARCHAR(255) NOT NULL,
     board_id BIGINT NOT NULL,
@@ -187,7 +187,7 @@ CREATE TABLE like_board (
 );
 
 -- Create Event table
-CREATE TABLE event (
+CREATE TABLE IF NOT EXISTS event (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     expired_at DATETIME(6) NOT NULL,
@@ -196,7 +196,7 @@ CREATE TABLE event (
 );
 
 -- Create EventImage table
-CREATE TABLE event_image (
+CREATE TABLE IF NOT EXISTS event_image (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     url VARCHAR(255) NOT NULL,
     event_id BIGINT NOT NULL,
@@ -204,7 +204,7 @@ CREATE TABLE event_image (
 );
 
 -- Create ContestWinner table
-CREATE TABLE contest_winner (
+CREATE TABLE IF NOT EXISTS contest_winner (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     winner_rank INT NOT NULL,
     description VARCHAR(255) NOT NULL,

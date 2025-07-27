@@ -8,7 +8,7 @@ spring:
     password: ${secret.datasource.password}
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create-drop
     defer-datasource-initialization: true
     show-sql: true
     properties:
