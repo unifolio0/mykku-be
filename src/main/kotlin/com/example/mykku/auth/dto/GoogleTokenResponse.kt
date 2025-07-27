@@ -7,7 +7,7 @@ data class GoogleTokenResponse(
     val accessToken: String,
 
     @JsonProperty("expires_in")
-    val expiresIn: Int,
+    val expiresIn: Long,
 
     @JsonProperty("token_type")
     val tokenType: String,

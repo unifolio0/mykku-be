@@ -106,7 +106,7 @@ class AuthControllerRestDocsTest {
             tokenType = "Bearer",
             expiresIn = 86400000,
             member = MemberInfo(
-                id = 1L,
+                id = "testId",
                 email = "user@example.com",
                 nickname = "홍길동",
                 profileImage = "https://example.com/profile.jpg"
@@ -138,7 +138,7 @@ class AuthControllerRestDocsTest {
                         fieldWithPath("data.tokenType").type(JsonFieldType.STRING).description("토큰 타입"),
                         fieldWithPath("data.expiresIn").type(JsonFieldType.NUMBER).description("토큰 만료 시간 (밀리초)"),
                         fieldWithPath("data.member").type(JsonFieldType.OBJECT).description("회원 정보"),
-                        fieldWithPath("data.member.id").type(JsonFieldType.NUMBER).description("회원 ID"),
+                        fieldWithPath("data.member.id").type(JsonFieldType.STRING).description("회원 ID"),
                         fieldWithPath("data.member.email").type(JsonFieldType.STRING).description("회원 이메일"),
                         fieldWithPath("data.member.nickname").type(JsonFieldType.STRING).description("회원 닉네임"),
                         fieldWithPath("data.member.profileImage").type(JsonFieldType.STRING).description("프로필 이미지 URL")

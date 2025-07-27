@@ -27,7 +27,7 @@ class Member(
     val socialId: String,
 
     @Column(name = "email")
-    val email: String? = null,
+    val email: String,
 
     @Column(name = "follower_count")
     var followerCount: Int = 0,

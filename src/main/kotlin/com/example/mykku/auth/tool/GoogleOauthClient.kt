@@ -5,6 +5,7 @@ import com.example.mykku.auth.dto.GoogleTokenResponse
 import com.example.mykku.auth.dto.GoogleUserInfo
 import com.example.mykku.exception.ErrorCode
 import com.example.mykku.exception.MykkuException
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
@@ -19,6 +20,7 @@ class GoogleOauthClient(
     private val oAuthProperties: OAuthProperties,
     private val restClient: RestClient
 ) : OauthClient {
+    private val logger = LoggerFactory.getLogger(JwtTokenProvider::class.java)
 
     override fun getAuthUrl(): String {
         return "https://accounts.google.com/o/oauth2/v2/auth?" +
@@ -53,8 +55,10 @@ class GoogleOauthClient(
                 else -> throw MykkuException(ErrorCode.OAUTH_TOKEN_EXCHANGE_FAILED)
             }
         } catch (e: HttpServerErrorException) {
+            logger.error("External service error during token exchange", e)
             throw MykkuException(ErrorCode.OAUTH_EXTERNAL_SERVICE_ERROR)
         } catch (e: Exception) {
+            logger.error("Unexpected error during token exchange", e)
             throw MykkuException(ErrorCode.OAUTH_TOKEN_EXCHANGE_FAILED)
         }
     }
@@ -73,8 +77,10 @@ class GoogleOauthClient(
                 else -> throw MykkuException(ErrorCode.OAUTH_USER_INFO_FAILED)
             }
         } catch (e: HttpServerErrorException) {
+            logger.error("External service error while fetching user info", e)
             throw MykkuException(ErrorCode.OAUTH_EXTERNAL_SERVICE_ERROR)
         } catch (e: Exception) {
+            logger.error("Unexpected error while fetching user info", e)
             throw MykkuException(ErrorCode.OAUTH_USER_INFO_FAILED)
         }
     }

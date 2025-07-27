@@ -14,10 +14,10 @@ class JwtTokenProviderTest {
 
     @BeforeEach
     fun setUp() {
-        val jwtProperties = JwtProperties().apply {
-            secret = testSecret
+        val jwtProperties = JwtProperties(
+            secret = testSecret,
             expiration = 86400000 // 24 hours
-        }
+        )
         jwtTokenProvider = JwtTokenProvider(jwtProperties)
     }
 
@@ -109,7 +109,7 @@ class JwtTokenProviderTest {
         // then
         assertNotNull(loginResponse.accessToken)
         assertEquals(86400000, loginResponse.expiresIn)
-        assertEquals(0L, loginResponse.member.id)
+        assertEquals(member.id, loginResponse.member.id)
         assertEquals(userEmail, loginResponse.member.email)
         assertEquals(member.nickname, loginResponse.member.nickname)
         assertEquals(member.profileImage, loginResponse.member.profileImage)

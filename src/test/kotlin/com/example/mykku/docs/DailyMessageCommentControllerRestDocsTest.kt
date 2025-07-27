@@ -121,7 +121,7 @@ class DailyMessageCommentControllerRestDocsTest {
                         parameterWithName("dailyMessageId").description("댓글을 작성할 하루 덕담 ID")
                     ),
                     requestHeaders(
-                        headerWithName("Authorization").description("요청한 회원의 ID")
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
                     ),
                     requestFields(
                         fieldWithPath("content").type(JsonFieldType.STRING).description("댓글 내용"),

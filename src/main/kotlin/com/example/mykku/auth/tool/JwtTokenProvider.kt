@@ -7,6 +7,7 @@ import com.example.mykku.member.domain.Member
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.util.*
 
@@ -14,6 +15,7 @@ import java.util.*
 class JwtTokenProvider(
     private val jwtProperties: JwtProperties
 ) {
+    private val logger = LoggerFactory.getLogger(JwtTokenProvider::class.java)
     private val secretKey = Keys.hmacShaKeyFor(jwtProperties.secret.toByteArray())
 
     fun generateToken(memberId: String, email: String): String {
@@ -31,12 +33,12 @@ class JwtTokenProvider(
 
     fun createLoginResponse(member: Member, userEmail: String): LoginResponse {
         val jwtToken = generateToken(member.id, userEmail)
-        
+
         return LoginResponse(
             accessToken = jwtToken,
             expiresIn = jwtProperties.expiration,
             member = MemberInfo(
-                id = member.id.toLongOrNull() ?: 0L,
+                id = member.id,
                 email = userEmail,
                 nickname = member.nickname,
                 profileImage = member.profileImage
@@ -49,6 +51,7 @@ class JwtTokenProvider(
             parseToken(token)
             true
         } catch (e: Exception) {
+            logger.debug("Token validation failed", e)
             false
         }
     }

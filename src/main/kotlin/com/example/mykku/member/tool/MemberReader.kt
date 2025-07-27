@@ -6,6 +6,7 @@ import com.example.mykku.member.domain.Member
 import com.example.mykku.member.repository.FollowRepository
 import com.example.mykku.member.repository.MemberRepository
 import org.springframework.stereotype.Component
+import java.util.*
 
 @Component
 class MemberReader(
@@ -20,5 +21,13 @@ class MemberReader(
     fun getMemberById(memberId: String): Member {
         return memberRepository.findById(memberId)
             .orElseThrow { MykkuException(ErrorCode.MEMBER_NOT_FOUND) }
+    }
+
+    fun findById(memberId: String): Optional<Member> {
+        return memberRepository.findById(memberId)
+    }
+
+    fun existsByNickname(nickname: String): Boolean {
+        return memberRepository.existsByNickname(nickname)
     }
 }
