@@ -11,8 +11,14 @@ permissions:
 
 jobs:
   generate:
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: $
     runs-on: ubuntu-latest
-    
+
     services:
       mysql:
         image: mysql:8.0
@@ -38,6 +44,7 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+          cache: "gradle"
 
       - name: Grant Permission
         run: chmod +x ./gradlew
@@ -48,27 +55,11 @@ jobs:
       - name: Generate API documentation
         run: ./gradlew asciidoctor
 
-      - name: Copy generated docs to static resources
-        run: |
-          mkdir -p src/main/resources/static/docs/generated
-          cp -r build/docs/asciidoc/* src/main/resources/static/docs/generated/
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "./build/docs/asciidoc"
 
-      - name: Check for changes
-        id: check_changes
-        run: |
-          git add -A
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-            echo "changes=false" >> $GITHUB_OUTPUT
-          else
-            echo "Changes detected"
-            echo "changes=true" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Commit and push documentation
-        if: steps.check_changes.outputs.changes == 'true'
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git commit -m "docs: Update API documentation [skip ci]"
-          git push
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
