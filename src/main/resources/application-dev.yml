@@ -15,3 +15,15 @@ spring:
     hibernate:
       ddl-auto: update
     defer-datasource-initialization: true
+
+google:
+  oauth:
+    client-id: ${secret.oauth.client-id}
+    client-secret: ${secret.oauth.client-secret}
+    redirect-uri: ${secret.oauth.redirect-uri}
+    token-uri: ${secret.oauth.token-uri}
+    user-info-uri: ${secret.oauth.user-info-uri}
+
+jwt:
+  secret: ${secret.jwt.secret_key}
+  expiration: ${secret.jwt.expiration}
