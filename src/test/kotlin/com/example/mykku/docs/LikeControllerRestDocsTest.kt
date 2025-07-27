@@ -1,5 +1,6 @@
 package com.example.mykku.docs
 
+import com.example.mykku.auth.resolver.TestMemberArgumentResolver
 import com.example.mykku.like.controller.LikeController
 import com.example.mykku.like.dto.*
 import com.example.mykku.like.service.LikeService
@@ -54,6 +55,7 @@ class LikeControllerRestDocsTest {
     fun setUp(restDocumentation: RestDocumentationContextProvider) {
         mockMvc = MockMvcBuilders.standaloneSetup(likeController)
             .setMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
+            .setCustomArgumentResolvers(TestMemberArgumentResolver())
             .apply<StandaloneMockMvcBuilder>(
                 documentationConfiguration(restDocumentation)
                     .operationPreprocessors()
@@ -100,12 +102,12 @@ class LikeControllerRestDocsTest {
             )
         )
 
-        `when`(likeService.getLikedBoards(memberId)).thenReturn(likedBoards)
+        `when`(likeService.getLikedBoards("member123")).thenReturn(likedBoards)
 
         // when & then
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/api/v1/boards/like")
-                .header("X-Member-Id", memberId)
+                .header("Authorization", "Bearer jwt-token")
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andDo(MockMvcResultHandlers.print())
@@ -115,7 +117,7 @@ class LikeControllerRestDocsTest {
                 document(
                     "like-board-list",
                     requestHeaders(
-                        headerWithName("X-Member-Id").description("요청한 회원의 ID")
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
                     ),
                     responseFields(
                         fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
@@ -139,12 +141,12 @@ class LikeControllerRestDocsTest {
             boardId = 1L
         )
 
-        `when`(likeService.likeBoard(request, memberId)).thenReturn(response)
+        `when`(likeService.likeBoard(request, "member123")).thenReturn(response)
 
         // when & then
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/api/v1/board/like")
-                .header("X-Member-Id", memberId)
+                .header("Authorization", "Bearer jwt-token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
         )
@@ -155,7 +157,7 @@ class LikeControllerRestDocsTest {
                 document(
                     "like-board-create",
                     requestHeaders(
-                        headerWithName("X-Member-Id").description("요청한 회원의 ID")
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
                     ),
                     requestFields(
                         fieldWithPath("boardId").type(JsonFieldType.NUMBER).description("즐겨찾기할 게시판 ID")
@@ -182,7 +184,7 @@ class LikeControllerRestDocsTest {
         // when & then
         mockMvc.perform(
             RestDocumentationRequestBuilders.delete("/api/v1/board/unlike/{boardId}", boardId)
-                .header("X-Member-Id", memberId)
+                .header("Authorization", "Bearer jwt-token")
         )
             .andDo(MockMvcResultHandlers.print())
             .andExpect(status().isNoContent)
@@ -193,7 +195,7 @@ class LikeControllerRestDocsTest {
                         parameterWithName("boardId").description("즐겨찾기 취소할 게시판 ID")
                     ),
                     requestHeaders(
-                        headerWithName("X-Member-Id").description("요청한 회원의 ID")
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
                     )
                 )
             )
@@ -215,7 +217,7 @@ class LikeControllerRestDocsTest {
         // when & then
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/api/v1/feed/like")
-                .header("X-Member-Id", memberId)
+                .header("Authorization", "Bearer jwt-token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
         )
@@ -226,7 +228,7 @@ class LikeControllerRestDocsTest {
                 document(
                     "like-feed-create",
                     requestHeaders(
-                        headerWithName("X-Member-Id").description("요청한 회원의 ID")
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
                     ),
                     requestFields(
                         fieldWithPath("feedId").type(JsonFieldType.NUMBER).description("좋아요할 피드 ID")
@@ -253,7 +255,7 @@ class LikeControllerRestDocsTest {
         // when & then
         mockMvc.perform(
             RestDocumentationRequestBuilders.delete("/api/v1/feed/unlike/{feedId}", feedId)
-                .header("X-Member-Id", memberId)
+                .header("Authorization", "Bearer jwt-token")
         )
             .andDo(MockMvcResultHandlers.print())
             .andExpect(status().isNoContent)
@@ -264,7 +266,7 @@ class LikeControllerRestDocsTest {
                         parameterWithName("feedId").description("좋아요 취소할 피드 ID")
                     ),
                     requestHeaders(
-                        headerWithName("X-Member-Id").description("요청한 회원의 ID")
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
                     )
                 )
             )
@@ -286,7 +288,7 @@ class LikeControllerRestDocsTest {
         // when & then
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/api/v1/comment/like")
-                .header("X-Member-Id", memberId)
+                .header("Authorization", "Bearer jwt-token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
         )
@@ -297,7 +299,7 @@ class LikeControllerRestDocsTest {
                 document(
                     "like-comment-create",
                     requestHeaders(
-                        headerWithName("X-Member-Id").description("요청한 회원의 ID")
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
                     ),
                     requestFields(
                         fieldWithPath("feedCommentId").type(JsonFieldType.NUMBER).description("좋아요할 댓글 ID")
@@ -329,7 +331,7 @@ class LikeControllerRestDocsTest {
         // when & then
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/api/v1/daily-message-comment/like")
-                .header("X-Member-Id", memberId)
+                .header("Authorization", "Bearer jwt-token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
         )
@@ -340,7 +342,7 @@ class LikeControllerRestDocsTest {
                 document(
                     "like-daily-message-comment-create",
                     requestHeaders(
-                        headerWithName("X-Member-Id").description("요청한 회원의 ID")
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
                     ),
                     requestFields(
                         fieldWithPath("dailyMessageCommentId").type(JsonFieldType.NUMBER)
@@ -372,7 +374,7 @@ class LikeControllerRestDocsTest {
                 "/api/v1/daily-message-comment/unlike/{dailyMessageCommentId}",
                 dailyMessageCommentId
             )
-                .header("X-Member-Id", memberId)
+                .header("Authorization", "Bearer jwt-token")
         )
             .andDo(MockMvcResultHandlers.print())
             .andExpect(status().isNoContent)
@@ -383,7 +385,7 @@ class LikeControllerRestDocsTest {
                         parameterWithName("dailyMessageCommentId").description("좋아요 취소할 하루 덕담 댓글 ID")
                     ),
                     requestHeaders(
-                        headerWithName("X-Member-Id").description("요청한 회원의 ID")
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
                     )
                 )
             )
@@ -400,7 +402,7 @@ class LikeControllerRestDocsTest {
         // when & then
         mockMvc.perform(
             RestDocumentationRequestBuilders.delete("/api/v1/comment/unlike/{feedCommentId}", feedCommentId)
-                .header("X-Member-Id", memberId)
+                .header("Authorization", "Bearer jwt-token")
         )
             .andDo(MockMvcResultHandlers.print())
             .andExpect(status().isNoContent)
@@ -411,7 +413,7 @@ class LikeControllerRestDocsTest {
                         parameterWithName("feedCommentId").description("좋아요 취소할 댓글 ID")
                     ),
                     requestHeaders(
-                        headerWithName("X-Member-Id").description("요청한 회원의 ID")
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
                     )
                 )
             )

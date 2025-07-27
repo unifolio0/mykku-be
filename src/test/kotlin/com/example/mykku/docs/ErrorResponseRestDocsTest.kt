@@ -1,5 +1,6 @@
 package com.example.mykku.docs
 
+import com.example.mykku.auth.resolver.TestMemberArgumentResolver
 import com.example.mykku.board.controller.BoardController
 import com.example.mykku.board.dto.CreateBoardRequest
 import com.example.mykku.board.dto.UpdateBoardRequest
@@ -55,6 +56,7 @@ class ErrorResponseRestDocsTest {
         mockMvc = MockMvcBuilders.standaloneSetup(boardController)
             .setControllerAdvice(GlobalExceptionHandler())
             .setMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
+            .setCustomArgumentResolvers(TestMemberArgumentResolver())
             .apply<StandaloneMockMvcBuilder>(
                 documentationConfiguration(restDocumentation)
                     .operationPreprocessors()
@@ -88,13 +90,13 @@ class ErrorResponseRestDocsTest {
             logo = "https://example.com/board-logo.png"
         )
 
-        `when`(boardService.createBoard(request, memberId))
+        `when`(boardService.createBoard(request, "member123"))
             .thenThrow(MykkuException(ErrorCode.BOARD_DUPLICATE_TITLE))
 
         // when & then
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/api/v1/board")
-                .header("X-Member-Id", memberId)
+                .header("Authorization", "Bearer jwt-token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
         )
@@ -121,13 +123,13 @@ class ErrorResponseRestDocsTest {
             logo = "https://example.com/board-logo.png"
         )
 
-        `when`(boardService.updateBoard(request, boardId, memberId))
+        `when`(boardService.updateBoard(request, boardId, "member123"))
             .thenThrow(MykkuException(ErrorCode.BOARD_NOT_FOUND))
 
         // when & then
         mockMvc.perform(
             RestDocumentationRequestBuilders.put("/api/v1/board/{id}", boardId)
-                .header("X-Member-Id", memberId)
+                .header("Authorization", "Bearer jwt-token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
         )
@@ -153,13 +155,13 @@ class ErrorResponseRestDocsTest {
             logo = "https://example.com/board-logo.png"
         )
 
-        `when`(boardService.createBoard(request, memberId))
+        `when`(boardService.createBoard(request, "member123"))
             .thenThrow(RuntimeException("예상치 못한 에러"))
 
         // when & then
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/api/v1/board")
-                .header("X-Member-Id", memberId)
+                .header("Authorization", "Bearer jwt-token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
         )

@@ -135,11 +135,11 @@ class FeedControllerRestDocsTest {
             )
         )
 
-        `when`(feedService.getFeeds(memberId)).thenReturn(feedsResponse)
+        `when`(feedService.getFeeds("member123")).thenReturn(feedsResponse)
 
         // when & then
         mockMvc.perform(
-            RestDocumentationRequestBuilders.get("/api/v1/{memberId}/feeds", memberId)
+            RestDocumentationRequestBuilders.get("/api/v1/{memberId}/feeds", "member123")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
         )

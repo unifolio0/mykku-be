@@ -57,4 +57,16 @@ enum class ErrorCode(val status: HttpStatus, val message: String) {
     LIKE_FEED_COMMENT_ALREADY_LIKED(HttpStatus.BAD_REQUEST, "이미 좋아요한 피드 댓글입니다"),
     FEED_COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "피드 댓글을 찾을 수 없습니다"),
     LIKE_FEED_COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "좋아요한 피드 댓글을 찾을 수 없습니다"),
+
+    // OAuth
+    OAUTH_TOKEN_EXCHANGE_FAILED(HttpStatus.BAD_REQUEST, "OAuth 토큰 교환에 실패했습니다"),
+    OAUTH_USER_INFO_FAILED(HttpStatus.BAD_REQUEST, "사용자 정보를 가져오는데 실패했습니다"),
+    OAUTH_INVALID_CODE(HttpStatus.BAD_REQUEST, "유효하지 않은 인증 코드입니다"),
+    OAUTH_INVALID_CLIENT(HttpStatus.UNAUTHORIZED, "유효하지 않은 클라이언트 정보입니다"),
+    OAUTH_INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 액세스 토큰입니다"),
+    OAUTH_EXTERNAL_SERVICE_ERROR(HttpStatus.SERVICE_UNAVAILABLE, "외부 서비스 오류가 발생했습니다"),
+
+    // Auth
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증이 필요합니다"),
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다"),
 }

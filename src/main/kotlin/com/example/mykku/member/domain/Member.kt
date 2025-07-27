@@ -3,9 +3,7 @@ package com.example.mykku.member.domain
 import com.example.mykku.common.domain.BaseEntity
 import com.example.mykku.exception.ErrorCode
 import com.example.mykku.exception.MykkuException
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
+import jakarta.persistence.*
 
 @Entity
 class Member(
@@ -20,6 +18,16 @@ class Member(
 
     @Column(name = "profile_image")
     var profileImage: String,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "provider")
+    val provider: SocialProvider,
+
+    @Column(name = "social_id")
+    val socialId: String,
+
+    @Column(name = "email")
+    val email: String,
 
     @Column(name = "follower_count")
     var followerCount: Int = 0,

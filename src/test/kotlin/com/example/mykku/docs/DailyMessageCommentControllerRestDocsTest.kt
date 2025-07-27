@@ -1,5 +1,6 @@
 package com.example.mykku.docs
 
+import com.example.mykku.auth.resolver.TestMemberArgumentResolver
 import com.example.mykku.dailymessage.controller.DailyMessageCommentController
 import com.example.mykku.dailymessage.dto.CommentResponse
 import com.example.mykku.dailymessage.dto.CreateCommentRequest
@@ -56,6 +57,7 @@ class DailyMessageCommentControllerRestDocsTest {
     fun setUp(restDocumentation: RestDocumentationContextProvider) {
         mockMvc = MockMvcBuilders.standaloneSetup(dailyMessageCommentController)
             .setMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
+            .setCustomArgumentResolvers(TestMemberArgumentResolver())
             .apply<StandaloneMockMvcBuilder>(
                 documentationConfiguration(restDocumentation)
                     .operationPreprocessors()
@@ -84,7 +86,6 @@ class DailyMessageCommentControllerRestDocsTest {
     fun `하루 덕담 댓글 생성 API 문서화`() {
         // given
         val dailyMessageId = 1L
-        val memberId = "member123"
         val request = CreateCommentRequest(
             content = "좋은 덕담 감사합니다!",
             parentCommentId = null
@@ -99,13 +100,13 @@ class DailyMessageCommentControllerRestDocsTest {
             replies = emptyList()
         )
 
-        `when`(dailyMessageCommentService.createComment(dailyMessageId, memberId, request))
+        `when`(dailyMessageCommentService.createComment(dailyMessageId, "member123", request))
             .thenReturn(response)
 
         // when & then
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/api/v1/daily-messages/{dailyMessageId}/comment", dailyMessageId)
-                .header("X-Member-Id", memberId)
+                .header("Authorization", "Bearer jwt-token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
         )
@@ -119,7 +120,7 @@ class DailyMessageCommentControllerRestDocsTest {
                         parameterWithName("dailyMessageId").description("댓글을 작성할 하루 덕담 ID")
                     ),
                     requestHeaders(
-                        headerWithName("X-Member-Id").description("요청한 회원의 ID")
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
                     ),
                     requestFields(
                         fieldWithPath("content").type(JsonFieldType.STRING).description("댓글 내용"),
@@ -144,7 +145,6 @@ class DailyMessageCommentControllerRestDocsTest {
     fun `하루 덕담 답글 생성 API 문서화`() {
         // given
         val dailyMessageId = 1L
-        val memberId = "member456"
         val parentCommentId = 10L
         val request = CreateCommentRequest(
             content = "저도 동감합니다!",
@@ -160,13 +160,13 @@ class DailyMessageCommentControllerRestDocsTest {
             replies = emptyList()
         )
 
-        `when`(dailyMessageCommentService.createComment(dailyMessageId, memberId, request))
+        `when`(dailyMessageCommentService.createComment(dailyMessageId, "member123", request))
             .thenReturn(response)
 
         // when & then
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/api/v1/daily-messages/{dailyMessageId}/comment", dailyMessageId)
-                .header("X-Member-Id", memberId)
+                .header("Authorization", "Bearer jwt-token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
         )
@@ -180,7 +180,7 @@ class DailyMessageCommentControllerRestDocsTest {
                         parameterWithName("dailyMessageId").description("댓글을 작성할 하루 덕담 ID")
                     ),
                     requestHeaders(
-                        headerWithName("X-Member-Id").description("요청한 회원의 ID")
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
                     ),
                     requestFields(
                         fieldWithPath("content").type(JsonFieldType.STRING).description("답글 내용"),
@@ -204,7 +204,6 @@ class DailyMessageCommentControllerRestDocsTest {
     fun `하루 덕담 댓글 수정 API 문서화`() {
         // given
         val commentId = 1L
-        val memberId = "member123"
         val request = UpdateCommentRequest(
             content = "수정된 댓글 내용입니다!"
         )
@@ -218,13 +217,13 @@ class DailyMessageCommentControllerRestDocsTest {
             replies = emptyList()
         )
 
-        `when`(dailyMessageCommentService.updateComment(commentId, memberId, request))
+        `when`(dailyMessageCommentService.updateComment(commentId, "member123", request))
             .thenReturn(response)
 
         // when & then
         mockMvc.perform(
             RestDocumentationRequestBuilders.put("/api/v1/daily-messages/comments/{commentId}", commentId)
-                .header("X-Member-Id", memberId)
+                .header("Authorization", "Bearer jwt-token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
         )
@@ -238,7 +237,7 @@ class DailyMessageCommentControllerRestDocsTest {
                         parameterWithName("commentId").description("수정할 댓글 ID")
                     ),
                     requestHeaders(
-                        headerWithName("X-Member-Id").description("요청한 회원의 ID")
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
                     ),
                     requestFields(
                         fieldWithPath("content").type(JsonFieldType.STRING).description("수정할 댓글 내용")
