@@ -19,7 +19,7 @@ import org.springframework.web.client.body
 class GoogleOauthClient(
     private val oAuthProperties: OAuthProperties,
     private val restClient: RestClient
-) : OauthClient {
+) : OauthClient<GoogleTokenResponse, GoogleUserInfo> {
     private val logger = LoggerFactory.getLogger(JwtTokenProvider::class.java)
 
     override fun getAuthUrl(): String {
@@ -63,11 +63,11 @@ class GoogleOauthClient(
         }
     }
 
-    override fun getUserInfo(accessToken: String): GoogleUserInfo {
+    override fun getUserInfo(token: String): GoogleUserInfo {
         return try {
             restClient.get()
                 .uri(oAuthProperties.userInfoUri)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
                 .retrieve()
                 .body<GoogleUserInfo>()
                 ?: throw MykkuException(ErrorCode.OAUTH_USER_INFO_FAILED)

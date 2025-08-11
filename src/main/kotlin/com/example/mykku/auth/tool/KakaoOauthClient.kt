@@ -19,17 +19,17 @@ import org.springframework.web.client.body
 class KakaoOauthClient(
     private val kakaoOAuthProperties: KakaoOAuthProperties,
     private val restClient: RestClient
-) {
+) : OauthClient<KakaoTokenResponse, KakaoUserInfo> {
     private val logger = LoggerFactory.getLogger(KakaoOauthClient::class.java)
 
-    fun getAuthUrl(): String {
+    override fun getAuthUrl(): String {
         return "https://kauth.kakao.com/oauth/authorize?" +
                 "client_id=${kakaoOAuthProperties.clientId}&" +
                 "response_type=code&" +
                 "redirect_uri=${kakaoOAuthProperties.redirectUri}"
     }
 
-    fun exchangeCodeForToken(code: String): KakaoTokenResponse {
+    override fun exchangeCodeForToken(code: String): KakaoTokenResponse {
         val formData = LinkedMultiValueMap<String, String>().apply {
             add("grant_type", "authorization_code")
             add("client_id", kakaoOAuthProperties.clientId)
@@ -61,11 +61,11 @@ class KakaoOauthClient(
         }
     }
 
-    fun getUserInfo(accessToken: String): KakaoUserInfo {
+    override fun getUserInfo(token: String): KakaoUserInfo {
         return try {
             restClient.get()
                 .uri(kakaoOAuthProperties.userInfoUri)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
                 .header(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded;charset=utf-8")
                 .retrieve()
                 .body<KakaoUserInfo>()

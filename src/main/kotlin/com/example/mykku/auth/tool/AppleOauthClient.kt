@@ -34,7 +34,7 @@ class AppleOauthClient(
     private val restClient: RestClient,
     private val resourceLoader: ResourceLoader,
     private val objectMapper: ObjectMapper
-) {
+) : OauthClient<AppleTokenResponse, AppleUserInfo> {
     private val logger = LoggerFactory.getLogger(AppleOauthClient::class.java)
     private val appleKeysUrl = "https://appleid.apple.com/auth/keys"
     
@@ -43,7 +43,11 @@ class AppleOauthClient(
     private var cacheTimestamp: LocalDateTime? = null
     private val cacheTtlMinutes = 60L // 1시간 캐시 유지
 
-    fun getAuthUrl(state: String = UUID.randomUUID().toString()): String {
+    override fun getAuthUrl(): String {
+        return getAuthUrl(UUID.randomUUID().toString())
+    }
+
+    fun getAuthUrl(state: String): String {
         return "${appleOAuthProperties.authUri}?" +
                 "client_id=${appleOAuthProperties.clientId}&" +
                 "redirect_uri=${appleOAuthProperties.redirectUri}&" +
@@ -53,7 +57,7 @@ class AppleOauthClient(
                 "response_mode=form_post"
     }
 
-    fun exchangeCodeForToken(code: String): AppleTokenResponse {
+    override fun exchangeCodeForToken(code: String): AppleTokenResponse {
         val clientSecret = generateClientSecret()
         
         val formData = LinkedMultiValueMap<String, String>().apply {
@@ -87,9 +91,9 @@ class AppleOauthClient(
         }
     }
 
-    fun getUserInfo(idToken: String): AppleUserInfo {
+    override fun getUserInfo(token: String): AppleUserInfo {
         return try {
-            val claims = parseAndVerifyIdToken(idToken)
+            val claims = parseAndVerifyIdToken(token)
             AppleUserInfo(
                 sub = claims["sub"] as String,
                 email = claims["email"] as? String,

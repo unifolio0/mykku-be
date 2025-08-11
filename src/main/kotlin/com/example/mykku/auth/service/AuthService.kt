@@ -5,9 +5,9 @@ import com.example.mykku.auth.dto.GoogleUserInfo
 import com.example.mykku.auth.dto.KakaoUserInfo
 import com.example.mykku.auth.dto.LoginResponse
 import com.example.mykku.auth.tool.AppleOauthClient
+import com.example.mykku.auth.tool.GoogleOauthClient
 import com.example.mykku.auth.tool.JwtTokenProvider
 import com.example.mykku.auth.tool.KakaoOauthClient
-import com.example.mykku.auth.tool.OauthClient
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.tool.MemberReader
@@ -20,18 +20,18 @@ class AuthService(
     private val jwtTokenProvider: JwtTokenProvider,
     private val memberReader: MemberReader,
     private val memberWriter: MemberWriter,
-    private val oauthClient: OauthClient,
+    private val googleOauthClient: GoogleOauthClient,
     private val kakaoOauthClient: KakaoOauthClient,
     private val appleOauthClient: AppleOauthClient
 ) {
     fun getGoogleAuthUrl(): String {
-        return oauthClient.getAuthUrl()
+        return googleOauthClient.getAuthUrl()
     }
 
     @Transactional
     fun handleGoogleCallback(code: String): LoginResponse {
-        val tokenResponse = oauthClient.exchangeCodeForToken(code)
-        val userInfo = oauthClient.getUserInfo(tokenResponse.accessToken)
+        val tokenResponse = googleOauthClient.exchangeCodeForToken(code)
+        val userInfo = googleOauthClient.getUserInfo(tokenResponse.accessToken)
         val member = createOrUpdateMember(userInfo)
         return jwtTokenProvider.createLoginResponse(member, userInfo.email)
     }
