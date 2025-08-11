@@ -7,7 +7,6 @@ import com.example.mykku.exception.ErrorCode
 import com.example.mykku.exception.MykkuException
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ResourceLoader
 import org.springframework.http.MediaType
@@ -27,6 +26,7 @@ import java.security.spec.RSAPublicKeySpec
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 @Component
 class AppleOauthClient(
@@ -38,8 +38,10 @@ class AppleOauthClient(
     private val logger = LoggerFactory.getLogger(AppleOauthClient::class.java)
     private val appleKeysUrl = "https://appleid.apple.com/auth/keys"
     
-    // Apple 공개 키 캐싱 (실제 운영 환경에서는 TTL 기반 캐싱 권장)
-    private var cachedAppleKeys: Map<String, PublicKey>? = null
+    // Apple 공개 키 TTL 기반 캐싱
+    private val cachedAppleKeys = ConcurrentHashMap<String, PublicKey>()
+    private var cacheTimestamp: LocalDateTime? = null
+    private val cacheTtlMinutes = 60L // 1시간 캐시 유지
 
     fun getAuthUrl(state: String = UUID.randomUUID().toString()): String {
         return "${appleOAuthProperties.authUri}?" +
@@ -116,7 +118,7 @@ class AppleOauthClient(
             .audience().add("https://appleid.apple.com").and()
             .subject(appleOAuthProperties.clientId)
             .header().keyId(appleOAuthProperties.keyId).and()
-            .signWith(getPrivateKey(), SignatureAlgorithm.ES256)
+            .signWith(getPrivateKey())
             .compact()
     }
 
@@ -176,13 +178,31 @@ class AppleOauthClient(
     }
     
     private fun getApplePublicKey(kid: String): PublicKey {
-        // 캐시된 키가 없으면 Apple에서 가져오기
-        if (cachedAppleKeys == null) {
-            cachedAppleKeys = fetchApplePublicKeys()
+        // 캐시가 만료되었거나 비어있으면 새로 가져오기
+        if (isCacheExpired()) {
+            refreshApplePublicKeys()
         }
         
-        return cachedAppleKeys!![kid] 
+        return cachedAppleKeys[kid] 
             ?: throw IllegalArgumentException("Public key not found for kid: $kid")
+    }
+    
+    private fun isCacheExpired(): Boolean {
+        return cacheTimestamp == null || 
+               LocalDateTime.now().isAfter(cacheTimestamp!!.plusMinutes(cacheTtlMinutes))
+    }
+    
+    private fun refreshApplePublicKeys() {
+        try {
+            val newKeys = fetchApplePublicKeys()
+            cachedAppleKeys.clear()
+            cachedAppleKeys.putAll(newKeys)
+            cacheTimestamp = LocalDateTime.now()
+            logger.info("Apple public keys refreshed successfully. Total keys: ${newKeys.size}")
+        } catch (e: Exception) {
+            logger.error("Failed to refresh Apple public keys", e)
+            throw e
+        }
     }
     
     private fun fetchApplePublicKeys(): Map<String, PublicKey> {

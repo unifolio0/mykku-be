@@ -64,6 +64,30 @@ operation::auth-google-login[snippets='http-request,http-response']
 
 operation::auth-google-callback[snippets='http-request,query-parameters,http-response,response-fields']
 
+=== 카카오 로그인
+
+카카오 OAuth 로그인 페이지로 리다이렉트합니다.
+
+operation::auth-kakao-login[snippets='http-request,http-response']
+
+=== 카카오 로그인 콜백
+
+카카오 OAuth 인증 후 콜백을 처리하고 JWT 토큰을 발급합니다.
+
+operation::auth-kakao-callback[snippets='http-request,query-parameters,http-response,response-fields']
+
+=== 애플 로그인
+
+애플 OAuth 로그인 페이지로 리다이렉트합니다.
+
+operation::auth-apple-login[snippets='http-request,query-parameters,http-response']
+
+=== 애플 로그인 콜백
+
+애플 OAuth 인증 후 콜백을 처리하고 JWT 토큰을 발급합니다.
+
+operation::auth-apple-callback[snippets='http-request,form-parameters,http-response,response-fields']
+
 [[home-api]]
 == 홈 API
 
