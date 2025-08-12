@@ -1,8 +1,8 @@
 package com.example.mykku.auth.tool
 
-import com.example.mykku.auth.config.OAuthProperties
-import com.example.mykku.auth.dto.GoogleTokenResponse
-import com.example.mykku.auth.dto.GoogleUserInfo
+import com.example.mykku.auth.config.KakaoOAuthProperties
+import com.example.mykku.auth.dto.KakaoTokenResponse
+import com.example.mykku.auth.dto.KakaoUserInfo
 import com.example.mykku.exception.ErrorCode
 import com.example.mykku.exception.MykkuException
 import org.slf4j.LoggerFactory
@@ -16,37 +16,35 @@ import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
 
 @Component
-class GoogleOauthClient(
-    private val oAuthProperties: OAuthProperties,
+class KakaoOauthClient(
+    private val kakaoOAuthProperties: KakaoOAuthProperties,
     private val restClient: RestClient
-) : OauthClient<GoogleTokenResponse, GoogleUserInfo> {
-    private val logger = LoggerFactory.getLogger(GoogleOauthClient::class.java)
+) : OauthClient<KakaoTokenResponse, KakaoUserInfo> {
+    private val logger = LoggerFactory.getLogger(KakaoOauthClient::class.java)
 
     override fun getAuthUrl(): String {
-        return "https://accounts.google.com/o/oauth2/v2/auth?" +
-                "client_id=${oAuthProperties.clientId}&" +
+        return "https://kauth.kakao.com/oauth/authorize?" +
+                "client_id=${kakaoOAuthProperties.clientId}&" +
                 "response_type=code&" +
-                "scope=openid email profile&" +
-                "redirect_uri=${oAuthProperties.redirectUri}&" +
-                "access_type=offline"
+                "redirect_uri=${kakaoOAuthProperties.redirectUri}"
     }
 
-    override fun exchangeCodeForToken(code: String): GoogleTokenResponse {
+    override fun exchangeCodeForToken(code: String): KakaoTokenResponse {
         val formData = LinkedMultiValueMap<String, String>().apply {
-            add("code", code)
-            add("client_id", oAuthProperties.clientId)
-            add("client_secret", oAuthProperties.clientSecret)
-            add("redirect_uri", oAuthProperties.redirectUri)
             add("grant_type", "authorization_code")
+            add("client_id", kakaoOAuthProperties.clientId)
+            add("client_secret", kakaoOAuthProperties.clientSecret)
+            add("redirect_uri", kakaoOAuthProperties.redirectUri)
+            add("code", code)
         }
 
         return try {
             restClient.post()
-                .uri(oAuthProperties.tokenUri)
+                .uri(kakaoOAuthProperties.tokenUri)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(formData)
                 .retrieve()
-                .body<GoogleTokenResponse>()
+                .body<KakaoTokenResponse>()
                 ?: throw MykkuException(ErrorCode.OAUTH_TOKEN_EXCHANGE_FAILED)
         } catch (e: HttpClientErrorException) {
             when (e.statusCode.value()) {
@@ -63,13 +61,14 @@ class GoogleOauthClient(
         }
     }
 
-    override fun getUserInfo(token: String): GoogleUserInfo {
+    override fun getUserInfo(token: String): KakaoUserInfo {
         return try {
             restClient.get()
-                .uri(oAuthProperties.userInfoUri)
+                .uri(kakaoOAuthProperties.userInfoUri)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer $token")
+                .header(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded;charset=utf-8")
                 .retrieve()
-                .body<GoogleUserInfo>()
+                .body<KakaoUserInfo>()
                 ?: throw MykkuException(ErrorCode.OAUTH_USER_INFO_FAILED)
         } catch (e: HttpClientErrorException) {
             when (e.statusCode.value()) {
