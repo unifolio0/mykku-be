@@ -20,7 +20,7 @@ class GoogleOauthClient(
     private val oAuthProperties: OAuthProperties,
     private val restClient: RestClient
 ) : OauthClient<GoogleTokenResponse, GoogleUserInfo> {
-    private val logger = LoggerFactory.getLogger(JwtTokenProvider::class.java)
+    private val logger = LoggerFactory.getLogger(GoogleOauthClient::class.java)
 
     override fun getAuthUrl(): String {
         return "https://accounts.google.com/o/oauth2/v2/auth?" +
