@@ -10,7 +10,7 @@ data class FeedResponse(
     val createdAt: LocalDateTime,
     val title: String,
     val content: String,
-    val images: List<String>,
+    val images: List<FeedImageResponse>,
     val tags: List<String>,
     val likeCount: Int,
     val isLiked: Boolean,
@@ -25,7 +25,13 @@ data class FeedResponse(
         createdAt = feed.createdAt,
         title = feed.title,
         content = feed.content,
-        images = feed.feedImages.map { it.url },
+        images = feed.feedImages.map { 
+            FeedImageResponse(
+                url = it.url,
+                width = it.width,
+                height = it.height
+            )
+        },
         tags = feed.feedTags.map { it.tag.title },
         likeCount = feed.likeCount,
         isLiked = isLiked,
