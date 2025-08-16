@@ -1,0 +1,22 @@
+package com.example.mykku.feed.dto
+
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Size
+import org.springframework.web.multipart.MultipartFile
+
+data class CreateFeedRequest(
+    @field:NotBlank(message = "제목은 필수입니다")
+    val title: String,
+    
+    @field:NotBlank(message = "내용은 필수입니다")
+    @field:Size(max = 1000, message = "내용은 1000자 이하여야 합니다")
+    val content: String,
+    
+    val boardId: Long,
+    
+    @field:Size(max = 10, message = "이미지는 10개 이하여야 합니다")
+    val images: List<MultipartFile> = emptyList(),
+    
+    @field:Size(max = 7, message = "태그는 7개 이하여야 합니다")
+    val tags: List<String> = emptyList()
+)

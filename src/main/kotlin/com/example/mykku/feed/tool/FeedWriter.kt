@@ -1,0 +1,64 @@
+package com.example.mykku.feed.tool
+
+import com.example.mykku.board.domain.Board
+import com.example.mykku.feed.domain.Feed
+import com.example.mykku.feed.domain.FeedImage
+import com.example.mykku.feed.domain.FeedTag
+import com.example.mykku.feed.domain.Tag
+import com.example.mykku.feed.repository.FeedRepository
+import com.example.mykku.feed.repository.TagRepository
+import com.example.mykku.image.dto.ImageUploadResult
+import com.example.mykku.member.domain.Member
+import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
+
+@Component
+class FeedWriter(
+    private val feedRepository: FeedRepository,
+    private val tagRepository: TagRepository
+) {
+    @Transactional
+    fun createFeed(
+        title: String,
+        content: String,
+        board: Board,
+        member: Member,
+        imageResults: List<ImageUploadResult>,
+        tagTitles: List<String>
+    ): Feed {
+        val feed = Feed(
+            title = title,
+            content = content,
+            board = board,
+            member = member
+        )
+        
+        imageResults.forEach { imageResult ->
+            val feedImage = FeedImage(
+                url = imageResult.url,
+                width = imageResult.width,
+                height = imageResult.height,
+                feed = feed
+            )
+            feed.feedImages.add(feedImage)
+        }
+        
+        tagTitles.forEach { tagTitle ->
+            val tag = findOrCreateTag(tagTitle)
+            val feedTag = FeedTag(
+                feed = feed,
+                tag = tag
+            )
+            feed.feedTags.add(feedTag)
+        }
+        
+        return feedRepository.save(feed)
+    }
+    
+    private fun findOrCreateTag(title: String): Tag {
+        return tagRepository.findByTitle(title)
+            .orElseGet {
+                tagRepository.save(Tag(title = title))
+            }
+    }
+}

@@ -11,6 +11,12 @@ class FeedImage(
     @Column(name = "url")
     var url: String,
 
+    @Column(name = "width")
+    var width: Int,
+
+    @Column(name = "height")
+    var height: Int,
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feed_id")
     val feed: Feed,

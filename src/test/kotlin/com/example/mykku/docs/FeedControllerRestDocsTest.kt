@@ -1,8 +1,13 @@
 package com.example.mykku.docs
 
+import com.example.mykku.auth.resolver.TestMemberArgumentResolver
 import com.example.mykku.feed.controller.FeedController
 import com.example.mykku.feed.dto.AuthorResponse
 import com.example.mykku.feed.dto.CommentPreviewResponse
+import com.example.mykku.feed.dto.CreateFeedRequest
+import com.example.mykku.feed.dto.CreateFeedRequestDto
+import com.example.mykku.feed.dto.CreateFeedResponse
+import com.example.mykku.feed.dto.FeedImageResponse
 import com.example.mykku.feed.dto.FeedResponse
 import com.example.mykku.feed.dto.FeedsResponse
 import com.example.mykku.feed.service.FeedService
@@ -16,19 +21,25 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.springframework.http.MediaType
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.restdocs.RestDocumentationContextProvider
 import org.springframework.restdocs.RestDocumentationExtension
+import org.springframework.restdocs.headers.HeaderDocumentation.headerWithName
+import org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
 import org.springframework.restdocs.operation.preprocess.Preprocessors.*
 import org.springframework.restdocs.payload.JsonFieldType
-import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
-import org.springframework.restdocs.payload.PayloadDocumentation.responseFields
+import org.springframework.restdocs.payload.PayloadDocumentation.*
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
 import org.springframework.restdocs.request.RequestDocumentation.pathParameters
+import org.springframework.restdocs.request.RequestDocumentation.partWithName
+import org.springframework.restdocs.request.RequestDocumentation.requestParts
+import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
@@ -48,6 +59,9 @@ class FeedControllerRestDocsTest {
 
     @Mock
     private lateinit var feedService: FeedService
+    
+    @Mock
+    private lateinit var mockObjectMapper: com.fasterxml.jackson.databind.ObjectMapper
 
     @InjectMocks
     private lateinit var feedController: FeedController
@@ -55,6 +69,7 @@ class FeedControllerRestDocsTest {
     @BeforeEach
     fun setUp(restDocumentation: RestDocumentationContextProvider) {
         mockMvc = MockMvcBuilders.standaloneSetup(feedController)
+            .setCustomArgumentResolvers(TestMemberArgumentResolver())
             .setMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
             .apply<StandaloneMockMvcBuilder>(
                 documentationConfiguration(restDocumentation)
@@ -177,6 +192,113 @@ class FeedControllerRestDocsTest {
                         fieldWithPath("data.feeds[].comment.profileImage").type(JsonFieldType.STRING)
                             .description("댓글 작성자 프로필 이미지"),
                         fieldWithPath("data.feeds[].comment.content").type(JsonFieldType.STRING).description("댓글 내용")
+                    )
+                )
+            )
+    }
+
+    @Test
+    fun `피드 작성 API 문서화`() {
+        // given
+        val response = CreateFeedResponse(
+            id = 1L,
+            title = "새로운 피드 제목",
+            content = "피드 내용입니다. 오늘은 날씨가 좋네요.",
+            boardId = 1L,
+            boardTitle = "자유게시판",
+            authorId = "member1",
+            authorNickname = "테스트유저",
+            authorProfileUrl = "https://example.com/profile.jpg",
+            images = listOf(
+                FeedImageResponse(
+                    url = "https://example.com/image1.jpg",
+                    width = 1920,
+                    height = 1080
+                ),
+                FeedImageResponse(
+                    url = "https://example.com/image2.jpg",
+                    width = 800,
+                    height = 600
+                )
+            ),
+            tags = listOf("일상", "날씨", "행복"),
+            likeCount = 0,
+            commentCount = 0,
+            createdAt = LocalDateTime.of(2024, 1, 1, 12, 0)
+        )
+
+        `when`(feedService.createFeed(any(), any())).thenReturn(response)
+
+        // when & then
+        val requestDto = CreateFeedRequestDto(
+            title = "새로운 피드 제목",
+            content = "피드 내용입니다. 오늘은 날씨가 좋네요.",
+            boardId = 1L,
+            tags = listOf("일상", "날씨", "행복")
+        )
+        val requestJson = objectMapper.writeValueAsString(requestDto)
+        
+        val mockImageFile1 = MockMultipartFile(
+            "images",
+            "test-image1.jpg",
+            "image/jpeg",
+            "mock image content 1".toByteArray()
+        )
+        
+        val mockImageFile2 = MockMultipartFile(
+            "images", 
+            "test-image2.jpg",
+            "image/jpeg", 
+            "mock image content 2".toByteArray()
+        )
+        
+        val requestPart = MockMultipartFile(
+            "request",
+            "request",
+            "application/json",
+            requestJson.toByteArray()
+        )
+        
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.multipart("/api/v1/feeds")
+                .file(requestPart)
+                .file(mockImageFile1)
+                .file(mockImageFile2)
+                .header("Authorization", "Bearer test-token")
+        )
+            .andExpect(status().isCreated)
+            .andExpect(jsonPath("$.message").value("피드가 성공적으로 작성되었습니다."))
+            .andExpect(jsonPath("$.data.id").value(1))
+            .andExpect(jsonPath("$.data.title").value("새로운 피드 제목"))
+            .andDo(MockMvcResultHandlers.print())
+            .andDo(
+                document(
+                    "feed-create",
+                    requestHeaders(
+                        headerWithName("Authorization").description("Bearer 토큰")
+                    ),
+                    requestParts(
+                        partWithName("request").description("피드 생성 요청 정보 (JSON)"),
+                        partWithName("images").description("업로드할 이미지 파일들").optional()
+                    ),
+                    responseFields(
+                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                        fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("피드 ID"),
+                        fieldWithPath("data.title").type(JsonFieldType.STRING).description("피드 제목"),
+                        fieldWithPath("data.content").type(JsonFieldType.STRING).description("피드 내용"),
+                        fieldWithPath("data.boardId").type(JsonFieldType.NUMBER).description("게시판 ID"),
+                        fieldWithPath("data.boardTitle").type(JsonFieldType.STRING).description("게시판 이름"),
+                        fieldWithPath("data.authorId").type(JsonFieldType.STRING).description("작성자 ID"),
+                        fieldWithPath("data.authorNickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
+                        fieldWithPath("data.authorProfileUrl").type(JsonFieldType.STRING).description("작성자 프로필 이미지 URL").optional(),
+                        fieldWithPath("data.images").type(JsonFieldType.ARRAY).description("이미지 목록"),
+                        fieldWithPath("data.images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
+                        fieldWithPath("data.images[].width").type(JsonFieldType.NUMBER).description("이미지 가로 크기 (픽셀)"),
+                        fieldWithPath("data.images[].height").type(JsonFieldType.NUMBER).description("이미지 세로 크기 (픽셀)"),
+                        fieldWithPath("data.tags").type(JsonFieldType.ARRAY).description("태그 목록"),
+                        fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
+                        fieldWithPath("data.commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
+                        fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성 일시")
                     )
                 )
             )
