@@ -96,6 +96,9 @@ class ImageUploadService(
                 ?: throw MykkuException(ErrorCode.IMAGE_UNREADABLE)
             
             Pair(bufferedImage.width, bufferedImage.height)
+        } catch (e: MykkuException) {
+            // 도메인 예외는 그대로 전달
+            throw e
         } catch (e: Exception) {
             throw MykkuException(ErrorCode.IMAGE_SIZE_EXTRACTION_FAILED)
         }

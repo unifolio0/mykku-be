@@ -52,6 +52,11 @@ class FeedWriter(
             .distinct()
             .toList()
 
+        // 태그 개수 제한 검증 (엔티티 생성 후 추가이므로 여기서 방어)
+        if (normalizedDistinctTags.size > Feed.TAG_MAX_COUNT) {
+            throw MykkuException(ErrorCode.FEED_TAG_LIMIT_EXCEEDED)
+        }
+
         normalizedDistinctTags.forEach { tagTitle ->
             val tag = findOrCreateTag(tagTitle)
             val feedTag = FeedTag(
