@@ -19,8 +19,11 @@ class FeedCommentService(
         val feed = feedReader.getFeedById(feedId)
         val commentsPage = feedCommentReader.getCommentsByFeed(feed, pageable)
         
+        // 모든 부모 댓글의 대댓글을 한 번에 조회
+        val repliesMap = feedCommentReader.getRepliesByParentComments(commentsPage.content)
+        
         val commentResponses = commentsPage.content.map { comment ->
-            val replies = feedCommentReader.getRepliesByParentComment(comment)
+            val replies = repliesMap[comment.id] ?: emptyList()
             val replyResponses = replies.map { reply ->
                 FeedCommentReplyResponse(
                     id = reply.id!!,

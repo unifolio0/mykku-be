@@ -4,8 +4,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(prefix = "aws.s3")
 data class S3Properties(
-    val accessKey: String,
-    val secretKey: String,
+    val accessKey: String? = null,
+    val secretKey: String? = null,
     val region: String,
     val bucketName: String
 )

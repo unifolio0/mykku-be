@@ -93,7 +93,7 @@ class ImageUploadService(
             
             Pair(bufferedImage.width, bufferedImage.height)
         } catch (e: Exception) {
-            throw IllegalArgumentException("이미지 크기를 추출할 수 없습니다: ${e.message}")
+            throw IllegalArgumentException("이미지 크기를 추출할 수 없습니다: ${e.message}", e)
         }
     }
 }

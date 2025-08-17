@@ -9,6 +9,7 @@ import com.example.mykku.feed.repository.FeedRepository
 import com.example.mykku.feed.repository.TagRepository
 import com.example.mykku.image.dto.ImageUploadResult
 import com.example.mykku.member.domain.Member
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
@@ -56,9 +57,12 @@ class FeedWriter(
     }
     
     private fun findOrCreateTag(title: String): Tag {
-        return tagRepository.findByTitle(title)
-            .orElseGet {
-                tagRepository.save(Tag(title = title))
-            }
+        return tagRepository.findByTitle(title) ?: try {
+            tagRepository.save(Tag(title = title))
+        } catch (e: DataIntegrityViolationException) {
+            // 동시성 문제로 이미 태그가 생성된 경우 다시 조회
+            tagRepository.findByTitle(title) 
+                ?: throw IllegalStateException("태그 생성 중 오류가 발생했습니다.")
+        }
     }
 }

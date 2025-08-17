@@ -27,6 +27,13 @@ class FeedCommentReader(
         return feedCommentRepository.findByParentComment(parentComment)
     }
     
+    fun getRepliesByParentComments(parentComments: List<FeedComment>): Map<Long, List<FeedComment>> {
+        if (parentComments.isEmpty()) return emptyMap()
+        
+        val allReplies = feedCommentRepository.findByParentCommentIn(parentComments)
+        return allReplies.groupBy { it.parentComment?.id ?: 0L }
+    }
+    
     fun getCommentCount(feed: Feed): Long {
         return feedCommentRepository.countByFeed(feed)
     }

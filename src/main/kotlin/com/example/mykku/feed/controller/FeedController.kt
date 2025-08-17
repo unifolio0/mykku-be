@@ -26,11 +26,18 @@ class FeedController(
         @RequestPart("images", required = false) images: List<MultipartFile>?,
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<CreateFeedResponse>> {
+        val imageList = images ?: emptyList()
+        
+        // 이미지 개수 제한 검증
+        if (imageList.size > 10) {
+            throw IllegalArgumentException("이미지는 10개 이하여야 합니다.")
+        }
+        
         val request = CreateFeedRequest(
             title = requestDto.title,
             content = requestDto.content,
             boardId = requestDto.boardId,
-            images = images ?: emptyList(),
+            images = imageList,
             tags = requestDto.tags
         )
 

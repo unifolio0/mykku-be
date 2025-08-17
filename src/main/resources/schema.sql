@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS feed_image (
 -- Create Tag table
 CREATE TABLE IF NOT EXISTS tag (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(20) NOT NULL,
+    title VARCHAR(20) NOT NULL UNIQUE,
     created_at DATETIME(6) NOT NULL,
     updated_at DATETIME(6) NOT NULL
 );
