@@ -1,6 +1,8 @@
 package com.example.mykku.feed.tool
 
 import com.example.mykku.board.domain.Board
+import com.example.mykku.exception.ErrorCode
+import com.example.mykku.exception.MykkuException
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedImage
 import com.example.mykku.feed.domain.FeedTag
@@ -44,7 +46,13 @@ class FeedWriter(
             feed.feedImages.add(feedImage)
         }
         
-        tagTitles.forEach { tagTitle ->
+        val normalizedDistinctTags = tagTitles.asSequence()
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
+            .distinct()
+            .toList()
+
+        normalizedDistinctTags.forEach { tagTitle ->
             val tag = findOrCreateTag(tagTitle)
             val feedTag = FeedTag(
                 feed = feed,
@@ -62,7 +70,7 @@ class FeedWriter(
         } catch (e: DataIntegrityViolationException) {
             // 동시성 문제로 이미 태그가 생성된 경우 다시 조회
             tagRepository.findByTitle(title) 
-                ?: throw IllegalStateException("태그 생성 중 오류가 발생했습니다.")
+                ?: throw MykkuException(ErrorCode.TAG_CREATION_FAILED)
         }
     }
 }

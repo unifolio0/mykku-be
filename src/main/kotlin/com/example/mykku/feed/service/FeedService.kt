@@ -1,6 +1,8 @@
 package com.example.mykku.feed.service
 
 import com.example.mykku.board.tool.BoardReader
+import com.example.mykku.exception.ErrorCode
+import com.example.mykku.exception.MykkuException
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.dto.AuthorResponse
 import com.example.mykku.feed.dto.CreateFeedRequest
@@ -33,10 +35,10 @@ class FeedService(
         val board = boardReader.getBoardById(request.boardId)
         
         // 이미지 파일들을 S3에 업로드하고 결과 받기
-        val imageResults = if (request.images.isNotEmpty() && imageUploadService != null) {
-            imageUploadService.uploadImages(request.images)
-        } else {
-            emptyList()
+        val imageResults = when {
+            request.images.isEmpty() -> emptyList()
+            imageUploadService != null -> imageUploadService.uploadImages(request.images)
+            else -> throw MykkuException(ErrorCode.IMAGE_UPLOAD_SERVICE_UNAVAILABLE)
         }
         
         val feed = feedWriter.createFeed(

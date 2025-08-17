@@ -1,6 +1,8 @@
 package com.example.mykku.image.service
 
 import com.example.mykku.config.S3Properties
+import com.example.mykku.exception.ErrorCode
+import com.example.mykku.exception.MykkuException
 import com.example.mykku.image.dto.ImageUploadResult
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
@@ -52,7 +54,9 @@ class ImageUploadService(
             RequestBody.fromBytes(imageBytes)
         )
         
-        val url = "https://${s3Properties.bucketName}.s3.${s3Properties.region}.amazonaws.com/$key"
+        val url = s3Client.utilities()
+            .getUrl { it.bucket(s3Properties.bucketName).key(key) }
+            .toString()
         return ImageUploadResult(
             url = url,
             width = dimensions.first,
@@ -62,16 +66,16 @@ class ImageUploadService(
     
     private fun validateImage(image: MultipartFile) {
         if (image.isEmpty) {
-            throw IllegalArgumentException("이미지 파일이 비어있습니다")
+            throw MykkuException(ErrorCode.IMAGE_FILE_EMPTY)
         }
         
         if (image.size > MAX_FILE_SIZE) {
-            throw IllegalArgumentException("이미지 파일 크기는 10MB 이하여야 합니다")
+            throw MykkuException(ErrorCode.IMAGE_FILE_TOO_LARGE)
         }
         
         val extension = getFileExtension(image.originalFilename)
         if (extension !in ALLOWED_EXTENSIONS) {
-            throw IllegalArgumentException("지원하지 않는 이미지 형식입니다. (지원 형식: ${ALLOWED_EXTENSIONS.joinToString(", ")})")
+            throw MykkuException(ErrorCode.IMAGE_INVALID_FORMAT)
         }
     }
     
@@ -89,11 +93,11 @@ class ImageUploadService(
     private fun extractImageDimensions(imageBytes: ByteArray): Pair<Int, Int> {
         return try {
             val bufferedImage: BufferedImage = ImageIO.read(ByteArrayInputStream(imageBytes))
-                ?: throw IllegalArgumentException("이미지를 읽을 수 없습니다")
+                ?: throw MykkuException(ErrorCode.IMAGE_UNREADABLE)
             
             Pair(bufferedImage.width, bufferedImage.height)
         } catch (e: Exception) {
-            throw IllegalArgumentException("이미지 크기를 추출할 수 없습니다: ${e.message}", e)
+            throw MykkuException(ErrorCode.IMAGE_SIZE_EXTRACTION_FAILED)
         }
     }
 }

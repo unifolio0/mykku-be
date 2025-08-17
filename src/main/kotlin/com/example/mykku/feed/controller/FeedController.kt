@@ -2,6 +2,8 @@ package com.example.mykku.feed.controller
 
 import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
+import com.example.mykku.exception.ErrorCode
+import com.example.mykku.exception.MykkuException
 import com.example.mykku.feed.dto.*
 import com.example.mykku.feed.service.FeedCommentService
 import com.example.mykku.feed.service.FeedService
@@ -29,8 +31,8 @@ class FeedController(
         val imageList = images ?: emptyList()
         
         // 이미지 개수 제한 검증
-        if (imageList.size > 10) {
-            throw IllegalArgumentException("이미지는 10개 이하여야 합니다.")
+        if (imageList.size > CreateFeedRequest.MAX_IMAGE_COUNT) {
+            throw MykkuException(ErrorCode.FEED_IMAGE_LIMIT_EXCEEDED)
         }
         
         val request = CreateFeedRequest(
@@ -65,10 +67,11 @@ class FeedController(
     fun getComments(
         @PathVariable feedId: Long,
         @RequestParam(defaultValue = "0") page: Int,
-        @RequestParam(defaultValue = "20") size: Int
+        @RequestParam(defaultValue = "20") size: Int,
+        @CurrentMember member: Member?
     ): ResponseEntity<ApiResponse<FeedCommentsResponse>> {
         val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"))
-        val comments = feedCommentService.getComments(feedId, null, pageable)
+        val comments = feedCommentService.getComments(feedId, member?.id, pageable)
         return ResponseEntity.ok(
             ApiResponse(
                 message = "댓글 목록을 성공적으로 조회했습니다.",

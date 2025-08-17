@@ -16,6 +16,8 @@ import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
+import org.springframework.data.domain.Pageable
 import org.springframework.http.MediaType
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.mock.web.MockMultipartFile
@@ -369,7 +371,7 @@ class FeedControllerRestDocsTest {
             hasNext = false
         )
 
-        `when`(feedCommentService.getComments(eq(1L), eq(null), any())).thenReturn(feedCommentsResponse)
+        `when`(feedCommentService.getComments(eq(1L), eq("member123"), any<Pageable>())).thenReturn(feedCommentsResponse)
 
         // when & then
         mockMvc.perform(

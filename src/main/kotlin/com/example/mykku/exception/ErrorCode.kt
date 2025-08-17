@@ -66,6 +66,25 @@ enum class ErrorCode(val status: HttpStatus, val message: String) {
     OAUTH_INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 액세스 토큰입니다"),
     OAUTH_EXTERNAL_SERVICE_ERROR(HttpStatus.SERVICE_UNAVAILABLE, "외부 서비스 오류가 발생했습니다"),
 
+    // Image Upload
+    IMAGE_FILE_EMPTY(HttpStatus.BAD_REQUEST, "이미지 파일이 비어있습니다"),
+    IMAGE_FILE_TOO_LARGE(HttpStatus.BAD_REQUEST, "이미지 파일 크기는 10MB 이하여야 합니다"),
+    IMAGE_INVALID_FORMAT(HttpStatus.BAD_REQUEST, "지원하지 않는 이미지 형식입니다. (지원 형식: jpeg, jpg, png, gif)"),
+    IMAGE_UNREADABLE(HttpStatus.BAD_REQUEST, "이미지를 읽을 수 없습니다"),
+    IMAGE_SIZE_EXTRACTION_FAILED(HttpStatus.BAD_REQUEST, "이미지 크기를 추출할 수 없습니다"),
+    IMAGE_UPLOAD_SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, "ImageUploadService가 구성되지 않았습니다. 이미지 업로드가 비활성화된 환경에서는 images를 비워 주세요."),
+
+    // Tag Creation
+    TAG_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "태그 생성 중 오류가 발생했습니다."),
+
+    // Apple OAuth
+    APPLE_JWT_HEADER_MISSING_KID(HttpStatus.BAD_REQUEST, "JWT 헤더에 kid가 없습니다"),
+    APPLE_JWT_INVALID_FORMAT(HttpStatus.BAD_REQUEST, "잘못된 JWT 토큰 형식입니다"),
+    APPLE_PUBLIC_KEY_NOT_FOUND(HttpStatus.BAD_REQUEST, "공개 키를 찾을 수 없습니다"),
+
+    // Validation
+    INVALID_SORT_DIRECTION(HttpStatus.BAD_REQUEST, "잘못된 정렬 방향입니다. 'asc' 또는 'desc'를 사용해주세요"),
+
     // Auth
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증이 필요합니다"),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다"),
