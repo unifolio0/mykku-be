@@ -26,6 +26,8 @@ class ImageUploadService(
     companion object {
         private val ALLOWED_EXTENSIONS = setOf("jpg", "jpeg", "png", "gif", "webp")
         private const val MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+        private val FILENAME_TS_FORMATTER: DateTimeFormatter = 
+            DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
     }
     
     fun uploadImages(images: List<MultipartFile>): List<ImageUploadResult> {
@@ -42,11 +44,20 @@ class ImageUploadService(
         val fileName = generateFileName(image.originalFilename)
         val key = "feed-images/$fileName"
         
+        val extensionForContentType = getFileExtension(image.originalFilename)
+        val contentType = image.contentType ?: when (extensionForContentType) {
+            "jpg", "jpeg" -> "image/jpeg"
+            "png" -> "image/png"
+            "gif" -> "image/gif"
+            "webp" -> "image/webp"
+            else -> "application/octet-stream"
+        }
+        
         val putObjectRequest = PutObjectRequest.builder()
             .bucket(s3Properties.bucketName)
             .key(key)
-            .contentType(image.contentType)
-            .contentLength(image.size)
+            .contentType(contentType)
+            .contentLength(imageBytes.size.toLong())
             .build()
         
         s3Client.putObject(
@@ -81,7 +92,7 @@ class ImageUploadService(
     
     private fun generateFileName(originalFilename: String?): String {
         val extension = getFileExtension(originalFilename)
-        val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
+        val timestamp = LocalDateTime.now().format(FILENAME_TS_FORMATTER)
         val uuid = UUID.randomUUID().toString().replace("-", "")
         return "${timestamp}_${uuid}.$extension"
     }

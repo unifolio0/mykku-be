@@ -72,6 +72,7 @@ enum class ErrorCode(val status: HttpStatus, val message: String) {
     IMAGE_INVALID_FORMAT(HttpStatus.BAD_REQUEST, "지원하지 않는 이미지 형식입니다. (지원 형식: jpeg, jpg, png, gif)"),
     IMAGE_UNREADABLE(HttpStatus.BAD_REQUEST, "이미지를 읽을 수 없습니다"),
     IMAGE_SIZE_EXTRACTION_FAILED(HttpStatus.BAD_REQUEST, "이미지 크기를 추출할 수 없습니다"),
+    IMAGE_INVALID_DIMENSIONS(HttpStatus.BAD_REQUEST, "이미지 크기가 유효하지 않습니다"),
     IMAGE_UPLOAD_SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, "ImageUploadService가 구성되지 않았습니다. 이미지 업로드가 비활성화된 환경에서는 images를 비워 주세요."),
 
     // Tag Creation
