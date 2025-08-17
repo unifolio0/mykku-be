@@ -1,6 +1,8 @@
 package com.example.mykku.dailymessage.controller.converter
 
 import com.example.mykku.dailymessage.domain.SortDirection
+import com.example.mykku.exception.ErrorCode
+import com.example.mykku.exception.MykkuException
 import org.springframework.core.convert.converter.Converter
 import org.springframework.stereotype.Component
 
@@ -10,7 +12,7 @@ class SortDirectionConverter : Converter<String, SortDirection> {
         return try {
             SortDirection.valueOf(source.uppercase())
         } catch (e: IllegalArgumentException) {
-            throw IllegalArgumentException("Invalid sort direction: $source. Must be 'asc' or 'desc' (case insensitive)")
+            throw MykkuException(ErrorCode.INVALID_SORT_DIRECTION)
         }
     }
 }

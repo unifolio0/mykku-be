@@ -149,7 +149,7 @@ class AppleOauthClient(
             // JWT 헤더에서 kid (Key ID) 추출
             val header = extractJwtHeader(idToken)
             val kid = header["kid"] as? String 
-                ?: throw IllegalArgumentException("Missing kid in JWT header")
+                ?: throw MykkuException(ErrorCode.APPLE_JWT_HEADER_MISSING_KID)
             
             // Apple 공개 키 가져오기
             val publicKey = getApplePublicKey(kid)
@@ -174,7 +174,7 @@ class AppleOauthClient(
     private fun extractJwtHeader(idToken: String): Map<String, Any> {
         val parts = idToken.split(".")
         if (parts.size != 3) {
-            throw IllegalArgumentException("Invalid JWT token format")
+            throw MykkuException(ErrorCode.APPLE_JWT_INVALID_FORMAT)
         }
         
         val headerJson = String(Base64.getUrlDecoder().decode(parts[0]))
@@ -188,7 +188,7 @@ class AppleOauthClient(
         }
         
         return cachedAppleKeys[kid] 
-            ?: throw IllegalArgumentException("Public key not found for kid: $kid")
+            ?: throw MykkuException(ErrorCode.APPLE_PUBLIC_KEY_NOT_FOUND)
     }
     
     private fun isCacheExpired(): Boolean {
