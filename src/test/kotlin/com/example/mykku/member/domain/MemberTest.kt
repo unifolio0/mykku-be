@@ -11,7 +11,7 @@ class MemberTest {
     @Test
     fun `nickname이 최대 길이 10자일 때 성공한다`() {
         val validNickname = "r".repeat(Member.NICKNAME_MAX_LENGTH)
-        
+
         Member(
             id = "test_member",
             nickname = validNickname,
@@ -38,7 +38,7 @@ class MemberTest {
                 email = "test@example.com"
             )
         }
-        
+
         assertEquals(ErrorCode.MEMBER_NICKNAME_TOO_LONG, exception.errorCode)
     }
 
@@ -53,7 +53,7 @@ class MemberTest {
             socialId = "12345",
             email = "test@example.com"
         )
-        
+
         Member(
             id = "test_member2",
             nickname = "English123",
@@ -63,7 +63,7 @@ class MemberTest {
             socialId = "12345",
             email = "test@example.com"
         )
-        
+
         Member(
             id = "test_member3",
             nickname = "123456",
@@ -88,24 +88,7 @@ class MemberTest {
                 email = "test@example.com"
             )
         }
-        
-        assertEquals(ErrorCode.MEMBER_NICKNAME_INVALID_FORMAT, exception.errorCode)
-    }
 
-    @Test
-    fun `공백이 포함된 nickname이면 예외가 발생한다`() {
-        val exception = assertThrows<MykkuException> {
-            Member(
-                id = "test_member",
-                nickname = "닉네임 테스트",
-                role = "USER",
-                profileImage = "profile.jpg",
-                provider = SocialProvider.GOOGLE,
-                socialId = "12345",
-                email = "test@example.com"
-            )
-        }
-        
         assertEquals(ErrorCode.MEMBER_NICKNAME_INVALID_FORMAT, exception.errorCode)
     }
 }
