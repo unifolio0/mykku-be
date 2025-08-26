@@ -1,5 +1,6 @@
 package com.example.mykku.docs
 
+import com.example.mykku.auth.resolver.TestMemberArgumentResolver
 import com.example.mykku.feed.controller.EventController
 import com.example.mykku.feed.dto.CreateEventResponse
 import com.example.mykku.feed.dto.EventImageResponse
@@ -18,6 +19,8 @@ import org.springframework.http.MediaType
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.restdocs.RestDocumentationContextProvider
 import org.springframework.restdocs.RestDocumentationExtension
+import org.springframework.restdocs.headers.HeaderDocumentation.headerWithName
+import org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
@@ -52,6 +55,7 @@ class EventControllerRestDocsTest {
         eventController = EventController(eventService)
 
         mockMvc = MockMvcBuilders.standaloneSetup(eventController)
+            .setCustomArgumentResolvers(TestMemberArgumentResolver())
             .setMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
             .apply<StandaloneMockMvcBuilder>(
                 documentationConfiguration(restDocumentation)
@@ -120,6 +124,7 @@ class EventControllerRestDocsTest {
         // when & then
         mockMvc.perform(
             RestDocumentationRequestBuilders.post("/api/v1/events")
+                .header("Authorization", "Bearer jwt-token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody)
         )
@@ -128,6 +133,9 @@ class EventControllerRestDocsTest {
             .andDo(
                 document(
                     "event-create",
+                    requestHeaders(
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
+                    ),
                     requestFields(
                         fieldWithPath("title").type(JsonFieldType.STRING).description("이벤트 제목"),
                         fieldWithPath("isContest").type(JsonFieldType.BOOLEAN).description("경품 이벤트 여부"),

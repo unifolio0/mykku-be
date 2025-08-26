@@ -65,6 +65,9 @@ enum class ErrorCode(val status: HttpStatus, val message: String) {
     OAUTH_INVALID_CLIENT(HttpStatus.UNAUTHORIZED, "유효하지 않은 클라이언트 정보입니다"),
     OAUTH_INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 액세스 토큰입니다"),
     OAUTH_EXTERNAL_SERVICE_ERROR(HttpStatus.SERVICE_UNAVAILABLE, "외부 서비스 오류가 발생했습니다"),
+    OAUTH_INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다"),
+    OAUTH_ACCESS_DENIED(HttpStatus.FORBIDDEN, "OAuth 접근이 거부되었습니다"),
+    OAUTH_SERVER_ERROR(HttpStatus.SERVICE_UNAVAILABLE, "OAuth 서버에서 오류가 발생했습니다"),
 
     // Image Upload
     IMAGE_FILE_EMPTY(HttpStatus.BAD_REQUEST, "이미지 파일이 비어있습니다"),

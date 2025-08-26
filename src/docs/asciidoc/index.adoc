@@ -52,41 +52,23 @@ MyKKU API 문서입니다.
 [[auth-api]]
 == 인증 API
 
-=== 구글 로그인
+=== 모바일 구글 로그인
 
-구글 OAuth 로그인 페이지로 리다이렉트합니다.
+모바일 앱에서 구글 액세스 토큰을 사용하여 로그인합니다.
 
-operation::auth-google-login[snippets='http-request,http-response']
+operation::auth-mobile-login-google[snippets='http-request,request-fields,http-response,response-fields']
 
-=== 구글 로그인 콜백
+=== 모바일 카카오 로그인  
 
-구글 OAuth 인증 후 콜백을 처리하고 JWT 토큰을 발급합니다.
+모바일 앱에서 카카오 액세스 토큰을 사용하여 로그인합니다.
 
-operation::auth-google-callback[snippets='http-request,query-parameters,http-response,response-fields']
+operation::auth-mobile-login-kakao[snippets='http-request,http-response']
 
-=== 카카오 로그인
+=== 모바일 애플 로그인
 
-카카오 OAuth 로그인 페이지로 리다이렉트합니다.
+모바일 앱에서 애플 ID 토큰을 사용하여 로그인합니다.
 
-operation::auth-kakao-login[snippets='http-request,http-response']
-
-=== 카카오 로그인 콜백
-
-카카오 OAuth 인증 후 콜백을 처리하고 JWT 토큰을 발급합니다.
-
-operation::auth-kakao-callback[snippets='http-request,query-parameters,http-response,response-fields']
-
-=== 애플 로그인
-
-애플 OAuth 로그인 페이지로 리다이렉트합니다.
-
-operation::auth-apple-login[snippets='http-request,query-parameters,http-response']
-
-=== 애플 로그인 콜백
-
-애플 OAuth 인증 후 콜백을 처리하고 JWT 토큰을 발급합니다.
-
-operation::auth-apple-callback[snippets='http-request,form-parameters,http-response,response-fields']
+operation::auth-mobile-login-apple[snippets='http-request,http-response']
 
 [[home-api]]
 == 홈 API
@@ -94,6 +76,15 @@ operation::auth-apple-callback[snippets='http-request,form-parameters,http-respo
 === 홈 데이터 조회
 
 operation::home[snippets='http-request,http-response,response-fields']
+
+[[event-api]]
+== 이벤트 API
+
+=== 이벤트 생성
+
+이벤트를 생성합니다. 이벤트 이미지와 태그도 함께 저장됩니다.
+
+operation::event-create[snippets='http-request,request-headers,request-fields,http-response,response-fields']
 
 [[feed-api]]
 == 피드 API
