@@ -49,7 +49,7 @@ class FeedService(
             else -> throw MykkuException(ErrorCode.IMAGE_UPLOAD_SERVICE_UNAVAILABLE)
         }
 
-        val feed = feedWriter.createFeed(
+        val (feed, feedImages, feedTags) = feedWriter.createFeed(
             title = request.title,
             content = request.content,
             board = board,
@@ -57,10 +57,6 @@ class FeedService(
             imageResults = imageResults,
             tagTitles = request.tags
         )
-
-        // Fetch the saved images and tags
-        val feedImages = feedImageRepository.findByFeed(feed)
-        val feedTags = feedTagRepository.findByFeed(feed)
 
         return CreateFeedResponse(
             id = feed.id!!,

@@ -8,5 +8,4 @@ import org.springframework.stereotype.Repository
 @Repository
 interface FeedTagRepository : JpaRepository<FeedTag, Long> {
     fun findByFeed(feed: Feed): List<FeedTag>
-    fun findByFeedIn(feeds: List<Feed>): List<FeedTag>
 }

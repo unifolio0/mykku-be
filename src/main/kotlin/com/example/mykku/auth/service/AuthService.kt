@@ -31,10 +31,9 @@ class AuthService(
     @Transactional
     fun handleMobileLogin(request: MobileLoginRequest): LoginResponse {
         return when (request.provider) {
-            SocialProvider.GOOGLE -> handleGoogleMobileLogin(request.accessToken)
-            SocialProvider.KAKAO -> handleKakaoMobileLogin(request.accessToken)
-            SocialProvider.APPLE -> handleAppleMobileLogin(request.idToken 
-                ?: throw MykkuException(ErrorCode.OAUTH_INVALID_TOKEN))
+            SocialProvider.GOOGLE -> handleGoogleMobileLogin(request.accessToken!!) // validation이 init에서 되미로 안전
+            SocialProvider.KAKAO -> handleKakaoMobileLogin(request.accessToken!!) // validation이 init에서 되미로 안전
+            SocialProvider.APPLE -> handleAppleMobileLogin(request.idToken!!) // validation이 init에서 되미로 안전
             SocialProvider.NAVER -> throw MykkuException(ErrorCode.OAUTH_EXTERNAL_SERVICE_ERROR)
         }
     }

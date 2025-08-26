@@ -25,7 +25,8 @@ jwt:
 
 aws:
   s3:
-    access-key: ${AWS_S3_ACCESS_KEY:your-s3-access-key}
-    secret-key: ${AWS_S3_SECRET_KEY:your-s3-secret-key}
-    region: ${AWS_S3_REGION:ap-northeast-2}
-    bucket-name: ${AWS_S3_BUCKET_NAME:mykku-bucket}
+    enabled: true
+    access-key: ${secret.aws.s3.access_key}
+    secret-key: ${secret.aws.s3.secret_key}
+    region: ${secret.aws.s3.region}
+    bucket-name: ${secret.aws.s3.bucket_name}

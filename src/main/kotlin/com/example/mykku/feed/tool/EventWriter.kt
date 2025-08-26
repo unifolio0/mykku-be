@@ -1,5 +1,7 @@
 package com.example.mykku.feed.tool
 
+import com.example.mykku.exception.ErrorCode
+import com.example.mykku.exception.MykkuException
 import com.example.mykku.feed.domain.Event
 import com.example.mykku.feed.domain.EventImage
 import com.example.mykku.feed.domain.EventTag
@@ -25,7 +27,24 @@ class EventWriter(
         expiredAt: LocalDateTime,
         imageRequests: List<EventImageRequest>,
         tagTitles: List<String>
-    ): Event {
+    ): Triple<Event, List<EventImage>, List<EventTag>> {
+        // 이미지 개수 제한 검증
+        if (imageRequests.size > Event.IMAGE_MAX_COUNT) {
+            throw MykkuException(ErrorCode.EVENT_IMAGE_LIMIT_EXCEEDED)
+        }
+
+        // 태그 유효성 검증 및 정규화
+        val normalizedDistinctTags = tagTitles.asSequence()
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
+            .distinct()
+            .toList()
+
+        // 태그 개수 제한 검증
+        if (normalizedDistinctTags.size > Event.TAG_MAX_COUNT) {
+            throw MykkuException(ErrorCode.EVENT_TAG_LIMIT_EXCEEDED)
+        }
+
         val event = Event(
             title = title,
             isContest = isContest,
@@ -34,31 +53,26 @@ class EventWriter(
 
         val savedEvent = eventRepository.save(event)
 
-        // Save images separately
-        imageRequests.forEach { imageRequest ->
-            val eventImage = EventImage(
+        // Save images using saveAll for better performance
+        val eventImages = imageRequests.map { imageRequest ->
+            EventImage(
                 url = imageRequest.url,
                 orderIndex = imageRequest.orderIndex,
                 event = savedEvent
             )
-            eventImageRepository.save(eventImage)
         }
+        val savedEventImages = eventImageRepository.saveAll(eventImages)
 
-        // Process and save tags separately
-        val normalizedDistinctTags = tagTitles.asSequence()
-            .map { it.trim() }
-            .filter { it.isNotBlank() }
-            .distinct()
-            .toList()
+        // Save tags using saveAll
 
-        normalizedDistinctTags.forEach { tagTitle ->
-            val eventTag = EventTag(
+        val eventTags = normalizedDistinctTags.map { tagTitle ->
+            EventTag(
                 title = tagTitle,
                 event = savedEvent
             )
-            eventTagRepository.save(eventTag)
         }
+        val savedEventTags = eventTagRepository.saveAll(eventTags)
 
-        return savedEvent
+        return Triple(savedEvent, savedEventImages, savedEventTags)
     }
 }

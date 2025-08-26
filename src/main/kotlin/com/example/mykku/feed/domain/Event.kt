@@ -18,4 +18,9 @@ class Event(
 
     @Column(name = "expired_at")
     var expiredAt: LocalDateTime,
-) : BaseEntity()
+) : BaseEntity() {
+    companion object {
+        const val IMAGE_MAX_COUNT = 10
+        const val TAG_MAX_COUNT = 7
+    }
+}

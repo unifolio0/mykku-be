@@ -29,7 +29,7 @@ class FeedWriter(
         member: Member,
         imageResults: List<ImageUploadResult>,
         tagTitles: List<String>
-    ): Feed {
+    ): Triple<Feed, List<FeedImage>, List<FeedTag>> {
         // 이미지 개수 제한 검증
         if (imageResults.size > Feed.IMAGE_MAX_COUNT) {
             throw MykkuException(ErrorCode.FEED_IMAGE_LIMIT_EXCEEDED)
@@ -55,31 +55,31 @@ class FeedWriter(
 
         val savedFeed = feedRepository.save(feed)
 
-        // Save images separately
-        imageResults.forEach { imageResult ->
+        // Save images using saveAll for better performance
+        val feedImages = imageResults.map { imageResult ->
             // 이미지 크기 검증
             if (imageResult.width <= 0 || imageResult.height <= 0) {
                 throw MykkuException(ErrorCode.IMAGE_INVALID_DIMENSIONS)
             }
 
-            val feedImage = FeedImage(
+            FeedImage(
                 url = imageResult.url,
                 width = imageResult.width,
                 height = imageResult.height,
                 feed = savedFeed
             )
-            feedImageRepository.save(feedImage)
         }
+        val savedFeedImages = feedImageRepository.saveAll(feedImages)
 
-        // Save tags separately
-        normalizedDistinctTags.forEach { tagTitle ->
-            val feedTag = FeedTag(
+        // Save tags using saveAll
+        val feedTags = normalizedDistinctTags.map { tagTitle ->
+            FeedTag(
                 feed = savedFeed,
                 title = tagTitle
             )
-            feedTagRepository.save(feedTag)
         }
+        val savedFeedTags = feedTagRepository.saveAll(feedTags)
 
-        return savedFeed
+        return Triple(savedFeed, savedFeedImages, savedFeedTags)
     }
 }

@@ -7,6 +7,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface EventImageRepository : JpaRepository<EventImage, Long> {
-    fun findByEvent(event: Event): List<EventImage>
     fun findByEventIn(events: List<Event>): List<EventImage>
 }
