@@ -1,36 +1,24 @@
 package com.example.mykku.docs
 
-import com.example.mykku.auth.resolver.TestMemberArgumentResolver
+import com.example.mykku.BaseControllerRestDocsTest
 import com.example.mykku.dailymessage.DailyMessageCommentController
 import com.example.mykku.dailymessage.DailyMessageCommentService
 import com.example.mykku.dailymessage.dto.CommentResponse
 import com.example.mykku.dailymessage.dto.CreateCommentRequest
 import com.example.mykku.dailymessage.dto.UpdateCommentRequest
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
-import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.http.MediaType
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
-import org.springframework.restdocs.RestDocumentationContextProvider
-import org.springframework.restdocs.RestDocumentationExtension
 import org.springframework.restdocs.headers.HeaderDocumentation.headerWithName
 import org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
-import org.springframework.restdocs.operation.preprocess.Preprocessors.*
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.*
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
 import org.springframework.restdocs.request.RequestDocumentation.pathParameters
-import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -38,14 +26,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
 import java.time.LocalDateTime
 
-@ExtendWith(MockitoExtension::class, RestDocumentationExtension::class)
-class DailyMessageCommentControllerRestDocsTest {
-
-    private lateinit var mockMvc: MockMvc
-    private val objectMapper = jacksonObjectMapper().apply {
-        registerModule(JavaTimeModule())
-        disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-    }
+class DailyMessageCommentControllerRestDocsTest : BaseControllerRestDocsTest() {
 
     @Mock
     private lateinit var dailyMessageCommentService: DailyMessageCommentService
@@ -53,33 +34,8 @@ class DailyMessageCommentControllerRestDocsTest {
     @InjectMocks
     private lateinit var dailyMessageCommentController: DailyMessageCommentController
 
-    @BeforeEach
-    fun setUp(restDocumentation: RestDocumentationContextProvider) {
-        mockMvc = MockMvcBuilders.standaloneSetup(dailyMessageCommentController)
-            .setMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
-            .setCustomArgumentResolvers(TestMemberArgumentResolver())
-            .apply<StandaloneMockMvcBuilder>(
-                documentationConfiguration(restDocumentation)
-                    .operationPreprocessors()
-                    .withRequestDefaults(
-                        modifyUris()
-                            .scheme("https")
-                            .host("api.mykku.com")
-                            .removePort(),
-                        prettyPrint()
-                    )
-                    .withResponseDefaults(
-                        modifyHeaders()
-                            .remove("X-Content-Type-Options")
-                            .remove("X-XSS-Protection")
-                            .remove("Cache-Control")
-                            .remove("Pragma")
-                            .remove("Expires")
-                            .remove("X-Frame-Options"),
-                        prettyPrint()
-                    )
-            )
-            .build()
+    override fun createMockMvcBuilder(): StandaloneMockMvcBuilder {
+        return MockMvcBuilders.standaloneSetup(dailyMessageCommentController)
     }
 
     @Test

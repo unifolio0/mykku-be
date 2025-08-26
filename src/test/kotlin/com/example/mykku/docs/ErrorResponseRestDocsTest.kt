@@ -1,49 +1,29 @@
 package com.example.mykku.docs
 
-import com.example.mykku.auth.resolver.TestMemberArgumentResolver
+import com.example.mykku.BaseControllerRestDocsTest
 import com.example.mykku.board.BoardController
 import com.example.mykku.board.BoardService
 import com.example.mykku.board.dto.CreateBoardRequest
 import com.example.mykku.board.dto.UpdateBoardRequest
 import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.GlobalExceptionHandler
 import com.example.mykku.exception.MykkuException
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
-import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.http.MediaType
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
-import org.springframework.restdocs.RestDocumentationContextProvider
-import org.springframework.restdocs.RestDocumentationExtension
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
-import org.springframework.restdocs.operation.preprocess.Preprocessors.*
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.payload.PayloadDocumentation.responseFields
-import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
 
-@ExtendWith(MockitoExtension::class, RestDocumentationExtension::class)
-class ErrorResponseRestDocsTest {
-
-    private lateinit var mockMvc: MockMvc
-    private val objectMapper = jacksonObjectMapper().apply {
-        registerModule(JavaTimeModule())
-        disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-    }
+class ErrorResponseRestDocsTest : BaseControllerRestDocsTest() {
 
     @Mock
     private lateinit var boardService: BoardService
@@ -51,34 +31,8 @@ class ErrorResponseRestDocsTest {
     @InjectMocks
     private lateinit var boardController: BoardController
 
-    @BeforeEach
-    fun setUp(restDocumentation: RestDocumentationContextProvider) {
-        mockMvc = MockMvcBuilders.standaloneSetup(boardController)
-            .setControllerAdvice(GlobalExceptionHandler())
-            .setMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
-            .setCustomArgumentResolvers(TestMemberArgumentResolver())
-            .apply<StandaloneMockMvcBuilder>(
-                documentationConfiguration(restDocumentation)
-                    .operationPreprocessors()
-                    .withRequestDefaults(
-                        modifyUris()
-                            .scheme("https")
-                            .host("api.mykku.com")
-                            .removePort(),
-                        prettyPrint()
-                    )
-                    .withResponseDefaults(
-                        modifyHeaders()
-                            .remove("X-Content-Type-Options")
-                            .remove("X-XSS-Protection")
-                            .remove("Cache-Control")
-                            .remove("Pragma")
-                            .remove("Expires")
-                            .remove("X-Frame-Options"),
-                        prettyPrint()
-                    )
-            )
-            .build()
+    override fun createMockMvcBuilder(): StandaloneMockMvcBuilder {
+        return MockMvcBuilders.standaloneSetup(boardController)
     }
 
     @Test
