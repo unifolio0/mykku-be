@@ -32,15 +32,6 @@ class Feed(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     val member: Member,
-
-    @OneToMany(mappedBy = "feed", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    val feedImages: MutableList<FeedImage> = mutableListOf(),
-
-    @OneToMany(mappedBy = "feed", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    val feedComments: MutableList<FeedComment> = mutableListOf(),
-
-    @OneToMany(mappedBy = "feed", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    val feedTags: MutableList<FeedTag> = mutableListOf(),
 ) : BaseEntity() {
     companion object {
         const val CONTENT_MAX_LENGTH = 1000
@@ -51,12 +42,6 @@ class Feed(
     init {
         if (content.length > CONTENT_MAX_LENGTH) {
             throw MykkuException(ErrorCode.FEED_CONTENT_TOO_LONG)
-        }
-        if (feedImages.size > IMAGE_MAX_COUNT) {
-            throw MykkuException(ErrorCode.FEED_IMAGE_LIMIT_EXCEEDED)
-        }
-        if (feedTags.size > TAG_MAX_COUNT) {
-            throw MykkuException(ErrorCode.FEED_TAG_LIMIT_EXCEEDED)
         }
     }
 }

@@ -6,6 +6,7 @@ import com.example.mykku.dailymessage.dto.CommentResponse
 import com.example.mykku.dailymessage.dto.DailyMessageResponse
 import com.example.mykku.dailymessage.dto.DailyMessageSummaryResponse
 import com.example.mykku.dailymessage.dto.ReplyResponse
+import com.example.mykku.dailymessage.repository.DailyMessageCommentRepository
 import com.example.mykku.dailymessage.tool.DailyMessageReader
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -13,7 +14,8 @@ import java.time.LocalDate
 
 @Service
 class DailyMessageService(
-    private val dailyMessageReader: DailyMessageReader
+    private val dailyMessageReader: DailyMessageReader,
+    private val dailyMessageCommentRepository: DailyMessageCommentRepository
 ) {
     @Transactional(readOnly = true)
     fun getDailyMessages(date: LocalDate, limit: Int, sort: SortDirection): List<DailyMessageSummaryResponse> {
@@ -34,8 +36,9 @@ class DailyMessageService(
     @Transactional(readOnly = true)
     fun getDailyMessage(id: Long): DailyMessageResponse {
         val dailyMessage = dailyMessageReader.getDailyMessage(id)
-        val repliesByParentId = getReplies(dailyMessage)
-        val comments = getCommentResponses(dailyMessage, repliesByParentId)
+        val allComments = dailyMessageCommentRepository.findByDailyMessage(dailyMessage)
+        val repliesByParentId = getReplies(allComments)
+        val comments = getCommentResponses(allComments, repliesByParentId)
 
         return DailyMessageResponse(
             id = dailyMessage.id!!,
@@ -46,8 +49,8 @@ class DailyMessageService(
         )
     }
 
-    private fun getReplies(dailyMessage: DailyMessage): Map<Long?, List<ReplyResponse>> {
-        val repliesByParentId = dailyMessage.comments
+    private fun getReplies(allComments: List<com.example.mykku.dailymessage.domain.DailyMessageComment>): Map<Long?, List<ReplyResponse>> {
+        val repliesByParentId = allComments
             .filter { it.parentComment != null }
             .groupBy { it.parentComment!!.id }
             .mapValues { (_, replies) ->
@@ -65,10 +68,10 @@ class DailyMessageService(
     }
 
     private fun getCommentResponses(
-        dailyMessage: DailyMessage,
+        allComments: List<com.example.mykku.dailymessage.domain.DailyMessageComment>,
         repliesByParentId: Map<Long?, List<ReplyResponse>>
     ): List<CommentResponse> {
-        val comments = dailyMessage.comments
+        val comments = allComments
             .filter { it.parentComment == null }
             .map { comment ->
                 CommentResponse(

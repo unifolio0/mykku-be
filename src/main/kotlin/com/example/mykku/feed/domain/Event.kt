@@ -10,13 +10,12 @@ class Event(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
+    @Column(name = "is_contest")
+    var isContest: Boolean = false,
+
     @Column(name = "title")
     var title: String,
 
     @Column(name = "expired_at")
     var expiredAt: LocalDateTime,
-
-    @OneToMany(mappedBy = "event", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    val eventImages: MutableList<EventImage> = mutableListOf(),
-) : BaseEntity() {
-}
+) : BaseEntity()

@@ -3,9 +3,7 @@ package com.example.mykku.board.domain
 import com.example.mykku.common.domain.BaseEntity
 import com.example.mykku.exception.ErrorCode
 import com.example.mykku.exception.MykkuException
-import com.example.mykku.feed.domain.Feed
 import jakarta.persistence.*
-import org.hibernate.annotations.BatchSize
 
 @Entity
 class Board(
@@ -18,10 +16,6 @@ class Board(
 
     @Column(name = "logo")
     var logo: String,
-
-    @BatchSize(size = 50)
-    @OneToMany(mappedBy = "board", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    val feeds: MutableList<Feed> = mutableListOf(),
 ) : BaseEntity() {
     companion object {
         const val TITLE_MAX_LENGTH = 16
