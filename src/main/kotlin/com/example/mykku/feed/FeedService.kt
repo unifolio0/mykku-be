@@ -1,22 +1,17 @@
-package com.example.mykku.feed.service
+package com.example.mykku.feed
 
 import com.example.mykku.board.tool.BoardReader
 import com.example.mykku.exception.ErrorCode
 import com.example.mykku.exception.MykkuException
 import com.example.mykku.feed.domain.Feed
-import com.example.mykku.feed.dto.AuthorResponse
-import com.example.mykku.feed.dto.CreateFeedRequest
-import com.example.mykku.feed.dto.CreateFeedResponse
-import com.example.mykku.feed.dto.FeedImageResponse
-import com.example.mykku.feed.dto.FeedResponse
-import com.example.mykku.feed.dto.FeedsResponse
+import com.example.mykku.feed.dto.*
 import com.example.mykku.feed.repository.EventTagRepository
 import com.example.mykku.feed.repository.FeedCommentRepository
 import com.example.mykku.feed.repository.FeedImageRepository
 import com.example.mykku.feed.repository.FeedTagRepository
 import com.example.mykku.feed.tool.FeedReader
 import com.example.mykku.feed.tool.FeedWriter
-import com.example.mykku.image.service.ImageUploadService
+import com.example.mykku.image.ImageUploadService
 import com.example.mykku.like.tool.LikeFeedReader
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.tool.MemberReader
@@ -98,10 +93,13 @@ class FeedService(
         // Fetch related data for this feed
         val feedImages = feedImageRepository.findByFeed(feed)
         val feedTags = feedTagRepository.findByFeed(feed)
-        val feedComments = feedCommentRepository.findByFeedAndParentCommentIsNull(feed, org.springframework.data.domain.PageRequest.of(0, 1)).content
-        
+        val feedComments = feedCommentRepository.findByFeedAndParentCommentIsNull(
+            feed,
+            org.springframework.data.domain.PageRequest.of(0, 1)
+        ).content
+
         val tagTitles = feedTags.map { it.title }
-        
+
         // Find which of these are event tags
         val eventTags = eventTagRepository.findAllByTitleIn(tagTitles)
         val eventTagTitles = eventTags.map { it.title }.toSet()

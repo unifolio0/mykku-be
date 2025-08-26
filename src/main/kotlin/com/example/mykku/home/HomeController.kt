@@ -1,8 +1,7 @@
-package com.example.mykku.home.controller
+package com.example.mykku.home
 
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.home.dto.HomeResponse
-import com.example.mykku.home.service.HomeService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController

@@ -1,8 +1,7 @@
-package com.example.mykku.auth.controller
+package com.example.mykku.auth
 
 import com.example.mykku.auth.dto.LoginResponse
 import com.example.mykku.auth.dto.MobileLoginRequest
-import com.example.mykku.auth.service.AuthService
 import com.example.mykku.common.dto.ApiResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping

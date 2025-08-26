@@ -4,9 +4,9 @@ import com.example.mykku.feed.dto.ContestWinnerResponse
 import com.example.mykku.feed.dto.ContestWinnersResponse
 import com.example.mykku.feed.dto.EventPreviewResponse
 import com.example.mykku.feed.dto.FeedPreviewResponse
-import com.example.mykku.home.controller.HomeController
+import com.example.mykku.home.HomeController
+import com.example.mykku.home.HomeService
 import com.example.mykku.home.dto.HomeResponse
-import com.example.mykku.home.service.HomeService
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper

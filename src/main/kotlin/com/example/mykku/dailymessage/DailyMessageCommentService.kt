@@ -1,4 +1,4 @@
-package com.example.mykku.dailymessage.service
+package com.example.mykku.dailymessage
 
 import com.example.mykku.dailymessage.dto.CommentResponse
 import com.example.mykku.dailymessage.dto.CreateCommentRequest

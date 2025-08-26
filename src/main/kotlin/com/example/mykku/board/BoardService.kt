@@ -1,4 +1,4 @@
-package com.example.mykku.board.service
+package com.example.mykku.board
 
 import com.example.mykku.board.dto.CreateBoardRequest
 import com.example.mykku.board.dto.CreateBoardResponse

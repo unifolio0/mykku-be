@@ -1,11 +1,10 @@
-package com.example.mykku.dailymessage.controller
+package com.example.mykku.dailymessage
 
 import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.dailymessage.dto.CommentResponse
 import com.example.mykku.dailymessage.dto.CreateCommentRequest
 import com.example.mykku.dailymessage.dto.UpdateCommentRequest
-import com.example.mykku.dailymessage.service.DailyMessageCommentService
 import com.example.mykku.member.domain.Member
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

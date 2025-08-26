@@ -1,16 +1,12 @@
-package com.example.mykku.auth.service
+package com.example.mykku.auth
 
-import com.example.mykku.auth.dto.AppleUserInfo
-import com.example.mykku.auth.dto.GoogleUserInfo
-import com.example.mykku.auth.dto.KakaoUserInfo
-import com.example.mykku.auth.dto.LoginResponse
-import com.example.mykku.auth.dto.MobileLoginRequest
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.auth.dto.*
 import com.example.mykku.auth.tool.AppleOauthClient
 import com.example.mykku.auth.tool.GoogleOauthClient
 import com.example.mykku.auth.tool.JwtTokenProvider
 import com.example.mykku.auth.tool.KakaoOauthClient
+import com.example.mykku.exception.ErrorCode
+import com.example.mykku.exception.MykkuException
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.tool.MemberReader
@@ -27,7 +23,7 @@ class AuthService(
     private val kakaoOauthClient: KakaoOauthClient,
     private val appleOauthClient: AppleOauthClient
 ) {
-    
+
     @Transactional
     fun handleMobileLogin(request: MobileLoginRequest): LoginResponse {
         return when (request.provider) {
@@ -37,20 +33,20 @@ class AuthService(
             SocialProvider.NAVER -> throw MykkuException(ErrorCode.OAUTH_EXTERNAL_SERVICE_ERROR)
         }
     }
-    
+
     private fun handleGoogleMobileLogin(accessToken: String): LoginResponse {
         val userInfo = googleOauthClient.verifyAndGetUserInfo(accessToken)
         val member = createOrUpdateMember(userInfo)
         return jwtTokenProvider.createLoginResponse(member, userInfo.email)
     }
-    
+
     private fun handleKakaoMobileLogin(accessToken: String): LoginResponse {
         val userInfo = kakaoOauthClient.verifyAndGetUserInfo(accessToken)
         val member = createOrUpdateKakaoMember(userInfo)
         val email = userInfo.kakaoAccount?.email ?: "kakao_${userInfo.id}@kakao.com"
         return jwtTokenProvider.createLoginResponse(member, email)
     }
-    
+
     private fun handleAppleMobileLogin(idToken: String): LoginResponse {
         val userInfo = appleOauthClient.verifyAndGetUserInfo(idToken)
         val member = createOrUpdateAppleMember(userInfo)

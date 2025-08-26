@@ -1,4 +1,4 @@
-package com.example.mykku.feed.service
+package com.example.mykku.feed
 
 import com.example.mykku.feed.dto.CreateEventRequest
 import com.example.mykku.feed.dto.CreateEventResponse

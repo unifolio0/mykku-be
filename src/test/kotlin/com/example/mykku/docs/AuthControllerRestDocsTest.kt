@@ -1,10 +1,10 @@
 package com.example.mykku.docs
 
-import com.example.mykku.auth.controller.AuthController
+import com.example.mykku.auth.AuthController
+import com.example.mykku.auth.AuthService
 import com.example.mykku.auth.dto.LoginResponse
 import com.example.mykku.auth.dto.MemberInfo
 import com.example.mykku.auth.dto.MobileLoginRequest
-import com.example.mykku.auth.service.AuthService
 import com.example.mykku.member.domain.SocialProvider
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
@@ -25,12 +25,11 @@ import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentati
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
 import org.springframework.restdocs.operation.preprocess.Preprocessors.*
 import org.springframework.restdocs.payload.JsonFieldType
-import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
-import org.springframework.restdocs.payload.PayloadDocumentation.requestFields
-import org.springframework.restdocs.payload.PayloadDocumentation.responseFields
+import org.springframework.restdocs.payload.PayloadDocumentation.*
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
 
@@ -84,7 +83,7 @@ class AuthControllerRestDocsTest {
             provider = SocialProvider.GOOGLE,
             accessToken = "google_access_token_example"
         )
-        
+
         val loginResponse = LoginResponse(
             accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
             tokenType = "Bearer",
@@ -113,9 +112,11 @@ class AuthControllerRestDocsTest {
                 document(
                     "auth-mobile-login-google",
                     requestFields(
-                        fieldWithPath("provider").type(JsonFieldType.STRING).description("OAuth 제공자 (GOOGLE, KAKAO, APPLE)"),
+                        fieldWithPath("provider").type(JsonFieldType.STRING)
+                            .description("OAuth 제공자 (GOOGLE, KAKAO, APPLE)"),
                         fieldWithPath("accessToken").type(JsonFieldType.STRING).description("OAuth 제공자에서 받은 액세스 토큰"),
-                        fieldWithPath("idToken").type(JsonFieldType.STRING).description("Apple 로그인 시 필요한 ID 토큰 (선택사항)").optional()
+                        fieldWithPath("idToken").type(JsonFieldType.STRING).description("Apple 로그인 시 필요한 ID 토큰 (선택사항)")
+                            .optional()
                     ),
                     responseFields(
                         fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
@@ -127,7 +128,8 @@ class AuthControllerRestDocsTest {
                         fieldWithPath("data.member.id").type(JsonFieldType.STRING).description("회원 ID"),
                         fieldWithPath("data.member.email").type(JsonFieldType.STRING).description("회원 이메일"),
                         fieldWithPath("data.member.nickname").type(JsonFieldType.STRING).description("회원 닉네임"),
-                        fieldWithPath("data.member.profileImage").type(JsonFieldType.STRING).description("프로필 이미지 URL").optional()
+                        fieldWithPath("data.member.profileImage").type(JsonFieldType.STRING).description("프로필 이미지 URL")
+                            .optional()
                     )
                 )
             )
@@ -140,7 +142,7 @@ class AuthControllerRestDocsTest {
             provider = SocialProvider.KAKAO,
             accessToken = "kakao_access_token_example"
         )
-        
+
         val loginResponse = LoginResponse(
             accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
             tokenType = "Bearer",
@@ -178,7 +180,7 @@ class AuthControllerRestDocsTest {
             accessToken = "apple_access_token_example",
             idToken = "apple_id_token_example"
         )
-        
+
         val loginResponse = LoginResponse(
             accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
             tokenType = "Bearer",

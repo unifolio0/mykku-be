@@ -1,10 +1,9 @@
-package com.example.mykku.dailymessage.controller
+package com.example.mykku.dailymessage
 
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.dailymessage.domain.SortDirection
 import com.example.mykku.dailymessage.dto.DailyMessageResponse
 import com.example.mykku.dailymessage.dto.DailyMessageSummaryResponse
-import com.example.mykku.dailymessage.service.DailyMessageService
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping

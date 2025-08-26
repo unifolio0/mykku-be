@@ -1,9 +1,8 @@
-package com.example.mykku.feed.controller
+package com.example.mykku.feed
 
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.feed.dto.CreateEventRequest
 import com.example.mykku.feed.dto.CreateEventResponse
-import com.example.mykku.feed.service.EventService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -24,9 +23,11 @@ class EventController(
         val response = eventService.createEvent(request)
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(ApiResponse(
-                message = "이벤트가 성공적으로 생성되었습니다.",
-                data = response
-            ))
+            .body(
+                ApiResponse(
+                    message = "이벤트가 성공적으로 생성되었습니다.",
+                    data = response
+                )
+            )
     }
 }

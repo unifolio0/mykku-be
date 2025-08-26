@@ -1,4 +1,4 @@
-package com.example.mykku.dailymessage.controller.converter
+package com.example.mykku.dailymessage.converter
 
 import com.example.mykku.dailymessage.domain.SortDirection
 import com.example.mykku.exception.ErrorCode

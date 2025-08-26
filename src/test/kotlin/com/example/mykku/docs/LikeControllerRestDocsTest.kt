@@ -1,9 +1,9 @@
 package com.example.mykku.docs
 
 import com.example.mykku.auth.resolver.TestMemberArgumentResolver
-import com.example.mykku.like.controller.LikeController
+import com.example.mykku.like.LikeController
+import com.example.mykku.like.LikeService
 import com.example.mykku.like.dto.*
-import com.example.mykku.like.service.LikeService
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper

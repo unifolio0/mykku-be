@@ -1,10 +1,10 @@
 package com.example.mykku.docs
 
 import com.example.mykku.auth.resolver.TestMemberArgumentResolver
-import com.example.mykku.feed.controller.EventController
+import com.example.mykku.feed.EventController
+import com.example.mykku.feed.EventService
 import com.example.mykku.feed.dto.CreateEventResponse
 import com.example.mykku.feed.dto.EventImageResponse
-import com.example.mykku.feed.service.EventService
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -26,9 +26,7 @@ import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentati
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
 import org.springframework.restdocs.operation.preprocess.Preprocessors.*
 import org.springframework.restdocs.payload.JsonFieldType
-import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
-import org.springframework.restdocs.payload.PayloadDocumentation.requestFields
-import org.springframework.restdocs.payload.PayloadDocumentation.responseFields
+import org.springframework.restdocs.payload.PayloadDocumentation.*
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -86,7 +84,7 @@ class EventControllerRestDocsTest {
         // given
         val expiredAt = LocalDateTime.of(2024, 12, 31, 23, 59, 59)
         val createdAt = LocalDateTime.of(2024, 1, 1, 10, 0, 0)
-        
+
         val response = CreateEventResponse(
             id = 1L,
             title = "2024 신년 이벤트",

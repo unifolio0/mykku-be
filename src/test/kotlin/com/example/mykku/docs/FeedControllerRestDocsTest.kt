@@ -1,10 +1,10 @@
 package com.example.mykku.docs
 
 import com.example.mykku.auth.resolver.TestMemberArgumentResolver
-import com.example.mykku.feed.controller.FeedController
+import com.example.mykku.feed.FeedCommentService
+import com.example.mykku.feed.FeedController
+import com.example.mykku.feed.FeedService
 import com.example.mykku.feed.dto.*
-import com.example.mykku.feed.service.FeedCommentService
-import com.example.mykku.feed.service.FeedService
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -16,7 +16,6 @@ import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
-import org.mockito.kotlin.isNull
 import org.springframework.data.domain.Pageable
 import org.springframework.http.MediaType
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
@@ -200,7 +199,8 @@ class FeedControllerRestDocsTest {
                             .description("이미지 세로 크기 (픽셀)").optional(),
                         fieldWithPath("data.feeds[].tags").type(JsonFieldType.ARRAY).description("피드 태그 목록"),
                         fieldWithPath("data.feeds[].tags[].title").type(JsonFieldType.STRING).description("태그 제목"),
-                        fieldWithPath("data.feeds[].tags[].isEvent").type(JsonFieldType.BOOLEAN).description("이벤트 태그 여부"),
+                        fieldWithPath("data.feeds[].tags[].isEvent").type(JsonFieldType.BOOLEAN)
+                            .description("이벤트 태그 여부"),
                         fieldWithPath("data.feeds[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                         fieldWithPath("data.feeds[].commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
                         fieldWithPath("data.feeds[].isLiked").type(JsonFieldType.BOOLEAN).description("현재 사용자의 좋아요 여부"),
@@ -378,7 +378,13 @@ class FeedControllerRestDocsTest {
             hasNext = false
         )
 
-        `when`(feedCommentService.getComments(eq(1L), eq("member123"), any<Pageable>())).thenReturn(feedCommentsResponse)
+        `when`(
+            feedCommentService.getComments(
+                eq(1L),
+                eq("member123"),
+                any<Pageable>()
+            )
+        ).thenReturn(feedCommentsResponse)
 
         // when & then
         mockMvc.perform(

@@ -1,4 +1,4 @@
-package com.example.mykku.home.service
+package com.example.mykku.home
 
 import com.example.mykku.dailymessage.tool.DailyMessageReader
 import com.example.mykku.feed.tool.EventReader

@@ -1,9 +1,8 @@
-package com.example.mykku.like.controller
+package com.example.mykku.like
 
 import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.like.dto.*
-import com.example.mykku.like.service.LikeService
 import com.example.mykku.member.domain.Member
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

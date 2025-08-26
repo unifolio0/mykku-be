@@ -1,12 +1,12 @@
 package com.example.mykku.docs
 
-import com.example.mykku.dailymessage.controller.DailyMessageController
+import com.example.mykku.dailymessage.DailyMessageController
+import com.example.mykku.dailymessage.DailyMessageService
 import com.example.mykku.dailymessage.domain.SortDirection
 import com.example.mykku.dailymessage.dto.CommentResponse
 import com.example.mykku.dailymessage.dto.DailyMessageResponse
 import com.example.mykku.dailymessage.dto.DailyMessageSummaryResponse
 import com.example.mykku.dailymessage.dto.ReplyResponse
-import com.example.mykku.dailymessage.service.DailyMessageService
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper

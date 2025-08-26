@@ -1,4 +1,4 @@
-package com.example.mykku.like.service
+package com.example.mykku.like
 
 import com.example.mykku.board.tool.BoardReader
 import com.example.mykku.dailymessage.tool.DailyMessageCommentReader

@@ -1,11 +1,10 @@
-package com.example.mykku.board.controller
+package com.example.mykku.board
 
 import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.board.dto.CreateBoardRequest
 import com.example.mykku.board.dto.CreateBoardResponse
 import com.example.mykku.board.dto.UpdateBoardRequest
 import com.example.mykku.board.dto.UpdateBoardResponse
-import com.example.mykku.board.service.BoardService
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.member.domain.Member
 import org.springframework.http.HttpStatus

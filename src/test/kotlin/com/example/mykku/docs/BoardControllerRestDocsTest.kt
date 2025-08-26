@@ -1,12 +1,12 @@
 package com.example.mykku.docs
 
 import com.example.mykku.auth.resolver.TestMemberArgumentResolver
-import com.example.mykku.board.controller.BoardController
+import com.example.mykku.board.BoardController
+import com.example.mykku.board.BoardService
 import com.example.mykku.board.dto.CreateBoardRequest
 import com.example.mykku.board.dto.CreateBoardResponse
 import com.example.mykku.board.dto.UpdateBoardRequest
 import com.example.mykku.board.dto.UpdateBoardResponse
-import com.example.mykku.board.service.BoardService
 import com.example.mykku.exception.ErrorCode
 import com.example.mykku.exception.GlobalExceptionHandler
 import com.example.mykku.exception.MykkuException
