@@ -11,6 +11,9 @@ class EventImage(
     @Column(name = "url")
     var url: String,
 
+    @Column(name = "order_index")
+    var orderIndex: Int,
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
     val event: Event,

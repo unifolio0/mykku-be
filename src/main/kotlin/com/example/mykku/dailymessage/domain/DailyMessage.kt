@@ -20,9 +20,6 @@ class DailyMessage(
 
     @Column(name = "date")
     var date: LocalDate,
-
-    @OneToMany(mappedBy = "dailyMessage", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    val comments: MutableList<DailyMessageComment> = mutableListOf(),
 ) : BaseEntity() {
     companion object {
         const val CONTENT_MAX_LENGTH = 42

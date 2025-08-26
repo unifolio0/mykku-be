@@ -119,7 +119,10 @@ class FeedControllerRestDocsTest {
                             height = 600
                         )
                     ),
-                    tags = listOf("태그1", "태그2"),
+                    tags = listOf(
+                        TagResponse(title = "태그1", isEvent = false),
+                        TagResponse(title = "태그2", isEvent = true)
+                    ),
                     likeCount = 10,
                     isLiked = true,
                     isSaved = false,
@@ -142,7 +145,9 @@ class FeedControllerRestDocsTest {
                     title = "두 번째 피드 제목",
                     content = "두 번째 피드 내용입니다.",
                     images = emptyList(),
-                    tags = listOf("태그3"),
+                    tags = listOf(
+                        TagResponse(title = "태그3", isEvent = false)
+                    ),
                     likeCount = 20,
                     isLiked = false,
                     isSaved = true,
@@ -194,6 +199,8 @@ class FeedControllerRestDocsTest {
                         fieldWithPath("data.feeds[].images[].height").type(JsonFieldType.NUMBER)
                             .description("이미지 세로 크기 (픽셀)").optional(),
                         fieldWithPath("data.feeds[].tags").type(JsonFieldType.ARRAY).description("피드 태그 목록"),
+                        fieldWithPath("data.feeds[].tags[].title").type(JsonFieldType.STRING).description("태그 제목"),
+                        fieldWithPath("data.feeds[].tags[].isEvent").type(JsonFieldType.BOOLEAN).description("이벤트 태그 여부"),
                         fieldWithPath("data.feeds[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                         fieldWithPath("data.feeds[].commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
                         fieldWithPath("data.feeds[].isLiked").type(JsonFieldType.BOOLEAN).description("현재 사용자의 좋아요 여부"),

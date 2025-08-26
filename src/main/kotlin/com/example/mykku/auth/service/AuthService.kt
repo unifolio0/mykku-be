@@ -4,6 +4,9 @@ import com.example.mykku.auth.dto.AppleUserInfo
 import com.example.mykku.auth.dto.GoogleUserInfo
 import com.example.mykku.auth.dto.KakaoUserInfo
 import com.example.mykku.auth.dto.LoginResponse
+import com.example.mykku.auth.dto.MobileLoginRequest
+import com.example.mykku.exception.ErrorCode
+import com.example.mykku.exception.MykkuException
 import com.example.mykku.auth.tool.AppleOauthClient
 import com.example.mykku.auth.tool.GoogleOauthClient
 import com.example.mykku.auth.tool.JwtTokenProvider
@@ -24,28 +27,34 @@ class AuthService(
     private val kakaoOauthClient: KakaoOauthClient,
     private val appleOauthClient: AppleOauthClient
 ) {
-    fun getGoogleAuthUrl(): String {
-        return googleOauthClient.getAuthUrl()
-    }
-
+    
     @Transactional
-    fun handleGoogleCallback(code: String): LoginResponse {
-        val tokenResponse = googleOauthClient.exchangeCodeForToken(code)
-        val userInfo = googleOauthClient.getUserInfo(tokenResponse.accessToken)
+    fun handleMobileLogin(request: MobileLoginRequest): LoginResponse {
+        return when (request.provider) {
+            SocialProvider.GOOGLE -> handleGoogleMobileLogin(request.accessToken!!) // validation이 init에서 되미로 안전
+            SocialProvider.KAKAO -> handleKakaoMobileLogin(request.accessToken!!) // validation이 init에서 되미로 안전
+            SocialProvider.APPLE -> handleAppleMobileLogin(request.idToken!!) // validation이 init에서 되미로 안전
+            SocialProvider.NAVER -> throw MykkuException(ErrorCode.OAUTH_EXTERNAL_SERVICE_ERROR)
+        }
+    }
+    
+    private fun handleGoogleMobileLogin(accessToken: String): LoginResponse {
+        val userInfo = googleOauthClient.verifyAndGetUserInfo(accessToken)
         val member = createOrUpdateMember(userInfo)
         return jwtTokenProvider.createLoginResponse(member, userInfo.email)
     }
-
-    fun getKakaoAuthUrl(): String {
-        return kakaoOauthClient.getAuthUrl()
-    }
-
-    @Transactional
-    fun handleKakaoCallback(code: String): LoginResponse {
-        val tokenResponse = kakaoOauthClient.exchangeCodeForToken(code)
-        val userInfo = kakaoOauthClient.getUserInfo(tokenResponse.accessToken)
+    
+    private fun handleKakaoMobileLogin(accessToken: String): LoginResponse {
+        val userInfo = kakaoOauthClient.verifyAndGetUserInfo(accessToken)
         val member = createOrUpdateKakaoMember(userInfo)
         val email = userInfo.kakaoAccount?.email ?: "kakao_${userInfo.id}@kakao.com"
+        return jwtTokenProvider.createLoginResponse(member, email)
+    }
+    
+    private fun handleAppleMobileLogin(idToken: String): LoginResponse {
+        val userInfo = appleOauthClient.verifyAndGetUserInfo(idToken)
+        val member = createOrUpdateAppleMember(userInfo)
+        val email = userInfo.email ?: "apple_${userInfo.sub}@privaterelay.appleid.com"
         return jwtTokenProvider.createLoginResponse(member, email)
     }
 
@@ -82,22 +91,6 @@ class AuthService(
         }
     }
 
-    fun getAppleAuthUrl(state: String? = null): String {
-        return if (state != null) {
-            appleOauthClient.getAuthUrl(state)
-        } else {
-            appleOauthClient.getAuthUrl()
-        }
-    }
-
-    @Transactional
-    fun handleAppleCallback(code: String): LoginResponse {
-        val tokenResponse = appleOauthClient.exchangeCodeForToken(code)
-        val userInfo = appleOauthClient.getUserInfo(tokenResponse.idToken)
-        val member = createOrUpdateAppleMember(userInfo)
-        val email = userInfo.email ?: "apple_${userInfo.sub}@privaterelay.appleid.com"
-        return jwtTokenProvider.createLoginResponse(member, email)
-    }
 
     private fun createOrUpdateAppleMember(userInfo: AppleUserInfo): Member {
         val memberId = "apple_${userInfo.sub}"
