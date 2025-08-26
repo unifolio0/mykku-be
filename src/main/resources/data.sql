@@ -16,18 +16,7 @@ INSERT INTO board (title, logo, created_at, updated_at) VALUES
 ('운동', 'https://example.com/logo_exercise.png', NOW(), NOW()),
 ('취미', 'https://example.com/logo_hobby.png', NOW(), NOW());
 
--- Insert sample tags
-INSERT INTO tag (title, created_at, updated_at) VALUES
-('일상', NOW(), NOW()),
-('여행', NOW(), NOW()),
-('맛집', NOW(), NOW()),
-('운동', NOW(), NOW()),
-('취미', NOW(), NOW()),
-('사진', NOW(), NOW()),
-('공부', NOW(), NOW()),
-('친구', NOW(), NOW()),
-('가족', NOW(), NOW()),
-('휴식', NOW(), NOW());
+-- Tags are now stored directly in feed_tag and event_tag tables
 
 -- Insert sample feeds
 INSERT INTO feed (title, content, like_count, comment_count, board_id, member_id, created_at, updated_at) VALUES
@@ -38,28 +27,28 @@ INSERT INTO feed (title, content, like_count, comment_count, board_id, member_id
 ('새로운 취미 시작', '요즘 그림 그리기에 푹 빠져있어요. 아직 초보지만 재미있네요!', 35, 7, 5, 'member5', NOW(), NOW());
 
 -- Insert sample feed images
-INSERT INTO feed_image (url, feed_id) VALUES
-('https://example.com/daily1.jpg', 1),
-('https://example.com/daily2.jpg', 1),
-('https://example.com/jeju1.jpg', 2),
-('https://example.com/jeju2.jpg', 2),
-('https://example.com/jeju3.jpg', 2),
-('https://example.com/pasta1.jpg', 3),
-('https://example.com/exercise1.jpg', 4),
-('https://example.com/hobby1.jpg', 5),
-('https://example.com/hobby2.jpg', 5);
+INSERT INTO feed_image (url, width, height, feed_id, created_at, updated_at) VALUES
+('https://example.com/daily1.jpg', 800, 600, 1, NOW(), NOW()),
+('https://example.com/daily2.jpg', 1024, 768, 1, NOW(), NOW()),
+('https://example.com/jeju1.jpg', 1200, 900, 2, NOW(), NOW()),
+('https://example.com/jeju2.jpg', 800, 1200, 2, NOW(), NOW()),
+('https://example.com/jeju3.jpg', 1600, 1200, 2, NOW(), NOW()),
+('https://example.com/pasta1.jpg', 800, 600, 3, NOW(), NOW()),
+('https://example.com/exercise1.jpg', 600, 800, 4, NOW(), NOW()),
+('https://example.com/hobby1.jpg', 1000, 800, 5, NOW(), NOW()),
+('https://example.com/hobby2.jpg', 800, 1000, 5, NOW(), NOW());
 
 -- Insert sample feed tags
-INSERT INTO feed_tag (feed_id, tag_id, created_at, updated_at) VALUES
-(1, 1, NOW(), NOW()),
-(1, 10, NOW(), NOW()),
-(2, 2, NOW(), NOW()),
-(2, 6, NOW(), NOW()),
-(3, 3, NOW(), NOW()),
-(3, 6, NOW(), NOW()),
-(4, 4, NOW(), NOW()),
-(5, 5, NOW(), NOW()),
-(5, 6, NOW(), NOW());
+INSERT INTO feed_tag (feed_id, title, created_at, updated_at) VALUES
+(1, '일상', NOW(), NOW()),
+(1, '휴식', NOW(), NOW()),
+(2, '여행', NOW(), NOW()),
+(2, '사진', NOW(), NOW()),
+(3, '맛집', NOW(), NOW()),
+(3, '사진', NOW(), NOW()),
+(4, '운동', NOW(), NOW()),
+(5, '취미', NOW(), NOW()),
+(5, '사진', NOW(), NOW());
 
 -- Insert sample feed comments
 INSERT INTO feed_comment (content, like_count, feed_id, parent_comment_id, member_id, created_at, updated_at) VALUES
@@ -163,15 +152,28 @@ INSERT INTO like_board (member_id, board_id) VALUES
 ('member5', 5);
 
 -- Insert sample events
-INSERT INTO event (title, expired_at, created_at, updated_at) VALUES
-('2024 여름 사진 콘테스트', '2024-08-31 23:59:59', NOW(), NOW()),
-('가을 여행기 공모전', '2024-11-30 23:59:59', NOW(), NOW());
+INSERT INTO event (title, is_contest, expired_at, created_at, updated_at) VALUES
+('2024 여름 사진 콘테스트', TRUE, '2024-08-31 23:59:59', NOW(), NOW()),
+('가을 여행기 공모전', TRUE, '2024-11-30 23:59:59', NOW(), NOW()),
+('일반 이벤트', FALSE, '2024-12-31 23:59:59', NOW(), NOW());
 
 -- Insert sample event images
-INSERT INTO event_image (url, event_id) VALUES
-('https://example.com/contest_banner1.jpg', 1),
-('https://example.com/contest_banner2.jpg', 1),
-('https://example.com/travel_contest1.jpg', 2);
+INSERT INTO event_image (url, order_index, event_id, created_at, updated_at) VALUES
+('https://example.com/contest_banner1.jpg', 1, 1, NOW(), NOW()),
+('https://example.com/contest_banner2.jpg', 2, 1, NOW(), NOW()),
+('https://example.com/travel_contest1.jpg', 1, 2, NOW(), NOW()),
+('https://example.com/general_event1.jpg', 1, 3, NOW(), NOW());
+
+-- Insert sample event tags
+INSERT INTO event_tag (title, event_id, created_at, updated_at) VALUES
+('사진', 1, NOW(), NOW()),
+('콘테스트', 1, NOW(), NOW()),
+('여름', 1, NOW(), NOW()),
+('여행', 2, NOW(), NOW()),
+('가을', 2, NOW(), NOW()),
+('콘테스트', 2, NOW(), NOW()),
+('이벤트', 3, NOW(), NOW()),
+('일반', 3, NOW(), NOW());
 
 -- Insert sample contest winners
 INSERT INTO contest_winner (winner_rank, description, acceptance_speech, image, event_id, created_at, updated_at) VALUES

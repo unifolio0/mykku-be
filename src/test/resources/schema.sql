@@ -46,26 +46,19 @@ CREATE TABLE IF NOT EXISTS feed_image (
     width INT NOT NULL,
     height INT NOT NULL,
     feed_id BIGINT NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
     FOREIGN KEY (feed_id) REFERENCES feed(id) ON DELETE CASCADE
 );
 
--- Create Tag table
-CREATE TABLE IF NOT EXISTS tag (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(20) NOT NULL UNIQUE,
-    created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL
-);
-
--- Create FeedTag table (Many-to-Many relationship between Feed and Tag)
+-- Create FeedTag table (stores tag title directly)
 CREATE TABLE IF NOT EXISTS feed_tag (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     feed_id BIGINT NOT NULL,
-    tag_id BIGINT NOT NULL,
+    title VARCHAR(20) NOT NULL,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
-    FOREIGN KEY (feed_id) REFERENCES feed(id) ON DELETE CASCADE,
-    FOREIGN KEY (tag_id) REFERENCES tag(id) ON DELETE CASCADE
+    FOREIGN KEY (feed_id) REFERENCES feed(id) ON DELETE CASCADE
 );
 
 -- Create FeedComment table
@@ -185,6 +178,7 @@ CREATE TABLE IF NOT EXISTS like_board (
 CREATE TABLE IF NOT EXISTS event (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
+    is_contest BOOLEAN NOT NULL DEFAULT FALSE,
     expired_at TIMESTAMP NOT NULL,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL
@@ -194,7 +188,20 @@ CREATE TABLE IF NOT EXISTS event (
 CREATE TABLE IF NOT EXISTS event_image (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     url VARCHAR(255) NOT NULL,
+    order_index INT NOT NULL,
     event_id BIGINT NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    FOREIGN KEY (event_id) REFERENCES event(id) ON DELETE CASCADE
+);
+
+-- Create EventTag table (stores tag title directly)
+CREATE TABLE IF NOT EXISTS event_tag (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(20) NOT NULL,
+    event_id BIGINT NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
     FOREIGN KEY (event_id) REFERENCES event(id) ON DELETE CASCADE
 );
 
