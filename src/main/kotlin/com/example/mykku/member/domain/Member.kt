@@ -37,7 +37,7 @@ class Member(
 ) : BaseEntity() {
     companion object {
         const val NICKNAME_MAX_LENGTH = 10
-        val VALID_NICKNAME_PATTERN = Regex("^[가-힣a-zA-Z0-9]+$")
+        val VALID_NICKNAME_PATTERN = Regex("^[가-힣a-zA-Z0-9\\s]+$")
     }
 
     init {

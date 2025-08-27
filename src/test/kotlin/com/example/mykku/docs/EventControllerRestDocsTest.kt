@@ -1,84 +1,37 @@
 package com.example.mykku.docs
 
-import com.example.mykku.auth.resolver.TestMemberArgumentResolver
-import com.example.mykku.feed.controller.EventController
+import com.example.mykku.BaseControllerRestDocsTest
+import com.example.mykku.feed.EventController
+import com.example.mykku.feed.EventService
 import com.example.mykku.feed.dto.CreateEventResponse
 import com.example.mykku.feed.dto.EventImageResponse
-import com.example.mykku.feed.service.EventService
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.springframework.http.MediaType
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
-import org.springframework.restdocs.RestDocumentationContextProvider
-import org.springframework.restdocs.RestDocumentationExtension
 import org.springframework.restdocs.headers.HeaderDocumentation.headerWithName
 import org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
-import org.springframework.restdocs.operation.preprocess.Preprocessors.*
 import org.springframework.restdocs.payload.JsonFieldType
-import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
-import org.springframework.restdocs.payload.PayloadDocumentation.requestFields
-import org.springframework.restdocs.payload.PayloadDocumentation.responseFields
-import org.springframework.test.web.servlet.MockMvc
+import org.springframework.restdocs.payload.PayloadDocumentation.*
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
 import java.time.LocalDateTime
 
-@ExtendWith(MockitoExtension::class, RestDocumentationExtension::class)
-class EventControllerRestDocsTest {
-
-    private lateinit var mockMvc: MockMvc
-    private val objectMapper = jacksonObjectMapper().apply {
-        registerModule(JavaTimeModule())
-        disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-    }
+class EventControllerRestDocsTest : BaseControllerRestDocsTest() {
 
     @Mock
     private lateinit var eventService: EventService
 
     private lateinit var eventController: EventController
 
-    @BeforeEach
-    fun setUp(restDocumentation: RestDocumentationContextProvider) {
+    override fun createMockMvcBuilder(): StandaloneMockMvcBuilder {
         eventController = EventController(eventService)
-
-        mockMvc = MockMvcBuilders.standaloneSetup(eventController)
-            .setCustomArgumentResolvers(TestMemberArgumentResolver())
-            .setMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
-            .apply<StandaloneMockMvcBuilder>(
-                documentationConfiguration(restDocumentation)
-                    .operationPreprocessors()
-                    .withRequestDefaults(
-                        modifyUris()
-                            .scheme("https")
-                            .host("api.mykku.com")
-                            .removePort(),
-                        prettyPrint()
-                    )
-                    .withResponseDefaults(
-                        modifyHeaders()
-                            .remove("X-Content-Type-Options")
-                            .remove("X-XSS-Protection")
-                            .remove("Cache-Control")
-                            .remove("Pragma")
-                            .remove("Expires")
-                            .remove("X-Frame-Options"),
-                        prettyPrint()
-                    )
-            )
-            .build()
+        return MockMvcBuilders.standaloneSetup(eventController)
     }
 
     @Test
@@ -86,7 +39,7 @@ class EventControllerRestDocsTest {
         // given
         val expiredAt = LocalDateTime.of(2024, 12, 31, 23, 59, 59)
         val createdAt = LocalDateTime.of(2024, 1, 1, 10, 0, 0)
-        
+
         val response = CreateEventResponse(
             id = 1L,
             title = "2024 신년 이벤트",

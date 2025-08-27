@@ -1,39 +1,26 @@
 package com.example.mykku.docs
 
-import com.example.mykku.auth.resolver.TestMemberArgumentResolver
-import com.example.mykku.feed.controller.FeedController
+import com.example.mykku.BaseControllerRestDocsTest
+import com.example.mykku.feed.FeedCommentService
+import com.example.mykku.feed.FeedController
+import com.example.mykku.feed.FeedService
 import com.example.mykku.feed.dto.*
-import com.example.mykku.feed.service.FeedCommentService
-import com.example.mykku.feed.service.FeedService
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
-import org.mockito.kotlin.isNull
 import org.springframework.data.domain.Pageable
 import org.springframework.http.MediaType
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.mock.web.MockMultipartFile
-import org.springframework.restdocs.RestDocumentationContextProvider
-import org.springframework.restdocs.RestDocumentationExtension
 import org.springframework.restdocs.headers.HeaderDocumentation.headerWithName
 import org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
-import org.springframework.restdocs.operation.preprocess.Preprocessors.*
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.payload.PayloadDocumentation.responseFields
 import org.springframework.restdocs.request.RequestDocumentation.*
-import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -41,14 +28,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
 import java.time.LocalDateTime
 
-@ExtendWith(MockitoExtension::class, RestDocumentationExtension::class)
-class FeedControllerRestDocsTest {
-
-    private lateinit var mockMvc: MockMvc
-    private val objectMapper = jacksonObjectMapper().apply {
-        registerModule(JavaTimeModule())
-        disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-    }
+class FeedControllerRestDocsTest : BaseControllerRestDocsTest() {
 
     @Mock
     private lateinit var feedService: FeedService
@@ -58,35 +38,9 @@ class FeedControllerRestDocsTest {
 
     private lateinit var feedController: FeedController
 
-    @BeforeEach
-    fun setUp(restDocumentation: RestDocumentationContextProvider) {
+    override fun createMockMvcBuilder(): StandaloneMockMvcBuilder {
         feedController = FeedController(feedService, feedCommentService)
-
-        mockMvc = MockMvcBuilders.standaloneSetup(feedController)
-            .setCustomArgumentResolvers(TestMemberArgumentResolver())
-            .setMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
-            .apply<StandaloneMockMvcBuilder>(
-                documentationConfiguration(restDocumentation)
-                    .operationPreprocessors()
-                    .withRequestDefaults(
-                        modifyUris()
-                            .scheme("https")
-                            .host("api.mykku.com")
-                            .removePort(),
-                        prettyPrint()
-                    )
-                    .withResponseDefaults(
-                        modifyHeaders()
-                            .remove("X-Content-Type-Options")
-                            .remove("X-XSS-Protection")
-                            .remove("Cache-Control")
-                            .remove("Pragma")
-                            .remove("Expires")
-                            .remove("X-Frame-Options"),
-                        prettyPrint()
-                    )
-            )
-            .build()
+        return MockMvcBuilders.standaloneSetup(feedController)
     }
 
     @Test
@@ -200,7 +154,8 @@ class FeedControllerRestDocsTest {
                             .description("이미지 세로 크기 (픽셀)").optional(),
                         fieldWithPath("data.feeds[].tags").type(JsonFieldType.ARRAY).description("피드 태그 목록"),
                         fieldWithPath("data.feeds[].tags[].title").type(JsonFieldType.STRING).description("태그 제목"),
-                        fieldWithPath("data.feeds[].tags[].isEvent").type(JsonFieldType.BOOLEAN).description("이벤트 태그 여부"),
+                        fieldWithPath("data.feeds[].tags[].isEvent").type(JsonFieldType.BOOLEAN)
+                            .description("이벤트 태그 여부"),
                         fieldWithPath("data.feeds[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                         fieldWithPath("data.feeds[].commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
                         fieldWithPath("data.feeds[].isLiked").type(JsonFieldType.BOOLEAN).description("현재 사용자의 좋아요 여부"),
@@ -378,7 +333,13 @@ class FeedControllerRestDocsTest {
             hasNext = false
         )
 
-        `when`(feedCommentService.getComments(eq(1L), eq("member123"), any<Pageable>())).thenReturn(feedCommentsResponse)
+        `when`(
+            feedCommentService.getComments(
+                eq(1L),
+                eq("member123"),
+                any<Pageable>()
+            )
+        ).thenReturn(feedCommentsResponse)
 
         // when & then
         mockMvc.perform(

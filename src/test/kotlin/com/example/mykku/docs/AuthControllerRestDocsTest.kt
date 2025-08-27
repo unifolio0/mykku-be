@@ -1,80 +1,36 @@
 package com.example.mykku.docs
 
-import com.example.mykku.auth.controller.AuthController
+import com.example.mykku.BaseControllerRestDocsTest
+import com.example.mykku.auth.AuthController
+import com.example.mykku.auth.AuthService
 import com.example.mykku.auth.dto.LoginResponse
 import com.example.mykku.auth.dto.MemberInfo
 import com.example.mykku.auth.dto.MobileLoginRequest
-import com.example.mykku.auth.service.AuthService
 import com.example.mykku.member.domain.SocialProvider
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
-import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.http.MediaType
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
-import org.springframework.restdocs.RestDocumentationContextProvider
-import org.springframework.restdocs.RestDocumentationExtension
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
-import org.springframework.restdocs.operation.preprocess.Preprocessors.*
 import org.springframework.restdocs.payload.JsonFieldType
-import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
-import org.springframework.restdocs.payload.PayloadDocumentation.requestFields
-import org.springframework.restdocs.payload.PayloadDocumentation.responseFields
-import org.springframework.test.web.servlet.MockMvc
+import org.springframework.restdocs.payload.PayloadDocumentation.*
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
 
-@ExtendWith(MockitoExtension::class, RestDocumentationExtension::class)
-class AuthControllerRestDocsTest {
-
-    private lateinit var mockMvc: MockMvc
-    private val objectMapper = jacksonObjectMapper().apply {
-        registerModule(JavaTimeModule())
-        disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-    }
+class AuthControllerRestDocsTest : BaseControllerRestDocsTest() {
 
     @Mock
     private lateinit var authService: AuthService
 
-    @InjectMocks
     private lateinit var authController: AuthController
 
-    @BeforeEach
-    fun setUp(restDocumentation: RestDocumentationContextProvider) {
-        mockMvc = MockMvcBuilders.standaloneSetup(authController)
-            .setMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
-            .apply<StandaloneMockMvcBuilder>(
-                documentationConfiguration(restDocumentation)
-                    .operationPreprocessors()
-                    .withRequestDefaults(
-                        modifyUris()
-                            .scheme("https")
-                            .host("api.mykku.com")
-                            .removePort(),
-                        prettyPrint()
-                    )
-                    .withResponseDefaults(
-                        modifyHeaders()
-                            .remove("X-Content-Type-Options")
-                            .remove("X-XSS-Protection")
-                            .remove("Cache-Control")
-                            .remove("Pragma")
-                            .remove("Expires")
-                            .remove("X-Frame-Options"),
-                        prettyPrint()
-                    )
-            )
-            .build()
+    override fun createMockMvcBuilder(): StandaloneMockMvcBuilder {
+        authController = AuthController(authService)
+        return MockMvcBuilders.standaloneSetup(authController)
     }
 
     @Test
@@ -84,7 +40,7 @@ class AuthControllerRestDocsTest {
             provider = SocialProvider.GOOGLE,
             accessToken = "google_access_token_example"
         )
-        
+
         val loginResponse = LoginResponse(
             accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
             tokenType = "Bearer",
@@ -113,9 +69,11 @@ class AuthControllerRestDocsTest {
                 document(
                     "auth-mobile-login-google",
                     requestFields(
-                        fieldWithPath("provider").type(JsonFieldType.STRING).description("OAuth 제공자 (GOOGLE, KAKAO, APPLE)"),
+                        fieldWithPath("provider").type(JsonFieldType.STRING)
+                            .description("OAuth 제공자 (GOOGLE, KAKAO, APPLE)"),
                         fieldWithPath("accessToken").type(JsonFieldType.STRING).description("OAuth 제공자에서 받은 액세스 토큰"),
-                        fieldWithPath("idToken").type(JsonFieldType.STRING).description("Apple 로그인 시 필요한 ID 토큰 (선택사항)").optional()
+                        fieldWithPath("idToken").type(JsonFieldType.STRING).description("Apple 로그인 시 필요한 ID 토큰 (선택사항)")
+                            .optional()
                     ),
                     responseFields(
                         fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
@@ -127,7 +85,8 @@ class AuthControllerRestDocsTest {
                         fieldWithPath("data.member.id").type(JsonFieldType.STRING).description("회원 ID"),
                         fieldWithPath("data.member.email").type(JsonFieldType.STRING).description("회원 이메일"),
                         fieldWithPath("data.member.nickname").type(JsonFieldType.STRING).description("회원 닉네임"),
-                        fieldWithPath("data.member.profileImage").type(JsonFieldType.STRING).description("프로필 이미지 URL").optional()
+                        fieldWithPath("data.member.profileImage").type(JsonFieldType.STRING).description("프로필 이미지 URL")
+                            .optional()
                     )
                 )
             )
@@ -140,7 +99,7 @@ class AuthControllerRestDocsTest {
             provider = SocialProvider.KAKAO,
             accessToken = "kakao_access_token_example"
         )
-        
+
         val loginResponse = LoginResponse(
             accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
             tokenType = "Bearer",
@@ -178,7 +137,7 @@ class AuthControllerRestDocsTest {
             accessToken = "apple_access_token_example",
             idToken = "apple_id_token_example"
         )
-        
+
         val loginResponse = LoginResponse(
             accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
             tokenType = "Bearer",
