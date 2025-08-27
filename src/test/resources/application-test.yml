@@ -24,7 +24,7 @@ jwt:
 
 aws:
   s3:
-    enabled: true
+    enabled: false
     access-key: test-access-key
     secret-key: test-secret-key
     region: ap-northeast-2
