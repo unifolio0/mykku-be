@@ -1,5 +1,6 @@
 package com.example.mykku.member.domain
 
+import com.example.mykku.common.domain.BaseEntity
 import jakarta.persistence.*
 
 @Entity
@@ -15,5 +16,5 @@ class Follow(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "following_id")
     val following: Member
-) {
+) : BaseEntity() {
 }

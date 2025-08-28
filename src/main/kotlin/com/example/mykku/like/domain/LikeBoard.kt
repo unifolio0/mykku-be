@@ -1,6 +1,7 @@
 package com.example.mykku.like.domain
 
 import com.example.mykku.board.domain.Board
+import com.example.mykku.common.domain.BaseEntity
 import com.example.mykku.member.domain.Member
 import jakarta.persistence.*
 
@@ -17,5 +18,5 @@ class LikeBoard(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
     val board: Board,
-) {
+) : BaseEntity() {
 }

@@ -74,17 +74,17 @@ INSERT INTO daily_message_comment (content, like_count, daily_message_id, parent
 ('저도 그렇게 생각해요!', 3, 1, 1, 'member4', NOW(), NOW());
 
 -- Insert sample follow relationships
-INSERT INTO follow (follower_id, following_id) VALUES
-('member1', 'member2'),
-('member1', 'member3'),
-('member1', 'member4'),
-('member2', 'member1'),
-('member2', 'member3'),
-('member3', 'member1'),
-('member3', 'member2'),
-('member4', 'member1'),
-('member5', 'member1'),
-('member5', 'member2');
+INSERT INTO follow (follower_id, following_id, created_at, updated_at) VALUES
+('member1', 'member2', NOW(), NOW()),
+('member1', 'member3', NOW(), NOW()),
+('member1', 'member4', NOW(), NOW()),
+('member2', 'member1', NOW(), NOW()),
+('member2', 'member3', NOW(), NOW()),
+('member3', 'member1', NOW(), NOW()),
+('member3', 'member2', NOW(), NOW()),
+('member4', 'member1', NOW(), NOW()),
+('member5', 'member1', NOW(), NOW()),
+('member5', 'member2', NOW(), NOW());
 
 -- Insert sample saved feeds
 INSERT INTO save_feed (member_id, feed_id, created_at, updated_at) VALUES
@@ -139,17 +139,17 @@ INSERT INTO like_daily_message_comment (member_id, daily_message_comment_id, cre
 ('member5', 2, NOW(), NOW());
 
 -- Insert sample board likes
-INSERT INTO like_board (member_id, board_id) VALUES
-('member1', 1),
-('member1', 2),
-('member2', 1),
-('member2', 3),
-('member3', 2),
-('member3', 4),
-('member4', 1),
-('member4', 5),
-('member5', 3),
-('member5', 5);
+INSERT INTO like_board (member_id, board_id, created_at, updated_at) VALUES
+('member1', 1, NOW(), NOW()),
+('member1', 2, NOW(), NOW()),
+('member2', 1, NOW(), NOW()),
+('member2', 3, NOW(), NOW()),
+('member3', 2, NOW(), NOW()),
+('member3', 4, NOW(), NOW()),
+('member4', 1, NOW(), NOW()),
+('member4', 5, NOW(), NOW()),
+('member5', 3, NOW(), NOW()),
+('member5', 5, NOW(), NOW());
 
 -- Insert sample events
 INSERT INTO event (title, is_contest, expired_at, created_at, updated_at) VALUES

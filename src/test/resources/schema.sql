@@ -106,6 +106,8 @@ CREATE TABLE IF NOT EXISTS follow (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     follower_id VARCHAR(255) NOT NULL,
     following_id VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
     FOREIGN KEY (follower_id) REFERENCES member(id) ON DELETE CASCADE,
     FOREIGN KEY (following_id) REFERENCES member(id) ON DELETE CASCADE
 );
@@ -170,6 +172,8 @@ CREATE TABLE IF NOT EXISTS like_board (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     member_id VARCHAR(255) NOT NULL,
     board_id BIGINT NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
     FOREIGN KEY (member_id) REFERENCES member(id) ON DELETE CASCADE,
     FOREIGN KEY (board_id) REFERENCES board(id) ON DELETE CASCADE
 );

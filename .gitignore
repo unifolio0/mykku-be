@@ -45,3 +45,4 @@ out/
 # src/main/resources/static/docs/images/
 
 src/main/resources/application-local.yml
+src/main/resources/dev-secret.yml

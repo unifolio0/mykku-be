@@ -1,5 +1,6 @@
 package com.example.mykku.feed.domain
 
+import com.example.mykku.common.domain.BaseEntity
 import jakarta.persistence.*
 
 @Entity
@@ -17,5 +18,5 @@ class EventImage(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
     val event: Event,
-) {
+) : BaseEntity() {
 }
