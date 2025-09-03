@@ -81,7 +81,7 @@ class EventControllerRestDocsTest : BaseControllerRestDocsTest() {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody)
         )
-            .andExpect(status().isCreated)
+            .andExpect(status().isOk)
             .andDo(MockMvcResultHandlers.print())
             .andDo(
                 document(

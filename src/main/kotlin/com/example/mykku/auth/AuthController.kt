@@ -2,6 +2,8 @@ package com.example.mykku.auth
 
 import com.example.mykku.auth.dto.LoginResponse
 import com.example.mykku.auth.dto.MobileLoginRequest
+import com.example.mykku.auth.dto.RefreshTokenRequest
+import com.example.mykku.auth.dto.RefreshTokenResponse
 import com.example.mykku.common.dto.ApiResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -19,5 +21,11 @@ class AuthController(
     fun mobileLogin(@RequestBody request: MobileLoginRequest): ResponseEntity<ApiResponse<LoginResponse>> {
         val loginResponse = authService.handleMobileLogin(request)
         return ResponseEntity.ok(ApiResponse("로그인 성공", loginResponse))
+    }
+    
+    @PostMapping("/refresh")
+    fun refreshToken(@RequestBody request: RefreshTokenRequest): ResponseEntity<ApiResponse<RefreshTokenResponse>> {
+        val refreshResponse = authService.refreshAccessToken(request)
+        return ResponseEntity.ok(ApiResponse("토큰 갱신 성공", refreshResponse))
     }
 }

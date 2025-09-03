@@ -70,8 +70,10 @@ class AuthServiceTest {
         )
         val loginResponse = LoginResponse(
             accessToken = "jwt_token",
+            refreshToken = "refresh_token",
             tokenType = "Bearer",
-            expiresIn = 3600L,
+            accessTokenExpiresIn = 86400000L,
+            refreshTokenExpiresIn = 1209600000L,
             member = MemberInfo(
                 id = member.id,
                 email = member.email,
@@ -130,8 +132,10 @@ class AuthServiceTest {
         )
         val loginResponse = LoginResponse(
             accessToken = "jwt_token",
+            refreshToken = "refresh_token",
             tokenType = "Bearer",
-            expiresIn = 3600L,
+            accessTokenExpiresIn = 86400000L,
+            refreshTokenExpiresIn = 1209600000L,
             member = MemberInfo(
                 id = member.id,
                 email = member.email,
@@ -170,8 +174,10 @@ class AuthServiceTest {
         )
         val loginResponse = LoginResponse(
             accessToken = "jwt_token",
+            refreshToken = "refresh_token",
             tokenType = "Bearer",
-            expiresIn = 3600L,
+            accessTokenExpiresIn = 86400000L,
+            refreshTokenExpiresIn = 1209600000L,
             member = MemberInfo(
                 id = member.id,
                 email = member.email,
@@ -231,8 +237,10 @@ class AuthServiceTest {
         )
         val loginResponse = LoginResponse(
             accessToken = "jwt_token",
+            refreshToken = "refresh_token",
             tokenType = "Bearer",
-            expiresIn = 3600L,
+            accessTokenExpiresIn = 86400000L,
+            refreshTokenExpiresIn = 1209600000L,
             member = MemberInfo(
                 id = newMember.id,
                 email = newMember.email,
@@ -292,8 +300,10 @@ class AuthServiceTest {
         )
         val loginResponse = LoginResponse(
             accessToken = "jwt_token",
+            refreshToken = "refresh_token",
             tokenType = "Bearer",
-            expiresIn = 3600L,
+            accessTokenExpiresIn = 86400000L,
+            refreshTokenExpiresIn = 1209600000L,
             member = MemberInfo(
                 id = member.id,
                 email = member.email,
@@ -332,8 +342,10 @@ class AuthServiceTest {
         )
         val loginResponse = LoginResponse(
             accessToken = "jwt_token",
+            refreshToken = "refresh_token",
             tokenType = "Bearer",
-            expiresIn = 3600L,
+            accessTokenExpiresIn = 86400000L,
+            refreshTokenExpiresIn = 1209600000L,
             member = MemberInfo(
                 id = member.id,
                 email = member.email,

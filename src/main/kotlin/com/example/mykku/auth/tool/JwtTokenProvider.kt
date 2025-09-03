@@ -13,18 +13,32 @@ import java.util.*
 
 @Component
 class JwtTokenProvider(
-    private val jwtProperties: JwtProperties
+    val jwtProperties: JwtProperties
 ) {
     private val logger = LoggerFactory.getLogger(JwtTokenProvider::class.java)
     private val secretKey = Keys.hmacShaKeyFor(jwtProperties.secret.toByteArray())
 
-    fun generateToken(memberId: String, email: String): String {
+    fun generateAccessToken(memberId: String, email: String): String {
         val now = Date()
-        val expiryDate = Date(now.time + jwtProperties.expiration)
+        val expiryDate = Date(now.time + jwtProperties.accessTokenExpiration)
 
         return Jwts.builder()
             .subject(memberId)
             .claim("email", email)
+            .claim("tokenType", "access")
+            .issuedAt(now)
+            .expiration(expiryDate)
+            .signWith(secretKey)
+            .compact()
+    }
+
+    fun generateRefreshToken(memberId: String): String {
+        val now = Date()
+        val expiryDate = Date(now.time + jwtProperties.refreshTokenExpiration)
+
+        return Jwts.builder()
+            .subject(memberId)
+            .claim("tokenType", "refresh")
             .issuedAt(now)
             .expiration(expiryDate)
             .signWith(secretKey)
@@ -32,11 +46,14 @@ class JwtTokenProvider(
     }
 
     fun createLoginResponse(member: Member, userEmail: String): LoginResponse {
-        val jwtToken = generateToken(member.id, userEmail)
+        val accessToken = generateAccessToken(member.id, userEmail)
+        val refreshToken = generateRefreshToken(member.id)
 
         return LoginResponse(
-            accessToken = jwtToken,
-            expiresIn = jwtProperties.expiration,
+            accessToken = accessToken,
+            refreshToken = refreshToken,
+            accessTokenExpiresIn = jwtProperties.accessTokenExpiration,
+            refreshTokenExpiresIn = jwtProperties.refreshTokenExpiration,
             member = MemberInfo(
                 id = member.id,
                 email = userEmail,
@@ -64,6 +81,19 @@ class JwtTokenProvider(
     fun getEmailFromToken(token: String): String {
         val claims = parseToken(token)
         return claims.get("email", String::class.java)
+    }
+
+    fun getTokenType(token: String): String? {
+        val claims = parseToken(token)
+        return claims.get("tokenType", String::class.java)
+    }
+
+    fun isRefreshToken(token: String): Boolean {
+        return try {
+            getTokenType(token) == "refresh"
+        } catch (e: Exception) {
+            false
+        }
     }
 
     private fun parseToken(token: String): Claims {

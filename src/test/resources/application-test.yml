@@ -20,7 +20,8 @@ spring:
 
 jwt:
   secret: test-secret-key-should-be-very-long-and-secure-at-least-32-characters-long
-  expiration: 86400000
+  access-token-expiration: 86400000 # 1 day
+  refresh-token-expiration: 1209600000 # 14 days
 
 aws:
   s3:

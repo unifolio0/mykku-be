@@ -7,7 +7,6 @@ import com.example.mykku.board.dto.UpdateBoardRequest
 import com.example.mykku.board.dto.UpdateBoardResponse
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.member.domain.Member
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -24,13 +23,12 @@ class BoardController(
             request = request,
             memberId = member.id
         )
-        return ResponseEntity.status(HttpStatus.CREATED)
-            .body(
-                ApiResponse(
-                    message = "게시판이 성공적으로 생성되었습니다.",
-                    data = response
-                )
+        return ResponseEntity.ok(
+            ApiResponse(
+                message = "게시판이 성공적으로 생성되었습니다.",
+                data = response
             )
+        )
     }
 
     @PutMapping("/api/v1/board/{id}")
