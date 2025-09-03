@@ -49,7 +49,7 @@ class EventRepositoryTest {
 
     @Test
     fun `getByEventPreviews는 만료 시간이 정확히 같은 시간의 이벤트는 제외한다`() {
-        val currentTime = LocalDateTime.now()
+        val currentTime = LocalDateTime.now().withNano(0)
         
         val exactTimeEvent = Event(
             isContest = false,
