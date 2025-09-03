@@ -9,7 +9,6 @@ import com.example.mykku.member.domain.Member
 import jakarta.validation.Valid
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -42,7 +41,7 @@ class FeedController(
         )
 
         val response = feedService.createFeed(request, member)
-        return ResponseEntity.status(HttpStatus.CREATED).body(
+        return ResponseEntity.ok(
             ApiResponse(
                 message = "피드가 성공적으로 작성되었습니다.",
                 data = response

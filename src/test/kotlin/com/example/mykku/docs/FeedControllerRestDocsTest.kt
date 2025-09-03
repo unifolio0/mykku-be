@@ -239,7 +239,7 @@ class FeedControllerRestDocsTest : BaseControllerRestDocsTest() {
                 .header("Authorization", "Bearer test-token")
         )
             .andDo(MockMvcResultHandlers.print())
-            .andExpect(status().isCreated)
+            .andExpect(status().isOk)
             .andExpect(jsonPath("$.message").value("피드가 성공적으로 작성되었습니다."))
             .andDo(
                 document(

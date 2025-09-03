@@ -4,7 +4,6 @@ import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.like.dto.*
 import com.example.mykku.member.domain.Member
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -34,13 +33,12 @@ class LikeController(
             request = request,
             memberId = member.id
         )
-        return ResponseEntity.status(HttpStatus.CREATED)
-            .body(
-                ApiResponse(
-                    message = "게시판 즐겨찾기가 성공적으로 처리되었습니다.",
-                    data = response
-                )
+        return ResponseEntity.ok(
+            ApiResponse(
+                message = "게시판 즐겨찾기가 성공적으로 처리되었습니다.",
+                data = response
             )
+        )
     }
 
     @DeleteMapping("/api/v1/board/unlike/{boardId}")
@@ -49,7 +47,12 @@ class LikeController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
         likeService.unlikeBoard(memberId = member.id, boardId = boardId)
-        return ResponseEntity.noContent().build()
+        return ResponseEntity.ok(
+            ApiResponse(
+                message = "게시판 즐겨찾기 해제가 성공적으로 처리되었습니다.",
+                data = Unit
+            )
+        )
     }
 
     @PostMapping("/api/v1/feed/like")
@@ -61,13 +64,12 @@ class LikeController(
             memberId = member.id,
             request = request
         )
-        return ResponseEntity.status(HttpStatus.CREATED)
-            .body(
-                ApiResponse(
-                    message = "피드 좋아요가 성공적으로 처리되었습니다.",
-                    data = response
-                )
+        return ResponseEntity.ok(
+            ApiResponse(
+                message = "피드 좋아요가 성공적으로 처리되었습니다.",
+                data = response
             )
+        )
     }
 
     @DeleteMapping("/api/v1/feed/unlike/{feedId}")
@@ -76,7 +78,12 @@ class LikeController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
         likeService.unlikeFeed(memberId = member.id, feedId = feedId)
-        return ResponseEntity.noContent().build()
+        return ResponseEntity.ok(
+            ApiResponse(
+                message = "피드 좋아요 해제가 성공적으로 처리되었습니다.",
+                data = Unit
+            )
+        )
     }
 
     @PostMapping("/api/v1/daily-message-comment/like")
@@ -88,13 +95,12 @@ class LikeController(
             memberId = member.id,
             request = request
         )
-        return ResponseEntity.status(HttpStatus.CREATED)
-            .body(
-                ApiResponse(
-                    message = "댓글 좋아요가 성공적으로 처리되었습니다.",
-                    data = response
-                )
+        return ResponseEntity.ok(
+            ApiResponse(
+                message = "댓글 좋아요가 성공적으로 처리되었습니다.",
+                data = response
             )
+        )
     }
 
     @DeleteMapping("/api/v1/daily-message-comment/unlike/{dailyMessageCommentId}")
@@ -103,7 +109,12 @@ class LikeController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
         likeService.unlikeDailyMessageComment(memberId = member.id, dailyMessageCommentId = dailyMessageCommentId)
-        return ResponseEntity.noContent().build()
+        return ResponseEntity.ok(
+            ApiResponse(
+                message = "댓글 좋아요 해제가 성공적으로 처리되었습니다.",
+                data = Unit
+            )
+        )
     }
 
     @PostMapping("/api/v1/comment/like")
@@ -115,13 +126,12 @@ class LikeController(
             memberId = member.id,
             request = request
         )
-        return ResponseEntity.status(HttpStatus.CREATED)
-            .body(
-                ApiResponse(
-                    message = "댓글 좋아요가 성공적으로 처리되었습니다.",
-                    data = response
-                )
+        return ResponseEntity.ok(
+            ApiResponse(
+                message = "댓글 좋아요가 성공적으로 처리되었습니다.",
+                data = response
             )
+        )
     }
 
     @DeleteMapping("/api/v1/comment/unlike/{feedCommentId}")
@@ -130,6 +140,11 @@ class LikeController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
         likeService.unlikeFeedComment(memberId = member.id, feedCommentId = feedCommentId)
-        return ResponseEntity.noContent().build()
+        return ResponseEntity.ok(
+            ApiResponse(
+                message = "댓글 좋아요 해제가 성공적으로 처리되었습니다.",
+                data = Unit
+            )
+        )
     }
 }

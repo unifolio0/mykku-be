@@ -67,7 +67,7 @@ class DailyMessageCommentControllerRestDocsTest : BaseControllerRestDocsTest() {
                 .content(objectMapper.writeValueAsString(request))
         )
             .andDo(MockMvcResultHandlers.print())
-            .andExpect(status().isCreated)
+            .andExpect(status().isOk)
             .andExpect(jsonPath("$.message").value("댓글이 성공적으로 등록되었습니다."))
             .andDo(
                 document(
@@ -127,7 +127,7 @@ class DailyMessageCommentControllerRestDocsTest : BaseControllerRestDocsTest() {
                 .content(objectMapper.writeValueAsString(request))
         )
             .andDo(MockMvcResultHandlers.print())
-            .andExpect(status().isCreated)
+            .andExpect(status().isOk)
             .andExpect(jsonPath("$.message").value("댓글이 성공적으로 등록되었습니다."))
             .andDo(
                 document(

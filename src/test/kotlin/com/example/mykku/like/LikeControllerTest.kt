@@ -111,7 +111,7 @@ class LikeControllerTest {
         .`when`()
             .post("/api/v1/board/like")
         .then()
-            .statusCode(201)
+            .statusCode(200)
             .body("message", equalTo("게시판 즐겨찾기가 성공적으로 처리되었습니다."))
             .body("data.memberId", equalTo("member1"))
             .body("data.boardId", equalTo(board.id!!.toInt()))

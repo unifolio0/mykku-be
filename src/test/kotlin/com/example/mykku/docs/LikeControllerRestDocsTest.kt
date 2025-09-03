@@ -107,7 +107,7 @@ class LikeControllerRestDocsTest : BaseControllerRestDocsTest() {
                 .content(objectMapper.writeValueAsString(request))
         )
             .andDo(MockMvcResultHandlers.print())
-            .andExpect(status().isCreated)
+            .andExpect(status().isOk)
             .andExpect(jsonPath("$.message").value("게시판 즐겨찾기가 성공적으로 처리되었습니다."))
             .andDo(
                 document(
@@ -143,7 +143,7 @@ class LikeControllerRestDocsTest : BaseControllerRestDocsTest() {
                 .header("Authorization", "Bearer jwt-token")
         )
             .andDo(MockMvcResultHandlers.print())
-            .andExpect(status().isNoContent)
+            .andExpect(status().isOk)
             .andDo(
                 document(
                     "like-board-delete",
@@ -178,7 +178,7 @@ class LikeControllerRestDocsTest : BaseControllerRestDocsTest() {
                 .content(objectMapper.writeValueAsString(request))
         )
             .andDo(MockMvcResultHandlers.print())
-            .andExpect(status().isCreated)
+            .andExpect(status().isOk)
             .andExpect(jsonPath("$.message").value("피드 좋아요가 성공적으로 처리되었습니다."))
             .andDo(
                 document(
@@ -214,7 +214,7 @@ class LikeControllerRestDocsTest : BaseControllerRestDocsTest() {
                 .header("Authorization", "Bearer jwt-token")
         )
             .andDo(MockMvcResultHandlers.print())
-            .andExpect(status().isNoContent)
+            .andExpect(status().isOk)
             .andDo(
                 document(
                     "like-feed-delete",
@@ -249,7 +249,7 @@ class LikeControllerRestDocsTest : BaseControllerRestDocsTest() {
                 .content(objectMapper.writeValueAsString(request))
         )
             .andDo(MockMvcResultHandlers.print())
-            .andExpect(status().isCreated)
+            .andExpect(status().isOk)
             .andExpect(jsonPath("$.message").value("댓글 좋아요가 성공적으로 처리되었습니다."))
             .andDo(
                 document(
@@ -292,7 +292,7 @@ class LikeControllerRestDocsTest : BaseControllerRestDocsTest() {
                 .content(objectMapper.writeValueAsString(request))
         )
             .andDo(MockMvcResultHandlers.print())
-            .andExpect(status().isCreated)
+            .andExpect(status().isOk)
             .andExpect(jsonPath("$.message").value("댓글 좋아요가 성공적으로 처리되었습니다."))
             .andDo(
                 document(
@@ -333,7 +333,7 @@ class LikeControllerRestDocsTest : BaseControllerRestDocsTest() {
                 .header("Authorization", "Bearer jwt-token")
         )
             .andDo(MockMvcResultHandlers.print())
-            .andExpect(status().isNoContent)
+            .andExpect(status().isOk)
             .andDo(
                 document(
                     "like-daily-message-comment-delete",
@@ -361,7 +361,7 @@ class LikeControllerRestDocsTest : BaseControllerRestDocsTest() {
                 .header("Authorization", "Bearer jwt-token")
         )
             .andDo(MockMvcResultHandlers.print())
-            .andExpect(status().isNoContent)
+            .andExpect(status().isOk)
             .andDo(
                 document(
                     "like-comment-delete",

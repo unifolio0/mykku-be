@@ -51,7 +51,7 @@ class EventControllerTest {
         .`when`()
             .post("/api/v1/events")
         .then()
-            .statusCode(201)
+            .statusCode(200)
             .body("message", equalTo("이벤트가 성공적으로 생성되었습니다."))
             .body("data", notNullValue())
     }

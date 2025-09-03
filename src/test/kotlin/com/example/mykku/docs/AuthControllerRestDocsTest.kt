@@ -6,6 +6,8 @@ import com.example.mykku.auth.AuthService
 import com.example.mykku.auth.dto.LoginResponse
 import com.example.mykku.auth.dto.MemberInfo
 import com.example.mykku.auth.dto.MobileLoginRequest
+import com.example.mykku.auth.dto.RefreshTokenRequest
+import com.example.mykku.auth.dto.RefreshTokenResponse
 import com.example.mykku.member.domain.SocialProvider
 import org.junit.jupiter.api.Test
 import org.mockito.Mock
@@ -43,8 +45,10 @@ class AuthControllerRestDocsTest : BaseControllerRestDocsTest() {
 
         val loginResponse = LoginResponse(
             accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+            refreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.refresh...",
             tokenType = "Bearer",
-            expiresIn = 86400000,
+            accessTokenExpiresIn = 86400000,
+            refreshTokenExpiresIn = 1209600000,
             member = MemberInfo(
                 id = "google_123456789",
                 email = "user@gmail.com",
@@ -80,7 +84,9 @@ class AuthControllerRestDocsTest : BaseControllerRestDocsTest() {
                         fieldWithPath("data").type(JsonFieldType.OBJECT).description("로그인 응답 데이터"),
                         fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("JWT 액세스 토큰"),
                         fieldWithPath("data.tokenType").type(JsonFieldType.STRING).description("토큰 타입"),
-                        fieldWithPath("data.expiresIn").type(JsonFieldType.NUMBER).description("토큰 만료 시간 (밀리초)"),
+                        fieldWithPath("data.refreshToken").type(JsonFieldType.STRING).description("JWT 리프레시 토큰"),
+                        fieldWithPath("data.accessTokenExpiresIn").type(JsonFieldType.NUMBER).description("액세스 토큰 만료 시간 (밀리초)"),
+                        fieldWithPath("data.refreshTokenExpiresIn").type(JsonFieldType.NUMBER).description("리프레시 토큰 만료 시간 (밀리초)"),
                         fieldWithPath("data.member").type(JsonFieldType.OBJECT).description("회원 정보"),
                         fieldWithPath("data.member.id").type(JsonFieldType.STRING).description("회원 ID"),
                         fieldWithPath("data.member.email").type(JsonFieldType.STRING).description("회원 이메일"),
@@ -102,8 +108,10 @@ class AuthControllerRestDocsTest : BaseControllerRestDocsTest() {
 
         val loginResponse = LoginResponse(
             accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+            refreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.refresh...",
             tokenType = "Bearer",
-            expiresIn = 86400000,
+            accessTokenExpiresIn = 86400000,
+            refreshTokenExpiresIn = 1209600000,
             member = MemberInfo(
                 id = "kakao_987654321",
                 email = "user@kakao.com",
@@ -140,8 +148,10 @@ class AuthControllerRestDocsTest : BaseControllerRestDocsTest() {
 
         val loginResponse = LoginResponse(
             accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+            refreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.refresh...",
             tokenType = "Bearer",
-            expiresIn = 86400000,
+            accessTokenExpiresIn = 86400000,
+            refreshTokenExpiresIn = 1209600000,
             member = MemberInfo(
                 id = "apple_000123.abc456def789",
                 email = "user@privaterelay.appleid.com",
@@ -164,6 +174,49 @@ class AuthControllerRestDocsTest : BaseControllerRestDocsTest() {
             .andExpect(jsonPath("$.data.accessToken").exists())
             .andDo(
                 document("auth-mobile-login-apple")
+            )
+    }
+
+    @Test
+    fun `리프레시 토큰으로 액세스 토큰 재발급 API 문서화`() {
+        // given
+        val request = RefreshTokenRequest(
+            refreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.refresh.token.example"
+        )
+
+        val response = RefreshTokenResponse(
+            accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.new.access.token",
+            tokenType = "Bearer",
+            expiresIn = 86400000
+        )
+
+        `when`(authService.refreshAccessToken(request)).thenReturn(response)
+
+        // when & then
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.post("/api/v1/auth/refresh")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+        )
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.message").value("토큰 갱신 성공"))
+            .andExpect(jsonPath("$.data.accessToken").exists())
+            .andDo(
+                document(
+                    "auth-refresh-token",
+                    requestFields(
+                        fieldWithPath("refreshToken").type(JsonFieldType.STRING)
+                            .description("리프레시 토큰")
+                    ),
+                    responseFields(
+                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("토큰 갱신 응답 데이터"),
+                        fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("새로운 JWT 액세스 토큰"),
+                        fieldWithPath("data.tokenType").type(JsonFieldType.STRING).description("토큰 타입"),
+                        fieldWithPath("data.expiresIn").type(JsonFieldType.NUMBER).description("액세스 토큰 만료 시간 (밀리초)")
+                    )
+                )
             )
     }
 }

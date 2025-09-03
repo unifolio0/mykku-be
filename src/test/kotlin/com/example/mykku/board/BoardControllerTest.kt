@@ -70,7 +70,7 @@ class BoardControllerTest {
         .`when`()
             .post("/api/v1/board")
         .then()
-            .statusCode(201)
+            .statusCode(200)
             .body("message", equalTo("게시판이 성공적으로 생성되었습니다."))
             .body("data.id", notNullValue())
             .body("data.title", equalTo(request.title))

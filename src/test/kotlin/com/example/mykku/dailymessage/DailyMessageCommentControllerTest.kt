@@ -80,7 +80,7 @@ class DailyMessageCommentControllerTest {
         .`when`()
             .post("/api/v1/daily-messages/{dailyMessageId}/comment", dailyMessage.id)
         .then()
-            .statusCode(201)
+            .statusCode(200)
             .body("message", equalTo("댓글이 성공적으로 등록되었습니다."))
             .body("data", notNullValue())
     }

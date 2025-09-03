@@ -25,6 +25,29 @@ class AuthService(
 ) {
 
     @Transactional
+    fun refreshAccessToken(request: RefreshTokenRequest): RefreshTokenResponse {
+        val refreshToken = request.refreshToken
+        
+        if (!jwtTokenProvider.validateToken(refreshToken)) {
+            throw MykkuException(ErrorCode.OAUTH_INVALID_TOKEN)
+        }
+        
+        if (!jwtTokenProvider.isRefreshToken(refreshToken)) {
+            throw MykkuException(ErrorCode.OAUTH_INVALID_TOKEN)
+        }
+        
+        val memberId = jwtTokenProvider.getMemberIdFromToken(refreshToken)
+        val member = memberReader.getMemberById(memberId)
+        
+        val newAccessToken = jwtTokenProvider.generateAccessToken(member.id, member.email)
+        
+        return RefreshTokenResponse(
+            accessToken = newAccessToken,
+            expiresIn = jwtTokenProvider.jwtProperties.accessTokenExpiration
+        )
+    }
+    
+    @Transactional
     fun handleMobileLogin(request: MobileLoginRequest): LoginResponse {
         return when (request.provider) {
             SocialProvider.GOOGLE -> handleGoogleMobileLogin(request.accessToken!!) // validation이 init에서 되미로 안전

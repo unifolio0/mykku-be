@@ -64,7 +64,7 @@ class BoardControllerRestDocsTest : BaseControllerRestDocsTest() {
                 .content(objectMapper.writeValueAsString(request))
         )
             .andDo(MockMvcResultHandlers.print())
-            .andExpect(status().isCreated)
+            .andExpect(status().isOk)
             .andExpect(jsonPath("$.message").value("게시판이 성공적으로 생성되었습니다."))
             .andDo(
                 document(

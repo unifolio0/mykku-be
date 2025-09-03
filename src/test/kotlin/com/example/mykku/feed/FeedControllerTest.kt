@@ -85,7 +85,7 @@ class FeedControllerTest {
         .`when`()
             .post("/api/v1/feeds")
         .then()
-            .statusCode(201)
+            .statusCode(200)
             .body("message", equalTo("피드가 성공적으로 작성되었습니다."))
             .body("data", notNullValue())
     }

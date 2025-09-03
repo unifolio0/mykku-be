@@ -16,7 +16,8 @@ class JwtTokenProviderTest {
     fun setUp() {
         val jwtProperties = JwtProperties(
             secret = testSecret,
-            expiration = 86400000 // 24 hours
+            accessTokenExpiration = 86400000, // 24 hours
+            refreshTokenExpiration = 1209600000 // 14 days
         )
         jwtTokenProvider = JwtTokenProvider(jwtProperties)
     }
@@ -28,7 +29,7 @@ class JwtTokenProviderTest {
         val email = "test@example.com"
 
         // when
-        val token = jwtTokenProvider.generateToken(memberId, email)
+        val token = jwtTokenProvider.generateAccessToken(memberId, email)
 
         // then
         assertNotNull(token)
@@ -40,7 +41,7 @@ class JwtTokenProviderTest {
         // given
         val memberId = "google_123456"
         val email = "test@example.com"
-        val token = jwtTokenProvider.generateToken(memberId, email)
+        val token = jwtTokenProvider.generateAccessToken(memberId, email)
 
         // when
         val isValid = jwtTokenProvider.validateToken(token)
@@ -66,7 +67,7 @@ class JwtTokenProviderTest {
         // given
         val memberId = "google_123456"
         val email = "test@example.com"
-        val token = jwtTokenProvider.generateToken(memberId, email)
+        val token = jwtTokenProvider.generateAccessToken(memberId, email)
 
         // when
         val extractedMemberId = jwtTokenProvider.getMemberIdFromToken(token)
@@ -80,13 +81,56 @@ class JwtTokenProviderTest {
         // given
         val memberId = "google_123456"
         val email = "test@example.com"
-        val token = jwtTokenProvider.generateToken(memberId, email)
+        val token = jwtTokenProvider.generateAccessToken(memberId, email)
 
         // when
         val extractedEmail = jwtTokenProvider.getEmailFromToken(token)
 
         // then
         assertEquals(email, extractedEmail)
+    }
+
+    @Test
+    fun `should generate valid refresh token`() {
+        // given
+        val memberId = "google_123456"
+
+        // when
+        val token = jwtTokenProvider.generateRefreshToken(memberId)
+
+        // then
+        assertNotNull(token)
+        assertTrue(token.isNotEmpty())
+    }
+
+    @Test
+    fun `should identify refresh token correctly`() {
+        // given
+        val memberId = "google_123456"
+        val email = "test@example.com"
+        val refreshToken = jwtTokenProvider.generateRefreshToken(memberId)
+        val accessToken = jwtTokenProvider.generateAccessToken(memberId, email)
+
+        // when & then
+        assertTrue(jwtTokenProvider.isRefreshToken(refreshToken))
+        assertFalse(jwtTokenProvider.isRefreshToken(accessToken))
+    }
+
+    @Test
+    fun `should get token type from token`() {
+        // given
+        val memberId = "google_123456"
+        val email = "test@example.com"
+        val refreshToken = jwtTokenProvider.generateRefreshToken(memberId)
+        val accessToken = jwtTokenProvider.generateAccessToken(memberId, email)
+
+        // when
+        val refreshTokenType = jwtTokenProvider.getTokenType(refreshToken)
+        val accessTokenType = jwtTokenProvider.getTokenType(accessToken)
+
+        // then
+        assertEquals("refresh", refreshTokenType)
+        assertEquals("access", accessTokenType)
     }
 
     @Test
@@ -108,7 +152,9 @@ class JwtTokenProviderTest {
 
         // then
         assertNotNull(loginResponse.accessToken)
-        assertEquals(86400000, loginResponse.expiresIn)
+        assertNotNull(loginResponse.refreshToken)
+        assertEquals(86400000, loginResponse.accessTokenExpiresIn)
+        assertEquals(1209600000, loginResponse.refreshTokenExpiresIn)
         assertEquals(member.id, loginResponse.member.id)
         assertEquals(userEmail, loginResponse.member.email)
         assertEquals(member.nickname, loginResponse.member.nickname)
