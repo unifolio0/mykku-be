@@ -21,8 +21,8 @@ spring:
 
 jwt:
   secret: ${secret.jwt.secret_key}
-  access-token-expiration: ${secret.jwt.access_token_expiration:86400000}
-  refresh-token-expiration: ${secret.jwt.refresh_token_expiration:1209600000}
+  access-token-expiration: ${secret.jwt.access_token_expiration}
+  refresh-token-expiration: ${secret.jwt.refresh_token_expiration}
 
 aws:
   s3:
