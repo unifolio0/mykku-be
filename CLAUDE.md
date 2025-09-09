@@ -1,0 +1,189 @@
+# MyKKU Backend Project Guide for Claude
+
+## Project Overview
+
+MyKKU는 덕질 커뮤니티 플랫폼의 백엔드 서비스입니다.
+
+## Architecture and Dependency Rules
+
+### Layer Architecture
+
+이 프로젝트는 명확한 계층 구조를 따릅니다. 각 계층은 특정한 의존성 규칙을 준수해야 합니다:
+
+#### 1. Controller Layer
+
+- **역할**: HTTP 요청/응답 처리, API 엔드포인트 정의
+- **의존성 규칙**: Service 계층에만 의존
+- **금지사항**: Repository나 Tool 계층에 직접 의존 불가
+- **예시**:
+  ```kotlin
+  @RestController
+  class FeedController(
+      private val feedService: FeedService,  // ✅ Service 계층만 의존
+      // private val feedRepository: FeedRepository  // ❌ Repository 직접 의존 금지
+  )
+  ```
+
+#### 2. Service Layer
+
+- **역할**: 비즈니스 로직 처리, 트랜잭션 관리
+- **의존성 규칙**: Tool 계층에만 의존
+- **금지사항**: Repository 계층에 직접 의존 불가
+- **예시**:
+  ```kotlin
+  @Service
+  class FeedService(
+      private val feedReader: FeedReader,  // ✅ Tool 계층 의존
+      private val feedWriter: FeedWriter,  // ✅ Tool 계층 의존
+      // private val feedRepository: FeedRepository  // ❌ Repository 직접 의존 금지
+  )
+  ```
+
+#### 3. Tool Layer
+
+- **역할**: 데이터 접근 로직 캡슐화, Repository 조작
+- **의존성 규칙**: Repository 계층이나 다른 Tool 계층에 의존 가능
+- **예시**:
+  ```kotlin
+  @Component
+  class FeedReader(
+      private val feedRepository: FeedRepository,  // ✅ Repository 의존 가능
+      private val memberReader: MemberReader  // ✅ 다른 Tool 의존 가능
+  )
+  ```
+
+#### 4. Repository Layer
+
+- **역할**: 데이터베이스 접근, JPA 인터페이스
+- **의존성 규칙**: 최하위 계층으로 다른 계층에 의존하지 않음
+- **예시**:
+  ```kotlin
+  @Repository
+  interface FeedRepository : JpaRepository<Feed, Long> {
+      // 순수한 데이터 접근 메서드만 정의
+  }
+  ```
+
+### 의존성 방향
+
+```
+Controller → Service → Tool → Repository
+                         ↓
+                    Other Tools
+```
+
+## Testing Guidelines
+
+### 각 계층별 테스트 작성 규칙
+
+#### 1. Controller Tests
+
+- 통합 테스트 작성 (`@SpringBootTest`)
+- REST Docs 테스트 작성
+- 실제 HTTP 요청/응답 검증
+
+#### 2. Service Tests
+
+- 단위 테스트 작성 (`@ExtendWith(MockitoExtension::class)`)
+- Tool 계층 Mock 처리
+- 비즈니스 로직 검증
+
+#### 3. Tool Tests
+
+- 단위 테스트 작성
+- Repository Mock 처리
+- 데이터 변환 로직 검증
+
+#### 4. Repository Tests
+
+- `@DataJpaTest` 사용
+- 실제 데이터베이스 쿼리 검증
+- 커스텀 쿼리 메서드 테스트
+
+## Code Style Guidelines
+
+### Kotlin Conventions
+
+- 함수명과 변수명은 camelCase 사용
+- 클래스명은 PascalCase 사용
+- 상수는 UPPER_SNAKE_CASE 사용
+- 최대 라인 길이: 120자
+
+### Import Order
+
+1. Java imports
+2. Kotlin imports
+3. Spring imports
+4. Project imports
+5. Static imports
+
+### Documentation
+
+- 복잡한 비즈니스 로직에는 KDoc 주석 추가
+- REST API는 RestDocs로 문서화
+- 테스트 메서드명은 한글로 작성 가능
+
+## Common Patterns
+
+### Pagination
+
+- Spring Data의 `Pageable`과 `Page` 사용
+- 기본 페이지 크기: 20
+- Sort 기본값: createdAt DESC
+
+### Exception Handling
+
+- `MykkuException` 사용
+- `ErrorCode` enum으로 에러 코드 관리
+- GlobalExceptionHandler에서 통합 처리
+
+### Transaction Management
+
+- Service 계층에서 `@Transactional` 사용
+- 읽기 전용 메서드는 `@Transactional(readOnly = true)` 사용
+
+## Directory Structure
+
+```
+src/main/kotlin/com/example/mykku/
+├── [domain]/
+│   ├── domain/        # Entity 클래스
+│   ├── dto/           # DTO 클래스
+│   ├── repository/    # Repository 인터페이스
+│   ├── tool/          # Tool 계층 (Reader, Writer)
+│   ├── [Domain]Controller.kt
+│   └── [Domain]Service.kt
+├── auth/              # 인증/인가
+├── common/            # 공통 클래스
+├── config/            # 설정 클래스
+├── exception/         # 예외 처리
+└── image/             # 이미지 업로드
+```
+
+## Development Workflow
+
+1. **새 기능 개발 시**:
+    - Tool 계층부터 시작 (Repository 접근 로직)
+    - Service 계층 구현 (비즈니스 로직)
+    - Controller 계층 구현 (API 엔드포인트)
+    - 테스트 작성 (단위 테스트 → 통합 테스트)
+    - RestDocs 문서화
+
+2. **리팩토링 시**:
+    - 계층 간 의존성 규칙 확인
+    - Tool 계층으로 Repository 로직 이동
+    - 테스트 업데이트
+
+3. **코드 리뷰 체크리스트**:
+    - [ ] 계층 간 의존성 규칙 준수
+    - [ ] 적절한 Tool 계층 사용
+    - [ ] 트랜잭션 처리 확인
+    - [ ] 테스트 커버리지 확인
+    - [ ] RestDocs 문서화
+
+## Important Notes
+
+- **절대 Service에서 Repository를 직접 주입하지 마세요**
+- **Controller에서는 오직 Service만 사용하세요**
+- **복잡한 쿼리는 Tool 계층에 캡슐화하세요**
+- **페이지네이션은 항상 적용을 고려하세요**

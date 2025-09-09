@@ -28,6 +28,8 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.springframework.data.domain.PageImpl
@@ -35,6 +37,8 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 @ExtendWith(MockitoExtension::class)
 class FeedServiceTest {
@@ -57,17 +61,9 @@ class FeedServiceTest {
     @Mock
     private lateinit var saveFeedReader: SaveFeedReader
 
-    @Mock
-    private lateinit var eventTagRepository: EventTagRepository
 
-    @Mock
-    private lateinit var feedCommentRepository: FeedCommentRepository
 
-    @Mock
-    private lateinit var feedImageRepository: FeedImageRepository
 
-    @Mock
-    private lateinit var feedTagRepository: FeedTagRepository
 
     @Mock
     private lateinit var imageUploadService: ImageUploadService
@@ -231,10 +227,6 @@ class FeedServiceTest {
             memberReader = memberReader,
             likeFeedReader = likeFeedReader,
             saveFeedReader = saveFeedReader,
-            eventTagRepository = eventTagRepository,
-            feedCommentRepository = feedCommentRepository,
-            feedImageRepository = feedImageRepository,
-            feedTagRepository = feedTagRepository,
             imageUploadService = null
         )
 
@@ -285,15 +277,15 @@ class FeedServiceTest {
         whenever(feedReader.getFeedsByFollower(listOf(follower))).thenReturn(listOf(feed))
         whenever(likeFeedReader.isLiked("member1", feed)).thenReturn(true)
         whenever(saveFeedReader.isSaved("member1", feed)).thenReturn(false)
-        whenever(feedImageRepository.findByFeed(feed)).thenReturn(listOf(feedImage))
-        whenever(feedTagRepository.findByFeed(feed)).thenReturn(listOf(feedTag))
+        whenever(feedReader.getFeedImagesByFeed(feed)).thenReturn(listOf(feedImage))
+        whenever(feedReader.getFeedTagsByFeed(feed)).thenReturn(listOf(feedTag))
         whenever(
-            feedCommentRepository.findByFeedAndParentCommentIsNull(
+            feedReader.getFeedCommentsByFeed(
                 feed,
                 PageRequest.of(0, 1)
             )
         ).thenReturn(PageImpl(listOf(feedComment)))
-        whenever(eventTagRepository.findAllByTitleIn(listOf("태그1"))).thenReturn(emptyList())
+        whenever(feedReader.getEventTagsByTitles(listOf("태그1"))).thenReturn(emptyList())
 
         // when
         val result = feedService.getFeeds("member1")
@@ -306,5 +298,199 @@ class FeedServiceTest {
         assertEquals(false, result.feeds[0].isSaved)
         assertEquals(1, result.feeds[0].images.size)
         assertEquals(1, result.feeds[0].tags.size)
+    }
+
+    @Test
+    fun `getFeedsByMemberWithRecommendations - 팔로우와 추천 사용자의 피드를 페이지네이션으로 반환한다`() {
+        // given
+        val memberId = "member1"
+        val followingMember = Member(
+            id = "member2",
+            nickname = "following",
+            role = "USER",
+            profileImage = "",
+            provider = SocialProvider.GOOGLE,
+            socialId = "456",
+            email = "following@test.com"
+        )
+        val recommendedMember = Member(
+            id = "member3",
+            nickname = "recommend",
+            role = "USER",
+            profileImage = "",
+            provider = SocialProvider.GOOGLE,
+            socialId = "789",
+            email = "recommended@test.com"
+        )
+        
+        val feed1 = createTestFeed(
+            id = 1L,
+            title = "Following Feed",
+            content = "Content from following",
+            board = board,
+            member = followingMember
+        )
+        val feed2 = createTestFeed(
+            id = 2L,
+            title = "Recommended Feed",
+            content = "Content from recommended",
+            board = board,
+            member = recommendedMember
+        )
+        
+        val pageable = PageRequest.of(0, 10)
+        val feedPage = PageImpl(listOf(feed1, feed2), pageable, 2)
+        
+        whenever(memberReader.getFollowerByMemberId(memberId)).thenReturn(listOf(followingMember))
+        whenever(memberReader.getRecommendedMembersByCommonFollowers(memberId, 10L))
+            .thenReturn(listOf(recommendedMember))
+        whenever(feedReader.getFeedsByMembersWithPagination(any(), eq(pageable)))
+            .thenReturn(feedPage)
+        
+        // Mock for getFeedResponse
+        whenever(likeFeedReader.isLiked(memberId, feed1)).thenReturn(true)
+        whenever(likeFeedReader.isLiked(memberId, feed2)).thenReturn(false)
+        whenever(saveFeedReader.isSaved(memberId, feed1)).thenReturn(false)
+        whenever(saveFeedReader.isSaved(memberId, feed2)).thenReturn(true)
+        whenever(feedReader.getFeedImagesByFeed(any())).thenReturn(emptyList())
+        whenever(feedReader.getFeedTagsByFeed(any())).thenReturn(emptyList())
+        whenever(feedReader.getFeedCommentsByFeed(any(), any()))
+            .thenReturn(PageImpl(emptyList()))
+        whenever(feedReader.getEventTagsByTitles(any())).thenReturn(emptyList())
+        
+        // when
+        val result = feedService.getFeedsByMemberWithRecommendations(memberId, pageable, 10L)
+        
+        // then
+        assertEquals(2, result.feeds.size)
+        assertEquals(0, result.currentPage)
+        assertEquals(1, result.totalPages)
+        assertEquals(2, result.totalElements)
+        assertEquals(10, result.size)
+        assertFalse(result.hasNext)
+        assertFalse(result.hasPrevious)
+        assertEquals("Following Feed", result.feeds[0].title)
+        assertEquals("Recommended Feed", result.feeds[1].title)
+    }
+
+    @Test
+    fun `getFeedsByBoard - 특정 보드의 피드를 페이지네이션으로 반환한다`() {
+        // given
+        val boardId = 1L
+        val memberId = "member1"
+        val feed1 = createTestFeed(
+            id = 1L,
+            title = "Board Feed 1",
+            content = "Content 1",
+            board = board,
+            member = member
+        )
+        val feed2 = createTestFeed(
+            id = 2L,
+            title = "Board Feed 2",
+            content = "Content 2",
+            board = board,
+            member = member
+        )
+        
+        val pageable = PageRequest.of(0, 20)
+        val feedPage = PageImpl(listOf(feed1, feed2), pageable, 2)
+        
+        whenever(boardReader.getBoardById(boardId)).thenReturn(board)
+        whenever(feedReader.getFeedsByBoardWithPagination(board, pageable))
+            .thenReturn(feedPage)
+        
+        // Mock for getFeedResponse
+        whenever(likeFeedReader.isLiked(eq(memberId), any())).thenReturn(false)
+        whenever(saveFeedReader.isSaved(eq(memberId), any())).thenReturn(false)
+        whenever(feedReader.getFeedImagesByFeed(any())).thenReturn(emptyList())
+        whenever(feedReader.getFeedTagsByFeed(any())).thenReturn(emptyList())
+        whenever(feedReader.getFeedCommentsByFeed(any(), any()))
+            .thenReturn(PageImpl(emptyList()))
+        whenever(feedReader.getEventTagsByTitles(any())).thenReturn(emptyList())
+        
+        // when
+        val result = feedService.getFeedsByBoard(boardId, memberId, pageable)
+        
+        // then
+        assertEquals(2, result.feeds.size)
+        assertEquals(0, result.currentPage)
+        assertEquals(1, result.totalPages)
+        assertEquals(2, result.totalElements)
+        assertEquals("Board Feed 1", result.feeds[0].title)
+        assertEquals("Board Feed 2", result.feeds[1].title)
+    }
+
+    @Test
+    fun `getFeedDetail - 피드 상세 정보를 반환한다`() {
+        // given
+        val feedId = 1L
+        val memberId = "member1"
+        val feed = createTestFeed(
+            id = feedId,
+            title = "Detail Feed",
+            content = "Detailed content",
+            board = board,
+            member = member
+        )
+        
+        val feedImage = FeedImage(
+            url = "https://example.com/image.jpg",
+            width = 1920,
+            height = 1080,
+            feed = feed
+        )
+        val feedTag = FeedTag(title = "DetailTag", feed = feed)
+        
+        whenever(feedReader.getFeedById(feedId)).thenReturn(feed)
+        whenever(likeFeedReader.isLiked(memberId, feed)).thenReturn(true)
+        whenever(saveFeedReader.isSaved(memberId, feed)).thenReturn(true)
+        whenever(feedReader.getFeedImagesByFeed(feed)).thenReturn(listOf(feedImage))
+        whenever(feedReader.getFeedTagsByFeed(feed)).thenReturn(listOf(feedTag))
+        whenever(feedReader.getEventTagsByTitles(listOf("DetailTag")))
+            .thenReturn(emptyList())
+        
+        // when
+        val result = feedService.getFeedDetail(feedId, memberId)
+        
+        // then
+        assertEquals(feedId, result.id)
+        assertEquals("Detail Feed", result.title)
+        assertEquals("Detailed content", result.content)
+        assertEquals(board.id, result.boardId)
+        assertEquals(board.title, result.boardTitle)
+        assertTrue(result.isLiked)
+        assertTrue(result.isSaved)
+        assertEquals(1, result.images.size)
+        assertEquals(1, result.tags.size)
+        assertEquals("DetailTag", result.tags[0].title)
+        assertFalse(result.tags[0].isEvent)
+    }
+
+    @Test
+    fun `getFeedDetail - 로그인하지 않은 사용자도 피드 상세 정보를 볼 수 있다`() {
+        // given
+        val feedId = 1L
+        val feed = createTestFeed(
+            id = feedId,
+            title = "Public Feed",
+            content = "Public content",
+            board = board,
+            member = member
+        )
+        
+        whenever(feedReader.getFeedById(feedId)).thenReturn(feed)
+        whenever(feedReader.getFeedImagesByFeed(feed)).thenReturn(emptyList())
+        whenever(feedReader.getFeedTagsByFeed(feed)).thenReturn(emptyList())
+        whenever(feedReader.getEventTagsByTitles(any())).thenReturn(emptyList())
+        
+        // when
+        val result = feedService.getFeedDetail(feedId, null)
+        
+        // then
+        assertEquals(feedId, result.id)
+        assertEquals("Public Feed", result.title)
+        assertFalse(result.isLiked)
+        assertFalse(result.isSaved)
     }
 }

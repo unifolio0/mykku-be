@@ -50,12 +50,57 @@ class FeedController(
     }
 
     @GetMapping("/{memberId}/feeds")
-    fun getFeeds(@PathVariable memberId: String): ResponseEntity<ApiResponse<FeedsResponse>> {
-        val feeds = feedService.getFeeds(memberId)
+    fun getFeeds(
+        @PathVariable memberId: String,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "20") size: Int,
+        @RequestParam(defaultValue = "10") minCommonFollowers: Long
+    ): ResponseEntity<ApiResponse<PagedFeedsResponse>> {
+        val pageable = PageRequest.of(page, size)
+        val feeds = feedService.getFeedsByMemberWithRecommendations(
+            memberId = memberId,
+            pageable = pageable,
+            minCommonFollowers = minCommonFollowers
+        )
         return ResponseEntity.ok(
             ApiResponse(
                 message = "피드 목록 불러오기에 성공했습니다.",
                 data = feeds
+            )
+        )
+    }
+
+    @GetMapping("/boards/{boardId}/feeds")
+    fun getFeedsByBoard(
+        @PathVariable boardId: Long,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "20") size: Int,
+        @CurrentMember(required = false) member: Member?
+    ): ResponseEntity<ApiResponse<PagedFeedsResponse>> {
+        val pageable = PageRequest.of(page, size)
+        val feeds = feedService.getFeedsByBoard(
+            boardId = boardId,
+            memberId = member?.id,
+            pageable = pageable
+        )
+        return ResponseEntity.ok(
+            ApiResponse(
+                message = "보드별 피드 목록을 성공적으로 조회했습니다.",
+                data = feeds
+            )
+        )
+    }
+
+    @GetMapping("/feeds/{feedId}")
+    fun getFeedDetail(
+        @PathVariable feedId: Long,
+        @CurrentMember(required = false) member: Member?
+    ): ResponseEntity<ApiResponse<FeedDetailResponse>> {
+        val feedDetail = feedService.getFeedDetail(feedId, member?.id)
+        return ResponseEntity.ok(
+            ApiResponse(
+                message = "피드 상세 정보를 성공적으로 조회했습니다.",
+                data = feedDetail
             )
         )
     }
@@ -65,7 +110,7 @@ class FeedController(
         @PathVariable feedId: Long,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int,
-        @CurrentMember member: Member?
+        @CurrentMember(required = false) member: Member?
     ): ResponseEntity<ApiResponse<FeedCommentsResponse>> {
         val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"))
         val comments = feedCommentService.getComments(feedId, member?.id, pageable)

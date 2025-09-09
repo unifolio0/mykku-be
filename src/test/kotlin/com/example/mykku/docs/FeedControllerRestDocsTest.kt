@@ -47,7 +47,7 @@ class FeedControllerRestDocsTest : BaseControllerRestDocsTest() {
     fun `피드 목록 조회 API 문서화`() {
         // given
         val memberId = "member123"
-        val feedsResponse = FeedsResponse(
+        val feedsResponse = PagedFeedsResponse(
             feeds = listOf(
                 FeedResponse(
                     id = 1L,
@@ -111,10 +111,20 @@ class FeedControllerRestDocsTest : BaseControllerRestDocsTest() {
                         content = ""
                     )
                 )
-            )
+            ),
+            currentPage = 0,
+            totalPages = 1,
+            totalElements = 2,
+            size = 20,
+            hasNext = false,
+            hasPrevious = false
         )
 
-        `when`(feedService.getFeeds("member123")).thenReturn(feedsResponse)
+        `when`(feedService.getFeedsByMemberWithRecommendations(
+            eq("member123"),
+            any(),
+            eq(10L)
+        )).thenReturn(feedsResponse)
 
         // when & then
         mockMvc.perform(
@@ -131,9 +141,20 @@ class FeedControllerRestDocsTest : BaseControllerRestDocsTest() {
                     pathParameters(
                         parameterWithName("memberId").description("조회할 회원의 ID")
                     ),
+                    queryParameters(
+                        parameterWithName("page").description("페이지 번호 (0부터 시작)").optional(),
+                        parameterWithName("size").description("페이지 크기").optional(),
+                        parameterWithName("minCommonFollowers").description("공통 팔로워 최소 수").optional()
+                    ),
                     responseFields(
                         fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                         fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
+                        fieldWithPath("data.currentPage").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
+                        fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
+                        fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 요소 수"),
+                        fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
+                        fieldWithPath("data.hasNext").type(JsonFieldType.BOOLEAN).description("다음 페이지 존재 여부"),
+                        fieldWithPath("data.hasPrevious").type(JsonFieldType.BOOLEAN).description("이전 페이지 존재 여부"),
                         fieldWithPath("data.feeds").type(JsonFieldType.ARRAY).description("피드 목록"),
                         fieldWithPath("data.feeds[].id").type(JsonFieldType.NUMBER).description("피드 ID"),
                         fieldWithPath("data.feeds[].author").type(JsonFieldType.OBJECT).description("작성자 정보"),

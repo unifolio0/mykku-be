@@ -5,10 +5,6 @@ import com.example.mykku.exception.ErrorCode
 import com.example.mykku.exception.MykkuException
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.dto.*
-import com.example.mykku.feed.repository.EventTagRepository
-import com.example.mykku.feed.repository.FeedCommentRepository
-import com.example.mykku.feed.repository.FeedImageRepository
-import com.example.mykku.feed.repository.FeedTagRepository
 import com.example.mykku.feed.tool.FeedReader
 import com.example.mykku.feed.tool.FeedWriter
 import com.example.mykku.image.ImageUploadService
@@ -16,6 +12,7 @@ import com.example.mykku.like.tool.LikeFeedReader
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.tool.MemberReader
 import com.example.mykku.member.tool.SaveFeedReader
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -27,10 +24,6 @@ class FeedService(
     private val memberReader: MemberReader,
     private val likeFeedReader: LikeFeedReader,
     private val saveFeedReader: SaveFeedReader,
-    private val eventTagRepository: EventTagRepository,
-    private val feedCommentRepository: FeedCommentRepository,
-    private val feedImageRepository: FeedImageRepository,
-    private val feedTagRepository: FeedTagRepository,
     private val imageUploadService: ImageUploadService?
 ) {
     @Transactional
@@ -85,15 +78,86 @@ class FeedService(
         )
     }
 
+    @Transactional(readOnly = true)
+    fun getFeedsByMemberWithRecommendations(
+        memberId: String,
+        pageable: Pageable,
+        minCommonFollowers: Long = 10
+    ): PagedFeedsResponse {
+        // 팔로우한 사람들 가져오기
+        val followingMembers = memberReader.getFollowerByMemberId(memberId)
+        
+        // 추천 사용자들 가져오기 (공통 팔로워 기준)
+        val recommendedMembers = memberReader.getRecommendedMembersByCommonFollowers(
+            memberId, 
+            minCommonFollowers
+        )
+        
+        // 모든 멤버 합치기
+        val allMembers = (followingMembers + recommendedMembers).distinct()
+        
+        // 페이지네이션으로 피드 가져오기
+        val feedPage = feedReader.getFeedsByMembersWithPagination(allMembers, pageable)
+        
+        // FeedResponse로 변환
+        val feedResponses = feedPage.map { feed -> 
+            getFeedResponse(memberId, feed) 
+        }
+        
+        return PagedFeedsResponse.from(feedResponses)
+    }
+
+    @Transactional(readOnly = true)
+    fun getFeedsByBoard(
+        boardId: Long,
+        memberId: String?,
+        pageable: Pageable
+    ): PagedFeedsResponse {
+        val board = boardReader.getBoardById(boardId)
+        val feedPage = feedReader.getFeedsByBoardWithPagination(board, pageable)
+        
+        val feedResponses = feedPage.map { feed ->
+            getFeedResponse(memberId ?: "", feed)
+        }
+        
+        return PagedFeedsResponse.from(feedResponses)
+    }
+
+    @Transactional(readOnly = true)
+    fun getFeedDetail(feedId: Long, memberId: String?): FeedDetailResponse {
+        val feed = feedReader.getFeedById(feedId)
+        val authorResponse = AuthorResponse(feed.member)
+        val isLiked = memberId?.let { likeFeedReader.isLiked(it, feed) } ?: false
+        val isSaved = memberId?.let { saveFeedReader.isSaved(it, feed) } ?: false
+        
+        // Fetch related data
+        val feedImages = feedReader.getFeedImagesByFeed(feed)
+        val feedTags = feedReader.getFeedTagsByFeed(feed)
+        
+        val tagTitles = feedTags.map { it.title }
+        val eventTags = feedReader.getEventTagsByTitles(tagTitles)
+        val eventTagTitles = eventTags.map { it.title }.toSet()
+        
+        return FeedDetailResponse(
+            feed = feed,
+            author = authorResponse,
+            isLiked = isLiked,
+            isSaved = isSaved,
+            eventTagTitles = eventTagTitles,
+            feedImages = feedImages,
+            feedTags = feedTags
+        )
+    }
+
     private fun getFeedResponse(memberId: String, feed: Feed): FeedResponse {
         val authorResponse = AuthorResponse(feed.member)
         val isLiked = likeFeedReader.isLiked(memberId, feed)
         val isSaved = saveFeedReader.isSaved(memberId, feed)
 
         // Fetch related data for this feed
-        val feedImages = feedImageRepository.findByFeed(feed)
-        val feedTags = feedTagRepository.findByFeed(feed)
-        val feedComments = feedCommentRepository.findByFeedAndParentCommentIsNull(
+        val feedImages = feedReader.getFeedImagesByFeed(feed)
+        val feedTags = feedReader.getFeedTagsByFeed(feed)
+        val feedComments = feedReader.getFeedCommentsByFeed(
             feed,
             org.springframework.data.domain.PageRequest.of(0, 1)
         ).content
@@ -101,7 +165,7 @@ class FeedService(
         val tagTitles = feedTags.map { it.title }
 
         // Find which of these are event tags
-        val eventTags = eventTagRepository.findAllByTitleIn(tagTitles)
+        val eventTags = feedReader.getEventTagsByTitles(tagTitles)
         val eventTagTitles = eventTags.map { it.title }.toSet()
 
         return FeedResponse(

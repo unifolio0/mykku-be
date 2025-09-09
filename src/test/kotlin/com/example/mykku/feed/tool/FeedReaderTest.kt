@@ -4,7 +4,11 @@ import com.example.mykku.board.domain.Board
 import com.example.mykku.exception.ErrorCode
 import com.example.mykku.exception.MykkuException
 import com.example.mykku.feed.domain.Feed
+import com.example.mykku.feed.repository.EventTagRepository
+import com.example.mykku.feed.repository.FeedCommentRepository
+import com.example.mykku.feed.repository.FeedImageRepository
 import com.example.mykku.feed.repository.FeedRepository
+import com.example.mykku.feed.repository.FeedTagRepository
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import org.junit.jupiter.api.Test
@@ -23,6 +27,18 @@ class FeedReaderTest {
 
     @Mock
     private lateinit var feedRepository: FeedRepository
+    
+    @Mock
+    private lateinit var feedImageRepository: FeedImageRepository
+    
+    @Mock
+    private lateinit var feedTagRepository: FeedTagRepository
+    
+    @Mock
+    private lateinit var feedCommentRepository: FeedCommentRepository
+    
+    @Mock
+    private lateinit var eventTagRepository: EventTagRepository
 
     @InjectMocks
     private lateinit var feedReader: FeedReader

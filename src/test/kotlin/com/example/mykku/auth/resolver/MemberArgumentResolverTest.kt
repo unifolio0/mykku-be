@@ -93,8 +93,12 @@ class MemberArgumentResolverTest {
     }
 
     @Test
-    fun `should throw exception when no authorization header`() {
+    fun `should throw exception when no authorization header for required member`() {
         // given
+        val annotation = mock<CurrentMember>()
+        whenever(annotation.required).thenReturn(true)
+        whenever(parameter.getParameterAnnotation(CurrentMember::class.java)).thenReturn(annotation)
+        whenever(parameter.isOptional).thenReturn(false)
         whenever(request.getHeader("Authorization")).thenReturn(null)
 
         // when & then
@@ -105,8 +109,13 @@ class MemberArgumentResolverTest {
     }
 
     @Test
-    fun `should throw exception when token is invalid`() {
+    fun `should throw exception when token is invalid for required member`() {
         // given
+        val annotation = mock<CurrentMember>()
+        whenever(annotation.required).thenReturn(true)
+        whenever(parameter.getParameterAnnotation(CurrentMember::class.java)).thenReturn(annotation)
+        whenever(parameter.isOptional).thenReturn(false)
+        
         val token = "invalid-token"
         whenever(request.getHeader("Authorization")).thenReturn("Bearer $token")
         whenever(jwtTokenProvider.validateToken(token)).thenReturn(false)
@@ -115,12 +124,17 @@ class MemberArgumentResolverTest {
         val exception = assertThrows<MykkuException> {
             resolver.resolveArgument(parameter, null, webRequest, null)
         }
-        assertEquals(ErrorCode.INVALID_TOKEN, exception.errorCode)
+        assertEquals(ErrorCode.UNAUTHORIZED, exception.errorCode)
     }
 
     @Test
-    fun `should throw exception when member not found`() {
+    fun `should return null when member not found for optional member`() {
         // given
+        val annotation = mock<CurrentMember>()
+        whenever(annotation.required).thenReturn(false)
+        whenever(parameter.getParameterAnnotation(CurrentMember::class.java)).thenReturn(annotation)
+        whenever(parameter.isOptional).thenReturn(true)
+        
         val token = "valid-token"
         val memberId = "google_123456"
 
@@ -129,10 +143,45 @@ class MemberArgumentResolverTest {
         whenever(jwtTokenProvider.getMemberIdFromToken(token)).thenReturn(memberId)
         whenever(memberRepository.findById(memberId)).thenReturn(Optional.empty())
 
-        // when & then
-        val exception = assertThrows<MykkuException> {
-            resolver.resolveArgument(parameter, null, webRequest, null)
-        }
-        assertEquals(ErrorCode.MEMBER_NOT_FOUND, exception.errorCode)
+        // when
+        val result = resolver.resolveArgument(parameter, null, webRequest, null)
+
+        // then
+        assertNull(result)
+    }
+    
+    @Test
+    fun `should return null when no authorization header for optional member`() {
+        // given
+        val annotation = mock<CurrentMember>()
+        whenever(annotation.required).thenReturn(false)
+        whenever(parameter.getParameterAnnotation(CurrentMember::class.java)).thenReturn(annotation)
+        whenever(parameter.isOptional).thenReturn(true)
+        whenever(request.getHeader("Authorization")).thenReturn(null)
+
+        // when
+        val result = resolver.resolveArgument(parameter, null, webRequest, null)
+
+        // then
+        assertNull(result)
+    }
+
+    @Test
+    fun `should return null when token is invalid for optional member`() {
+        // given
+        val annotation = mock<CurrentMember>()
+        whenever(annotation.required).thenReturn(false)
+        whenever(parameter.getParameterAnnotation(CurrentMember::class.java)).thenReturn(annotation)
+        whenever(parameter.isOptional).thenReturn(true)
+        
+        val token = "invalid-token"
+        whenever(request.getHeader("Authorization")).thenReturn("Bearer $token")
+        whenever(jwtTokenProvider.validateToken(token)).thenReturn(false)
+
+        // when
+        val result = resolver.resolveArgument(parameter, null, webRequest, null)
+
+        // then
+        assertNull(result)
     }
 }
