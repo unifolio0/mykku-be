@@ -1,6 +1,7 @@
 package com.example.mykku.exception
 
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -11,6 +12,7 @@ class GlobalExceptionHandler {
     fun handleMykkuException(exception: MykkuException): ResponseEntity<ErrorResponse> {
         return ResponseEntity
             .status(exception.errorCode.status)
+            .contentType(MediaType.APPLICATION_JSON)
             .body(ErrorResponse(exception.errorCode.message))
     }
 
@@ -18,6 +20,7 @@ class GlobalExceptionHandler {
     fun handleException(exception: Exception): ResponseEntity<ErrorResponse> {
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .contentType(MediaType.APPLICATION_JSON)
             .body(ErrorResponse("서버 오류가 발생했습니다. 관리자에게 문의해주세요."))
     }
 }
