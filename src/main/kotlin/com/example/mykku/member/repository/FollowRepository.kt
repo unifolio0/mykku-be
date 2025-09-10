@@ -11,15 +11,17 @@ import org.springframework.stereotype.Repository
 interface FollowRepository : JpaRepository<Follow, Long> {
     fun findByFollowerId(followerId: String): List<Follow>
     
+    // 성능 최적화: EXISTS 사용 및 서브쿼리 최소화
     @Query("""
         SELECT DISTINCT f2.following 
         FROM Follow f1 
         JOIN Follow f2 ON f1.following.id = f2.follower.id 
         WHERE f1.follower.id = :memberId 
-        AND f2.following.id NOT IN (
-            SELECT f3.following.id 
+        AND NOT EXISTS (
+            SELECT 1 
             FROM Follow f3 
             WHERE f3.follower.id = :memberId
+            AND f3.following.id = f2.following.id
         )
         GROUP BY f2.following 
         HAVING COUNT(DISTINCT f1.following) >= :minCommonFollowers
@@ -27,5 +29,27 @@ interface FollowRepository : JpaRepository<Follow, Long> {
     fun findRecommendedMembersByCommonFollowers(
         @Param("memberId") memberId: String,
         @Param("minCommonFollowers") minCommonFollowers: Long = 10
+    ): List<Member>
+    
+    // 더 간단한 추천 쿼리 - 공통 팔로워가 많은 순으로 정렬
+    @Query("""
+        SELECT f2.following, COUNT(DISTINCT f1.following) as commonCount
+        FROM Follow f1 
+        JOIN Follow f2 ON f1.following.id = f2.follower.id 
+        WHERE f1.follower.id = :memberId 
+        AND f2.following.id != :memberId
+        AND NOT EXISTS (
+            SELECT 1 
+            FROM Follow f3 
+            WHERE f3.follower.id = :memberId
+            AND f3.following.id = f2.following.id
+        )
+        GROUP BY f2.following 
+        ORDER BY commonCount DESC
+        LIMIT :limit
+    """, nativeQuery = true)
+    fun findTopRecommendedMembers(
+        @Param("memberId") memberId: String,
+        @Param("limit") limit: Int = 20
     ): List<Member>
 }

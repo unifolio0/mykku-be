@@ -69,4 +69,29 @@ class FeedReader(
     fun getEventTagsByTitles(titles: List<String>): List<EventTag> {
         return eventTagRepository.findAllByTitleIn(titles)
     }
+    
+    // Batch methods to prevent N+1 queries
+    fun getFeedImagesByFeeds(feeds: List<Feed>): Map<Long, List<FeedImage>> {
+        val images = feedImageRepository.findByFeedIn(feeds)
+        return images.groupBy { it.feed.id!! }
+    }
+    
+    fun getFeedTagsByFeeds(feeds: List<Feed>): Map<Long, List<FeedTag>> {
+        val tags = feedTagRepository.findByFeedIn(feeds)
+        return tags.groupBy { it.feed.id!! }
+    }
+    
+    fun getFeedCommentsByFeeds(feeds: List<Feed>, pageable: Pageable): Map<Long, Page<FeedComment>> {
+        val result = mutableMapOf<Long, Page<FeedComment>>()
+        feeds.forEach { feed ->
+            result[feed.id!!] = feedCommentRepository.findByFeedAndParentCommentIsNull(feed, pageable)
+        }
+        return result
+    }
+    
+    fun getEventTagsByFeedTags(feedTags: List<FeedTag>): Map<String, EventTag> {
+        val titles = feedTags.map { it.title }.distinct()
+        val eventTags = eventTagRepository.findAllByTitleIn(titles)
+        return eventTags.associateBy { it.title }
+    }
 }

@@ -11,4 +11,11 @@ class SaveFeedReader(
     fun isSaved(memberId: String, feed: Feed): Boolean {
         return saveFeedRepository.existsByMemberIdAndFeed(memberId, feed)
     }
+    
+    fun getSavedFeedsByMember(memberId: String, feeds: List<Feed>): Set<Long> {
+        val feedIds = feeds.mapNotNull { it.id }
+        return saveFeedRepository.findByMemberIdAndFeedIdIn(memberId, feedIds)
+            .map { it.feed.id!! }
+            .toSet()
+    }
 }

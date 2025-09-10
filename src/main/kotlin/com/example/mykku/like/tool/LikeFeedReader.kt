@@ -25,4 +25,11 @@ class LikeFeedReader(
             throw MykkuException(ErrorCode.LIKE_FEED_NOT_FOUND)
         }
     }
+    
+    fun getLikedFeedsByMember(memberId: String, feeds: List<Feed>): Set<Long> {
+        val feedIds = feeds.mapNotNull { it.id }
+        return likeFeedRepository.findByMemberIdAndFeedIdIn(memberId, feedIds)
+            .map { it.feed.id!! }
+            .toSet()
+    }
 }

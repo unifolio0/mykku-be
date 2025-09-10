@@ -98,46 +98,74 @@ class MemberArgumentResolverTest {
         val annotation = mock<CurrentMember>()
         whenever(annotation.required).thenReturn(true)
         whenever(parameter.getParameterAnnotation(CurrentMember::class.java)).thenReturn(annotation)
-        whenever(parameter.isOptional).thenReturn(false)
         whenever(request.getHeader("Authorization")).thenReturn(null)
 
         // when & then
-        val exception = assertThrows<MykkuException> {
+        assertThrows<MykkuException> {
             resolver.resolveArgument(parameter, null, webRequest, null)
+        }.also { exception ->
+            assertEquals(ErrorCode.UNAUTHORIZED, exception.errorCode)
         }
-        assertEquals(ErrorCode.UNAUTHORIZED, exception.errorCode)
+    }
+
+    @Test
+    fun `should return null when no authorization header for optional member`() {
+        // given
+        val annotation = mock<CurrentMember>()
+        whenever(annotation.required).thenReturn(false)
+        whenever(parameter.getParameterAnnotation(CurrentMember::class.java)).thenReturn(annotation)
+        whenever(request.getHeader("Authorization")).thenReturn(null)
+
+        // when
+        val result = resolver.resolveArgument(parameter, null, webRequest, null)
+
+        // then
+        assertNull(result)
     }
 
     @Test
     fun `should throw exception when token is invalid for required member`() {
         // given
+        val token = "invalid-token"
         val annotation = mock<CurrentMember>()
         whenever(annotation.required).thenReturn(true)
         whenever(parameter.getParameterAnnotation(CurrentMember::class.java)).thenReturn(annotation)
-        whenever(parameter.isOptional).thenReturn(false)
-        
-        val token = "invalid-token"
         whenever(request.getHeader("Authorization")).thenReturn("Bearer $token")
         whenever(jwtTokenProvider.validateToken(token)).thenReturn(false)
 
         // when & then
-        val exception = assertThrows<MykkuException> {
+        assertThrows<MykkuException> {
             resolver.resolveArgument(parameter, null, webRequest, null)
+        }.also { exception ->
+            assertEquals(ErrorCode.UNAUTHORIZED, exception.errorCode)
         }
-        assertEquals(ErrorCode.UNAUTHORIZED, exception.errorCode)
     }
 
     @Test
-    fun `should return null when member not found for optional member`() {
+    fun `should return null when token is invalid for optional member`() {
         // given
+        val token = "invalid-token"
         val annotation = mock<CurrentMember>()
         whenever(annotation.required).thenReturn(false)
         whenever(parameter.getParameterAnnotation(CurrentMember::class.java)).thenReturn(annotation)
-        whenever(parameter.isOptional).thenReturn(true)
-        
+        whenever(request.getHeader("Authorization")).thenReturn("Bearer $token")
+        whenever(jwtTokenProvider.validateToken(token)).thenReturn(false)
+
+        // when
+        val result = resolver.resolveArgument(parameter, null, webRequest, null)
+
+        // then
+        assertNull(result)
+    }
+
+    @Test
+    fun `should return null when member not found in database`() {
+        // given
         val token = "valid-token"
         val memberId = "google_123456"
-
+        val annotation = mock<CurrentMember>()
+        whenever(annotation.required).thenReturn(false)
+        whenever(parameter.getParameterAnnotation(CurrentMember::class.java)).thenReturn(annotation)
         whenever(request.getHeader("Authorization")).thenReturn("Bearer $token")
         whenever(jwtTokenProvider.validateToken(token)).thenReturn(true)
         whenever(jwtTokenProvider.getMemberIdFromToken(token)).thenReturn(memberId)
@@ -149,15 +177,14 @@ class MemberArgumentResolverTest {
         // then
         assertNull(result)
     }
-    
+
     @Test
-    fun `should return null when no authorization header for optional member`() {
+    fun `should handle authorization header without Bearer prefix`() {
         // given
         val annotation = mock<CurrentMember>()
         whenever(annotation.required).thenReturn(false)
         whenever(parameter.getParameterAnnotation(CurrentMember::class.java)).thenReturn(annotation)
-        whenever(parameter.isOptional).thenReturn(true)
-        whenever(request.getHeader("Authorization")).thenReturn(null)
+        whenever(request.getHeader("Authorization")).thenReturn("InvalidFormat token")
 
         // when
         val result = resolver.resolveArgument(parameter, null, webRequest, null)
@@ -167,21 +194,99 @@ class MemberArgumentResolverTest {
     }
 
     @Test
-    fun `should return null when token is invalid for optional member`() {
+    fun `should handle empty authorization header`() {
         // given
         val annotation = mock<CurrentMember>()
         whenever(annotation.required).thenReturn(false)
         whenever(parameter.getParameterAnnotation(CurrentMember::class.java)).thenReturn(annotation)
-        whenever(parameter.isOptional).thenReturn(true)
-        
-        val token = "invalid-token"
-        whenever(request.getHeader("Authorization")).thenReturn("Bearer $token")
-        whenever(jwtTokenProvider.validateToken(token)).thenReturn(false)
+        whenever(request.getHeader("Authorization")).thenReturn("")
 
         // when
         val result = resolver.resolveArgument(parameter, null, webRequest, null)
 
         // then
+        assertNull(result)
+    }
+
+    @Test
+    fun `should handle only Bearer prefix without token`() {
+        // given
+        val annotation = mock<CurrentMember>()
+        whenever(annotation.required).thenReturn(false)
+        whenever(parameter.getParameterAnnotation(CurrentMember::class.java)).thenReturn(annotation)
+        whenever(request.getHeader("Authorization")).thenReturn("Bearer ")
+
+        // when
+        val result = resolver.resolveArgument(parameter, null, webRequest, null)
+
+        // then
+        assertNull(result)
+    }
+
+    @Test
+    fun `should handle null webRequest`() {
+        // given
+        val annotation = mock<CurrentMember>()
+        whenever(annotation.required).thenReturn(false)
+        whenever(parameter.getParameterAnnotation(CurrentMember::class.java)).thenReturn(annotation)
+        whenever(webRequest.getNativeRequest(HttpServletRequest::class.java)).thenReturn(null)
+
+        // when
+        val result = resolver.resolveArgument(parameter, null, webRequest, null)
+
+        // then
+        assertNull(result)
+    }
+
+    @Test
+    fun `should throw exception for required member when webRequest is null`() {
+        // given
+        val annotation = mock<CurrentMember>()
+        whenever(annotation.required).thenReturn(true)
+        whenever(parameter.getParameterAnnotation(CurrentMember::class.java)).thenReturn(annotation)
+        whenever(webRequest.getNativeRequest(HttpServletRequest::class.java)).thenReturn(null)
+
+        // when & then
+        assertThrows<MykkuException> {
+            resolver.resolveArgument(parameter, null, webRequest, null)
+        }.also { exception ->
+            assertEquals(ErrorCode.UNAUTHORIZED, exception.errorCode)
+        }
+    }
+
+    @Test
+    fun `should handle case-insensitive Bearer prefix`() {
+        // given
+        val annotation = mock<CurrentMember>()
+        whenever(annotation.required).thenReturn(false)
+        whenever(parameter.getParameterAnnotation(CurrentMember::class.java)).thenReturn(annotation)
+        
+        // "bearer" 소문자로 시작
+        whenever(request.getHeader("Authorization")).thenReturn("bearer valid-token")
+
+        // when
+        val result = resolver.resolveArgument(parameter, null, webRequest, null)
+
+        // then
+        // 현재 구현은 대소문자를 구분하므로 null이 반환됨
+        assertNull(result)
+    }
+
+    @Test
+    fun `should handle token with extra spaces`() {
+        // given
+        val token = "valid-token"
+        val annotation = mock<CurrentMember>()
+        whenever(annotation.required).thenReturn(false)
+        whenever(parameter.getParameterAnnotation(CurrentMember::class.java)).thenReturn(annotation)
+        // 토큰 앞뒤로 공백이 있는 경우
+        whenever(request.getHeader("Authorization")).thenReturn("Bearer  $token ")
+
+        // when
+        val result = resolver.resolveArgument(parameter, null, webRequest, null)
+
+        // then
+        // 현재 구현은 공백을 제거하지 않으므로 토큰 검증이 실패할 것임
         assertNull(result)
     }
 }

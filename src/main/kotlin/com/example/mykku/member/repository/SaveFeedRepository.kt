@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository
 @Repository
 interface SaveFeedRepository : JpaRepository<SaveFeed, Long> {
     fun existsByMemberIdAndFeed(memberId: String, feed: Feed): Boolean
+    
+    fun findByMemberIdAndFeedIdIn(memberId: String, feedIds: List<Long>): List<SaveFeed>
 }

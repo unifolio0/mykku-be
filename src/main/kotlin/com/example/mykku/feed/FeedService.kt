@@ -3,8 +3,8 @@ package com.example.mykku.feed
 import com.example.mykku.board.tool.BoardReader
 import com.example.mykku.exception.ErrorCode
 import com.example.mykku.exception.MykkuException
-import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.dto.*
+import com.example.mykku.feed.tool.FeedDtoConverter
 import com.example.mykku.feed.tool.FeedReader
 import com.example.mykku.feed.tool.FeedWriter
 import com.example.mykku.image.ImageUploadService
@@ -20,21 +20,22 @@ import org.springframework.transaction.annotation.Transactional
 class FeedService(
     private val feedReader: FeedReader,
     private val feedWriter: FeedWriter,
+    private val feedDtoConverter: FeedDtoConverter,
     private val boardReader: BoardReader,
     private val memberReader: MemberReader,
     private val likeFeedReader: LikeFeedReader,
     private val saveFeedReader: SaveFeedReader,
-    private val imageUploadService: ImageUploadService?
+    private val imageUploadService: ImageUploadService
 ) {
     @Transactional
     fun createFeed(request: CreateFeedRequest, member: Member): CreateFeedResponse {
         val board = boardReader.getBoardById(request.boardId)
 
         // 이미지 파일들을 S3에 업로드하고 결과 받기
-        val imageResults = when {
-            request.images.isEmpty() -> emptyList()
-            imageUploadService != null -> imageUploadService.uploadImages(request.images)
-            else -> throw MykkuException(ErrorCode.IMAGE_UPLOAD_SERVICE_UNAVAILABLE)
+        val imageResults = if (request.images.isEmpty()) {
+            emptyList()
+        } else {
+            imageUploadService.uploadImages(request.images)
         }
 
         val (feed, feedImages, feedTags) = feedWriter.createFeed(
@@ -74,7 +75,7 @@ class FeedService(
         val follower = memberReader.getFollowerByMemberId(memberId)
         val feeds = feedReader.getFeedsByFollower(follower)
         return FeedsResponse(
-            feeds = feeds.map { feed -> getFeedResponse(memberId, feed) }
+            feeds = feeds.map { feed -> feedDtoConverter.convertToFeedResponse(memberId, feed) }
         )
     }
 
@@ -99,12 +100,13 @@ class FeedService(
         // 페이지네이션으로 피드 가져오기
         val feedPage = feedReader.getFeedsByMembersWithPagination(allMembers, pageable)
         
-        // FeedResponse로 변환
-        val feedResponses = feedPage.map { feed -> 
-            getFeedResponse(memberId, feed) 
+        // 배치로 데이터 조회 (N+1 방지)
+        val feedResponses = feedDtoConverter.convertToFeedResponsesBatch(memberId, feedPage.content)
+        val responsePage = feedPage.map { feed ->
+            feedResponses.find { it.id == feed.id }!!
         }
         
-        return PagedFeedsResponse.from(feedResponses)
+        return PagedFeedsResponse.from(responsePage)
     }
 
     @Transactional(readOnly = true)
@@ -116,11 +118,13 @@ class FeedService(
         val board = boardReader.getBoardById(boardId)
         val feedPage = feedReader.getFeedsByBoardWithPagination(board, pageable)
         
-        val feedResponses = feedPage.map { feed ->
-            getFeedResponse(memberId ?: "", feed)
+        // 배치로 데이터 조회 (N+1 방지)
+        val feedResponses = feedDtoConverter.convertToFeedResponsesBatch(memberId ?: "", feedPage.content)
+        val responsePage = feedPage.map { feed ->
+            feedResponses.find { response -> response.id == feed.id }!!
         }
         
-        return PagedFeedsResponse.from(feedResponses)
+        return PagedFeedsResponse.from(responsePage)
     }
 
     @Transactional(readOnly = true)
@@ -149,34 +153,4 @@ class FeedService(
         )
     }
 
-    private fun getFeedResponse(memberId: String, feed: Feed): FeedResponse {
-        val authorResponse = AuthorResponse(feed.member)
-        val isLiked = likeFeedReader.isLiked(memberId, feed)
-        val isSaved = saveFeedReader.isSaved(memberId, feed)
-
-        // Fetch related data for this feed
-        val feedImages = feedReader.getFeedImagesByFeed(feed)
-        val feedTags = feedReader.getFeedTagsByFeed(feed)
-        val feedComments = feedReader.getFeedCommentsByFeed(
-            feed,
-            org.springframework.data.domain.PageRequest.of(0, 1)
-        ).content
-
-        val tagTitles = feedTags.map { it.title }
-
-        // Find which of these are event tags
-        val eventTags = feedReader.getEventTagsByTitles(tagTitles)
-        val eventTagTitles = eventTags.map { it.title }.toSet()
-
-        return FeedResponse(
-            feed = feed,
-            author = authorResponse,
-            isLiked = isLiked,
-            isSaved = isSaved,
-            eventTagTitles = eventTagTitles,
-            feedImages = feedImages,
-            feedTags = feedTags,
-            feedComments = feedComments
-        )
-    }
 }

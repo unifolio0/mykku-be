@@ -29,7 +29,7 @@ class ImageUploadServiceTest {
     private lateinit var s3Properties: S3Properties
 
     @InjectMocks
-    private lateinit var imageUploadService: ImageUploadService
+    private lateinit var imageUploadService: S3ImageUploadService
 
     @Test
     fun `uploadImage - 이미지를 정상적으로 업로드한다`() {

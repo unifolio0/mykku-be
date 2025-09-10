@@ -84,6 +84,8 @@ enum class ErrorCode(val status: HttpStatus, val message: String) {
 
     // Validation
     INVALID_SORT_DIRECTION(HttpStatus.BAD_REQUEST, "잘못된 정렬 방향입니다. 'asc' 또는 'desc'를 사용해주세요"),
+    INVALID_PAGE_NUMBER(HttpStatus.BAD_REQUEST, "페이지 번호는 0 이상이어야 합니다"),
+    INVALID_PAGE_SIZE(HttpStatus.BAD_REQUEST, "페이지 크기는 1 이상 100 이하여야 합니다"),
 
     // Auth
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증이 필요합니다"),

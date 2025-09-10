@@ -2,12 +2,12 @@ package com.example.mykku.feed
 
 import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
+import com.example.mykku.common.util.PageableValidator
 import com.example.mykku.exception.ErrorCode
 import com.example.mykku.exception.MykkuException
 import com.example.mykku.feed.dto.*
 import com.example.mykku.member.domain.Member
 import jakarta.validation.Valid
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -56,7 +56,7 @@ class FeedController(
         @RequestParam(defaultValue = "20") size: Int,
         @RequestParam(defaultValue = "10") minCommonFollowers: Long
     ): ResponseEntity<ApiResponse<PagedFeedsResponse>> {
-        val pageable = PageRequest.of(page, size)
+        val pageable = PageableValidator.validateAndCreate(page, size)
         val feeds = feedService.getFeedsByMemberWithRecommendations(
             memberId = memberId,
             pageable = pageable,
@@ -77,7 +77,7 @@ class FeedController(
         @RequestParam(defaultValue = "20") size: Int,
         @CurrentMember(required = false) member: Member?
     ): ResponseEntity<ApiResponse<PagedFeedsResponse>> {
-        val pageable = PageRequest.of(page, size)
+        val pageable = PageableValidator.validateAndCreate(page, size)
         val feeds = feedService.getFeedsByBoard(
             boardId = boardId,
             memberId = member?.id,
@@ -112,7 +112,12 @@ class FeedController(
         @RequestParam(defaultValue = "20") size: Int,
         @CurrentMember(required = false) member: Member?
     ): ResponseEntity<ApiResponse<FeedCommentsResponse>> {
-        val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"))
+        val pageable = PageableValidator.validateAndCreate(
+            page, 
+            size, 
+            "createdAt", 
+            Sort.Direction.DESC
+        )
         val comments = feedCommentService.getComments(feedId, member?.id, pageable)
         return ResponseEntity.ok(
             ApiResponse(
