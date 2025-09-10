@@ -428,4 +428,208 @@ class FeedControllerRestDocsTest : BaseControllerRestDocsTest() {
                 )
             )
     }
+
+    @Test
+    fun `보드별 피드 목록 조회 API 문서화`() {
+        // given
+        val boardId = 1L
+        val feedsResponse = PagedFeedsResponse(
+            feeds = listOf(
+                FeedResponse(
+                    id = 1L,
+                    author = AuthorResponse(
+                        memberId = "member1",
+                        nickname = "닉네임1",
+                        profileImage = "https://example.com/profile1.jpg",
+                        role = "USER"
+                    ),
+                    board = "자유게시판",
+                    createdAt = LocalDateTime.of(2024, 1, 1, 12, 0),
+                    title = "자유게시판 피드 제목",
+                    content = "자유게시판 피드 내용입니다.",
+                    images = listOf(
+                        FeedImageResponse(
+                            url = "https://example.com/image1.jpg",
+                            width = 1920,
+                            height = 1080
+                        )
+                    ),
+                    tags = listOf(
+                        TagResponse(title = "자유", isEvent = false)
+                    ),
+                    likeCount = 15,
+                    isLiked = true,
+                    isSaved = false,
+                    commentCount = 3,
+                    comment = CommentPreviewResponse(
+                        profileImage = "https://example.com/commenter1.jpg",
+                        content = "좋은 글입니다."
+                    )
+                )
+            ),
+            currentPage = 0,
+            totalPages = 1,
+            totalElements = 1,
+            size = 20,
+            hasNext = false,
+            hasPrevious = false
+        )
+
+        `when`(feedService.getFeedsByBoard(
+            eq(boardId),
+            any(),
+            any()
+        )).thenReturn(feedsResponse)
+
+        // when & then
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.get("/api/v1/boards/{boardId}/feeds", boardId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+        )
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.message").value("보드별 피드 목록을 성공적으로 조회했습니다."))
+            .andDo(
+                document(
+                    "feed-list-by-board",
+                    pathParameters(
+                        parameterWithName("boardId").description("조회할 게시판의 ID")
+                    ),
+                    queryParameters(
+                        parameterWithName("page").description("페이지 번호 (0부터 시작)").optional(),
+                        parameterWithName("size").description("페이지 크기").optional()
+                    ),
+                    responseFields(
+                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
+                        fieldWithPath("data.currentPage").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
+                        fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
+                        fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 요소 수"),
+                        fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
+                        fieldWithPath("data.hasNext").type(JsonFieldType.BOOLEAN).description("다음 페이지 존재 여부"),
+                        fieldWithPath("data.hasPrevious").type(JsonFieldType.BOOLEAN).description("이전 페이지 존재 여부"),
+                        fieldWithPath("data.feeds").type(JsonFieldType.ARRAY).description("피드 목록"),
+                        fieldWithPath("data.feeds[].id").type(JsonFieldType.NUMBER).description("피드 ID"),
+                        fieldWithPath("data.feeds[].author").type(JsonFieldType.OBJECT).description("작성자 정보"),
+                        fieldWithPath("data.feeds[].author.memberId").type(JsonFieldType.STRING).description("작성자 ID"),
+                        fieldWithPath("data.feeds[].author.nickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
+                        fieldWithPath("data.feeds[].author.profileImage").type(JsonFieldType.STRING)
+                            .description("작성자 프로필 이미지 URL").optional(),
+                        fieldWithPath("data.feeds[].author.role").type(JsonFieldType.STRING).description("작성자 권한"),
+                        fieldWithPath("data.feeds[].board").type(JsonFieldType.STRING).description("게시판 이름"),
+                        fieldWithPath("data.feeds[].title").type(JsonFieldType.STRING).description("피드 제목"),
+                        fieldWithPath("data.feeds[].content").type(JsonFieldType.STRING).description("피드 내용"),
+                        fieldWithPath("data.feeds[].images").type(JsonFieldType.ARRAY).description("피드 이미지 목록"),
+                        fieldWithPath("data.feeds[].images[].url").type(JsonFieldType.STRING).description("이미지 URL")
+                            .optional(),
+                        fieldWithPath("data.feeds[].images[].width").type(JsonFieldType.NUMBER)
+                            .description("이미지 가로 크기 (픽셀)").optional(),
+                        fieldWithPath("data.feeds[].images[].height").type(JsonFieldType.NUMBER)
+                            .description("이미지 세로 크기 (픽셀)").optional(),
+                        fieldWithPath("data.feeds[].tags").type(JsonFieldType.ARRAY).description("피드 태그 목록"),
+                        fieldWithPath("data.feeds[].tags[].title").type(JsonFieldType.STRING).description("태그 제목"),
+                        fieldWithPath("data.feeds[].tags[].isEvent").type(JsonFieldType.BOOLEAN)
+                            .description("이벤트 태그 여부"),
+                        fieldWithPath("data.feeds[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
+                        fieldWithPath("data.feeds[].commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
+                        fieldWithPath("data.feeds[].isLiked").type(JsonFieldType.BOOLEAN).description("현재 사용자의 좋아요 여부"),
+                        fieldWithPath("data.feeds[].isSaved").type(JsonFieldType.BOOLEAN).description("현재 사용자의 저장 여부"),
+                        fieldWithPath("data.feeds[].createdAt").type(JsonFieldType.STRING).description("작성 일시"),
+                        fieldWithPath("data.feeds[].comment").type(JsonFieldType.OBJECT).description("첫 댓글 미리보기"),
+                        fieldWithPath("data.feeds[].comment.profileImage").type(JsonFieldType.STRING)
+                            .description("댓글 작성자 프로필 이미지"),
+                        fieldWithPath("data.feeds[].comment.content").type(JsonFieldType.STRING).description("댓글 내용")
+                    )
+                )
+            )
+    }
+
+    @Test
+    fun `피드 상세 조회 API 문서화`() {
+        // given
+        val feedId = 1L
+        val feedDetailResponse = FeedDetailResponse(
+            id = feedId,
+            author = AuthorResponse(
+                memberId = "member1",
+                nickname = "작성자닉네임",
+                profileImage = "https://example.com/profile.jpg",
+                role = "USER"
+            ),
+            boardId = 1L,
+            boardTitle = "자유게시판",
+            title = "피드 제목입니다",
+            content = "피드의 상세 내용입니다. 자세한 설명이 포함되어 있습니다.",
+            createdAt = LocalDateTime.of(2024, 1, 1, 12, 0),
+            updatedAt = LocalDateTime.of(2024, 1, 2, 14, 30),
+            images = listOf(
+                FeedImageResponse(
+                    url = "https://example.com/image1.jpg",
+                    width = 1920,
+                    height = 1080
+                ),
+                FeedImageResponse(
+                    url = "https://example.com/image2.jpg",
+                    width = 1280,
+                    height = 720
+                )
+            ),
+            tags = listOf(
+                TagResponse(title = "일상", isEvent = false),
+                TagResponse(title = "이벤트", isEvent = true)
+            ),
+            likeCount = 25,
+            isLiked = true,
+            isSaved = false,
+            commentCount = 10
+        )
+
+        `when`(feedService.getFeedDetail(eq(feedId), any())).thenReturn(feedDetailResponse)
+
+        // when & then
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.get("/api/v1/feeds/{feedId}", feedId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+        )
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.message").value("피드 상세 정보를 성공적으로 조회했습니다."))
+            .andDo(
+                document(
+                    "feed-detail",
+                    pathParameters(
+                        parameterWithName("feedId").description("조회할 피드의 ID")
+                    ),
+                    responseFields(
+                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                        fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("피드 ID"),
+                        fieldWithPath("data.author").type(JsonFieldType.OBJECT).description("작성자 정보"),
+                        fieldWithPath("data.author.memberId").type(JsonFieldType.STRING).description("작성자 ID"),
+                        fieldWithPath("data.author.nickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
+                        fieldWithPath("data.author.profileImage").type(JsonFieldType.STRING)
+                            .description("작성자 프로필 이미지 URL").optional(),
+                        fieldWithPath("data.author.role").type(JsonFieldType.STRING).description("작성자 권한"),
+                        fieldWithPath("data.boardId").type(JsonFieldType.NUMBER).description("게시판 ID"),
+                        fieldWithPath("data.boardTitle").type(JsonFieldType.STRING).description("게시판 이름"),
+                        fieldWithPath("data.title").type(JsonFieldType.STRING).description("피드 제목"),
+                        fieldWithPath("data.content").type(JsonFieldType.STRING).description("피드 내용"),
+                        fieldWithPath("data.images").type(JsonFieldType.ARRAY).description("피드 이미지 목록"),
+                        fieldWithPath("data.images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
+                        fieldWithPath("data.images[].width").type(JsonFieldType.NUMBER).description("이미지 가로 크기 (픽셀)"),
+                        fieldWithPath("data.images[].height").type(JsonFieldType.NUMBER).description("이미지 세로 크기 (픽셀)"),
+                        fieldWithPath("data.tags").type(JsonFieldType.ARRAY).description("피드 태그 목록"),
+                        fieldWithPath("data.tags[].title").type(JsonFieldType.STRING).description("태그 제목"),
+                        fieldWithPath("data.tags[].isEvent").type(JsonFieldType.BOOLEAN).description("이벤트 태그 여부"),
+                        fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
+                        fieldWithPath("data.commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
+                        fieldWithPath("data.isLiked").type(JsonFieldType.BOOLEAN).description("현재 사용자의 좋아요 여부"),
+                        fieldWithPath("data.isSaved").type(JsonFieldType.BOOLEAN).description("현재 사용자의 저장 여부"),
+                        fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성 일시"),
+                        fieldWithPath("data.updatedAt").type(JsonFieldType.STRING).description("수정 일시")
+                    )
+                )
+            )
+    }
 }
