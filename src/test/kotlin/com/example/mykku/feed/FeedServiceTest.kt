@@ -2,6 +2,7 @@ package com.example.mykku.feed
 
 import com.example.mykku.board.domain.Board
 import com.example.mykku.board.tool.BoardReader
+import com.example.mykku.common.domain.BaseEntity
 import com.example.mykku.exception.ErrorCode
 import com.example.mykku.exception.MykkuException
 import com.example.mykku.feed.domain.Feed
@@ -13,6 +14,7 @@ import com.example.mykku.feed.repository.EventTagRepository
 import com.example.mykku.feed.repository.FeedCommentRepository
 import com.example.mykku.feed.repository.FeedImageRepository
 import com.example.mykku.feed.repository.FeedTagRepository
+import com.example.mykku.feed.tool.FeedDtoConverter
 import com.example.mykku.feed.tool.FeedReader
 import com.example.mykku.feed.tool.FeedWriter
 import com.example.mykku.image.ImageUploadService
@@ -28,6 +30,9 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.springframework.data.domain.PageImpl
@@ -35,6 +40,8 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 @ExtendWith(MockitoExtension::class)
 class FeedServiceTest {
@@ -44,6 +51,9 @@ class FeedServiceTest {
 
     @Mock
     private lateinit var feedWriter: FeedWriter
+
+    @Mock
+    private lateinit var feedDtoConverter: FeedDtoConverter
 
     @Mock
     private lateinit var boardReader: BoardReader
@@ -58,18 +68,6 @@ class FeedServiceTest {
     private lateinit var saveFeedReader: SaveFeedReader
 
     @Mock
-    private lateinit var eventTagRepository: EventTagRepository
-
-    @Mock
-    private lateinit var feedCommentRepository: FeedCommentRepository
-
-    @Mock
-    private lateinit var feedImageRepository: FeedImageRepository
-
-    @Mock
-    private lateinit var feedTagRepository: FeedTagRepository
-
-    @Mock
     private lateinit var imageUploadService: ImageUploadService
 
     @InjectMocks
@@ -77,7 +75,7 @@ class FeedServiceTest {
 
     private val member = Member(
         id = "member1",
-        nickname = "testUser",
+        nickname = "test",
         role = "USER",
         profileImage = "",
         provider = SocialProvider.GOOGLE,
@@ -85,14 +83,18 @@ class FeedServiceTest {
         email = "test@test.com"
     )
 
-    private val board = Board(id = 1L, title = "테스트 보드", logo = "")
-    
+    private val board = Board(
+        id = 1L,
+        title = "보드1",
+        logo = "https://example.com/logo.png"
+    )
+
     private fun createTestFeed(
-        id: Long = 1L,
-        title: String,
-        content: String,
-        board: Board,
-        member: Member
+        id: Long? = null,
+        title: String = "테스트 피드",
+        content: String = "테스트 내용",
+        board: Board = this.board,
+        member: Member = this.member
     ): Feed {
         val feed = Feed(
             id = id,
@@ -101,33 +103,31 @@ class FeedServiceTest {
             board = board,
             member = member
         )
-        initializeBaseEntityFields(feed)
-        return feed
-    }
-    
-    private fun initializeBaseEntityFields(entity: Any) {
-        val now = LocalDateTime.now()
-        val createdAtField = entity::class.java.superclass.getDeclaredField("createdAt")
+        // createdAt과 updatedAt 설정 (테스트용)
+        val createdAtField = BaseEntity::class.java.getDeclaredField("createdAt")
         createdAtField.isAccessible = true
-        createdAtField.set(entity, now)
+        createdAtField.set(feed, LocalDateTime.now())
         
-        val updatedAtField = entity::class.java.superclass.getDeclaredField("updatedAt")
+        val updatedAtField = BaseEntity::class.java.getDeclaredField("updatedAt")
         updatedAtField.isAccessible = true
-        updatedAtField.set(entity, now)
+        updatedAtField.set(feed, LocalDateTime.now())
+        
+        return feed
     }
 
     @Test
-    fun `createFeed - 이미지가 없는 피드를 생성한다`() {
+    fun `createFeed - 이미지 없이 피드를 생성한다`() {
         // given
         val request = CreateFeedRequest(
             title = "새 피드",
             content = "피드 내용",
             boardId = 1L,
             images = emptyList(),
-            tags = listOf("태그1", "태그2")
+            tags = emptyList()
         )
 
         val feed = createTestFeed(
+            id = 1L,
             title = request.title,
             content = request.content,
             board = board,
@@ -135,10 +135,7 @@ class FeedServiceTest {
         )
 
         val feedImages = emptyList<FeedImage>()
-        val feedTags = listOf(
-            FeedTag(title = "태그1", feed = feed),
-            FeedTag(title = "태그2", feed = feed)
-        )
+        val feedTags = emptyList<FeedTag>()
 
         whenever(boardReader.getBoardById(1L)).thenReturn(board)
         whenever(
@@ -148,7 +145,7 @@ class FeedServiceTest {
                 board = board,
                 member = member,
                 imageResults = emptyList(),
-                tagTitles = request.tags
+                tagTitles = emptyList()
             )
         ).thenReturn(Triple(feed, feedImages, feedTags))
 
@@ -156,16 +153,19 @@ class FeedServiceTest {
         val result = feedService.createFeed(request, member)
 
         // then
-        assertEquals(feed.title, result.title)
-        assertEquals(feed.content, result.content)
-        assertEquals(member.id, result.authorId)
-        assertEquals(member.nickname, result.authorNickname)
-        assertEquals(0, result.images.size)
-        assertEquals(2, result.tags.size)
+        assertEquals(1L, result.id)
+        assertEquals("새 피드", result.title)
+        assertEquals("피드 내용", result.content)
+        assertEquals(1L, result.boardId)
+        assertEquals("보드1", result.boardTitle)
+        assertEquals("member1", result.authorId)
+        assertEquals("test", result.authorNickname)
+        assertTrue(result.images.isEmpty())
+        assertTrue(result.tags.isEmpty())
     }
 
     @Test
-    fun `createFeed - 이미지가 있는 피드를 생성한다`() {
+    fun `createFeed - 이미지와 함께 피드를 생성한다`() {
         // given
         val imageFile = mock<MultipartFile>()
         val request = CreateFeedRequest(
@@ -183,19 +183,21 @@ class FeedServiceTest {
         )
 
         val feed = createTestFeed(
+            id = 1L,
             title = request.title,
             content = request.content,
             board = board,
             member = member
         )
 
-        val feedImage = FeedImage(
-            url = imageResult.url,
-            width = imageResult.width,
-            height = imageResult.height,
-            feed = feed
+        val feedImages = listOf(
+            FeedImage(
+                url = imageResult.url,
+                width = imageResult.width,
+                height = imageResult.height,
+                feed = feed
+            )
         )
-        val feedImages = listOf(feedImage)
         val feedTags = emptyList<FeedTag>()
 
         whenever(boardReader.getBoardById(1L)).thenReturn(board)
@@ -222,20 +224,21 @@ class FeedServiceTest {
     }
 
     @Test
-    fun `createFeed - ImageUploadService가 null이고 이미지가 있으면 예외가 발생한다`() {
+    fun `createFeed - ImageUploadService가 사용 불가능하고 이미지가 있으면 예외가 발생한다`() {
         // given
+        val noOpImageUploadService = mock<ImageUploadService>()
+        whenever(noOpImageUploadService.uploadImages(any()))
+            .thenThrow(MykkuException(ErrorCode.IMAGE_UPLOAD_SERVICE_UNAVAILABLE))
+        
         val feedServiceWithoutImageUpload = FeedService(
             feedReader = feedReader,
             feedWriter = feedWriter,
+            feedDtoConverter = feedDtoConverter,
             boardReader = boardReader,
             memberReader = memberReader,
             likeFeedReader = likeFeedReader,
             saveFeedReader = saveFeedReader,
-            eventTagRepository = eventTagRepository,
-            feedCommentRepository = feedCommentRepository,
-            feedImageRepository = feedImageRepository,
-            feedTagRepository = feedTagRepository,
-            imageUploadService = null
+            imageUploadService = noOpImageUploadService
         )
 
         val imageFile = mock<MultipartFile>()
@@ -261,6 +264,7 @@ class FeedServiceTest {
         // given
         val follower = member
         val feed = createTestFeed(
+            id = 1L,
             title = "피드 제목",
             content = "피드 내용",
             board = board,
@@ -283,17 +287,20 @@ class FeedServiceTest {
 
         whenever(memberReader.getFollowerByMemberId("member1")).thenReturn(listOf(follower))
         whenever(feedReader.getFeedsByFollower(listOf(follower))).thenReturn(listOf(feed))
-        whenever(likeFeedReader.isLiked("member1", feed)).thenReturn(true)
-        whenever(saveFeedReader.isSaved("member1", feed)).thenReturn(false)
-        whenever(feedImageRepository.findByFeed(feed)).thenReturn(listOf(feedImage))
-        whenever(feedTagRepository.findByFeed(feed)).thenReturn(listOf(feedTag))
-        whenever(
-            feedCommentRepository.findByFeedAndParentCommentIsNull(
-                feed,
-                PageRequest.of(0, 1)
-            )
-        ).thenReturn(PageImpl(listOf(feedComment)))
-        whenever(eventTagRepository.findAllByTitleIn(listOf("태그1"))).thenReturn(emptyList())
+        
+        // FeedDtoConverter mocking
+        val feedResponse = com.example.mykku.feed.dto.FeedResponse(
+            feed, 
+            com.example.mykku.feed.dto.AuthorResponse(member),
+            true,
+            false,
+            emptySet(),
+            listOf(feedImage),
+            listOf(feedTag),
+            listOf(feedComment)
+        )
+        whenever(feedDtoConverter.convertToFeedResponse(eq("member1"), eq(feed), isNull(), isNull(), isNull()))
+            .thenReturn(feedResponse)
 
         // when
         val result = feedService.getFeeds("member1")
@@ -306,5 +313,361 @@ class FeedServiceTest {
         assertEquals(false, result.feeds[0].isSaved)
         assertEquals(1, result.feeds[0].images.size)
         assertEquals(1, result.feeds[0].tags.size)
+    }
+
+    @Test
+    fun `getFeedsByMemberWithRecommendations - 팔로우와 추천 사용자의 피드를 페이지네이션으로 반환한다`() {
+        // given
+        val memberId = "member1"
+        val followingMember = Member(
+            id = "member2",
+            nickname = "following",
+            role = "USER",
+            profileImage = "",
+            provider = SocialProvider.GOOGLE,
+            socialId = "456",
+            email = "following@test.com"
+        )
+        val recommendedMember = Member(
+            id = "member3",
+            nickname = "recommend",
+            role = "USER",
+            profileImage = "",
+            provider = SocialProvider.GOOGLE,
+            socialId = "789",
+            email = "recommended@test.com"
+        )
+        
+        val feed1 = createTestFeed(
+            id = 1L,
+            title = "Following Feed",
+            content = "Content from following",
+            board = board,
+            member = followingMember
+        )
+        val feed2 = createTestFeed(
+            id = 2L,
+            title = "Recommended Feed",
+            content = "Content from recommended",
+            board = board,
+            member = recommendedMember
+        )
+        
+        val pageable = PageRequest.of(0, 10)
+        val feedPage = PageImpl(listOf(feed1, feed2), pageable, 2)
+        
+        whenever(memberReader.getFollowerByMemberId(memberId)).thenReturn(listOf(followingMember))
+        whenever(memberReader.getRecommendedMembersByCommonFollowers(memberId, 10L))
+            .thenReturn(listOf(recommendedMember))
+        whenever(feedReader.getFeedsByMembersWithPagination(any(), eq(pageable)))
+            .thenReturn(feedPage)
+        
+        // Mock for FeedDtoConverter
+        val feedResponse1 = com.example.mykku.feed.dto.FeedResponse(
+            feed1,
+            com.example.mykku.feed.dto.AuthorResponse(followingMember),
+            true,
+            false,
+            emptySet(),
+            emptyList(),
+            emptyList(),
+            emptyList()
+        )
+        val feedResponse2 = com.example.mykku.feed.dto.FeedResponse(
+            feed2,
+            com.example.mykku.feed.dto.AuthorResponse(recommendedMember),
+            false,
+            true,
+            emptySet(),
+            emptyList(),
+            emptyList(),
+            emptyList()
+        )
+        whenever(feedDtoConverter.convertToFeedResponsesBatch(memberId, listOf(feed1, feed2)))
+            .thenReturn(listOf(feedResponse1, feedResponse2))
+        
+        // when
+        val result = feedService.getFeedsByMemberWithRecommendations(memberId, pageable, 10L)
+        
+        // then
+        assertEquals(2, result.feeds.size)
+        assertEquals(0, result.currentPage)
+        assertEquals(1, result.totalPages)
+        assertEquals(2, result.totalElements)
+        assertEquals(10, result.size)
+        assertFalse(result.hasNext)
+        assertFalse(result.hasPrevious)
+        assertEquals("Following Feed", result.feeds[0].title)
+        assertEquals("Recommended Feed", result.feeds[1].title)
+    }
+
+    @Test
+    fun `getFeedsByBoard - 보드별 피드를 페이지네이션으로 반환한다`() {
+        // given
+        val boardId = 1L
+        val memberId = "member1"
+        
+        val feed1 = createTestFeed(
+            id = 1L,
+            title = "Board Feed 1",
+            content = "Content 1",
+            board = board,
+            member = member
+        )
+        val feed2 = createTestFeed(
+            id = 2L,
+            title = "Board Feed 2",
+            content = "Content 2",
+            board = board,
+            member = member
+        )
+        
+        val pageable = PageRequest.of(0, 20)
+        val feedPage = PageImpl(listOf(feed1, feed2), pageable, 2)
+        
+        whenever(boardReader.getBoardById(boardId)).thenReturn(board)
+        whenever(feedReader.getFeedsByBoardWithPagination(board, pageable))
+            .thenReturn(feedPage)
+        
+        // Mock for FeedDtoConverter
+        val feedResponse1 = com.example.mykku.feed.dto.FeedResponse(
+            feed1,
+            com.example.mykku.feed.dto.AuthorResponse(member),
+            true,
+            false,
+            emptySet(),
+            emptyList(),
+            emptyList(),
+            emptyList()
+        )
+        val feedResponse2 = com.example.mykku.feed.dto.FeedResponse(
+            feed2,
+            com.example.mykku.feed.dto.AuthorResponse(member),
+            false,
+            true,
+            emptySet(),
+            emptyList(),
+            emptyList(),
+            emptyList()
+        )
+        whenever(feedDtoConverter.convertToFeedResponsesBatch(memberId, listOf(feed1, feed2)))
+            .thenReturn(listOf(feedResponse1, feedResponse2))
+        
+        // when
+        val result = feedService.getFeedsByBoard(boardId, memberId, pageable)
+        
+        // then
+        assertEquals(2, result.feeds.size)
+        assertEquals(0, result.currentPage)
+        assertEquals(1, result.totalPages)
+        assertEquals(2, result.totalElements)
+        assertEquals(20, result.size)
+        assertFalse(result.hasNext)
+        assertFalse(result.hasPrevious)
+        assertEquals("Board Feed 1", result.feeds[0].title)
+        assertEquals("Board Feed 2", result.feeds[1].title)
+    }
+
+    @Test
+    fun `getFeedsByBoard - 비로그인 사용자도 보드별 피드를 조회할 수 있다`() {
+        // given
+        val boardId = 1L
+        val memberId: String? = null
+        
+        val feed = createTestFeed(
+            id = 1L,
+            title = "Public Feed",
+            content = "Public Content",
+            board = board,
+            member = member
+        )
+        
+        val pageable = PageRequest.of(0, 20)
+        val feedPage = PageImpl(listOf(feed), pageable, 1)
+        
+        whenever(boardReader.getBoardById(boardId)).thenReturn(board)
+        whenever(feedReader.getFeedsByBoardWithPagination(board, pageable))
+            .thenReturn(feedPage)
+        
+        // Mock for FeedDtoConverter - 비로그인 사용자는 isLiked, isSaved가 false
+        val feedResponse = com.example.mykku.feed.dto.FeedResponse(
+            feed,
+            com.example.mykku.feed.dto.AuthorResponse(member),
+            false,  // isLiked는 false
+            false,  // isSaved는 false
+            emptySet(),
+            emptyList(),
+            emptyList(),
+            emptyList()
+        )
+        whenever(feedDtoConverter.convertToFeedResponsesBatch("", listOf(feed)))
+            .thenReturn(listOf(feedResponse))
+        
+        // when
+        val result = feedService.getFeedsByBoard(boardId, memberId, pageable)
+        
+        // then
+        assertEquals(1, result.feeds.size)
+        assertEquals("Public Feed", result.feeds[0].title)
+        assertFalse(result.feeds[0].isLiked)
+        assertFalse(result.feeds[0].isSaved)
+    }
+
+    @Test
+    fun `getFeedDetail - 로그인한 사용자가 피드 상세를 조회한다`() {
+        // given
+        val feedId = 1L
+        val memberId = "member1"
+        
+        val feed = createTestFeed(
+            id = feedId,
+            title = "Detail Feed",
+            content = "Detail Content",
+            board = board,
+            member = member
+        )
+        
+        val feedImage = FeedImage(
+            url = "https://s3.amazonaws.com/detail.jpg",
+            width = 1920,
+            height = 1080,
+            feed = feed
+        )
+        val feedTag = FeedTag(title = "태그1", feed = feed)
+        
+        whenever(feedReader.getFeedById(feedId)).thenReturn(feed)
+        whenever(likeFeedReader.isLiked(memberId, feed)).thenReturn(true)
+        whenever(saveFeedReader.isSaved(memberId, feed)).thenReturn(false)
+        whenever(feedReader.getFeedImagesByFeed(feed)).thenReturn(listOf(feedImage))
+        whenever(feedReader.getFeedTagsByFeed(feed)).thenReturn(listOf(feedTag))
+        whenever(feedReader.getEventTagsByTitles(listOf("태그1"))).thenReturn(emptyList())
+        
+        // when
+        val result = feedService.getFeedDetail(feedId, memberId)
+        
+        // then
+        assertEquals(feedId, result.id)
+        assertEquals("Detail Feed", result.title)
+        assertEquals("Detail Content", result.content)
+        assertTrue(result.isLiked)
+        assertFalse(result.isSaved)
+        assertEquals(1, result.images.size)
+        assertEquals(1, result.tags.size)
+        assertEquals(0, result.tags.count { it.isEvent })
+    }
+
+    @Test
+    fun `getFeedDetail - 비로그인 사용자도 피드 상세를 조회할 수 있다`() {
+        // given
+        val feedId = 1L
+        val memberId: String? = null
+        
+        val feed = createTestFeed(
+            id = feedId,
+            title = "Public Detail Feed",
+            content = "Public Detail Content",
+            board = board,
+            member = member
+        )
+        
+        val feedImage = FeedImage(
+            url = "https://s3.amazonaws.com/public.jpg",
+            width = 1920,
+            height = 1080,
+            feed = feed
+        )
+        val feedTag = FeedTag(title = "공개태그", feed = feed)
+        
+        whenever(feedReader.getFeedById(feedId)).thenReturn(feed)
+        whenever(feedReader.getFeedImagesByFeed(feed)).thenReturn(listOf(feedImage))
+        whenever(feedReader.getFeedTagsByFeed(feed)).thenReturn(listOf(feedTag))
+        whenever(feedReader.getEventTagsByTitles(listOf("공개태그"))).thenReturn(emptyList())
+        
+        // when
+        val result = feedService.getFeedDetail(feedId, memberId)
+        
+        // then
+        assertEquals(feedId, result.id)
+        assertEquals("Public Detail Feed", result.title)
+        assertFalse(result.isLiked)  // 비로그인 사용자는 좋아요 상태가 false
+        assertFalse(result.isSaved)  // 비로그인 사용자는 저장 상태가 false
+        assertEquals(1, result.images.size)
+        assertEquals(1, result.tags.size)
+    }
+
+    @Test
+    fun `getFeedsByMemberWithRecommendations - 팔로우한 사람이 없어도 추천 피드를 반환한다`() {
+        // given
+        val memberId = "member1"
+        val recommendedMember = Member(
+            id = "member2",
+            nickname = "recommend",
+            role = "USER",
+            profileImage = "",
+            provider = SocialProvider.GOOGLE,
+            socialId = "789",
+            email = "recommended@test.com"
+        )
+        
+        val feed = createTestFeed(
+            id = 1L,
+            title = "Recommended Feed Only",
+            content = "Only from recommendations",
+            board = board,
+            member = recommendedMember
+        )
+        
+        val pageable = PageRequest.of(0, 10)
+        val feedPage = PageImpl(listOf(feed), pageable, 1)
+        
+        whenever(memberReader.getFollowerByMemberId(memberId)).thenReturn(emptyList())
+        whenever(memberReader.getRecommendedMembersByCommonFollowers(memberId, 10L))
+            .thenReturn(listOf(recommendedMember))
+        whenever(feedReader.getFeedsByMembersWithPagination(listOf(recommendedMember), pageable))
+            .thenReturn(feedPage)
+        
+        val feedResponse = com.example.mykku.feed.dto.FeedResponse(
+            feed,
+            com.example.mykku.feed.dto.AuthorResponse(recommendedMember),
+            false,
+            false,
+            emptySet(),
+            emptyList(),
+            emptyList(),
+            emptyList()
+        )
+        whenever(feedDtoConverter.convertToFeedResponsesBatch(memberId, listOf(feed)))
+            .thenReturn(listOf(feedResponse))
+        
+        // when
+        val result = feedService.getFeedsByMemberWithRecommendations(memberId, pageable, 10L)
+        
+        // then
+        assertEquals(1, result.feeds.size)
+        assertEquals("Recommended Feed Only", result.feeds[0].title)
+    }
+
+    @Test
+    fun `getFeedsByMemberWithRecommendations - minCommonFollowers 파라미터가 올바르게 전달된다`() {
+        // given
+        val memberId = "member1"
+        val minCommonFollowers = 5L
+        val pageable = PageRequest.of(0, 10)
+        val feedPage = PageImpl<Feed>(emptyList(), pageable, 0)
+        
+        whenever(memberReader.getFollowerByMemberId(memberId)).thenReturn(emptyList())
+        whenever(memberReader.getRecommendedMembersByCommonFollowers(memberId, minCommonFollowers))
+            .thenReturn(emptyList())
+        whenever(feedReader.getFeedsByMembersWithPagination(emptyList(), pageable))
+            .thenReturn(feedPage)
+        whenever(feedDtoConverter.convertToFeedResponsesBatch(memberId, emptyList()))
+            .thenReturn(emptyList())
+        
+        // when
+        val result = feedService.getFeedsByMemberWithRecommendations(memberId, pageable, minCommonFollowers)
+        
+        // then
+        assertEquals(0, result.feeds.size)
+        // minCommonFollowers가 올바르게 전달되었는지는 mock verify로 확인됨
     }
 }

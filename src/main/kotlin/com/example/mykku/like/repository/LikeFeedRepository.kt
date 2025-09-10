@@ -12,4 +12,6 @@ interface LikeFeedRepository : JpaRepository<LikeFeed, Long> {
     fun existsByMemberIdAndFeedId(memberId: String, feedId: Long): Boolean
 
     fun deleteByMemberIdAndFeedId(memberId: String, feedId: Long)
+    
+    fun findByMemberIdAndFeedIdIn(memberId: String, feedIds: List<Long>): List<LikeFeed>
 }

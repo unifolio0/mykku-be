@@ -30,4 +30,11 @@ class MemberReader(
     fun existsByNickname(nickname: String): Boolean {
         return memberRepository.existsByNickname(nickname)
     }
+    
+    fun getRecommendedMembersByCommonFollowers(
+        memberId: String, 
+        minCommonFollowers: Long = 10
+    ): List<Member> {
+        return followRepository.findRecommendedMembersByCommonFollowers(memberId, minCommonFollowers)
+    }
 }
