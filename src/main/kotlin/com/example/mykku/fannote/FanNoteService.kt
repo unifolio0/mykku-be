@@ -20,7 +20,8 @@ class FanNoteService(
     }
 
     fun getFanNoteDetail(fanNoteId: Long): FanNoteDetailResponse {
-        val fanNote = fanNoteReader.findByIdWithPages(fanNoteId)
-        return FanNoteDetailResponse.from(fanNote)
+        val fanNote = fanNoteReader.findById(fanNoteId)
+        val pages = fanNoteReader.findPagesByFanNoteId(fanNoteId)
+        return FanNoteDetailResponse.from(fanNote, pages)
     }
 }

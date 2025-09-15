@@ -1,6 +1,7 @@
 package com.example.mykku.fannote.dto
 
 import com.example.mykku.fannote.domain.FanNote
+import com.example.mykku.fannote.domain.FanNotePage
 
 data class FanNoteDetailResponse(
     val id: Long,
@@ -12,7 +13,7 @@ data class FanNoteDetailResponse(
     val pages: List<FanNotePageResponse>
 ) {
     companion object {
-        fun from(fanNote: FanNote): FanNoteDetailResponse {
+        fun from(fanNote: FanNote, pages: List<FanNotePage>): FanNoteDetailResponse {
             return FanNoteDetailResponse(
                 id = fanNote.id,
                 title = fanNote.title,
@@ -20,7 +21,7 @@ data class FanNoteDetailResponse(
                 content = fanNote.content,
                 productionDate = fanNote.productionDate.toString(),
                 coverImageUrl = fanNote.coverImageUrl,
-                pages = fanNote.pages
+                pages = pages
                     .sortedBy { it.pageNumber }
                     .map { FanNotePageResponse.from(it) }
             )

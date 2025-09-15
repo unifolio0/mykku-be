@@ -5,6 +5,7 @@ import com.example.mykku.exception.MykkuException
 import com.example.mykku.fannote.domain.FanNote
 import com.example.mykku.fannote.domain.FanNotePage
 import com.example.mykku.fannote.repository.FanNoteRepository
+import com.example.mykku.fannote.repository.FanNotePageRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
@@ -25,6 +26,9 @@ class FanNoteReaderTest {
     @Mock
     private lateinit var fanNoteRepository: FanNoteRepository
 
+    @Mock
+    private lateinit var fanNotePageRepository: FanNotePageRepository
+
     @InjectMocks
     private lateinit var fanNoteReader: FanNoteReader
 
@@ -36,7 +40,7 @@ class FanNoteReaderTest {
         val fanNote2 = createFanNote(2L, "덕질노트2", LocalDate.of(2024, 1, 10))
         val fanNotePage = PageImpl(listOf(fanNote1, fanNote2), pageable, 2)
 
-        given(fanNoteRepository.findAllOrderByProductionDateDesc(pageable)).willReturn(fanNotePage)
+        given(fanNoteRepository.findAll(pageable)).willReturn(fanNotePage)
 
         // when
         val result = fanNoteReader.findAllWithPagination(pageable)
@@ -49,46 +53,60 @@ class FanNoteReaderTest {
         assertThat(result.content[1].title).isEqualTo("덕질노트2")
         assertThat(result.totalElements).isEqualTo(2)
 
-        verify(fanNoteRepository).findAllOrderByProductionDateDesc(pageable)
+        verify(fanNoteRepository).findAll(pageable)
     }
 
     @Test
-    fun `ID로 덕질노트와 페이지를 함께 조회한다`() {
+    fun `ID로 덕질노트를 조회한다`() {
         // given
         val fanNoteId = 1L
         val fanNote = createFanNote(fanNoteId, "덕질노트", LocalDate.of(2024, 1, 15))
-        val page1 = FanNotePage(1L, 1, "https://s3.amazonaws.com/mykku/page1.jpg")
-        val page2 = FanNotePage(2L, 2, "https://s3.amazonaws.com/mykku/page2.jpg")
-        fanNote.addPage(page1)
-        fanNote.addPage(page2)
 
-        given(fanNoteRepository.findByIdWithPages(fanNoteId)).willReturn(fanNote)
+        given(fanNoteRepository.findById(fanNoteId)).willReturn(java.util.Optional.of(fanNote))
 
         // when
-        val result = fanNoteReader.findByIdWithPages(fanNoteId)
+        val result = fanNoteReader.findById(fanNoteId)
 
         // then
         assertThat(result.id).isEqualTo(fanNoteId)
         assertThat(result.title).isEqualTo("덕질노트")
-        assertThat(result.pages).hasSize(2)
-        assertThat(result.pages[0].pageNumber).isEqualTo(1)
-        assertThat(result.pages[1].pageNumber).isEqualTo(2)
 
-        verify(fanNoteRepository).findByIdWithPages(fanNoteId)
+        verify(fanNoteRepository).findById(fanNoteId)
+    }
+
+    @Test
+    fun `덕질노트 ID로 페이지 목록을 조회한다`() {
+        // given
+        val fanNoteId = 1L
+        val page1 = FanNotePage(1L, 1, "https://s3.amazonaws.com/mykku/page1.jpg")
+        val page2 = FanNotePage(2L, 2, "https://s3.amazonaws.com/mykku/page2.jpg")
+        val pages = listOf(page1, page2)
+
+        given(fanNotePageRepository.findByFanNoteIdOrderByPageNumber(fanNoteId)).willReturn(pages)
+
+        // when
+        val result = fanNoteReader.findPagesByFanNoteId(fanNoteId)
+
+        // then
+        assertThat(result).hasSize(2)
+        assertThat(result[0].pageNumber).isEqualTo(1)
+        assertThat(result[1].pageNumber).isEqualTo(2)
+
+        verify(fanNotePageRepository).findByFanNoteIdOrderByPageNumber(fanNoteId)
     }
 
     @Test
     fun `존재하지 않는 덕질노트 조회 시 예외를 발생시킨다`() {
         // given
         val fanNoteId = 999L
-        given(fanNoteRepository.findByIdWithPages(fanNoteId)).willReturn(null)
+        given(fanNoteRepository.findById(fanNoteId)).willReturn(java.util.Optional.empty())
 
         // when & then
-        assertThatThrownBy { fanNoteReader.findByIdWithPages(fanNoteId) }
+        assertThatThrownBy { fanNoteReader.findById(fanNoteId) }
             .isInstanceOf(MykkuException::class.java)
             .hasFieldOrPropertyWithValue("errorCode", ErrorCode.FAN_NOTE_NOT_FOUND)
 
-        verify(fanNoteRepository).findByIdWithPages(fanNoteId)
+        verify(fanNoteRepository).findById(fanNoteId)
     }
 
     @Test

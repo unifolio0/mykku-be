@@ -1,10 +1,12 @@
 package com.example.mykku.fannote.repository
 
 import com.example.mykku.fannote.domain.FanNote
-import com.example.mykku.fannote.domain.FanNotePage
+import com.example.mykku.util.DatabaseCleaner
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.data.domain.PageRequest
@@ -12,6 +14,8 @@ import org.springframework.data.domain.Sort
 import java.time.LocalDate
 
 @DataJpaTest
+@ExtendWith(DatabaseCleaner::class)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class FanNoteRepositoryTest {
 
     @Autowired
@@ -48,7 +52,7 @@ class FanNoteRepositoryTest {
     }
 
     @Test
-    fun `덕질노트와 페이지를 함께 저장하고 조회한다`() {
+    fun `덕질노트를 저장하고 ID로 조회한다`() {
         // given
         val fanNote = FanNote(
             title = "웹툰 스타일 덕질노트",
@@ -58,28 +62,18 @@ class FanNoteRepositoryTest {
             coverImageUrl = "https://s3.amazonaws.com/mykku/cover.jpg"
         )
 
-        val page1 = FanNotePage(pageNumber = 1, imageUrl = "https://s3.amazonaws.com/mykku/page1.jpg")
-        val page2 = FanNotePage(pageNumber = 2, imageUrl = "https://s3.amazonaws.com/mykku/page2.jpg")
-        val page3 = FanNotePage(pageNumber = 3, imageUrl = "https://s3.amazonaws.com/mykku/page3.jpg")
-
-        fanNote.addPage(page1)
-        fanNote.addPage(page2)
-        fanNote.addPage(page3)
-
         // when
         val savedFanNote = fanNoteRepository.save(fanNote)
         testEntityManager.flush()
         testEntityManager.clear()
 
-        val foundFanNote = fanNoteRepository.findByIdWithPages(savedFanNote.id)
+        val foundFanNote = fanNoteRepository.findById(savedFanNote.id).orElse(null)
 
         // then
         assertThat(foundFanNote).isNotNull
-        assertThat(foundFanNote!!.pages).hasSize(3)
-        assertThat(foundFanNote.pages[0].pageNumber).isEqualTo(1)
-        assertThat(foundFanNote.pages[1].pageNumber).isEqualTo(2)
-        assertThat(foundFanNote.pages[2].pageNumber).isEqualTo(3)
-        assertThat(foundFanNote.pages[0].imageUrl).isEqualTo("https://s3.amazonaws.com/mykku/page1.jpg")
+        assertThat(foundFanNote.title).isEqualTo("웹툰 스타일 덕질노트")
+        assertThat(foundFanNote.subtitle).isEqualTo("옆으로 넘기는 만화")
+        assertThat(foundFanNote.content).isEqualTo("네이버 웹툰처럼 볼 수 있는 콘텐츠")
     }
 
     @Test
@@ -117,7 +111,8 @@ class FanNoteRepositoryTest {
 
         // when
         val pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "productionDate"))
-        val fanNotePage = fanNoteRepository.findAllOrderByProductionDateDesc(pageable)
+        val fanNotePage = fanNoteRepository.findAll(pageable)
+        println(fanNotePage.content.map { it.title })
 
         // then
         assertThat(fanNotePage.content).hasSize(3)
@@ -130,15 +125,15 @@ class FanNoteRepositoryTest {
     }
 
     @Test
-    fun `존재하지 않는 ID로 덕질노트 조회 시 null을 반환한다`() {
+    fun `존재하지 않는 ID로 덕질노트 조회 시 빈 Optional을 반환한다`() {
         // given
         val nonExistentId = 999L
 
         // when
-        val foundFanNote = fanNoteRepository.findByIdWithPages(nonExistentId)
+        val foundFanNote = fanNoteRepository.findById(nonExistentId)
 
         // then
-        assertThat(foundFanNote).isNull()
+        assertThat(foundFanNote).isEmpty
     }
 
     @Test
@@ -181,7 +176,8 @@ class FanNoteRepositoryTest {
 
         // when
         val firstPage = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "productionDate"))
-        val result = fanNoteRepository.findAllOrderByProductionDateDesc(firstPage)
+        val result = fanNoteRepository.findAll(firstPage)
+        result.content.forEach { println(it.title) }
 
         // then
         assertThat(result.content).hasSize(10)

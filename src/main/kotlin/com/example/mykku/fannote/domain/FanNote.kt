@@ -5,7 +5,6 @@ import jakarta.persistence.*
 import java.time.LocalDate
 
 @Entity
-@Table(name = "fan_notes")
 class FanNote(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,16 +23,8 @@ class FanNote(
     var productionDate: LocalDate,
 
     @Column(nullable = true, length = 500)
-    var coverImageUrl: String? = null,
-
-    @OneToMany(mappedBy = "fanNote", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val pages: MutableList<FanNotePage> = mutableListOf()
+    var coverImageUrl: String? = null
 ) : BaseEntity() {
-
-    fun addPage(page: FanNotePage) {
-        pages.add(page)
-        page.fanNote = this
-    }
 
     fun updateInfo(
         title: String,

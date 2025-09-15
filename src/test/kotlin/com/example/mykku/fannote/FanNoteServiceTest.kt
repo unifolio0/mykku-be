@@ -58,10 +58,10 @@ class FanNoteServiceTest {
         val fanNote = createFanNote(fanNoteId, "덕질노트", LocalDate.of(2024, 1, 1))
         val page1 = FanNotePage(1L, 1, "https://s3.amazonaws.com/mykku/page1.jpg")
         val page2 = FanNotePage(2L, 2, "https://s3.amazonaws.com/mykku/page2.jpg")
-        fanNote.addPage(page1)
-        fanNote.addPage(page2)
+        val pages = listOf(page1, page2)
 
-        given(fanNoteReader.findByIdWithPages(fanNoteId)).willReturn(fanNote)
+        given(fanNoteReader.findById(fanNoteId)).willReturn(fanNote)
+        given(fanNoteReader.findPagesByFanNoteId(fanNoteId)).willReturn(pages)
 
         // when
         val result = fanNoteService.getFanNoteDetail(fanNoteId)
@@ -74,14 +74,15 @@ class FanNoteServiceTest {
         assertThat(result.pages[0].imageUrl).isEqualTo("https://s3.amazonaws.com/mykku/page1.jpg")
         assertThat(result.pages[1].pageNumber).isEqualTo(2)
 
-        verify(fanNoteReader).findByIdWithPages(fanNoteId)
+        verify(fanNoteReader).findById(fanNoteId)
+        verify(fanNoteReader).findPagesByFanNoteId(fanNoteId)
     }
 
     @Test
     fun `존재하지 않는 덕질노트 조회 시 예외가 발생한다`() {
         // given
         val fanNoteId = 999L
-        given(fanNoteReader.findByIdWithPages(fanNoteId)).willThrow(MykkuException(ErrorCode.FAN_NOTE_NOT_FOUND))
+        given(fanNoteReader.findById(fanNoteId)).willThrow(MykkuException(ErrorCode.FAN_NOTE_NOT_FOUND))
 
         // when & then
         assertThatThrownBy { fanNoteService.getFanNoteDetail(fanNoteId) }
@@ -114,7 +115,8 @@ class FanNoteServiceTest {
         val fanNoteId = 1L
         val fanNote = createFanNote(fanNoteId, "페이지 없는 덕질노트", LocalDate.of(2024, 1, 1))
 
-        given(fanNoteReader.findByIdWithPages(fanNoteId)).willReturn(fanNote)
+        given(fanNoteReader.findById(fanNoteId)).willReturn(fanNote)
+        given(fanNoteReader.findPagesByFanNoteId(fanNoteId)).willReturn(emptyList())
 
         // when
         val result = fanNoteService.getFanNoteDetail(fanNoteId)
@@ -124,7 +126,8 @@ class FanNoteServiceTest {
         assertThat(result.title).isEqualTo("페이지 없는 덕질노트")
         assertThat(result.pages).isEmpty()
 
-        verify(fanNoteReader).findByIdWithPages(fanNoteId)
+        verify(fanNoteReader).findById(fanNoteId)
+        verify(fanNoteReader).findPagesByFanNoteId(fanNoteId)
     }
 
     private fun createFanNote(id: Long, title: String, productionDate: LocalDate): FanNote {

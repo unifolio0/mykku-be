@@ -4,7 +4,6 @@ import com.example.mykku.common.domain.BaseEntity
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "fan_note_pages")
 class FanNotePage(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

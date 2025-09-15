@@ -3,6 +3,7 @@ package com.example.mykku.dailymessage.repository
 import com.example.mykku.dailymessage.domain.DailyMessage
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.data.domain.PageRequest
 import java.time.LocalDate
@@ -10,6 +11,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class DailyMessageRepositoryTest {
 
     @Autowired

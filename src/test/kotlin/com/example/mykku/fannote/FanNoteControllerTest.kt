@@ -2,11 +2,12 @@ package com.example.mykku.fannote
 
 import com.example.mykku.fannote.domain.FanNote
 import com.example.mykku.fannote.domain.FanNotePage
+import com.example.mykku.fannote.repository.FanNotePageRepository
 import com.example.mykku.fannote.repository.FanNoteRepository
 import com.example.mykku.util.DatabaseCleaner
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -29,10 +30,12 @@ class FanNoteControllerTest {
     @Autowired
     private lateinit var fanNoteRepository: FanNoteRepository
 
+    @Autowired
+    private lateinit var fanNotePageRepository: FanNotePageRepository
+
     @BeforeEach
     fun setUp() {
         RestAssured.port = port
-        fanNoteRepository.deleteAll()
     }
 
     @Test
@@ -82,10 +85,30 @@ class FanNoteControllerTest {
             productionDate = LocalDate.of(2024, 1, 1),
             coverImageUrl = "https://s3.amazonaws.com/mykku/cover.jpg"
         )
-        fanNote.addPage(FanNotePage(pageNumber = 1, imageUrl = "https://s3.amazonaws.com/mykku/page1.jpg"))
-        fanNote.addPage(FanNotePage(pageNumber = 2, imageUrl = "https://s3.amazonaws.com/mykku/page2.jpg"))
-        fanNote.addPage(FanNotePage(pageNumber = 3, imageUrl = "https://s3.amazonaws.com/mykku/page3.jpg"))
         val savedFanNote = fanNoteRepository.save(fanNote)
+
+        // 페이지 데이터 별도 저장
+        fanNotePageRepository.save(
+            FanNotePage(
+                pageNumber = 1,
+                imageUrl = "https://s3.amazonaws.com/mykku/page1.jpg",
+                fanNote = savedFanNote
+            )
+        )
+        fanNotePageRepository.save(
+            FanNotePage(
+                pageNumber = 2,
+                imageUrl = "https://s3.amazonaws.com/mykku/page2.jpg",
+                fanNote = savedFanNote
+            )
+        )
+        fanNotePageRepository.save(
+            FanNotePage(
+                pageNumber = 3,
+                imageUrl = "https://s3.amazonaws.com/mykku/page3.jpg",
+                fanNote = savedFanNote
+            )
+        )
 
         // when & then
         RestAssured.given()

@@ -26,16 +26,16 @@ class DatabaseCleaner : BeforeEachCallback {
     }
 
     private fun truncateTables(em: EntityManager) {
-        // H2 데이터베이스의 경우 외래 키 검사 비활성화
-        em.createNativeQuery("SET REFERENTIAL_INTEGRITY FALSE").executeUpdate()
-        
+        // MySQL의 경우 외래 키 검사 비활성화
+        em.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0").executeUpdate()
+
         val tableNames = findTableNames(em)
         tableNames.forEach { tableName ->
             em.createNativeQuery("TRUNCATE TABLE $tableName").executeUpdate()
         }
-        
-        // H2 데이터베이스의 경우 외래 키 검사 다시 활성화
-        em.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE").executeUpdate()
+
+        // MySQL의 경우 외래 키 검사 다시 활성화
+        em.createNativeQuery("SET FOREIGN_KEY_CHECKS = 1").executeUpdate()
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -43,12 +43,12 @@ class DatabaseCleaner : BeforeEachCallback {
         val tableNameSelectQuery = """
             SELECT TABLE_NAME
             FROM INFORMATION_SCHEMA.TABLES
-            WHERE TABLE_SCHEMA = 'PUBLIC'
-            AND TABLE_TYPE = 'TABLE'
-            AND TABLE_NAME NOT LIKE 'FLYWAY_%'
+            WHERE TABLE_SCHEMA = DATABASE()
+            AND TABLE_TYPE = 'BASE TABLE'
+            AND TABLE_NAME NOT LIKE 'flyway_%'
         """.trimIndent()
 
-        return em.createNativeQuery(tableNameSelectQuery)
-            .resultList as List<String>
+        val results = em.createNativeQuery(tableNameSelectQuery).resultList
+        return results.map { it.toString() }
     }
 }

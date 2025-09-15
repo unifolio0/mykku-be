@@ -6,6 +6,40 @@ MyKKU는 덕질 커뮤니티 플랫폼의 백엔드 서비스입니다.
 
 ## Architecture and Dependency Rules
 
+### JPA Entity Relationship Rules
+
+#### OneToMany 관계 사용 금지
+- **절대 OneToMany 관계를 사용하지 마세요**
+- 부모 엔티티에서 자식 컬렉션을 관리하는 것은 성능 및 메모리 문제를 야기할 수 있습니다
+- 대신 다음 패턴을 사용하세요:
+  - 자식 엔티티에서 ManyToOne 관계만 사용
+  - 부모 엔티티의 자식들이 필요한 경우, 별도의 Repository 메서드로 조회
+  - Tool 계층에서 부모와 자식을 각각 조회하여 Service에서 조합
+
+#### 예시
+```kotlin
+// ❌ 잘못된 예시 - OneToMany 사용
+@Entity
+class FanNote {
+    @OneToMany(mappedBy = "fanNote")
+    val pages: List<FanNotePage> = mutableListOf()
+}
+
+// ✅ 올바른 예시 - ManyToOne만 사용
+@Entity
+class FanNotePage {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fan_note_id")
+    var fanNote: FanNote? = null
+}
+
+// Tool 계층에서 별도 조회
+class FanNoteReader {
+    fun findById(id: Long): FanNote { ... }
+    fun findPagesByFanNoteId(fanNoteId: Long): List<FanNotePage> { ... }
+}
+```
+
 ### Layer Architecture
 
 이 프로젝트는 명확한 계층 구조를 따릅니다. 각 계층은 특정한 의존성 규칙을 준수해야 합니다:
