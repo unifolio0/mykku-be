@@ -90,4 +90,8 @@ enum class ErrorCode(val status: HttpStatus, val message: String) {
     // Auth
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증이 필요합니다"),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다"),
+
+    // FanNote
+    FAN_NOTE_NOT_FOUND(HttpStatus.NOT_FOUND, "덕질노트를 찾을 수 없습니다"),
+    FAN_NOTE_PAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "덕질노트 페이지를 찾을 수 없습니다"),
 }

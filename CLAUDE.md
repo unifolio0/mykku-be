@@ -181,9 +181,86 @@ src/main/kotlin/com/example/mykku/
     - [ ] 테스트 커버리지 확인
     - [ ] RestDocs 문서화
 
+## Testing Requirements
+
+새로운 기능을 추가할 때는 **반드시** 다음 5가지 계층의 테스트를 모두 작성해야 합니다:
+
+### 1. RestDocsTest
+- **위치**: `src/test/kotlin/com/example/mykku/docs/[Domain]ControllerRestDocsTest.kt`
+- **상속**: `BaseControllerRestDocsTest`를 상속
+- **목적**: API 문서 자동 생성
+- **필수 요소**:
+  - `@Mock` Service 주입
+  - `@InjectMocks` Controller 주입
+  - MockMvcBuilders.standaloneSetup() 사용
+  - document() 메서드로 API 문서화
+  - 요청/응답 필드 상세 설명
+
+### 2. ControllerTest
+- **위치**: `src/test/kotlin/com/example/mykku/[domain]/[Domain]ControllerTest.kt`
+- **어노테이션**: `@WebMvcTest([Domain]Controller::class)`
+- **목적**: Controller 단위 테스트
+- **필수 요소**:
+  - `@MockBean` Service 주입
+  - HTTP 요청/응답 검증
+  - 에러 케이스 테스트
+
+### 3. ServiceTest
+- **위치**: `src/test/kotlin/com/example/mykku/[domain]/[Domain]ServiceTest.kt`
+- **어노테이션**: `@ExtendWith(MockitoExtension::class)`
+- **목적**: 비즈니스 로직 테스트
+- **필수 요소**:
+  - `@Mock` Tool 계층 주입
+  - `@InjectMocks` Service 주입
+  - 정상 케이스와 예외 케이스 테스트
+
+### 4. ToolTest
+- **위치**: `src/test/kotlin/com/example/mykku/[domain]/tool/[Tool]Test.kt`
+- **어노테이션**: `@ExtendWith(MockitoExtension::class)`
+- **목적**: 데이터 접근 로직 테스트
+- **필수 요소**:
+  - `@Mock` Repository 주입
+  - `@InjectMocks` Tool (Reader/Writer) 주입
+  - 데이터 변환 로직 검증
+
+### 5. RepositoryTest
+- **위치**: `src/test/kotlin/com/example/mykku/[domain]/repository/[Domain]RepositoryTest.kt`
+- **어노테이션**: `@DataJpaTest`
+- **목적**: 실제 데이터베이스 쿼리 테스트
+- **필수 요소**:
+  - TestEntityManager 사용
+  - 실제 JPA 쿼리 동작 검증
+  - 커스텀 쿼리 메서드 테스트
+
+### API 문서화 (RestDocs)
+
+RestDocsTest 작성 후 반드시:
+1. `src/docs/asciidoc/index.adoc` 파일에 API 섹션 추가
+2. operation 스니펫 참조 추가
+3. 다음 형식 준수:
+```asciidoc
+[[domain-api]]
+== 도메인 API
+
+=== API 이름
+
+API 설명
+
+operation::operation-name[snippets='http-request,request-fields,http-response,response-fields']
+```
+
+### 테스트 작성 체크리스트
+- [ ] RestDocsTest 작성 및 API 문서 생성
+- [ ] ControllerTest로 엔드포인트 검증
+- [ ] ServiceTest로 비즈니스 로직 검증
+- [ ] ToolTest로 데이터 접근 로직 검증
+- [ ] RepositoryTest로 실제 쿼리 동작 확인
+- [ ] index.adoc에 API 문서 섹션 추가
+
 ## Important Notes
 
 - **절대 Service에서 Repository를 직접 주입하지 마세요**
 - **Controller에서는 오직 Service만 사용하세요**
 - **복잡한 쿼리는 Tool 계층에 캡슐화하세요**
 - **페이지네이션은 항상 적용을 고려하세요**
+- **모든 기능은 5계층 테스트를 완전히 구현하세요**
