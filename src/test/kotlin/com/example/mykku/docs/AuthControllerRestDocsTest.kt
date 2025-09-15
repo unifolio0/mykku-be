@@ -54,7 +54,8 @@ class AuthControllerRestDocsTest : BaseControllerRestDocsTest() {
                 email = "user@gmail.com",
                 nickname = "홍길동",
                 profileImage = "https://lh3.googleusercontent.com/profile.jpg"
-            )
+            ),
+            isExistingUser = true
         )
 
         `when`(authService.handleMobileLogin(request)).thenReturn(loginResponse)
@@ -92,7 +93,8 @@ class AuthControllerRestDocsTest : BaseControllerRestDocsTest() {
                         fieldWithPath("data.member.email").type(JsonFieldType.STRING).description("회원 이메일"),
                         fieldWithPath("data.member.nickname").type(JsonFieldType.STRING).description("회원 닉네임"),
                         fieldWithPath("data.member.profileImage").type(JsonFieldType.STRING).description("프로필 이미지 URL")
-                            .optional()
+                            .optional(),
+                        fieldWithPath("data.isExistingUser").type(JsonFieldType.BOOLEAN).description("기존 가입자 여부 (true: 기존 가입자, false: 신규 가입자)")
                     )
                 )
             )
@@ -117,7 +119,8 @@ class AuthControllerRestDocsTest : BaseControllerRestDocsTest() {
                 email = "user@kakao.com",
                 nickname = "카카오사용자",
                 profileImage = "http://k.kakaocdn.net/profile.jpg"
-            )
+            ),
+            isExistingUser = true
         )
 
         `when`(authService.handleMobileLogin(request)).thenReturn(loginResponse)
@@ -157,7 +160,8 @@ class AuthControllerRestDocsTest : BaseControllerRestDocsTest() {
                 email = "user@privaterelay.appleid.com",
                 nickname = "애플사용자",
                 profileImage = ""
-            )
+            ),
+            isExistingUser = true
         )
 
         `when`(authService.handleMobileLogin(request)).thenReturn(loginResponse)

@@ -6,5 +6,6 @@ data class LoginResponse(
     val tokenType: String = "Bearer",
     val accessTokenExpiresIn: Long,
     val refreshTokenExpiresIn: Long,
-    val member: MemberInfo
+    val member: MemberInfo,
+    val isExistingUser: Boolean
 )

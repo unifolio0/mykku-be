@@ -45,7 +45,7 @@ class JwtTokenProvider(
             .compact()
     }
 
-    fun createLoginResponse(member: Member, userEmail: String): LoginResponse {
+    fun createLoginResponse(member: Member, userEmail: String, isExistingUser: Boolean): LoginResponse {
         val accessToken = generateAccessToken(member.id, userEmail)
         val refreshToken = generateRefreshToken(member.id)
 
@@ -59,7 +59,8 @@ class JwtTokenProvider(
                 email = userEmail,
                 nickname = member.nickname,
                 profileImage = member.profileImage
-            )
+            ),
+            isExistingUser = isExistingUser
         )
     }
 

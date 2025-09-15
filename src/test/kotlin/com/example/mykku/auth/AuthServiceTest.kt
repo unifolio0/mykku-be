@@ -79,12 +79,13 @@ class AuthServiceTest {
                 email = member.email,
                 nickname = member.nickname,
                 profileImage = member.profileImage
-            )
+            ),
+            isExistingUser = true
         )
 
         whenever(googleOauthClient.verifyAndGetUserInfo("google_token")).thenReturn(userInfo)
         whenever(memberReader.findById("google_123456")).thenReturn(Optional.of(member))
-        whenever(jwtTokenProvider.createLoginResponse(member, userInfo.email)).thenReturn(loginResponse)
+        whenever(jwtTokenProvider.createLoginResponse(member, userInfo.email, true)).thenReturn(loginResponse)
 
         // when
         val result = authService.handleMobileLogin(request)
@@ -141,12 +142,13 @@ class AuthServiceTest {
                 email = member.email,
                 nickname = member.nickname,
                 profileImage = member.profileImage
-            )
+            ),
+            isExistingUser = true
         )
 
         whenever(kakaoOauthClient.verifyAndGetUserInfo("kakao_token")).thenReturn(userInfo)
         whenever(memberReader.findById("kakao_123456")).thenReturn(Optional.of(member))
-        whenever(jwtTokenProvider.createLoginResponse(member, "test@kakao.com")).thenReturn(loginResponse)
+        whenever(jwtTokenProvider.createLoginResponse(member, "test@kakao.com", true)).thenReturn(loginResponse)
 
         // when
         val result = authService.handleMobileLogin(request)
@@ -183,7 +185,8 @@ class AuthServiceTest {
                 email = member.email,
                 nickname = member.nickname,
                 profileImage = member.profileImage
-            )
+            ),
+            isExistingUser = true
         )
 
         whenever(appleOauthClient.verifyAndGetUserInfo("apple_token")).thenReturn(userInfo)
@@ -191,7 +194,8 @@ class AuthServiceTest {
         whenever(
             jwtTokenProvider.createLoginResponse(
                 member,
-                "test@privaterelay.appleid.com"
+                "test@privaterelay.appleid.com",
+                true
             )
         ).thenReturn(loginResponse)
 
@@ -246,13 +250,14 @@ class AuthServiceTest {
                 email = newMember.email,
                 nickname = newMember.nickname,
                 profileImage = newMember.profileImage
-            )
+            ),
+            isExistingUser = false
         )
 
         whenever(googleOauthClient.verifyAndGetUserInfo("google_token")).thenReturn(userInfo)
         whenever(memberReader.findById("google_123456")).thenReturn(Optional.empty())
         whenever(memberWriter.save(any<Member>())).thenReturn(newMember)
-        whenever(jwtTokenProvider.createLoginResponse(newMember, userInfo.email)).thenReturn(loginResponse)
+        whenever(jwtTokenProvider.createLoginResponse(newMember, userInfo.email, false)).thenReturn(loginResponse)
 
         // when
         val request = MobileLoginRequest(provider = SocialProvider.GOOGLE, accessToken = "google_token", idToken = null)
@@ -309,12 +314,13 @@ class AuthServiceTest {
                 email = member.email,
                 nickname = member.nickname,
                 profileImage = member.profileImage
-            )
+            ),
+            isExistingUser = true
         )
 
         whenever(kakaoOauthClient.verifyAndGetUserInfo("kakao_token")).thenReturn(userInfo)
         whenever(memberReader.findById("kakao_123456")).thenReturn(Optional.of(member))
-        whenever(jwtTokenProvider.createLoginResponse(member, "kakao_123456@kakao.com")).thenReturn(loginResponse)
+        whenever(jwtTokenProvider.createLoginResponse(member, "kakao_123456@kakao.com", true)).thenReturn(loginResponse)
 
         // when
         val request = MobileLoginRequest(provider = SocialProvider.KAKAO, accessToken = "kakao_token", idToken = null)
@@ -351,7 +357,8 @@ class AuthServiceTest {
                 email = member.email,
                 nickname = member.nickname,
                 profileImage = member.profileImage
-            )
+            ),
+            isExistingUser = true
         )
 
         whenever(appleOauthClient.verifyAndGetUserInfo("apple_token")).thenReturn(userInfo)
@@ -359,7 +366,8 @@ class AuthServiceTest {
         whenever(
             jwtTokenProvider.createLoginResponse(
                 member,
-                "apple_apple.user.123456@privaterelay.appleid.com"
+                "apple_apple.user.123456@privaterelay.appleid.com",
+                true
             )
         ).thenReturn(loginResponse)
 

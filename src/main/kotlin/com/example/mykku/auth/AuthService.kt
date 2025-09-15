@@ -59,29 +59,32 @@ class AuthService(
 
     private fun handleGoogleMobileLogin(accessToken: String): LoginResponse {
         val userInfo = googleOauthClient.verifyAndGetUserInfo(accessToken)
-        val member = createOrUpdateMember(userInfo)
-        return jwtTokenProvider.createLoginResponse(member, userInfo.email)
+        val (member, isExistingUser) = createOrUpdateMember(userInfo)
+        return jwtTokenProvider.createLoginResponse(member, userInfo.email, isExistingUser)
     }
 
     private fun handleKakaoMobileLogin(accessToken: String): LoginResponse {
         val userInfo = kakaoOauthClient.verifyAndGetUserInfo(accessToken)
-        val member = createOrUpdateKakaoMember(userInfo)
+        val (member, isExistingUser) = createOrUpdateKakaoMember(userInfo)
         val email = userInfo.kakaoAccount?.email ?: "kakao_${userInfo.id}@kakao.com"
-        return jwtTokenProvider.createLoginResponse(member, email)
+        return jwtTokenProvider.createLoginResponse(member, email, isExistingUser)
     }
 
     private fun handleAppleMobileLogin(idToken: String): LoginResponse {
         val userInfo = appleOauthClient.verifyAndGetUserInfo(idToken)
-        val member = createOrUpdateAppleMember(userInfo)
+        val (member, isExistingUser) = createOrUpdateAppleMember(userInfo)
         val email = userInfo.email ?: "apple_${userInfo.sub}@privaterelay.appleid.com"
-        return jwtTokenProvider.createLoginResponse(member, email)
+        return jwtTokenProvider.createLoginResponse(member, email, isExistingUser)
     }
 
-    private fun createOrUpdateMember(userInfo: GoogleUserInfo): Member {
+    private fun createOrUpdateMember(userInfo: GoogleUserInfo): Pair<Member, Boolean> {
         val memberId = "google_${userInfo.id}"
+        val existingMember = memberReader.findById(memberId)
 
-        return memberReader.findById(memberId).orElseGet {
-            createNewMember(
+        return if (existingMember.isPresent) {
+            Pair(existingMember.get(), true)
+        } else {
+            val newMember = createNewMember(
                 id = memberId,
                 nickname = userInfo.name,
                 profileImage = userInfo.picture ?: "",
@@ -89,17 +92,21 @@ class AuthService(
                 socialId = userInfo.id,
                 email = userInfo.email
             )
+            Pair(newMember, false)
         }
     }
 
-    private fun createOrUpdateKakaoMember(userInfo: KakaoUserInfo): Member {
+    private fun createOrUpdateKakaoMember(userInfo: KakaoUserInfo): Pair<Member, Boolean> {
         val memberId = "kakao_${userInfo.id}"
         val nickname = userInfo.properties?.nickname ?: userInfo.kakaoAccount?.profile?.nickname ?: "카카오사용자"
         val profileImage = userInfo.properties?.profileImage ?: userInfo.kakaoAccount?.profile?.profileImageUrl ?: ""
         val email = userInfo.kakaoAccount?.email ?: "kakao_${userInfo.id}@kakao.com"
+        val existingMember = memberReader.findById(memberId)
 
-        return memberReader.findById(memberId).orElseGet {
-            createNewMember(
+        return if (existingMember.isPresent) {
+            Pair(existingMember.get(), true)
+        } else {
+            val newMember = createNewMember(
                 id = memberId,
                 nickname = nickname,
                 profileImage = profileImage,
@@ -107,17 +114,21 @@ class AuthService(
                 socialId = userInfo.id.toString(),
                 email = email
             )
+            Pair(newMember, false)
         }
     }
 
 
-    private fun createOrUpdateAppleMember(userInfo: AppleUserInfo): Member {
+    private fun createOrUpdateAppleMember(userInfo: AppleUserInfo): Pair<Member, Boolean> {
         val memberId = "apple_${userInfo.sub}"
         val nickname = "애플사용자"
         val email = userInfo.email ?: "apple_${userInfo.sub}@privaterelay.appleid.com"
+        val existingMember = memberReader.findById(memberId)
 
-        return memberReader.findById(memberId).orElseGet {
-            createNewMember(
+        return if (existingMember.isPresent) {
+            Pair(existingMember.get(), true)
+        } else {
+            val newMember = createNewMember(
                 id = memberId,
                 nickname = nickname,
                 profileImage = "",
@@ -125,6 +136,7 @@ class AuthService(
                 socialId = userInfo.sub,
                 email = email
             )
+            Pair(newMember, false)
         }
     }
 
