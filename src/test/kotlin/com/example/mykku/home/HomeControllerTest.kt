@@ -111,9 +111,6 @@ class HomeControllerTest {
             .then()
             .extract().response()
 
-        println("Status Code: ${response.statusCode}")
-        println("Response Body: ${response.body.asString()}")
-
         response.then()
             .statusCode(200)
             .body("message", equalTo("홈 데이터 불러오기에 성공했습니다."))

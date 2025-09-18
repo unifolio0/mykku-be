@@ -112,7 +112,6 @@ class FanNoteRepositoryTest {
         // when
         val pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "productionDate"))
         val fanNotePage = fanNoteRepository.findAll(pageable)
-        println(fanNotePage.content.map { it.title })
 
         // then
         assertThat(fanNotePage.content).hasSize(3)
@@ -177,7 +176,6 @@ class FanNoteRepositoryTest {
         // when
         val firstPage = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "productionDate"))
         val result = fanNoteRepository.findAll(firstPage)
-        result.content.forEach { println(it.title) }
 
         // then
         assertThat(result.content).hasSize(10)
