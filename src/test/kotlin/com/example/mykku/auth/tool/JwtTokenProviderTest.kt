@@ -148,7 +148,7 @@ class JwtTokenProviderTest {
         val userEmail = "test@example.com"
 
         // when
-        val loginResponse = jwtTokenProvider.createLoginResponse(member, userEmail)
+        val loginResponse = jwtTokenProvider.createLoginResponse(member, userEmail, true)
 
         // then
         assertNotNull(loginResponse.accessToken)

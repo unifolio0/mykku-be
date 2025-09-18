@@ -6,7 +6,7 @@ import java.util.*
 
 object TestTokenGenerator {
     
-    private const val SECRET_KEY = "test-secret-key-should-be-very-long-and-secure-at-least-32-characters-long"
+    private const val SECRET_KEY = "your-secret-key-should-be-very-long-and-secure-at-least-32-characters-long"
     private const val EXPIRATION_TIME = 86400000L // 24 hours
     
     private val secretKey = Keys.hmacShaKeyFor(SECRET_KEY.toByteArray())

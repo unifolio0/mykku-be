@@ -229,6 +229,29 @@ CREATE TABLE IF NOT EXISTS contest_winner (
     FOREIGN KEY (event_id) REFERENCES event(id) ON DELETE CASCADE
 );
 
+-- Create FanNotes table
+CREATE TABLE IF NOT EXISTS fan_note (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(100) NOT NULL,
+    subtitle VARCHAR(200),
+    content TEXT,
+    production_date DATE NOT NULL,
+    cover_image_url VARCHAR(500),
+    created_at DATETIME(6) NOT NULL,
+    updated_at DATETIME(6) NOT NULL
+);
+
+-- Create FanNotePages table
+CREATE TABLE IF NOT EXISTS fan_note_page (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    page_number INT NOT NULL,
+    image_url VARCHAR(500) NOT NULL,
+    fan_note_id BIGINT NOT NULL,
+    created_at DATETIME(6) NOT NULL,
+    updated_at DATETIME(6) NOT NULL,
+    FOREIGN KEY (fan_note_id) REFERENCES fan_notes(id) ON DELETE CASCADE
+);
+
 -- Create indexes for better performance
 CREATE INDEX idx_feed_board_id ON feed(board_id);
 CREATE INDEX idx_feed_member_id ON feed(member_id);
@@ -239,3 +262,5 @@ CREATE INDEX idx_daily_message_comment_member_id ON daily_message_comment(member
 CREATE INDEX idx_follow_follower_id ON follow(follower_id);
 CREATE INDEX idx_follow_following_id ON follow(following_id);
 CREATE INDEX idx_daily_message_date ON daily_message(date);
+CREATE INDEX idx_fan_note_pages_fan_note_id ON fan_note_page(fan_note_id);
+CREATE INDEX idx_fan_notes_production_date ON fan_note(production_date);
