@@ -4,8 +4,8 @@ import com.example.mykku.exception.ErrorCode
 import com.example.mykku.exception.MykkuException
 import com.example.mykku.fannote.domain.FanNote
 import com.example.mykku.fannote.domain.FanNotePage
-import com.example.mykku.fannote.repository.FanNoteRepository
 import com.example.mykku.fannote.repository.FanNotePageRepository
+import com.example.mykku.fannote.repository.FanNoteRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
@@ -78,8 +78,13 @@ class FanNoteReaderTest {
     fun `덕질노트 ID로 페이지 목록을 조회한다`() {
         // given
         val fanNoteId = 1L
-        val page1 = FanNotePage(1L, 1, "https://s3.amazonaws.com/mykku/page1.jpg")
-        val page2 = FanNotePage(2L, 2, "https://s3.amazonaws.com/mykku/page2.jpg")
+        val mockFanNote = FanNote(
+            id = fanNoteId,
+            title = "테스트 덕질노트",
+            productionDate = LocalDate.now()
+        )
+        val page1 = FanNotePage(1L, 1, "https://s3.amazonaws.com/mykku/page1.jpg", mockFanNote)
+        val page2 = FanNotePage(2L, 2, "https://s3.amazonaws.com/mykku/page2.jpg", mockFanNote)
         val pages = listOf(page1, page2)
 
         given(fanNotePageRepository.findByFanNoteIdOrderByPageNumber(fanNoteId)).willReturn(pages)

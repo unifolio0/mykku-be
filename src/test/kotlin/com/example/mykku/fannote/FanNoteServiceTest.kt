@@ -56,8 +56,9 @@ class FanNoteServiceTest {
         // given
         val fanNoteId = 1L
         val fanNote = createFanNote(fanNoteId, "덕질노트", LocalDate.of(2024, 1, 1))
-        val page1 = FanNotePage(1L, 1, "https://s3.amazonaws.com/mykku/page1.jpg")
-        val page2 = FanNotePage(2L, 2, "https://s3.amazonaws.com/mykku/page2.jpg")
+        val page1 = FanNotePage(1L, 1, "https://s3.amazonaws.com/mykku/page1.jpg", fanNote)
+        val page2 = FanNotePage(2L, 2, "https://s3.amazonaws.com/mykku/page2.jpg", fanNote)
+
         val pages = listOf(page1, page2)
 
         given(fanNoteReader.findById(fanNoteId)).willReturn(fanNote)

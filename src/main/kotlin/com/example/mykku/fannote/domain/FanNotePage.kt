@@ -17,7 +17,7 @@ class FanNotePage(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fan_note_id", nullable = false)
-    var fanNote: FanNote? = null
+    var fanNote: FanNote
 ) : BaseEntity() {
 
     fun updatePage(pageNumber: Int, imageUrl: String) {
