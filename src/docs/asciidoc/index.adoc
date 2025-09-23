@@ -70,6 +70,12 @@ operation::auth-mobile-login-kakao[snippets='http-request,http-response']
 
 operation::auth-mobile-login-apple[snippets='http-request,http-response']
 
+=== 모바일 네이버 로그인
+
+모바일 앱에서 네이버 액세스 토큰을 사용하여 로그인합니다.
+
+operation::auth-mobile-login-naver[snippets='http-request,request-fields,http-response,response-fields']
+
 === 토큰 갱신
 
 리프레시 토큰을 사용하여 새로운 액세스 토큰을 발급받습니다.
