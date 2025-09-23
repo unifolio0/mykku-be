@@ -26,138 +26,123 @@ class AuthService(
 
     @Transactional
     fun refreshAccessToken(request: RefreshTokenRequest): RefreshTokenResponse {
-        val refreshToken = request.refreshToken
-        
-        if (!jwtTokenProvider.validateToken(refreshToken)) {
-            throw MykkuException(ErrorCode.OAUTH_INVALID_TOKEN)
-        }
-        
-        if (!jwtTokenProvider.isRefreshToken(refreshToken)) {
-            throw MykkuException(ErrorCode.OAUTH_INVALID_TOKEN)
-        }
-        
-        val memberId = jwtTokenProvider.getMemberIdFromToken(refreshToken)
+        validateRefreshToken(request.refreshToken)
+        val memberId = jwtTokenProvider.getMemberIdFromToken(request.refreshToken)
         val member = memberReader.getMemberById(memberId)
-        
-        val newAccessToken = jwtTokenProvider.generateAccessToken(member.id, member.email)
-        
+
         return RefreshTokenResponse(
-            accessToken = newAccessToken,
+            accessToken = jwtTokenProvider.generateAccessToken(member.id, member.email),
             expiresIn = jwtTokenProvider.jwtProperties.accessTokenExpiration
         )
     }
-    
+
     @Transactional
     fun handleMobileLogin(request: MobileLoginRequest): LoginResponse {
         return when (request.provider) {
-            SocialProvider.GOOGLE -> handleGoogleMobileLogin(request.accessToken!!) // validation이 init에서 되미로 안전
-            SocialProvider.KAKAO -> handleKakaoMobileLogin(request.accessToken!!) // validation이 init에서 되미로 안전
-            SocialProvider.APPLE -> handleAppleMobileLogin(request.idToken!!) // validation이 init에서 되미로 안전
+            SocialProvider.GOOGLE -> handleGoogleMobileLogin(request.accessToken!!)
+            SocialProvider.KAKAO -> handleKakaoMobileLogin(request.accessToken!!)
+            SocialProvider.APPLE -> handleAppleMobileLogin(request.idToken!!)
             SocialProvider.NAVER -> throw MykkuException(ErrorCode.OAUTH_EXTERNAL_SERVICE_ERROR)
+        }
+    }
+
+    private fun validateRefreshToken(refreshToken: String) {
+        if (!jwtTokenProvider.validateToken(refreshToken) || !jwtTokenProvider.isRefreshToken(refreshToken)) {
+            throw MykkuException(ErrorCode.OAUTH_INVALID_TOKEN)
         }
     }
 
     private fun handleGoogleMobileLogin(accessToken: String): LoginResponse {
         val userInfo = googleOauthClient.verifyAndGetUserInfo(accessToken)
-        val (member, isExistingUser) = createOrUpdateMember(userInfo)
-        return jwtTokenProvider.createLoginResponse(member, userInfo.email, isExistingUser)
+        val memberInfo = extractGoogleMemberInfo(userInfo)
+        return processOAuthLogin(memberInfo)
     }
 
     private fun handleKakaoMobileLogin(accessToken: String): LoginResponse {
         val userInfo = kakaoOauthClient.verifyAndGetUserInfo(accessToken)
-        val (member, isExistingUser) = createOrUpdateKakaoMember(userInfo)
-        val email = userInfo.kakaoAccount?.email ?: "kakao_${userInfo.id}@kakao.com"
-        return jwtTokenProvider.createLoginResponse(member, email, isExistingUser)
+        val memberInfo = extractKakaoMemberInfo(userInfo)
+        return processOAuthLogin(memberInfo)
     }
 
     private fun handleAppleMobileLogin(idToken: String): LoginResponse {
         val userInfo = appleOauthClient.verifyAndGetUserInfo(idToken)
-        val (member, isExistingUser) = createOrUpdateAppleMember(userInfo)
-        val email = userInfo.email ?: "apple_${userInfo.sub}@privaterelay.appleid.com"
-        return jwtTokenProvider.createLoginResponse(member, email, isExistingUser)
+        val memberInfo = extractAppleMemberInfo(userInfo)
+        return processOAuthLogin(memberInfo)
     }
 
-    private fun createOrUpdateMember(userInfo: GoogleUserInfo): Pair<Member, Boolean> {
-        val memberId = "google_${userInfo.id}"
-        val existingMember = memberReader.findById(memberId)
+    private fun extractGoogleMemberInfo(userInfo: GoogleUserInfo): OAuthMemberInfo {
+        return OAuthMemberInfo(
+            memberId = "google_${userInfo.id}",
+            nickname = userInfo.name,
+            profileImage = userInfo.picture ?: "",
+            provider = SocialProvider.GOOGLE,
+            socialId = userInfo.id,
+            email = userInfo.email
+        )
+    }
+
+    private fun extractKakaoMemberInfo(userInfo: KakaoUserInfo): OAuthMemberInfo {
+        return OAuthMemberInfo(
+            memberId = "kakao_${userInfo.id}",
+            nickname = userInfo.properties?.nickname
+                ?: userInfo.kakaoAccount?.profile?.nickname
+                ?: "카카오사용자",
+            profileImage = userInfo.properties?.profileImage
+                ?: userInfo.kakaoAccount?.profile?.profileImageUrl
+                ?: "",
+            provider = SocialProvider.KAKAO,
+            socialId = userInfo.id.toString(),
+            email = userInfo.kakaoAccount?.email ?: "kakao_${userInfo.id}@kakao.com"
+        )
+    }
+
+    private fun extractAppleMemberInfo(userInfo: AppleUserInfo): OAuthMemberInfo {
+        return OAuthMemberInfo(
+            memberId = "apple_${userInfo.sub}",
+            nickname = "애플사용자",
+            profileImage = "",
+            provider = SocialProvider.APPLE,
+            socialId = userInfo.sub,
+            email = userInfo.email ?: "apple_${userInfo.sub}@privaterelay.appleid.com"
+        )
+    }
+
+    private fun processOAuthLogin(memberInfo: OAuthMemberInfo): LoginResponse {
+        val (member, isExistingUser) = findOrCreateMember(memberInfo)
+        return jwtTokenProvider.createLoginResponse(member, memberInfo.email, isExistingUser)
+    }
+
+    private fun findOrCreateMember(memberInfo: OAuthMemberInfo): Pair<Member, Boolean> {
+        val existingMember = memberReader.findById(memberInfo.memberId)
 
         return if (existingMember.isPresent) {
             Pair(existingMember.get(), true)
         } else {
-            val newMember = createNewMember(
-                id = memberId,
-                nickname = userInfo.name,
-                profileImage = userInfo.picture ?: "",
-                provider = SocialProvider.GOOGLE,
-                socialId = userInfo.id,
-                email = userInfo.email
-            )
+            val newMember = createNewMember(memberInfo)
             Pair(newMember, false)
         }
     }
 
-    private fun createOrUpdateKakaoMember(userInfo: KakaoUserInfo): Pair<Member, Boolean> {
-        val memberId = "kakao_${userInfo.id}"
-        val nickname = userInfo.properties?.nickname ?: userInfo.kakaoAccount?.profile?.nickname ?: "카카오사용자"
-        val profileImage = userInfo.properties?.profileImage ?: userInfo.kakaoAccount?.profile?.profileImageUrl ?: ""
-        val email = userInfo.kakaoAccount?.email ?: "kakao_${userInfo.id}@kakao.com"
-        val existingMember = memberReader.findById(memberId)
-
-        return if (existingMember.isPresent) {
-            Pair(existingMember.get(), true)
-        } else {
-            val newMember = createNewMember(
-                id = memberId,
-                nickname = nickname,
-                profileImage = profileImage,
-                provider = SocialProvider.KAKAO,
-                socialId = userInfo.id.toString(),
-                email = email
-            )
-            Pair(newMember, false)
-        }
-    }
-
-
-    private fun createOrUpdateAppleMember(userInfo: AppleUserInfo): Pair<Member, Boolean> {
-        val memberId = "apple_${userInfo.sub}"
-        val nickname = "애플사용자"
-        val email = userInfo.email ?: "apple_${userInfo.sub}@privaterelay.appleid.com"
-        val existingMember = memberReader.findById(memberId)
-
-        return if (existingMember.isPresent) {
-            Pair(existingMember.get(), true)
-        } else {
-            val newMember = createNewMember(
-                id = memberId,
-                nickname = nickname,
-                profileImage = "",
-                provider = SocialProvider.APPLE,
-                socialId = userInfo.sub,
-                email = email
-            )
-            Pair(newMember, false)
-        }
-    }
-
-    private fun createNewMember(
-        id: String,
-        nickname: String,
-        profileImage: String,
-        provider: SocialProvider,
-        socialId: String,
-        email: String
-    ): Member {
+    private fun createNewMember(memberInfo: OAuthMemberInfo): Member {
         return memberWriter.save(
             Member(
-                id = id,
-                nickname = nickname,
+                id = memberInfo.memberId,
+                nickname = memberInfo.nickname,
                 role = "USER",
-                profileImage = profileImage,
-                provider = provider,
-                socialId = socialId,
-                email = email
+                profileImage = memberInfo.profileImage,
+                provider = memberInfo.provider,
+                socialId = memberInfo.socialId,
+                email = memberInfo.email
             )
         )
     }
+
+    private data class OAuthMemberInfo(
+        val memberId: String,
+        val nickname: String,
+        val profileImage: String,
+        val provider: SocialProvider,
+        val socialId: String,
+        val email: String
+    )
 }
