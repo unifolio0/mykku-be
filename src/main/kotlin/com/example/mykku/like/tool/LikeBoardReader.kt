@@ -1,7 +1,6 @@
 package com.example.mykku.like.tool
 
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.like.exception.LikeException
 import com.example.mykku.like.domain.LikeBoard
 import com.example.mykku.like.repository.LikeBoardRepository
 import org.springframework.stereotype.Component
@@ -12,13 +11,13 @@ class LikeBoardReader(
 ) {
     fun validateLikeBoardNotExists(memberId: String, boardId: Long) {
         if (likeBoardRepository.existsByMemberIdAndBoardId(memberId, boardId)) {
-            throw MykkuException(ErrorCode.LIKE_BOARD_ALREADY_LIKED)
+            throw LikeException.likeBoardAlreadyLiked()
         }
     }
 
     fun validateLikeBoardExists(memberId: String, boardId: Long) {
         if (!likeBoardRepository.existsByMemberIdAndBoardId(memberId, boardId)) {
-            throw MykkuException(ErrorCode.LIKE_BOARD_NOT_FOUND)
+            throw LikeException.likeBoardNotFound()
         }
     }
 

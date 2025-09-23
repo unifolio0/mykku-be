@@ -7,8 +7,8 @@ import com.example.mykku.board.dto.CreateBoardRequest
 import com.example.mykku.board.dto.CreateBoardResponse
 import com.example.mykku.board.dto.UpdateBoardRequest
 import com.example.mykku.board.dto.UpdateBoardResponse
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.board.exception.BoardException
+import com.example.mykku.board.exception.BoardErrorCode
 import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
@@ -148,7 +148,7 @@ class BoardControllerRestDocsTest : BaseControllerRestDocsTest() {
         )
 
         `when`(boardService.createBoard(request, "member123"))
-            .thenThrow(MykkuException(ErrorCode.BOARD_DUPLICATE_TITLE))
+            .thenThrow(BoardException(BoardErrorCode.BOARD_DUPLICATE_TITLE))
 
         // when & then
         mockMvc.perform(
@@ -188,7 +188,7 @@ class BoardControllerRestDocsTest : BaseControllerRestDocsTest() {
         )
 
         `when`(boardService.updateBoard(request, boardId, "member123"))
-            .thenThrow(MykkuException(ErrorCode.BOARD_NOT_FOUND))
+            .thenThrow(BoardException(BoardErrorCode.BOARD_NOT_FOUND))
 
         // when & then
         mockMvc.perform(

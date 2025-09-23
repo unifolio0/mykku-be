@@ -1,7 +1,7 @@
 package com.example.mykku.fannote
 
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.fannote.exception.FanNoteException
+import com.example.mykku.fannote.exception.FanNoteErrorCode
 import com.example.mykku.fannote.domain.FanNote
 import com.example.mykku.fannote.domain.FanNotePage
 import com.example.mykku.fannote.tool.FanNoteReader
@@ -83,11 +83,11 @@ class FanNoteServiceTest {
     fun `존재하지 않는 덕질노트 조회 시 예외가 발생한다`() {
         // given
         val fanNoteId = 999L
-        given(fanNoteReader.findById(fanNoteId)).willThrow(MykkuException(ErrorCode.FAN_NOTE_NOT_FOUND))
+        given(fanNoteReader.findById(fanNoteId)).willThrow(FanNoteException(FanNoteErrorCode.FAN_NOTE_NOT_FOUND))
 
         // when & then
         assertThatThrownBy { fanNoteService.getFanNoteDetail(fanNoteId) }
-            .isInstanceOf(MykkuException::class.java)
+            .isInstanceOf(FanNoteException::class.java)
             .hasMessageContaining("덕질노트를 찾을 수 없습니다")
     }
 

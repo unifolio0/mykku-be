@@ -1,7 +1,7 @@
 package com.example.mykku
 
 import com.example.mykku.auth.resolver.TestMemberArgumentResolver
-import com.example.mykku.exception.GlobalExceptionHandler
+import com.example.mykku.common.exception.BaseExceptionHandler
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
@@ -39,7 +39,7 @@ abstract class BaseControllerRestDocsTest {
 
     protected abstract fun createMockMvcBuilder(): StandaloneMockMvcBuilder
 
-    protected open fun getControllerAdvice(): Any? = GlobalExceptionHandler()
+    protected open fun getControllerAdvice(): Any? = BaseExceptionHandler()
 
     private fun getDocumentationConfiguration(restDocumentation: RestDocumentationContextProvider) =
         documentationConfiguration(restDocumentation)

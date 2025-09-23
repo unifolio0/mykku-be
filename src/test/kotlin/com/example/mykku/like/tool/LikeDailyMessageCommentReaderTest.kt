@@ -1,7 +1,7 @@
 package com.example.mykku.like.tool
 
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.like.exception.LikeException
+import com.example.mykku.like.exception.LikeErrorCode
 import com.example.mykku.like.repository.LikeDailyMessageCommentRepository
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -29,11 +29,11 @@ class LikeDailyMessageCommentReaderTest {
         whenever(likeDailyMessageCommentRepository.existsByMemberIdAndDailyMessageCommentId(memberId, dailyMessageCommentId))
             .thenReturn(true)
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<LikeException> {
             likeDailyMessageCommentReader.validateLikeDailyMessageCommentNotExists(memberId, dailyMessageCommentId)
         }
 
-        assertEquals(ErrorCode.LIKE_DAILY_MESSAGE_COMMENT_ALREADY_LIKED, exception.errorCode)
+        assertEquals(LikeErrorCode.LIKE_DAILY_MESSAGE_COMMENT_ALREADY_LIKED, exception.errorCode)
     }
 
     @Test
@@ -55,11 +55,11 @@ class LikeDailyMessageCommentReaderTest {
         whenever(likeDailyMessageCommentRepository.existsByMemberIdAndDailyMessageCommentId(memberId, dailyMessageCommentId))
             .thenReturn(false)
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<LikeException> {
             likeDailyMessageCommentReader.validateLikeDailyMessageCommentExists(memberId, dailyMessageCommentId)
         }
 
-        assertEquals(ErrorCode.LIKE_DAILY_MESSAGE_COMMENT_NOT_FOUND, exception.errorCode)
+        assertEquals(LikeErrorCode.LIKE_DAILY_MESSAGE_COMMENT_NOT_FOUND, exception.errorCode)
     }
 
     @Test

@@ -2,8 +2,8 @@ package com.example.mykku.auth.resolver
 
 import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.auth.tool.JwtTokenProvider
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.auth.exception.AuthException
+import com.example.mykku.auth.exception.AuthErrorCode
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.repository.MemberRepository
@@ -101,10 +101,10 @@ class MemberArgumentResolverTest {
         whenever(request.getHeader("Authorization")).thenReturn(null)
 
         // when & then
-        assertThrows<MykkuException> {
+        assertThrows<AuthException> {
             resolver.resolveArgument(parameter, null, webRequest, null)
         }.also { exception ->
-            assertEquals(ErrorCode.UNAUTHORIZED, exception.errorCode)
+            assertEquals(AuthErrorCode.UNAUTHORIZED, exception.errorCode)
         }
     }
 
@@ -134,10 +134,10 @@ class MemberArgumentResolverTest {
         whenever(jwtTokenProvider.validateToken(token)).thenReturn(false)
 
         // when & then
-        assertThrows<MykkuException> {
+        assertThrows<AuthException> {
             resolver.resolveArgument(parameter, null, webRequest, null)
         }.also { exception ->
-            assertEquals(ErrorCode.UNAUTHORIZED, exception.errorCode)
+            assertEquals(AuthErrorCode.UNAUTHORIZED, exception.errorCode)
         }
     }
 
@@ -247,10 +247,10 @@ class MemberArgumentResolverTest {
         whenever(webRequest.getNativeRequest(HttpServletRequest::class.java)).thenReturn(null)
 
         // when & then
-        assertThrows<MykkuException> {
+        assertThrows<AuthException> {
             resolver.resolveArgument(parameter, null, webRequest, null)
         }.also { exception ->
-            assertEquals(ErrorCode.UNAUTHORIZED, exception.errorCode)
+            assertEquals(AuthErrorCode.UNAUTHORIZED, exception.errorCode)
         }
     }
 

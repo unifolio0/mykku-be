@@ -1,8 +1,8 @@
 package com.example.mykku.feed.tool
 
 import com.example.mykku.board.domain.Board
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.feed.exception.FeedException
+import com.example.mykku.feed.exception.FeedErrorCode
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedComment
 import com.example.mykku.feed.repository.FeedCommentRepository
@@ -76,11 +76,11 @@ class FeedCommentReaderTest {
         whenever(feedCommentRepository.findById(commentId))
             .thenReturn(Optional.empty())
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<FeedException> {
             feedCommentReader.getFeedCommentById(commentId)
         }
 
-        assertEquals(ErrorCode.FEED_COMMENT_NOT_FOUND, exception.errorCode)
+        assertEquals(FeedErrorCode.FEED_COMMENT_NOT_FOUND, exception.errorCode)
     }
 
     @Test

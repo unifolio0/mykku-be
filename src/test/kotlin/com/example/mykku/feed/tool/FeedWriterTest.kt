@@ -1,8 +1,8 @@
 package com.example.mykku.feed.tool
 
 import com.example.mykku.board.domain.Board
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.feed.exception.FeedException
+import com.example.mykku.feed.exception.FeedErrorCode
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedImage
 import com.example.mykku.feed.domain.FeedTag
@@ -97,11 +97,11 @@ class FeedWriterTest {
         }
         val tagTitles = listOf("태그1")
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<FeedException> {
             feedWriter.createFeed("테스트 피드", "테스트 내용", board, member, imageResults, tagTitles)
         }
 
-        assertEquals(ErrorCode.FEED_IMAGE_LIMIT_EXCEEDED, exception.errorCode)
+        assertEquals(FeedErrorCode.FEED_IMAGE_LIMIT_EXCEEDED, exception.errorCode)
     }
 
     @Test
@@ -111,11 +111,11 @@ class FeedWriterTest {
         val imageResults = listOf(ImageUploadResult(url = "image.jpg", width = 100, height = 100))
         val tagTitles = List(Feed.TAG_MAX_COUNT + 1) { "태그$it" }
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<FeedException> {
             feedWriter.createFeed("테스트 피드", "테스트 내용", board, member, imageResults, tagTitles)
         }
 
-        assertEquals(ErrorCode.FEED_TAG_LIMIT_EXCEEDED, exception.errorCode)
+        assertEquals(FeedErrorCode.FEED_TAG_LIMIT_EXCEEDED, exception.errorCode)
     }
 
     @Test
@@ -137,11 +137,11 @@ class FeedWriterTest {
         
         whenever(feedRepository.save(any<Feed>())).thenReturn(mockFeed)
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<FeedException> {
             feedWriter.createFeed("테스트 피드", "테스트 내용", board, member, imageResults, tagTitles)
         }
 
-        assertEquals(ErrorCode.IMAGE_INVALID_DIMENSIONS, exception.errorCode)
+        assertEquals(FeedErrorCode.IMAGE_INVALID_DIMENSIONS, exception.errorCode)
     }
 
     @Test

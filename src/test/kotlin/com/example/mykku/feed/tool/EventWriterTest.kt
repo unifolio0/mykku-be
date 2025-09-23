@@ -1,7 +1,7 @@
 package com.example.mykku.feed.tool
 
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.feed.exception.FeedException
+import com.example.mykku.feed.exception.FeedErrorCode
 import com.example.mykku.feed.domain.Event
 import com.example.mykku.feed.domain.EventImage
 import com.example.mykku.feed.domain.EventTag
@@ -105,11 +105,11 @@ class EventWriterTest {
         }
         val tagTitles = listOf("태그1")
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<FeedException> {
             eventWriter.createEvent(title, isContest, expiredAt, imageRequests, tagTitles)
         }
 
-        assertEquals(ErrorCode.EVENT_IMAGE_LIMIT_EXCEEDED, exception.errorCode)
+        assertEquals(FeedErrorCode.EVENT_IMAGE_LIMIT_EXCEEDED, exception.errorCode)
     }
 
     @Test
@@ -120,11 +120,11 @@ class EventWriterTest {
         val imageRequests = emptyList<EventImageRequest>()
         val tagTitles = List(Event.TAG_MAX_COUNT + 1) { "태그$it" }
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<FeedException> {
             eventWriter.createEvent(title, isContest, expiredAt, imageRequests, tagTitles)
         }
 
-        assertEquals(ErrorCode.EVENT_TAG_LIMIT_EXCEEDED, exception.errorCode)
+        assertEquals(FeedErrorCode.EVENT_TAG_LIMIT_EXCEEDED, exception.errorCode)
     }
 
     @Test

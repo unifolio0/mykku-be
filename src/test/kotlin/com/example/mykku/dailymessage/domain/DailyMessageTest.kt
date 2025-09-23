@@ -1,7 +1,7 @@
 package com.example.mykku.dailymessage.domain
 
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.dailymessage.exception.DailyMessageException
+import com.example.mykku.dailymessage.exception.DailyMessageErrorCode
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
@@ -24,7 +24,7 @@ class DailyMessageTest {
     fun `content가 최대 길이를 초과하면 예외가 발생한다`() {
         val invalidContent = "r".repeat(DailyMessage.CONTENT_MAX_LENGTH + 1)
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<DailyMessageException> {
             DailyMessage(
                 title = "오늘의 메시지",
                 content = invalidContent,
@@ -32,6 +32,6 @@ class DailyMessageTest {
             )
         }
         
-        assertEquals(ErrorCode.DAILY_MESSAGE_CONTENT_TOO_LONG, exception.errorCode)
+        assertEquals(DailyMessageErrorCode.DAILY_MESSAGE_CONTENT_TOO_LONG, exception.errorCode)
     }
 }

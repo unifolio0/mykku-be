@@ -1,8 +1,7 @@
 package com.example.mykku.feed.domain
 
 import com.example.mykku.common.domain.BaseEntity
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.member.domain.Member
 import jakarta.persistence.*
 
@@ -36,7 +35,7 @@ class FeedComment(
 
     init {
         if (content.length > CONTENT_MAX_LENGTH) {
-            throw MykkuException(ErrorCode.FEED_COMMENT_CONTENT_TOO_LONG)
+            throw FeedException.feedCommentContentTooLong()
         }
     }
 }

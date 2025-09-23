@@ -1,7 +1,7 @@
 package com.example.mykku.feed.domain
 
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.feed.exception.FeedException
+import com.example.mykku.feed.exception.FeedErrorCode
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.time.LocalDateTime
@@ -30,11 +30,11 @@ class EventTagTest {
         val event = createTestEvent()
         val invalidTitle = "r".repeat(EventTag.TITLE_MAX_LENGTH + 1)
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<FeedException> {
             EventTag(title = invalidTitle, event = event)
         }
         
-        assertEquals(ErrorCode.TAG_TITLE_TOO_LONG, exception.errorCode)
+        assertEquals(FeedErrorCode.TAG_TITLE_TOO_LONG, exception.errorCode)
     }
 
     @Test
@@ -50,21 +50,21 @@ class EventTagTest {
     fun `특수문자가 포함된 title이면 예외가 발생한다`() {
         val event = createTestEvent()
         
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<FeedException> {
             EventTag(title = "태그!", event = event)
         }
         
-        assertEquals(ErrorCode.TAG_INVALID_FORMAT, exception.errorCode)
+        assertEquals(FeedErrorCode.TAG_INVALID_FORMAT, exception.errorCode)
     }
 
     @Test
     fun `공백이 포함된 title이면 예외가 발생한다`() {
         val event = createTestEvent()
         
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<FeedException> {
             EventTag(title = "태그 테스트", event = event)
         }
         
-        assertEquals(ErrorCode.TAG_INVALID_FORMAT, exception.errorCode)
+        assertEquals(FeedErrorCode.TAG_INVALID_FORMAT, exception.errorCode)
     }
 }

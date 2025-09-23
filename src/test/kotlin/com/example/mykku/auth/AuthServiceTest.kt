@@ -6,8 +6,8 @@ import com.example.mykku.auth.tool.GoogleOauthClient
 import com.example.mykku.auth.tool.JwtTokenProvider
 import com.example.mykku.auth.tool.KakaoOauthClient
 import com.example.mykku.auth.tool.NaverOauthClient
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.auth.exception.AuthException
+import com.example.mykku.auth.exception.AuthErrorCode
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.tool.MemberReader

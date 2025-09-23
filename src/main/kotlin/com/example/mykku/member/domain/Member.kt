@@ -1,8 +1,7 @@
 package com.example.mykku.member.domain
 
 import com.example.mykku.common.domain.BaseEntity
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.member.exception.MemberException
 import jakarta.persistence.*
 
 @Entity
@@ -42,10 +41,10 @@ class Member(
 
     init {
         if (nickname.length > NICKNAME_MAX_LENGTH) {
-            throw MykkuException(ErrorCode.MEMBER_NICKNAME_TOO_LONG)
+            throw MemberException.memberNicknameTooLong()
         }
         if (!VALID_NICKNAME_PATTERN.matches(nickname)) {
-            throw MykkuException(ErrorCode.MEMBER_NICKNAME_INVALID_FORMAT)
+            throw MemberException.memberNicknameInvalidFormat()
         }
     }
 }

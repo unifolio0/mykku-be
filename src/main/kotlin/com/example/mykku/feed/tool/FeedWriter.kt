@@ -1,8 +1,7 @@
 package com.example.mykku.feed.tool
 
 import com.example.mykku.board.domain.Board
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedImage
 import com.example.mykku.feed.domain.FeedTag
@@ -32,7 +31,7 @@ class FeedWriter(
     ): Triple<Feed, List<FeedImage>, List<FeedTag>> {
         // 이미지 개수 제한 검증
         if (imageResults.size > Feed.IMAGE_MAX_COUNT) {
-            throw MykkuException(ErrorCode.FEED_IMAGE_LIMIT_EXCEEDED)
+            throw FeedException.feedImageLimitExceeded()
         }
 
         val normalizedDistinctTags = tagTitles.asSequence()
@@ -43,7 +42,7 @@ class FeedWriter(
 
         // 태그 개수 제한 검증
         if (normalizedDistinctTags.size > Feed.TAG_MAX_COUNT) {
-            throw MykkuException(ErrorCode.FEED_TAG_LIMIT_EXCEEDED)
+            throw FeedException.feedTagLimitExceeded()
         }
 
         val feed = Feed(
@@ -59,7 +58,7 @@ class FeedWriter(
         val feedImages = imageResults.map { imageResult ->
             // 이미지 크기 검증
             if (imageResult.width <= 0 || imageResult.height <= 0) {
-                throw MykkuException(ErrorCode.IMAGE_INVALID_DIMENSIONS)
+                throw FeedException.imageInvalidDimensions()
             }
 
             FeedImage(

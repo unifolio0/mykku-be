@@ -1,8 +1,7 @@
 package com.example.mykku.dailymessage.domain
 
 import com.example.mykku.common.domain.BaseEntity
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.dailymessage.exception.DailyMessageException
 import com.example.mykku.member.domain.Member
 import jakarta.persistence.*
 
@@ -36,13 +35,13 @@ class DailyMessageComment(
 
     init {
         if (content.length > CONTENT_MAX_LENGTH) {
-            throw MykkuException(ErrorCode.DAILY_MESSAGE_COMMENT_CONTENT_TOO_LONG)
+            throw DailyMessageException.dailyMessageCommentContentTooLong()
         }
     }
     
     fun updateContent(newContent: String) {
         if (newContent.length > CONTENT_MAX_LENGTH) {
-            throw MykkuException(ErrorCode.DAILY_MESSAGE_COMMENT_CONTENT_TOO_LONG)
+            throw DailyMessageException.dailyMessageCommentContentTooLong()
         }
         this.content = newContent
     }

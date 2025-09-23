@@ -1,8 +1,7 @@
 package com.example.mykku.dailymessage.domain
 
 import com.example.mykku.common.domain.BaseEntity
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.dailymessage.exception.DailyMessageException
 import jakarta.persistence.*
 import java.time.LocalDate
 
@@ -27,7 +26,7 @@ class DailyMessage(
 
     init {
         if (content.length > CONTENT_MAX_LENGTH) {
-            throw MykkuException(ErrorCode.DAILY_MESSAGE_CONTENT_TOO_LONG)
+            throw DailyMessageException.dailyMessageContentTooLong()
         }
     }
 }

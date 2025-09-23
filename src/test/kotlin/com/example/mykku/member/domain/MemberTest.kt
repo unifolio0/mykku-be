@@ -1,7 +1,7 @@
 package com.example.mykku.member.domain
 
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.member.exception.MemberException
+import com.example.mykku.member.exception.MemberErrorCode
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
@@ -27,7 +27,7 @@ class MemberTest {
     fun `nickname이 최대 길이를 초과하면 예외가 발생한다`() {
         val invalidNickname = "r".repeat(Member.NICKNAME_MAX_LENGTH + 1)
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<MemberException> {
             Member(
                 id = "test_member",
                 nickname = invalidNickname,
@@ -39,7 +39,7 @@ class MemberTest {
             )
         }
 
-        assertEquals(ErrorCode.MEMBER_NICKNAME_TOO_LONG, exception.errorCode)
+        assertEquals(MemberErrorCode.MEMBER_NICKNAME_TOO_LONG, exception.errorCode)
     }
 
     @Test
@@ -77,7 +77,7 @@ class MemberTest {
 
     @Test
     fun `특수문자가 포함된 nickname이면 예외가 발생한다`() {
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<MemberException> {
             Member(
                 id = "test_member",
                 nickname = "닉네임!",
@@ -89,6 +89,6 @@ class MemberTest {
             )
         }
 
-        assertEquals(ErrorCode.MEMBER_NICKNAME_INVALID_FORMAT, exception.errorCode)
+        assertEquals(MemberErrorCode.MEMBER_NICKNAME_INVALID_FORMAT, exception.errorCode)
     }
 }

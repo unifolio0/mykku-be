@@ -2,8 +2,8 @@ package com.example.mykku.auth.tool
 
 import com.example.mykku.auth.dto.NaverUserInfo
 import com.example.mykku.auth.dto.NaverUserResponse
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.auth.exception.AuthException
+import com.example.mykku.auth.exception.AuthErrorCode
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
@@ -98,11 +98,11 @@ class NaverOauthClientTest {
         whenever(requestHeadersSpec.retrieve()).thenReturn(responseSpec)
         whenever(responseSpec.body(NaverUserInfo::class.java)).thenReturn(failedUserInfo)
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<AuthException> {
             naverOauthClient.verifyAndGetUserInfo(accessToken)
         }
 
-        assertEquals(ErrorCode.OAUTH_USER_INFO_FAILED, exception.errorCode)
+        assertEquals(AuthErrorCode.OAUTH_USER_INFO_FAILED, exception.errorCode)
     }
 
     @Test
@@ -123,11 +123,11 @@ class NaverOauthClientTest {
             .thenReturn(requestHeadersSpec)
         whenever(requestHeadersSpec.retrieve()).thenThrow(httpException)
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<AuthException> {
             naverOauthClient.verifyAndGetUserInfo(accessToken)
         }
 
-        assertEquals(ErrorCode.OAUTH_INVALID_TOKEN, exception.errorCode)
+        assertEquals(AuthErrorCode.OAUTH_INVALID_TOKEN, exception.errorCode)
     }
 
     @Test
@@ -148,11 +148,11 @@ class NaverOauthClientTest {
             .thenReturn(requestHeadersSpec)
         whenever(requestHeadersSpec.retrieve()).thenThrow(httpException)
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<AuthException> {
             naverOauthClient.verifyAndGetUserInfo(accessToken)
         }
 
-        assertEquals(ErrorCode.OAUTH_ACCESS_DENIED, exception.errorCode)
+        assertEquals(AuthErrorCode.OAUTH_ACCESS_DENIED, exception.errorCode)
     }
 
     @Test
@@ -173,11 +173,11 @@ class NaverOauthClientTest {
             .thenReturn(requestHeadersSpec)
         whenever(requestHeadersSpec.retrieve()).thenThrow(httpException)
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<AuthException> {
             naverOauthClient.verifyAndGetUserInfo(accessToken)
         }
 
-        assertEquals(ErrorCode.OAUTH_SERVER_ERROR, exception.errorCode)
+        assertEquals(AuthErrorCode.OAUTH_SERVER_ERROR, exception.errorCode)
     }
 
     @Test
@@ -192,10 +192,10 @@ class NaverOauthClientTest {
         whenever(requestHeadersSpec.retrieve()).thenReturn(responseSpec)
         whenever(responseSpec.body(NaverUserInfo::class.java)).thenReturn(null)
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<AuthException> {
             naverOauthClient.verifyAndGetUserInfo(accessToken)
         }
 
-        assertEquals(ErrorCode.OAUTH_USER_INFO_FAILED, exception.errorCode)
+        assertEquals(AuthErrorCode.OAUTH_USER_INFO_FAILED, exception.errorCode)
     }
 }

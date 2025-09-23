@@ -6,8 +6,7 @@ import com.example.mykku.auth.tool.GoogleOauthClient
 import com.example.mykku.auth.tool.JwtTokenProvider
 import com.example.mykku.auth.tool.KakaoOauthClient
 import com.example.mykku.auth.tool.NaverOauthClient
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.auth.exception.AuthException
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.tool.MemberReader
@@ -50,7 +49,7 @@ class AuthService(
 
     private fun validateRefreshToken(refreshToken: String) {
         if (!jwtTokenProvider.validateToken(refreshToken) || !jwtTokenProvider.isRefreshToken(refreshToken)) {
-            throw MykkuException(ErrorCode.OAUTH_INVALID_TOKEN)
+            throw AuthException.oauthInvalidToken()
         }
     }
 

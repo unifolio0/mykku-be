@@ -1,8 +1,7 @@
 package com.example.mykku.board.domain
 
 import com.example.mykku.common.domain.BaseEntity
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.board.exception.BoardException
 import jakarta.persistence.*
 
 @Entity
@@ -23,7 +22,7 @@ class Board(
 
     init {
         if (title.length > TITLE_MAX_LENGTH) {
-            throw MykkuException(ErrorCode.BOARD_TITLE_TOO_LONG)
+            throw BoardException.boardTitleTooLong()
         }
     }
 }

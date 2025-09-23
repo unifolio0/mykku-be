@@ -3,8 +3,7 @@ package com.example.mykku.feed
 import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.common.util.PageableValidator
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.feed.dto.*
 import com.example.mykku.member.domain.Member
 import jakarta.validation.Valid
@@ -54,7 +53,7 @@ class FeedController(
 
     private fun validateImageCount(imageCount: Int) {
         if (imageCount > CreateFeedRequest.MAX_IMAGE_COUNT) {
-            throw MykkuException(ErrorCode.FEED_IMAGE_LIMIT_EXCEEDED)
+            throw FeedException.feedImageLimitExceeded()
         }
     }
 

@@ -2,8 +2,7 @@ package com.example.mykku.auth.resolver
 
 import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.auth.tool.JwtTokenProvider
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.auth.exception.AuthException
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.repository.MemberRepository
 import jakarta.servlet.http.HttpServletRequest
@@ -61,7 +60,7 @@ class MemberArgumentResolver(
         return if (annotation != null && !annotation.required) {
             null
         } else {
-            throw MykkuException(ErrorCode.UNAUTHORIZED)
+            throw AuthException.unauthorized()
         }
     }
 

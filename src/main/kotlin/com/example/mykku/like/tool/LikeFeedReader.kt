@@ -1,7 +1,6 @@
 package com.example.mykku.like.tool
 
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.like.exception.LikeException
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.like.repository.LikeFeedRepository
 import org.springframework.stereotype.Component
@@ -16,13 +15,13 @@ class LikeFeedReader(
 
     fun validateLikeFeedNotExists(memberId: String, feedId: Long) {
         if (likeFeedRepository.existsByMemberIdAndFeedId(memberId, feedId)) {
-            throw MykkuException(ErrorCode.LIKE_FEED_ALREADY_LIKED)
+            throw LikeException.likeFeedAlreadyLiked()
         }
     }
 
     fun validateLikeFeedExists(memberId: String, feedId: Long) {
         if (!likeFeedRepository.existsByMemberIdAndFeedId(memberId, feedId)) {
-            throw MykkuException(ErrorCode.LIKE_FEED_NOT_FOUND)
+            throw LikeException.likeFeedNotFound()
         }
     }
     

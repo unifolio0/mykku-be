@@ -1,7 +1,6 @@
 package com.example.mykku.feed.tool
 
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.feed.domain.Event
 import com.example.mykku.feed.domain.EventImage
 import com.example.mykku.feed.domain.EventTag
@@ -30,7 +29,7 @@ class EventWriter(
     ): Triple<Event, List<EventImage>, List<EventTag>> {
         // 이미지 개수 제한 검증
         if (imageRequests.size > Event.IMAGE_MAX_COUNT) {
-            throw MykkuException(ErrorCode.EVENT_IMAGE_LIMIT_EXCEEDED)
+            throw FeedException.eventImageLimitExceeded()
         }
 
         // 태그 유효성 검증 및 정규화
@@ -42,7 +41,7 @@ class EventWriter(
 
         // 태그 개수 제한 검증
         if (normalizedDistinctTags.size > Event.TAG_MAX_COUNT) {
-            throw MykkuException(ErrorCode.EVENT_TAG_LIMIT_EXCEEDED)
+            throw FeedException.eventTagLimitExceeded()
         }
 
         val event = Event(

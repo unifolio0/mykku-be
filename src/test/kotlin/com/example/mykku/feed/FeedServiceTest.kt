@@ -3,8 +3,8 @@ package com.example.mykku.feed
 import com.example.mykku.board.domain.Board
 import com.example.mykku.board.tool.BoardReader
 import com.example.mykku.common.domain.BaseEntity
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.image.exception.ImageErrorCode
+import com.example.mykku.image.exception.ImageException
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedComment
 import com.example.mykku.feed.domain.FeedImage
@@ -228,7 +228,7 @@ class FeedServiceTest {
         // given
         val noOpImageUploadService = mock<ImageUploadService>()
         whenever(noOpImageUploadService.uploadImages(any()))
-            .thenThrow(MykkuException(ErrorCode.IMAGE_UPLOAD_SERVICE_UNAVAILABLE))
+            .thenThrow(ImageException(ImageErrorCode.IMAGE_UPLOAD_SERVICE_UNAVAILABLE))
         
         val feedServiceWithoutImageUpload = FeedService(
             feedReader = feedReader,
@@ -253,10 +253,10 @@ class FeedServiceTest {
         whenever(boardReader.getBoardById(1L)).thenReturn(board)
 
         // when & then
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<ImageException> {
             feedServiceWithoutImageUpload.createFeed(request, member)
         }
-        assertEquals(ErrorCode.IMAGE_UPLOAD_SERVICE_UNAVAILABLE, exception.errorCode)
+        assertEquals(ImageErrorCode.IMAGE_UPLOAD_SERVICE_UNAVAILABLE, exception.errorCode)
     }
 
     @Test

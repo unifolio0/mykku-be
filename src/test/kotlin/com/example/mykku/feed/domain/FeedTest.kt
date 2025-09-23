@@ -1,8 +1,8 @@
 package com.example.mykku.feed.domain
 
 import com.example.mykku.board.domain.Board
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.feed.exception.FeedException
+import com.example.mykku.feed.exception.FeedErrorCode
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import org.junit.jupiter.api.Test
@@ -45,7 +45,7 @@ class FeedTest {
         val (member, board) = createTestMemberAndBoard()
         val invalidContent = "r".repeat(Feed.CONTENT_MAX_LENGTH + 1)
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<FeedException> {
             Feed(
                 title = "테스트 피드",
                 content = invalidContent,
@@ -54,6 +54,6 @@ class FeedTest {
             )
         }
         
-        assertEquals(ErrorCode.FEED_CONTENT_TOO_LONG, exception.errorCode)
+        assertEquals(FeedErrorCode.FEED_CONTENT_TOO_LONG, exception.errorCode)
     }
 }

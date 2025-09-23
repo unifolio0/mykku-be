@@ -1,8 +1,8 @@
 package com.example.mykku.auth.tool
 
 import com.example.mykku.auth.dto.GoogleUserInfo
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.auth.exception.AuthException
+import com.example.mykku.auth.exception.AuthErrorCode
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
@@ -75,11 +75,11 @@ class GoogleOauthClientTest {
         whenever(requestHeadersSpec.retrieve()).thenReturn(responseSpec)
         whenever(responseSpec.body(GoogleUserInfo::class.java)).thenReturn(null)
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<AuthException> {
             googleOauthClient.verifyAndGetUserInfo(accessToken)
         }
 
-        assertEquals(ErrorCode.OAUTH_USER_INFO_FAILED, exception.errorCode)
+        assertEquals(AuthErrorCode.OAUTH_USER_INFO_FAILED, exception.errorCode)
     }
 
     @Test
@@ -98,11 +98,11 @@ class GoogleOauthClientTest {
                 null
             ))
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<AuthException> {
             googleOauthClient.verifyAndGetUserInfo(accessToken)
         }
 
-        assertEquals(ErrorCode.OAUTH_INVALID_TOKEN, exception.errorCode)
+        assertEquals(AuthErrorCode.OAUTH_INVALID_TOKEN, exception.errorCode)
     }
 
     @Test
@@ -121,11 +121,11 @@ class GoogleOauthClientTest {
                 null
             ))
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<AuthException> {
             googleOauthClient.verifyAndGetUserInfo(accessToken)
         }
 
-        assertEquals(ErrorCode.OAUTH_ACCESS_DENIED, exception.errorCode)
+        assertEquals(AuthErrorCode.OAUTH_ACCESS_DENIED, exception.errorCode)
     }
 
     @Test
@@ -144,11 +144,11 @@ class GoogleOauthClientTest {
                 null
             ))
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<AuthException> {
             googleOauthClient.verifyAndGetUserInfo(accessToken)
         }
 
-        assertEquals(ErrorCode.OAUTH_USER_INFO_FAILED, exception.errorCode)
+        assertEquals(AuthErrorCode.OAUTH_USER_INFO_FAILED, exception.errorCode)
     }
 
     @Test
@@ -167,11 +167,11 @@ class GoogleOauthClientTest {
                 null
             ))
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<AuthException> {
             googleOauthClient.verifyAndGetUserInfo(accessToken)
         }
 
-        assertEquals(ErrorCode.OAUTH_SERVER_ERROR, exception.errorCode)
+        assertEquals(AuthErrorCode.OAUTH_SERVER_ERROR, exception.errorCode)
     }
 
     @Test
@@ -184,10 +184,10 @@ class GoogleOauthClientTest {
         whenever(requestHeadersSpec.retrieve())
             .thenThrow(RuntimeException("Unexpected error"))
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<AuthException> {
             googleOauthClient.verifyAndGetUserInfo(accessToken)
         }
 
-        assertEquals(ErrorCode.OAUTH_USER_INFO_FAILED, exception.errorCode)
+        assertEquals(AuthErrorCode.OAUTH_USER_INFO_FAILED, exception.errorCode)
     }
 }

@@ -1,8 +1,7 @@
 package com.example.mykku.auth.tool
 
 import com.example.mykku.auth.dto.NaverUserInfo
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.auth.exception.AuthException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Component
@@ -26,28 +25,28 @@ class NaverOauthClient(
                 .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
                 .retrieve()
                 .body(NaverUserInfo::class.java)
-                ?: throw MykkuException(ErrorCode.OAUTH_USER_INFO_FAILED)
+                ?: throw AuthException.oauthUserInfoFailed()
             
             if (userInfo.resultCode != "00") {
                 logger.error("Naver OAuth failed with code: ${userInfo.resultCode}")
-                throw MykkuException(ErrorCode.OAUTH_USER_INFO_FAILED)
+                throw AuthException.oauthUserInfoFailed()
             }
             
             userInfo
         } catch (e: HttpClientErrorException) {
             logger.error("Naver OAuth failed: ${e.message}")
             when (e.statusCode.value()) {
-                401 -> throw MykkuException(ErrorCode.OAUTH_INVALID_TOKEN)
-                403 -> throw MykkuException(ErrorCode.OAUTH_ACCESS_DENIED)
-                else -> throw MykkuException(ErrorCode.OAUTH_USER_INFO_FAILED)
+                401 -> throw AuthException.oauthInvalidToken()
+                403 -> throw AuthException.oauthAccessDenied()
+                else -> throw AuthException.oauthUserInfoFailed()
             }
         } catch (e: HttpServerErrorException) {
             logger.error("Naver OAuth server error: ${e.message}")
-            throw MykkuException(ErrorCode.OAUTH_SERVER_ERROR)
+            throw AuthException.oauthServerError()
         } catch (e: Exception) {
-            if (e is MykkuException) throw e
+            if (e is AuthException) throw e
             logger.error("Unexpected error during Naver OAuth: ${e.message}")
-            throw MykkuException(ErrorCode.OAUTH_USER_INFO_FAILED)
+            throw AuthException.oauthUserInfoFailed()
         }
     }
 }

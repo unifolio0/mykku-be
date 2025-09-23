@@ -1,8 +1,7 @@
 package com.example.mykku.auth.tool
 
 import com.example.mykku.auth.dto.GoogleUserInfo
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.auth.exception.AuthException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Component
@@ -26,20 +25,20 @@ class GoogleOauthClient(
                 .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
                 .retrieve()
                 .body(GoogleUserInfo::class.java)
-                ?: throw MykkuException(ErrorCode.OAUTH_USER_INFO_FAILED)
+                ?: throw AuthException.oauthUserInfoFailed()
         } catch (e: HttpClientErrorException) {
             logger.error("Google OAuth failed: ${e.message}")
             when (e.statusCode.value()) {
-                401 -> throw MykkuException(ErrorCode.OAUTH_INVALID_TOKEN)
-                403 -> throw MykkuException(ErrorCode.OAUTH_ACCESS_DENIED)
-                else -> throw MykkuException(ErrorCode.OAUTH_USER_INFO_FAILED)
+                401 -> throw AuthException.oauthInvalidToken()
+                403 -> throw AuthException.oauthAccessDenied()
+                else -> throw AuthException.oauthUserInfoFailed()
             }
         } catch (e: HttpServerErrorException) {
             logger.error("Google OAuth server error: ${e.message}")
-            throw MykkuException(ErrorCode.OAUTH_SERVER_ERROR)
+            throw AuthException.oauthServerError()
         } catch (e: Exception) {
             logger.error("Unexpected error during Google OAuth: ${e.message}")
-            throw MykkuException(ErrorCode.OAUTH_USER_INFO_FAILED)
+            throw AuthException.oauthUserInfoFailed()
         }
     }
 }

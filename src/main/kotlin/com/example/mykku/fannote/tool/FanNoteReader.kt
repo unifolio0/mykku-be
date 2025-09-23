@@ -1,7 +1,6 @@
 package com.example.mykku.fannote.tool
 
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.fannote.exception.FanNoteException
 import com.example.mykku.fannote.domain.FanNote
 import com.example.mykku.fannote.domain.FanNotePage
 import com.example.mykku.fannote.repository.FanNoteRepository
@@ -22,7 +21,7 @@ class FanNoteReader(
 
     fun findById(id: Long): FanNote {
         return fanNoteRepository.findById(id).orElseThrow {
-            MykkuException(ErrorCode.FAN_NOTE_NOT_FOUND)
+            FanNoteException.fanNoteNotFound()
         }
     }
 

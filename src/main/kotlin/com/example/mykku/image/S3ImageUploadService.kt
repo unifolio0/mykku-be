@@ -1,8 +1,7 @@
 package com.example.mykku.image
 
 import com.example.mykku.config.S3Properties
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.image.exception.ImageException
 import com.example.mykku.image.dto.ImageUploadResult
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
@@ -77,16 +76,16 @@ class S3ImageUploadService(
 
     private fun validateImage(image: MultipartFile) {
         if (image.isEmpty) {
-            throw MykkuException(ErrorCode.IMAGE_FILE_EMPTY)
+            throw ImageException.imageFileEmpty()
         }
 
         if (image.size > MAX_FILE_SIZE) {
-            throw MykkuException(ErrorCode.IMAGE_FILE_TOO_LARGE)
+            throw ImageException.imageFileTooLarge()
         }
 
         val extension = getFileExtension(image.originalFilename)
         if (extension !in ALLOWED_EXTENSIONS) {
-            throw MykkuException(ErrorCode.IMAGE_INVALID_FORMAT)
+            throw ImageException.imageInvalidFormat()
         }
     }
 
@@ -104,14 +103,14 @@ class S3ImageUploadService(
     private fun extractImageDimensions(imageBytes: ByteArray): Pair<Int, Int> {
         return try {
             val bufferedImage: BufferedImage = ImageIO.read(ByteArrayInputStream(imageBytes))
-                ?: throw MykkuException(ErrorCode.IMAGE_UNREADABLE)
+                ?: throw ImageException.imageUnreadable()
 
             Pair(bufferedImage.width, bufferedImage.height)
-        } catch (e: MykkuException) {
+        } catch (e: ImageException) {
             // 도메인 예외는 그대로 전달
             throw e
         } catch (e: Exception) {
-            throw MykkuException(ErrorCode.IMAGE_SIZE_EXTRACTION_FAILED)
+            throw ImageException.imageSizeExtractionFailed()
         }
     }
 }

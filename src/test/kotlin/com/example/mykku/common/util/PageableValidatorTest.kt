@@ -1,7 +1,7 @@
 package com.example.mykku.common.util
 
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.common.exception.CommonException
+import com.example.mykku.common.exception.CommonErrorCode
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
@@ -28,8 +28,8 @@ class PageableValidatorTest {
         assertThatThrownBy {
             PageableValidator.validateAndCreate(-1, 20)
         }
-            .isInstanceOf(MykkuException::class.java)
-            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_PAGE_NUMBER)
+            .isInstanceOf(CommonException::class.java)
+            .hasFieldOrPropertyWithValue("errorCode", CommonErrorCode.INVALID_PAGE_NUMBER)
     }
     
     @Test
@@ -39,14 +39,14 @@ class PageableValidatorTest {
         assertThatThrownBy {
             PageableValidator.validateAndCreate(0, 0)
         }
-            .isInstanceOf(MykkuException::class.java)
-            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_PAGE_SIZE)
+            .isInstanceOf(CommonException::class.java)
+            .hasFieldOrPropertyWithValue("errorCode", CommonErrorCode.INVALID_PAGE_SIZE)
             
         assertThatThrownBy {
             PageableValidator.validateAndCreate(0, -5)
         }
-            .isInstanceOf(MykkuException::class.java)
-            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_PAGE_SIZE)
+            .isInstanceOf(CommonException::class.java)
+            .hasFieldOrPropertyWithValue("errorCode", CommonErrorCode.INVALID_PAGE_SIZE)
     }
     
     @Test
@@ -56,14 +56,14 @@ class PageableValidatorTest {
         assertThatThrownBy {
             PageableValidator.validateAndCreate(0, 101)
         }
-            .isInstanceOf(MykkuException::class.java)
-            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_PAGE_SIZE)
+            .isInstanceOf(CommonException::class.java)
+            .hasFieldOrPropertyWithValue("errorCode", CommonErrorCode.INVALID_PAGE_SIZE)
             
         assertThatThrownBy {
             PageableValidator.validateAndCreate(0, 1000)
         }
-            .isInstanceOf(MykkuException::class.java)
-            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_PAGE_SIZE)
+            .isInstanceOf(CommonException::class.java)
+            .hasFieldOrPropertyWithValue("errorCode", CommonErrorCode.INVALID_PAGE_SIZE)
     }
     
     @Test
@@ -114,8 +114,8 @@ class PageableValidatorTest {
         assertThatThrownBy {
             PageableValidator.validateAndCreate(0, Int.MAX_VALUE)
         }
-            .isInstanceOf(MykkuException::class.java)
-            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_PAGE_SIZE)
+            .isInstanceOf(CommonException::class.java)
+            .hasFieldOrPropertyWithValue("errorCode", CommonErrorCode.INVALID_PAGE_SIZE)
     }
     
     @Test
