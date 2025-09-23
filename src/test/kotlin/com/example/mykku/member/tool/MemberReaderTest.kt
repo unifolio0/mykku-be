@@ -1,7 +1,7 @@
 package com.example.mykku.member.tool
 
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.member.exception.MemberException
+import com.example.mykku.member.exception.MemberErrorCode
 import com.example.mykku.member.domain.Follow
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
@@ -101,11 +101,11 @@ class MemberReaderTest {
 
         whenever(memberRepository.findById(memberId)).thenReturn(Optional.empty())
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<MemberException> {
             memberReader.getMemberById(memberId)
         }
 
-        assertEquals(ErrorCode.MEMBER_NOT_FOUND, exception.errorCode)
+        assertEquals(MemberErrorCode.MEMBER_NOT_FOUND, exception.errorCode)
     }
 
     @Test

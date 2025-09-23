@@ -1,7 +1,6 @@
 package com.example.mykku.common.util
 
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.common.exception.CommonException
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
@@ -36,13 +35,13 @@ object PageableValidator {
     
     private fun validatePageNumber(page: Int) {
         if (page < 0) {
-            throw MykkuException(ErrorCode.INVALID_PAGE_NUMBER)
+            throw CommonException.invalidPageNumber()
         }
     }
     
     private fun validateAndGetPageSize(size: Int): Int {
         if (size <= 0 || size > MAX_PAGE_SIZE) {
-            throw MykkuException(ErrorCode.INVALID_PAGE_SIZE)
+            throw CommonException.invalidPageSize()
         }
         
         return size

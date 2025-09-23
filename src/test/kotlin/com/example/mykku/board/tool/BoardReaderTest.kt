@@ -2,8 +2,8 @@ package com.example.mykku.board.tool
 
 import com.example.mykku.board.domain.Board
 import com.example.mykku.board.repository.BoardRepository
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.board.exception.BoardException
+import com.example.mykku.board.exception.BoardErrorCode
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
@@ -31,11 +31,11 @@ class BoardReaderTest {
         whenever(boardRepository.existsByTitle(title))
             .thenReturn(true)
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<BoardException> {
             boardReader.validateDuplicateTitle(title)
         }
 
-        assertEquals(ErrorCode.BOARD_DUPLICATE_TITLE, exception.errorCode)
+        assertEquals(BoardErrorCode.BOARD_DUPLICATE_TITLE, exception.errorCode)
     }
 
     @Test
@@ -55,11 +55,11 @@ class BoardReaderTest {
         whenever(boardRepository.findById(boardId))
             .thenReturn(Optional.empty())
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<BoardException> {
             boardReader.getBoardById(boardId)
         }
 
-        assertEquals(ErrorCode.BOARD_NOT_FOUND, exception.errorCode)
+        assertEquals(BoardErrorCode.BOARD_NOT_FOUND, exception.errorCode)
     }
 
     @Test

@@ -1,7 +1,6 @@
 package com.example.mykku.like.tool
 
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.like.exception.LikeException
 import com.example.mykku.like.repository.LikeDailyMessageCommentRepository
 import org.springframework.stereotype.Component
 
@@ -15,7 +14,7 @@ class LikeDailyMessageCommentReader(
                 dailyMessageCommentId
             )
         ) {
-            throw MykkuException(ErrorCode.LIKE_DAILY_MESSAGE_COMMENT_ALREADY_LIKED)
+            throw LikeException.likeDailyMessageCommentAlreadyLiked()
         }
     }
 
@@ -25,7 +24,7 @@ class LikeDailyMessageCommentReader(
                 dailyMessageCommentId
             )
         ) {
-            throw MykkuException(ErrorCode.LIKE_DAILY_MESSAGE_COMMENT_NOT_FOUND)
+            throw LikeException.likeDailyMessageCommentNotFound()
         }
     }
 }

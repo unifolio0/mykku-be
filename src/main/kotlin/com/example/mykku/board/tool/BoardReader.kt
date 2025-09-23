@@ -2,8 +2,7 @@ package com.example.mykku.board.tool
 
 import com.example.mykku.board.domain.Board
 import com.example.mykku.board.repository.BoardRepository
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.board.exception.BoardException
 import org.springframework.stereotype.Component
 
 @Component
@@ -12,13 +11,13 @@ class BoardReader(
 ) {
     fun validateDuplicateTitle(title: String) {
         if (boardRepository.existsByTitle(title)) {
-            throw MykkuException(ErrorCode.BOARD_DUPLICATE_TITLE)
+            throw BoardException.boardDuplicateTitle()
         }
     }
 
     fun getBoardById(id: Long): Board {
         return boardRepository.findById(id).orElseThrow {
-            MykkuException(ErrorCode.BOARD_NOT_FOUND)
+            BoardException.boardNotFound()
         }
     }
 }

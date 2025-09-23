@@ -1,7 +1,7 @@
 package com.example.mykku.board.domain
 
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.board.exception.BoardException
+import com.example.mykku.board.exception.BoardErrorCode
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
@@ -19,10 +19,10 @@ class BoardTest {
     fun `title이 최대 길이를 초과하면 예외가 발생한다`() {
         val invalidTitle = "r".repeat(Board.TITLE_MAX_LENGTH + 1)
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<BoardException> {
             Board(title = invalidTitle, logo = "logo")
         }
         
-        assertEquals(ErrorCode.BOARD_TITLE_TOO_LONG, exception.errorCode)
+        assertEquals(BoardErrorCode.BOARD_TITLE_TOO_LONG, exception.errorCode)
     }
 }

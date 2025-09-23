@@ -6,8 +6,7 @@ import com.example.mykku.dailymessage.dto.UpdateCommentRequest
 import com.example.mykku.dailymessage.tool.DailyMessageCommentReader
 import com.example.mykku.dailymessage.tool.DailyMessageCommentWriter
 import com.example.mykku.dailymessage.tool.DailyMessageReader
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.dailymessage.exception.DailyMessageException
 import com.example.mykku.member.tool.MemberReader
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -58,7 +57,7 @@ class DailyMessageCommentService(
         val comment = dailyMessageCommentReader.getComment(commentId)
 
         if (comment.member.id != memberId) {
-            throw MykkuException(ErrorCode.COMMENT_FORBIDDEN_ACCESS)
+            throw DailyMessageException.commentForbiddenAccess()
         }
 
         val updatedComment = dailyMessageCommentWriter.updateComment(

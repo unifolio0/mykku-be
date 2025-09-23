@@ -1,8 +1,7 @@
 package com.example.mykku.feed.domain
 
 import com.example.mykku.common.domain.BaseEntity
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.feed.exception.FeedException
 import jakarta.persistence.*
 
 @Entity
@@ -25,10 +24,10 @@ class EventTag(
 
     init {
         if (title.length > TITLE_MAX_LENGTH) {
-            throw MykkuException(ErrorCode.TAG_TITLE_TOO_LONG)
+            throw FeedException.tagTitleTooLong()
         }
         if (!VALID_PATTERN.matches(title)) {
-            throw MykkuException(ErrorCode.TAG_INVALID_FORMAT)
+            throw FeedException.tagInvalidFormat()
         }
     }
 }

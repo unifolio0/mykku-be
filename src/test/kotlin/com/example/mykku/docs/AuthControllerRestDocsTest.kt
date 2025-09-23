@@ -75,7 +75,7 @@ class AuthControllerRestDocsTest : BaseControllerRestDocsTest() {
                     "auth-mobile-login-google",
                     requestFields(
                         fieldWithPath("provider").type(JsonFieldType.STRING)
-                            .description("OAuth 제공자 (GOOGLE, KAKAO, APPLE)"),
+                            .description("OAuth 제공자 (GOOGLE, KAKAO, APPLE, NAVER)"),
                         fieldWithPath("accessToken").type(JsonFieldType.STRING).description("OAuth 제공자에서 받은 액세스 토큰"),
                         fieldWithPath("idToken").type(JsonFieldType.STRING).description("Apple 로그인 시 필요한 ID 토큰 (선택사항)")
                             .optional()
@@ -178,6 +178,46 @@ class AuthControllerRestDocsTest : BaseControllerRestDocsTest() {
             .andExpect(jsonPath("$.data.accessToken").exists())
             .andDo(
                 document("auth-mobile-login-apple")
+            )
+    }
+
+    @Test
+    fun `모바일 네이버 로그인 API 문서화`() {
+        // given
+        val request = MobileLoginRequest(
+            provider = SocialProvider.NAVER,
+            accessToken = "naver_access_token_example"
+        )
+
+        val loginResponse = LoginResponse(
+            accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+            refreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.refresh...",
+            tokenType = "Bearer",
+            accessTokenExpiresIn = 86400000,
+            refreshTokenExpiresIn = 1209600000,
+            member = MemberInfo(
+                id = "naver_abcdefgh12345678",
+                email = "user@naver.com",
+                nickname = "네이버사용자",
+                profileImage = "https://phinf.pstatic.net/profile.jpg"
+            ),
+            isExistingUser = true
+        )
+
+        `when`(authService.handleMobileLogin(request)).thenReturn(loginResponse)
+
+        // when & then
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.post("/api/v1/auth/mobile/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+        )
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.message").value("로그인 성공"))
+            .andExpect(jsonPath("$.data.accessToken").exists())
+            .andDo(
+                document("auth-mobile-login-naver")
             )
     }
 

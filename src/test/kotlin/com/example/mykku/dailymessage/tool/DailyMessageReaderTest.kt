@@ -3,8 +3,8 @@ package com.example.mykku.dailymessage.tool
 import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.domain.SortDirection
 import com.example.mykku.dailymessage.repository.DailyMessageRepository
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.dailymessage.exception.DailyMessageException
+import com.example.mykku.dailymessage.exception.DailyMessageErrorCode
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
@@ -41,11 +41,11 @@ class DailyMessageReaderTest {
         whenever(dailyMessageRepository.findByDate(LocalDate.now()))
             .thenReturn(null)
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<DailyMessageException> {
             dailyMessageReader.getTodayDailyMessage()
         }
 
-        assertEquals(ErrorCode.DAILY_MESSAGE_NOT_FOUND, exception.errorCode)
+        assertEquals(DailyMessageErrorCode.DAILY_MESSAGE_NOT_FOUND, exception.errorCode)
     }
 
     @Test
@@ -97,11 +97,11 @@ class DailyMessageReaderTest {
         whenever(dailyMessageRepository.findById(messageId))
             .thenReturn(Optional.empty())
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<DailyMessageException> {
             dailyMessageReader.getDailyMessage(messageId)
         }
 
-        assertEquals(ErrorCode.DAILY_MESSAGE_NOT_FOUND, exception.errorCode)
+        assertEquals(DailyMessageErrorCode.DAILY_MESSAGE_NOT_FOUND, exception.errorCode)
     }
 
     @Test

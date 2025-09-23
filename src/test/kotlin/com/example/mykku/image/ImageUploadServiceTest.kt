@@ -1,8 +1,8 @@
 package com.example.mykku.image
 
 import com.example.mykku.config.S3Properties
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.image.exception.ImageException
+import com.example.mykku.image.exception.ImageErrorCode
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
@@ -79,10 +79,10 @@ class ImageUploadServiceTest {
         }
 
         // when & then
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<ImageException> {
             imageUploadService.uploadImage(imageFile)
         }
-        assertEquals(ErrorCode.IMAGE_FILE_EMPTY, exception.errorCode)
+        assertEquals(ImageErrorCode.IMAGE_FILE_EMPTY, exception.errorCode)
     }
 
     @Test
@@ -94,10 +94,10 @@ class ImageUploadServiceTest {
         }
 
         // when & then
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<ImageException> {
             imageUploadService.uploadImage(imageFile)
         }
-        assertEquals(ErrorCode.IMAGE_FILE_TOO_LARGE, exception.errorCode)
+        assertEquals(ImageErrorCode.IMAGE_FILE_TOO_LARGE, exception.errorCode)
     }
 
     @Test
@@ -110,10 +110,10 @@ class ImageUploadServiceTest {
         }
 
         // when & then
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<ImageException> {
             imageUploadService.uploadImage(imageFile)
         }
-        assertEquals(ErrorCode.IMAGE_INVALID_FORMAT, exception.errorCode)
+        assertEquals(ImageErrorCode.IMAGE_INVALID_FORMAT, exception.errorCode)
     }
 
     @Test

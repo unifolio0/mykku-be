@@ -3,8 +3,7 @@ package com.example.mykku.feed
 import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.common.util.PageableValidator
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.feed.dto.*
 import com.example.mykku.member.domain.Member
 import jakarta.validation.Valid
@@ -25,28 +24,37 @@ class FeedController(
         @RequestPart("images", required = false) images: List<MultipartFile>?,
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<CreateFeedResponse>> {
-        val imageList = images ?: emptyList()
-
-        // 이미지 개수 제한 검증
-        if (imageList.size > CreateFeedRequest.MAX_IMAGE_COUNT) {
-            throw MykkuException(ErrorCode.FEED_IMAGE_LIMIT_EXCEEDED)
-        }
-
-        val request = CreateFeedRequest(
-            title = requestDto.title,
-            content = requestDto.content,
-            boardId = requestDto.boardId,
-            images = imageList,
-            tags = requestDto.tags
-        )
-
+        val request = buildCreateFeedRequest(requestDto, images)
         val response = feedService.createFeed(request, member)
+
         return ResponseEntity.ok(
             ApiResponse(
                 message = "피드가 성공적으로 작성되었습니다.",
                 data = response
             )
         )
+    }
+
+    private fun buildCreateFeedRequest(
+        requestDto: CreateFeedRequestDto,
+        images: List<MultipartFile>?
+    ): CreateFeedRequest {
+        val imageList = images ?: emptyList()
+        validateImageCount(imageList.size)
+
+        return CreateFeedRequest(
+            title = requestDto.title,
+            content = requestDto.content,
+            boardId = requestDto.boardId,
+            images = imageList,
+            tags = requestDto.tags
+        )
+    }
+
+    private fun validateImageCount(imageCount: Int) {
+        if (imageCount > CreateFeedRequest.MAX_IMAGE_COUNT) {
+            throw FeedException.feedImageLimitExceeded()
+        }
     }
 
     @GetMapping("/{memberId}/feeds")

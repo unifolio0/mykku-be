@@ -1,7 +1,7 @@
 package com.example.mykku.fannote.tool
 
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.fannote.exception.FanNoteException
+import com.example.mykku.fannote.exception.FanNoteErrorCode
 import com.example.mykku.fannote.domain.FanNote
 import com.example.mykku.fannote.domain.FanNotePage
 import com.example.mykku.fannote.repository.FanNotePageRepository
@@ -108,8 +108,8 @@ class FanNoteReaderTest {
 
         // when & then
         assertThatThrownBy { fanNoteReader.findById(fanNoteId) }
-            .isInstanceOf(MykkuException::class.java)
-            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.FAN_NOTE_NOT_FOUND)
+            .isInstanceOf(FanNoteException::class.java)
+            .hasFieldOrPropertyWithValue("errorCode", FanNoteErrorCode.FAN_NOTE_NOT_FOUND)
 
         verify(fanNoteRepository).findById(fanNoteId)
     }

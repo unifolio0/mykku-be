@@ -1,7 +1,7 @@
 package com.example.mykku.like.tool
 
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.like.exception.LikeException
+import com.example.mykku.like.exception.LikeErrorCode
 import com.example.mykku.like.domain.LikeBoard
 import com.example.mykku.like.repository.LikeBoardRepository
 import org.junit.jupiter.api.Test
@@ -30,11 +30,11 @@ class LikeBoardReaderTest {
         whenever(likeBoardRepository.existsByMemberIdAndBoardId(memberId, boardId))
             .thenReturn(true)
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<LikeException> {
             likeBoardReader.validateLikeBoardNotExists(memberId, boardId)
         }
 
-        assertEquals(ErrorCode.LIKE_BOARD_ALREADY_LIKED, exception.errorCode)
+        assertEquals(LikeErrorCode.LIKE_BOARD_ALREADY_LIKED, exception.errorCode)
     }
 
     @Test
@@ -56,11 +56,11 @@ class LikeBoardReaderTest {
         whenever(likeBoardRepository.existsByMemberIdAndBoardId(memberId, boardId))
             .thenReturn(false)
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<LikeException> {
             likeBoardReader.validateLikeBoardExists(memberId, boardId)
         }
 
-        assertEquals(ErrorCode.LIKE_BOARD_NOT_FOUND, exception.errorCode)
+        assertEquals(LikeErrorCode.LIKE_BOARD_NOT_FOUND, exception.errorCode)
     }
 
     @Test

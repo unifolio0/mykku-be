@@ -1,8 +1,8 @@
 package com.example.mykku.docs
 
 import com.example.mykku.BaseControllerRestDocsTest
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.fannote.exception.FanNoteException
+import com.example.mykku.fannote.exception.FanNoteErrorCode
 import com.example.mykku.fannote.FanNoteController
 import com.example.mykku.fannote.FanNoteService
 import com.example.mykku.fannote.dto.FanNoteDetailResponse
@@ -185,7 +185,7 @@ class FanNoteControllerRestDocsTest : BaseControllerRestDocsTest() {
         // given
         val fanNoteId = 999L
         `when`(fanNoteService.getFanNoteDetail(fanNoteId))
-            .thenThrow(MykkuException(ErrorCode.FAN_NOTE_NOT_FOUND))
+            .thenThrow(FanNoteException(FanNoteErrorCode.FAN_NOTE_NOT_FOUND))
 
         // when & then
         mockMvc.perform(

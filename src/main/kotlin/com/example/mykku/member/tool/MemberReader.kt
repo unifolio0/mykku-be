@@ -1,7 +1,6 @@
 package com.example.mykku.member.tool
 
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.member.exception.MemberException
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.repository.FollowRepository
 import com.example.mykku.member.repository.MemberRepository
@@ -20,7 +19,7 @@ class MemberReader(
 
     fun getMemberById(memberId: String): Member {
         return memberRepository.findById(memberId)
-            .orElseThrow { MykkuException(ErrorCode.MEMBER_NOT_FOUND) }
+            .orElseThrow { MemberException.memberNotFound() }
     }
 
     fun findById(memberId: String): Optional<Member> {

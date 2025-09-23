@@ -7,8 +7,8 @@ import com.example.mykku.dailymessage.dto.UpdateCommentRequest
 import com.example.mykku.dailymessage.tool.DailyMessageCommentReader
 import com.example.mykku.dailymessage.tool.DailyMessageCommentWriter
 import com.example.mykku.dailymessage.tool.DailyMessageReader
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.dailymessage.exception.DailyMessageException
+import com.example.mykku.dailymessage.exception.DailyMessageErrorCode
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.tool.MemberReader
@@ -207,9 +207,9 @@ class DailyMessageCommentServiceTest {
         whenever(dailyMessageCommentReader.getComment(1L)).thenReturn(comment)
 
         // when & then
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<DailyMessageException> {
             dailyMessageCommentService.updateComment(1L, "member1", request)
         }
-        assertEquals(ErrorCode.COMMENT_FORBIDDEN_ACCESS, exception.errorCode)
+        assertEquals(DailyMessageErrorCode.COMMENT_FORBIDDEN_ACCESS, exception.errorCode)
     }
 }

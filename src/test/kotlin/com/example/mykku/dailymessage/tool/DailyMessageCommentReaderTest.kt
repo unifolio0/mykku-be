@@ -3,8 +3,8 @@ package com.example.mykku.dailymessage.tool
 import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.domain.DailyMessageComment
 import com.example.mykku.dailymessage.repository.DailyMessageCommentRepository
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.dailymessage.exception.DailyMessageException
+import com.example.mykku.dailymessage.exception.DailyMessageErrorCode
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import org.junit.jupiter.api.Test
@@ -61,11 +61,11 @@ class DailyMessageCommentReaderTest {
         whenever(dailyMessageCommentRepository.findById(commentId))
             .thenReturn(Optional.empty())
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<DailyMessageException> {
             dailyMessageCommentReader.getComment(commentId)
         }
 
-        assertEquals(ErrorCode.DAILY_MESSAGE_COMMENT_NOT_FOUND, exception.errorCode)
+        assertEquals(DailyMessageErrorCode.DAILY_MESSAGE_COMMENT_NOT_FOUND, exception.errorCode)
     }
 
     @Test
@@ -89,11 +89,11 @@ class DailyMessageCommentReaderTest {
         whenever(dailyMessageCommentRepository.findByIdAndDailyMessageId(commentId, dailyMessageId))
             .thenReturn(null)
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<DailyMessageException> {
             dailyMessageCommentReader.getCommentByDailyMessageId(commentId, dailyMessageId)
         }
 
-        assertEquals(ErrorCode.DAILY_MESSAGE_COMMENT_NOT_FOUND, exception.errorCode)
+        assertEquals(DailyMessageErrorCode.DAILY_MESSAGE_COMMENT_NOT_FOUND, exception.errorCode)
     }
 
     @Test
@@ -117,11 +117,11 @@ class DailyMessageCommentReaderTest {
         whenever(dailyMessageCommentRepository.findById(commentId))
             .thenReturn(Optional.empty())
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<DailyMessageException> {
             dailyMessageCommentReader.getDailyMessageCommentById(commentId)
         }
 
-        assertEquals(ErrorCode.DAILY_MESSAGE_COMMENT_NOT_FOUND, exception.errorCode)
+        assertEquals(DailyMessageErrorCode.DAILY_MESSAGE_COMMENT_NOT_FOUND, exception.errorCode)
     }
 
     @Test

@@ -1,8 +1,7 @@
 package com.example.mykku.feed.tool
 
 import com.example.mykku.board.domain.Board
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.feed.domain.EventTag
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedComment
@@ -39,7 +38,7 @@ class FeedReader(
 
     fun getFeedById(feedId: Long): Feed {
         return feedRepository.findById(feedId)
-            .orElseThrow { MykkuException(ErrorCode.FEED_NOT_FOUND) }
+            .orElseThrow { FeedException.feedNotFound() }
     }
     
     fun getFeedsByMembersWithPagination(members: List<Member>, pageable: Pageable): Page<Feed> {

@@ -1,7 +1,6 @@
 package com.example.mykku.feed.tool
 
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedComment
 import com.example.mykku.feed.repository.FeedCommentRepository
@@ -16,7 +15,7 @@ class FeedCommentReader(
 ) {
     fun getFeedCommentById(id: Long): FeedComment {
         return feedCommentRepository.findByIdOrNull(id)
-            ?: throw MykkuException(ErrorCode.FEED_COMMENT_NOT_FOUND)
+            ?: throw FeedException.feedCommentNotFound()
     }
     
     fun getCommentsByFeed(feed: Feed, pageable: Pageable): Page<FeedComment> {

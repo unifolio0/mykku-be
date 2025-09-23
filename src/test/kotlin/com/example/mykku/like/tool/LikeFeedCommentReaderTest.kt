@@ -1,8 +1,8 @@
 package com.example.mykku.like.tool
 
 import com.example.mykku.board.domain.Board
-import com.example.mykku.exception.ErrorCode
-import com.example.mykku.exception.MykkuException
+import com.example.mykku.like.exception.LikeException
+import com.example.mykku.like.exception.LikeErrorCode
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedComment
 import com.example.mykku.like.repository.LikeFeedCommentRepository
@@ -69,11 +69,11 @@ class LikeFeedCommentReaderTest {
         whenever(likeFeedCommentRepository.existsByMemberIdAndFeedCommentId(memberId, feedCommentId))
             .thenReturn(true)
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<LikeException> {
             likeFeedCommentReader.validateLikeFeedCommentNotExists(memberId, feedCommentId)
         }
 
-        assertEquals(ErrorCode.LIKE_FEED_COMMENT_ALREADY_LIKED, exception.errorCode)
+        assertEquals(LikeErrorCode.LIKE_FEED_COMMENT_ALREADY_LIKED, exception.errorCode)
     }
 
     @Test
@@ -95,11 +95,11 @@ class LikeFeedCommentReaderTest {
         whenever(likeFeedCommentRepository.existsByMemberIdAndFeedCommentId(memberId, feedCommentId))
             .thenReturn(false)
 
-        val exception = assertThrows<MykkuException> {
+        val exception = assertThrows<LikeException> {
             likeFeedCommentReader.validateLikeFeedCommentExists(memberId, feedCommentId)
         }
 
-        assertEquals(ErrorCode.LIKE_FEED_COMMENT_NOT_FOUND, exception.errorCode)
+        assertEquals(LikeErrorCode.LIKE_FEED_COMMENT_NOT_FOUND, exception.errorCode)
     }
 
     @Test
