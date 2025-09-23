@@ -5,6 +5,7 @@ import com.example.mykku.auth.tool.AppleOauthClient
 import com.example.mykku.auth.tool.GoogleOauthClient
 import com.example.mykku.auth.tool.JwtTokenProvider
 import com.example.mykku.auth.tool.KakaoOauthClient
+import com.example.mykku.auth.tool.NaverOauthClient
 import com.example.mykku.exception.ErrorCode
 import com.example.mykku.exception.MykkuException
 import com.example.mykku.member.domain.Member
@@ -21,7 +22,8 @@ class AuthService(
     private val memberWriter: MemberWriter,
     private val googleOauthClient: GoogleOauthClient,
     private val kakaoOauthClient: KakaoOauthClient,
-    private val appleOauthClient: AppleOauthClient
+    private val appleOauthClient: AppleOauthClient,
+    private val naverOauthClient: NaverOauthClient
 ) {
 
     @Transactional
@@ -42,7 +44,7 @@ class AuthService(
             SocialProvider.GOOGLE -> handleGoogleMobileLogin(request.accessToken!!)
             SocialProvider.KAKAO -> handleKakaoMobileLogin(request.accessToken!!)
             SocialProvider.APPLE -> handleAppleMobileLogin(request.idToken!!)
-            SocialProvider.NAVER -> throw MykkuException(ErrorCode.OAUTH_EXTERNAL_SERVICE_ERROR)
+            SocialProvider.NAVER -> handleNaverMobileLogin(request.accessToken!!)
         }
     }
 
@@ -67,6 +69,12 @@ class AuthService(
     private fun handleAppleMobileLogin(idToken: String): LoginResponse {
         val userInfo = appleOauthClient.verifyAndGetUserInfo(idToken)
         val memberInfo = extractAppleMemberInfo(userInfo)
+        return processOAuthLogin(memberInfo)
+    }
+
+    private fun handleNaverMobileLogin(accessToken: String): LoginResponse {
+        val userInfo = naverOauthClient.verifyAndGetUserInfo(accessToken)
+        val memberInfo = extractNaverMemberInfo(userInfo)
         return processOAuthLogin(memberInfo)
     }
 
@@ -104,6 +112,19 @@ class AuthService(
             provider = SocialProvider.APPLE,
             socialId = userInfo.sub,
             email = userInfo.email ?: "apple_${userInfo.sub}@privaterelay.appleid.com"
+        )
+    }
+
+    private fun extractNaverMemberInfo(userInfo: NaverUserInfo): OAuthMemberInfo {
+        return OAuthMemberInfo(
+            memberId = "naver_${userInfo.response.id}",
+            nickname = userInfo.response.nickname 
+                ?: userInfo.response.name 
+                ?: "네이버사용자",
+            profileImage = userInfo.response.profileImage ?: "",
+            provider = SocialProvider.NAVER,
+            socialId = userInfo.response.id,
+            email = userInfo.response.email ?: "naver_${userInfo.response.id}@naver.com"
         )
     }
 

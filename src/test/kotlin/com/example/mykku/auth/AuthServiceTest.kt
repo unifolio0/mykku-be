@@ -5,6 +5,7 @@ import com.example.mykku.auth.tool.AppleOauthClient
 import com.example.mykku.auth.tool.GoogleOauthClient
 import com.example.mykku.auth.tool.JwtTokenProvider
 import com.example.mykku.auth.tool.KakaoOauthClient
+import com.example.mykku.auth.tool.NaverOauthClient
 import com.example.mykku.exception.ErrorCode
 import com.example.mykku.exception.MykkuException
 import com.example.mykku.member.domain.Member
@@ -42,6 +43,9 @@ class AuthServiceTest {
 
     @Mock
     private lateinit var appleOauthClient: AppleOauthClient
+
+    @Mock
+    private lateinit var naverOauthClient: NaverOauthClient
 
     @InjectMocks
     private lateinit var authService: AuthService
@@ -207,15 +211,58 @@ class AuthServiceTest {
     }
 
     @Test
-    fun `handleMobileLogin - NAVER 로그인 시 예외가 발생한다`() {
+    fun `handleMobileLogin - NAVER 로그인을 처리한다`() {
         // given
         val request = MobileLoginRequest(provider = SocialProvider.NAVER, accessToken = "naver_token", idToken = null)
+        val userInfo = NaverUserInfo(
+            resultCode = "00",
+            message = "success",
+            response = NaverUserResponse(
+                id = "naver123456",
+                email = "test@naver.com",
+                name = "네이버유저",
+                nickname = "네이버별명",
+                profileImage = "naver_profile.jpg",
+                age = null,
+                gender = null,
+                birthday = null,
+                birthYear = null,
+                mobile = null
+            )
+        )
+        val member = Member(
+            id = "naver_naver123456",
+            nickname = "네이버별명",
+            role = "USER",
+            profileImage = "naver_profile.jpg",
+            provider = SocialProvider.NAVER,
+            socialId = "naver123456",
+            email = "test@naver.com"
+        )
+        val loginResponse = LoginResponse(
+            accessToken = "jwt_token",
+            refreshToken = "refresh_token",
+            tokenType = "Bearer",
+            accessTokenExpiresIn = 86400000L,
+            refreshTokenExpiresIn = 1209600000L,
+            member = MemberInfo(
+                id = member.id,
+                email = member.email,
+                nickname = member.nickname,
+                profileImage = member.profileImage
+            ),
+            isExistingUser = true
+        )
 
-        // when & then
-        val exception = assertThrows<MykkuException> {
-            authService.handleMobileLogin(request)
-        }
-        assertEquals(ErrorCode.OAUTH_EXTERNAL_SERVICE_ERROR, exception.errorCode)
+        whenever(naverOauthClient.verifyAndGetUserInfo("naver_token")).thenReturn(userInfo)
+        whenever(memberReader.findById("naver_naver123456")).thenReturn(Optional.of(member))
+        whenever(jwtTokenProvider.createLoginResponse(member, "test@naver.com", true)).thenReturn(loginResponse)
+
+        // when
+        val result = authService.handleMobileLogin(request)
+
+        // then
+        assertEquals(loginResponse.accessToken, result.accessToken)
     }
 
     @Test
