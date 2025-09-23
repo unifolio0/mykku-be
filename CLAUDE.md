@@ -165,11 +165,56 @@ Controller → Service → Tool → Repository
 - 기본 페이지 크기: 20
 - Sort 기본값: createdAt DESC
 
-### Exception Handling
+### Exception Handling (도메인별 예외 처리 구조)
 
-- `MykkuException` 사용
-- `ErrorCode` enum으로 에러 코드 관리
-- GlobalExceptionHandler에서 통합 처리
+#### 개요
+- 각 도메인이 독립적인 예외 처리 체계를 보유
+- 도메인별 예외 클래스, 에러 코드, 핸들러 분리
+- 공통 기반 구조를 상속받아 일관성 유지
+
+#### 예외 처리 구조
+```
+common/exception/
+├── DomainErrorCode.kt         # 모든 도메인 에러 코드가 구현할 인터페이스
+├── BaseException.kt            # 모든 커스텀 예외의 추상 클래스
+├── BaseDomainException.kt      # 도메인 예외의 추상 클래스
+├── BaseExceptionHandler.kt     # 공통 예외 처리 핸들러
+├── CommonErrorCode.kt          # 공통 에러 코드 (Validation 등)
+└── CommonException.kt          # 공통 예외 클래스
+
+[domain]/exception/
+├── [Domain]ErrorCode.kt        # 도메인별 에러 코드 enum
+├── [Domain]Exception.kt        # 도메인별 예외 클래스
+└── [Domain]ExceptionHandler.kt # 도메인별 예외 핸들러
+```
+
+#### 예외 처리 예시
+```kotlin
+// Feed 도메인 예외 정의
+enum class FeedErrorCode(
+    override val status: HttpStatus,
+    override val message: String
+) : DomainErrorCode {
+    FEED_NOT_FOUND(HttpStatus.NOT_FOUND, "피드를 찾을 수 없습니다")
+}
+
+// Feed 도메인 예외 클래스
+class FeedException(
+    errorCode: FeedErrorCode
+) : BaseDomainException(errorCode) {
+    companion object {
+        fun feedNotFound() = FeedException(FeedErrorCode.FEED_NOT_FOUND)
+    }
+}
+
+// 사용 예시
+throw FeedException.feedNotFound()
+```
+
+#### Handler 우선순위
+- 도메인별 핸들러: `@Order(Ordered.HIGHEST_PRECEDENCE)` 
+- 공통 핸들러: `@Order(Ordered.LOWEST_PRECEDENCE)`
+- 도메인 핸들러 → 공통 핸들러 순서로 처리
 
 ### Transaction Management
 
@@ -183,14 +228,17 @@ src/main/kotlin/com/example/mykku/
 ├── [domain]/
 │   ├── domain/        # Entity 클래스
 │   ├── dto/           # DTO 클래스
+│   ├── exception/     # 도메인별 예외 처리 (ErrorCode, Exception, Handler)
 │   ├── repository/    # Repository 인터페이스
 │   ├── tool/          # Tool 계층 (Reader, Writer)
 │   ├── [Domain]Controller.kt
 │   └── [Domain]Service.kt
 ├── auth/              # 인증/인가
-├── common/            # 공통 클래스
+├── common/            
+│   ├── domain/        # 공통 Entity 기반 클래스
+│   ├── exception/     # 공통 예외 처리 구조
+│   └── util/          # 공통 유틸리티
 ├── config/            # 설정 클래스
-├── exception/         # 예외 처리
 └── image/             # 이미지 업로드
 ```
 
@@ -409,3 +457,5 @@ class FeedService(
 - **복잡한 쿼리는 Tool 계층에 캡슐화하세요**
 - **페이지네이션은 항상 적용을 고려하세요**
 - **모든 기능은 5계층 테스트를 완전히 구현하세요**
+- **각 도메인은 독립적인 예외 처리 체계를 유지하세요**
+- **새 도메인 추가 시 반드시 도메인별 예외 구조를 생성하세요**
