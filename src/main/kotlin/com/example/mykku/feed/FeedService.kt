@@ -1,18 +1,25 @@
 package com.example.mykku.feed
 
+import com.example.mykku.board.domain.Board
 import com.example.mykku.board.tool.BoardReader
+import com.example.mykku.feed.domain.Feed
+import com.example.mykku.feed.domain.FeedImage
+import com.example.mykku.feed.domain.FeedTag
 import com.example.mykku.feed.dto.*
 import com.example.mykku.feed.tool.FeedDtoConverter
 import com.example.mykku.feed.tool.FeedReader
 import com.example.mykku.feed.tool.FeedWriter
 import com.example.mykku.image.ImageUploadService
+import com.example.mykku.image.dto.ImageUploadResult
 import com.example.mykku.like.tool.LikeFeedReader
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.tool.MemberReader
 import com.example.mykku.member.tool.SaveFeedReader
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
 
 @Service
 class FeedService(
@@ -42,16 +49,16 @@ class FeedService(
         return buildCreateFeedResponse(feed, feedImages, feedTags, board, member)
     }
 
-    private fun uploadImages(images: List<org.springframework.web.multipart.MultipartFile>): List<com.example.mykku.image.dto.ImageUploadResult> {
+    private fun uploadImages(images: List<MultipartFile>): List<ImageUploadResult> {
         return if (images.isEmpty()) emptyList()
         else imageUploadService.uploadImages(images)
     }
 
     private fun buildCreateFeedResponse(
-        feed: com.example.mykku.feed.domain.Feed,
-        feedImages: List<com.example.mykku.feed.domain.FeedImage>,
-        feedTags: List<com.example.mykku.feed.domain.FeedTag>,
-        board: com.example.mykku.board.domain.Board,
+        feed: Feed,
+        feedImages: List<FeedImage>,
+        feedTags: List<FeedTag>,
+        board: Board,
         member: Member
     ): CreateFeedResponse {
         return CreateFeedResponse(
@@ -71,7 +78,7 @@ class FeedService(
         )
     }
 
-    private fun mapFeedImages(feedImages: List<com.example.mykku.feed.domain.FeedImage>): List<FeedImageResponse> {
+    private fun mapFeedImages(feedImages: List<FeedImage>): List<FeedImageResponse> {
         return feedImages.map {
             FeedImageResponse(
                 url = it.url,
@@ -111,7 +118,7 @@ class FeedService(
 
     private fun createPagedResponse(
         memberId: String,
-        feedPage: org.springframework.data.domain.Page<com.example.mykku.feed.domain.Feed>
+        feedPage: Page<Feed>
     ): PagedFeedsResponse {
         val feedResponses = feedDtoConverter.convertToFeedResponsesBatch(memberId, feedPage.content)
         val responsePage = feedPage.map { feed ->
@@ -141,7 +148,7 @@ class FeedService(
         return buildFeedDetailResponse(feed, feedData, interactions, eventTagTitles)
     }
 
-    private fun fetchFeedDetailData(feed: com.example.mykku.feed.domain.Feed): FeedDetailData {
+    private fun fetchFeedDetailData(feed: Feed): FeedDetailData {
         return FeedDetailData(
             feedImages = feedReader.getFeedImagesByFeed(feed),
             feedTags = feedReader.getFeedTagsByFeed(feed)
@@ -150,7 +157,7 @@ class FeedService(
 
     private fun fetchUserInteractions(
         memberId: String?,
-        feed: com.example.mykku.feed.domain.Feed
+        feed: Feed
     ): UserInteractions {
         return UserInteractions(
             isLiked = memberId?.let { likeFeedReader.isLiked(it, feed) } ?: false,
@@ -158,14 +165,14 @@ class FeedService(
         )
     }
 
-    private fun fetchEventTagTitles(feedTags: List<com.example.mykku.feed.domain.FeedTag>): Set<String> {
+    private fun fetchEventTagTitles(feedTags: List<FeedTag>): Set<String> {
         val tagTitles = feedTags.map { it.title }
         val eventTags = feedReader.getEventTagsByTitles(tagTitles)
         return eventTags.map { it.title }.toSet()
     }
 
     private fun buildFeedDetailResponse(
-        feed: com.example.mykku.feed.domain.Feed,
+        feed: Feed,
         feedData: FeedDetailData,
         interactions: UserInteractions,
         eventTagTitles: Set<String>
@@ -182,8 +189,8 @@ class FeedService(
     }
 
     private data class FeedDetailData(
-        val feedImages: List<com.example.mykku.feed.domain.FeedImage>,
-        val feedTags: List<com.example.mykku.feed.domain.FeedTag>
+        val feedImages: List<FeedImage>,
+        val feedTags: List<FeedTag>
     )
 
     private data class UserInteractions(
