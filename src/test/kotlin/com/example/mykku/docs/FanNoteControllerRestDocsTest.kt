@@ -1,6 +1,7 @@
 package com.example.mykku.docs
 
 import com.example.mykku.BaseControllerRestDocsTest
+import com.example.mykku.docs.RestDocsUtils.paginationParams
 import com.example.mykku.fannote.exception.FanNoteException
 import com.example.mykku.fannote.exception.FanNoteErrorCode
 import com.example.mykku.fannote.FanNoteController
@@ -78,8 +79,7 @@ class FanNoteControllerRestDocsTest : BaseControllerRestDocsTest() {
                 document(
                     "fan-note-list",
                     queryParameters(
-                        parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
-                        parameterWithName("size").description("페이지 크기 (기본값: 20, 최대: 100)").optional()
+                        *paginationParams(pageDefault = 0, sizeDefault = 20).toTypedArray()
                     ),
                     responseFields(
                         fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),

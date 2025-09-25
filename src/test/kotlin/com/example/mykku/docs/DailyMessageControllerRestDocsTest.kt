@@ -1,6 +1,8 @@
 package com.example.mykku.docs
 
 import com.example.mykku.BaseControllerRestDocsTest
+import com.example.mykku.docs.RestDocsUtils.queryParam
+import com.example.mykku.docs.RestDocsUtils.sortParam
 import com.example.mykku.dailymessage.DailyMessageController
 import com.example.mykku.dailymessage.DailyMessageService
 import com.example.mykku.dailymessage.domain.SortDirection
@@ -79,8 +81,8 @@ class DailyMessageControllerRestDocsTest : BaseControllerRestDocsTest() {
                     "daily-message-list",
                     queryParameters(
                         parameterWithName("date").description("조회할 날짜 (YYYY-MM-DD 형식)"),
-                        parameterWithName("limit").description("조회할 개수 (기본값: 10)").optional(),
-                        parameterWithName("sort").description("정렬 방향 (ASC/DESC, 기본값: DESC)").optional()
+                        queryParam("limit", "조회할 개수", defaultValue = 10),
+                        queryParam("sort", "정렬 방향 (ASC/DESC)", defaultValue = "DESC")
                     ),
                     responseFields(
                         fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
