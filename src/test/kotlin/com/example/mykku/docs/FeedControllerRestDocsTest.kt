@@ -1,5 +1,7 @@
 package com.example.mykku.docs
 
+import com.example.mykku.docs.RestDocsUtils.queryParam
+import com.example.mykku.docs.RestDocsUtils.paginationParams
 import com.example.mykku.BaseControllerRestDocsTest
 import com.example.mykku.feed.FeedCommentService
 import com.example.mykku.feed.FeedController
@@ -142,9 +144,8 @@ class FeedControllerRestDocsTest : BaseControllerRestDocsTest() {
                         parameterWithName("memberId").description("조회할 회원의 ID")
                     ),
                     queryParameters(
-                        parameterWithName("page").description("페이지 번호 (0부터 시작)").optional(),
-                        parameterWithName("size").description("페이지 크기").optional(),
-                        parameterWithName("minCommonFollowers").description("공통 팔로워 최소 수").optional()
+                        *paginationParams().toTypedArray(),
+                        queryParam("minCommonFollowers", "공통 팔로워 최소 수", defaultValue = 10)
                     ),
                     responseFields(
                         fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
@@ -497,8 +498,7 @@ class FeedControllerRestDocsTest : BaseControllerRestDocsTest() {
                         parameterWithName("boardId").description("조회할 게시판의 ID")
                     ),
                     queryParameters(
-                        parameterWithName("page").description("페이지 번호 (0부터 시작)").optional(),
-                        parameterWithName("size").description("페이지 크기").optional()
+                        *paginationParams().toTypedArray()
                     ),
                     responseFields(
                         fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
