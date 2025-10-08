@@ -8,9 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
+import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 
 @DataJpaTest
+@ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class FanNotePageRepositoryTest {
 
@@ -35,9 +37,12 @@ class FanNotePageRepositoryTest {
         )
         val savedFanNote = fanNoteRepository.save(fanNote)
 
-        val page3 = FanNotePage(pageNumber = 3, imageUrl = "https://s3.amazonaws.com/mykku/page3.jpg", fanNote = savedFanNote)
-        val page1 = FanNotePage(pageNumber = 1, imageUrl = "https://s3.amazonaws.com/mykku/page1.jpg", fanNote = savedFanNote)
-        val page2 = FanNotePage(pageNumber = 2, imageUrl = "https://s3.amazonaws.com/mykku/page2.jpg", fanNote = savedFanNote)
+        val page3 =
+            FanNotePage(pageNumber = 3, imageUrl = "https://s3.amazonaws.com/mykku/page3.jpg", fanNote = savedFanNote)
+        val page1 =
+            FanNotePage(pageNumber = 1, imageUrl = "https://s3.amazonaws.com/mykku/page1.jpg", fanNote = savedFanNote)
+        val page2 =
+            FanNotePage(pageNumber = 2, imageUrl = "https://s3.amazonaws.com/mykku/page2.jpg", fanNote = savedFanNote)
 
         fanNotePageRepository.save(page3)
         fanNotePageRepository.save(page1)

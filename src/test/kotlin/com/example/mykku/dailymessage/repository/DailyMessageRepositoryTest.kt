@@ -6,11 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.data.domain.PageRequest
+import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @DataJpaTest
+@ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class DailyMessageRepositoryTest {
 
@@ -20,28 +22,28 @@ class DailyMessageRepositoryTest {
     @Test
     fun `findByDateBeforeOrEqualOrderByDateDesc는 지정한 날짜 이전 또는 같은 날짜의 데일리메시지를 내림차순으로 조회한다`() {
         val baseDate = LocalDate.of(2024, 1, 15)
-        
+
         val message1 = DailyMessage(
             title = "1월 10일 메시지",
             content = "과거 메시지",
             date = baseDate.minusDays(5)
         )
         dailyMessageRepository.save(message1)
-        
+
         val message2 = DailyMessage(
             title = "1월 15일 메시지",
             content = "기준일 메시지",
             date = baseDate
         )
         dailyMessageRepository.save(message2)
-        
+
         val message3 = DailyMessage(
             title = "1월 20일 메시지",
             content = "미래 메시지",
             date = baseDate.plusDays(5)
         )
         dailyMessageRepository.save(message3)
-        
+
         val message4 = DailyMessage(
             title = "1월 12일 메시지",
             content = "중간 메시지",
@@ -62,28 +64,28 @@ class DailyMessageRepositoryTest {
     @Test
     fun `findByDateBeforeOrEqualOrderByDateAsc는 지정한 날짜 이전 또는 같은 날짜의 데일리메시지를 오름차순으로 조회한다`() {
         val baseDate = LocalDate.of(2024, 2, 15)
-        
+
         val message1 = DailyMessage(
             title = "2월 10일 메시지",
             content = "과거 메시지",
             date = baseDate.minusDays(5)
         )
         dailyMessageRepository.save(message1)
-        
+
         val message2 = DailyMessage(
             title = "2월 15일 메시지",
             content = "기준일 메시지",
             date = baseDate
         )
         dailyMessageRepository.save(message2)
-        
+
         val message3 = DailyMessage(
             title = "2월 20일 메시지",
             content = "미래 메시지",
             date = baseDate.plusDays(5)
         )
         dailyMessageRepository.save(message3)
-        
+
         val message4 = DailyMessage(
             title = "2월 12일 메시지",
             content = "중간 메시지",
@@ -104,7 +106,7 @@ class DailyMessageRepositoryTest {
     @Test
     fun `findByDateBeforeOrEqualOrderByDateDesc는 조건에 맞는 메시지가 없으면 빈 리스트를 반환한다`() {
         val futureDate = LocalDate.of(2024, 3, 15)
-        
+
         val message = DailyMessage(
             title = "3월 20일 메시지",
             content = "미래 메시지",
@@ -121,7 +123,7 @@ class DailyMessageRepositoryTest {
     @Test
     fun `findByDateBeforeOrEqualOrderByDateAsc는 조건에 맞는 메시지가 없으면 빈 리스트를 반환한다`() {
         val futureDate = LocalDate.of(2024, 4, 15)
-        
+
         val message = DailyMessage(
             title = "4월 20일 메시지",
             content = "미래 메시지",
@@ -138,7 +140,7 @@ class DailyMessageRepositoryTest {
     @Test
     fun `Pageable을 활용한 페이징이 정상 동작한다`() {
         val baseDate = LocalDate.of(2024, 5, 15)
-        
+
         // 10개의 메시지 생성
         repeat(10) { index ->
             val message = DailyMessage(

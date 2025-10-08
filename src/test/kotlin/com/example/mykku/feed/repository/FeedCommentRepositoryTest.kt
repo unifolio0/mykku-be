@@ -12,10 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.data.domain.PageRequest
+import org.springframework.test.context.ActiveProfiles
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @DataJpaTest
+@ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class FeedCommentRepositoryTest {
 
@@ -123,7 +125,7 @@ class FeedCommentRepositoryTest {
     @Test
     fun `findByParentComment는 특정 부모 댓글의 자식 댓글들을 조회한다`() {
         val (feed, parentComment, childComment) = createTestData()
-        
+
         val anotherChildComment = FeedComment(
             content = "또 다른 자식 댓글",
             feed = feed,
@@ -142,7 +144,7 @@ class FeedCommentRepositoryTest {
     @Test
     fun `findByParentComment는 자식 댓글이 없는 부모 댓글의 경우 빈 리스트를 반환한다`() {
         val (feed, _, _) = createTestData()
-        
+
         val lonelyParent = FeedComment(
             content = "외로운 부모 댓글",
             feed = feed,
@@ -158,14 +160,14 @@ class FeedCommentRepositoryTest {
     @Test
     fun `findByParentCommentIn은 여러 부모 댓글들의 자식 댓글들을 조회한다`() {
         val (feed, parentComment1, childComment1) = createTestData()
-        
+
         val parentComment2 = FeedComment(
             content = "두 번째 부모 댓글",
             feed = feed,
             member = feed.member
         )
         feedCommentRepository.save(parentComment2)
-        
+
         val childComment2 = FeedComment(
             content = "두 번째 자식 댓글",
             feed = feed,
@@ -185,14 +187,14 @@ class FeedCommentRepositoryTest {
     @Test
     fun `findByParentCommentIn은 자식 댓글이 없는 부모 댓글들의 경우 빈 리스트를 반환한다`() {
         val (feed, _, _) = createTestData()
-        
+
         val lonelyParent1 = FeedComment(
             content = "외로운 부모1",
             feed = feed,
             member = feed.member
         )
         feedCommentRepository.save(lonelyParent1)
-        
+
         val lonelyParent2 = FeedComment(
             content = "외로운 부모2",
             feed = feed,
