@@ -8,16 +8,17 @@ spring:
     password: ${secret.datasource.password}
   jpa:
     hibernate:
-      ddl-auto: create-drop
-    defer-datasource-initialization: true
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
-  sql:
-    init:
-      mode: always
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 0
+    locations: classpath:db/migration
 
 jwt:
   secret: ${secret.jwt.secret_key}

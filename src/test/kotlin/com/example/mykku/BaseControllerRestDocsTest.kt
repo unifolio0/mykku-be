@@ -14,9 +14,11 @@ import org.springframework.restdocs.RestDocumentationContextProvider
 import org.springframework.restdocs.RestDocumentationExtension
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
 import org.springframework.restdocs.operation.preprocess.Preprocessors.*
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
 
+@ActiveProfiles("test")
 @ExtendWith(MockitoExtension::class, RestDocumentationExtension::class)
 abstract class BaseControllerRestDocsTest {
 
