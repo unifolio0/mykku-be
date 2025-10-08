@@ -34,6 +34,7 @@ class HomeServiceTest {
     fun `getHomeData - 정상적으로 홈 데이터를 반환한다`() {
         // given
         val dailyMessage = DailyMessage(
+            id = 1L,
             title = "오늘의 메시지",
             content = "좋은 하루 보내세요",
             date = LocalDate.now()
@@ -49,7 +50,10 @@ class HomeServiceTest {
         val result = homeService.getHomeData()
 
         // then
-        assertEquals(dailyMessage.content, result.dailyMessage)
+        assertEquals(dailyMessage.id, result.dailyMessage.id)
+        assertEquals(dailyMessage.title, result.dailyMessage.title)
+        assertEquals(dailyMessage.content, result.dailyMessage.content)
+        assertEquals(dailyMessage.date, result.dailyMessage.date)
         assertEquals(events, result.events)
         assertEquals(feeds, result.feeds)
         assertEquals(mutableListOf(), result.contests)

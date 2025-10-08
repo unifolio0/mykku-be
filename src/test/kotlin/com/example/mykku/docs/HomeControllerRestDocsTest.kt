@@ -1,6 +1,7 @@
 package com.example.mykku.docs
 
 import com.example.mykku.BaseControllerRestDocsTest
+import com.example.mykku.dailymessage.dto.DailyMessageSummaryResponse
 import com.example.mykku.feed.dto.ContestWinnerResponse
 import com.example.mykku.feed.dto.ContestWinnersResponse
 import com.example.mykku.feed.dto.EventPreviewResponse
@@ -23,6 +24,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPat
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
+import java.time.LocalDate
 
 class HomeControllerRestDocsTest : BaseControllerRestDocsTest() {
 
@@ -40,7 +42,12 @@ class HomeControllerRestDocsTest : BaseControllerRestDocsTest() {
     fun `홈 데이터 조회 API 문서화`() {
         // given
         val homeResponse = HomeResponse(
-            dailyMessage = "오늘도 좋은 하루 되세요! 작은 일에도 감사하는 마음을 가져보세요.",
+            dailyMessage = DailyMessageSummaryResponse(
+                id = 1L,
+                title = "오늘의 덕담",
+                content = "오늘도 좋은 하루 되세요! 작은 일에도 감사하는 마음을 가져보세요.",
+                date = LocalDate.now()
+            ),
             events = listOf(
                 EventPreviewResponse(
                     id = 1L,
@@ -122,7 +129,11 @@ class HomeControllerRestDocsTest : BaseControllerRestDocsTest() {
                     responseFields(
                         fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                         fieldWithPath("data").type(JsonFieldType.OBJECT).description("홈 데이터"),
-                        fieldWithPath("data.dailyMessage").type(JsonFieldType.STRING).description("오늘의 메시지"),
+                        fieldWithPath("data.dailyMessage").type(JsonFieldType.OBJECT).description("오늘의 메시지"),
+                        fieldWithPath("data.dailyMessage.id").type(JsonFieldType.NUMBER).description("메시지 ID"),
+                        fieldWithPath("data.dailyMessage.title").type(JsonFieldType.STRING).description("메시지 제목"),
+                        fieldWithPath("data.dailyMessage.content").type(JsonFieldType.STRING).description("메시지 내용"),
+                        fieldWithPath("data.dailyMessage.date").type(JsonFieldType.STRING).description("메시지 날짜"),
                         fieldWithPath("data.events").type(JsonFieldType.ARRAY).description("이벤트 목록"),
                         fieldWithPath("data.events[].id").type(JsonFieldType.NUMBER).description("이벤트 ID"),
                         fieldWithPath("data.events[].images").type(JsonFieldType.ARRAY)
