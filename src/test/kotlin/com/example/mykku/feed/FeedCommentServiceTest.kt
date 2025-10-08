@@ -1,5 +1,6 @@
 package com.example.mykku.feed
 
+import com.example.mykku.BaseServiceTest
 import com.example.mykku.board.domain.Board
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedComment
@@ -7,21 +8,16 @@ import com.example.mykku.feed.tool.FeedCommentReader
 import com.example.mykku.feed.tool.FeedReader
 import com.example.mykku.like.tool.LikeFeedCommentReader
 import com.example.mykku.member.domain.Member
-import com.example.mykku.member.domain.SocialProvider
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
-import java.time.LocalDateTime
 import kotlin.test.assertEquals
 
-@ExtendWith(MockitoExtension::class)
-class FeedCommentServiceTest {
+class FeedCommentServiceTest : BaseServiceTest() {
 
     @Mock
     private lateinit var feedReader: FeedReader
@@ -35,20 +31,11 @@ class FeedCommentServiceTest {
     @InjectMocks
     private lateinit var feedCommentService: FeedCommentService
 
-    private val member = Member(
-        id = "member1",
-        nickname = "testUser",
-        role = "USER",
-        profileImage = "",
-        provider = SocialProvider.GOOGLE,
-        socialId = "123",
-        email = "test@test.com"
-    )
-
-    private val board = Board(id = 1L, title = "테스트 보드", logo = "")
+    private val member = createTestMember(id = "member1", nickname = "testUser", email = "test@test.com")
+    private val board = createTestBoard(id = 1L, title = "테스트 보드", logo = "")
 
     private val feed = createTestFeed()
-    
+
     private fun createTestFeed(): Feed {
         val feed = Feed(
             id = 1L,
@@ -57,10 +44,10 @@ class FeedCommentServiceTest {
             board = board,
             member = member
         )
-        initializeBaseEntityFields(feed)
+        initializeBaseEntityFieldsFromSuperclass(feed)
         return feed
     }
-    
+
     private fun createTestFeedComment(
         id: Long = 1L,
         content: String,
@@ -75,19 +62,8 @@ class FeedCommentServiceTest {
             member = member,
             parentComment = parentComment
         )
-        initializeBaseEntityFields(comment)
+        initializeBaseEntityFieldsFromSuperclass(comment)
         return comment
-    }
-    
-    private fun initializeBaseEntityFields(entity: Any) {
-        val now = LocalDateTime.now()
-        val createdAtField = entity::class.java.superclass.getDeclaredField("createdAt")
-        createdAtField.isAccessible = true
-        createdAtField.set(entity, now)
-        
-        val updatedAtField = entity::class.java.superclass.getDeclaredField("updatedAt")
-        updatedAtField.isAccessible = true
-        updatedAtField.set(entity, now)
     }
 
     @Test

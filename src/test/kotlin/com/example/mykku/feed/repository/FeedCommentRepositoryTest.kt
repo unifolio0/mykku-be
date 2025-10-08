@@ -1,25 +1,15 @@
 package com.example.mykku.feed.repository
 
-import com.example.mykku.board.domain.Board
-import com.example.mykku.board.repository.BoardRepository
+import com.example.mykku.BaseRepositoryTest
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedComment
-import com.example.mykku.member.domain.Member
-import com.example.mykku.member.domain.SocialProvider
-import com.example.mykku.member.repository.MemberRepository
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.data.domain.PageRequest
-import org.springframework.test.context.ActiveProfiles
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-@DataJpaTest
-@ActiveProfiles("test")
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class FeedCommentRepositoryTest {
+class FeedCommentRepositoryTest : BaseRepositoryTest() {
 
     @Autowired
     private lateinit var feedCommentRepository: FeedCommentRepository
@@ -27,29 +17,9 @@ class FeedCommentRepositoryTest {
     @Autowired
     private lateinit var feedRepository: FeedRepository
 
-    @Autowired
-    private lateinit var memberRepository: MemberRepository
-
-    @Autowired
-    private lateinit var boardRepository: BoardRepository
-
     private fun createTestData(): Triple<Feed, FeedComment, FeedComment> {
-        val member = Member(
-            id = "test_member",
-            nickname = "테스트유저",
-            role = "USER",
-            profileImage = "profile.jpg",
-            provider = SocialProvider.GOOGLE,
-            socialId = "12345",
-            email = "test@example.com"
-        )
-        memberRepository.save(member)
-
-        val board = Board(
-            title = "테스트보드",
-            logo = "logo.jpg"
-        )
-        boardRepository.save(board)
+        val member = createAndSaveMember("test_member", "테스트유저")
+        val board = createAndSaveBoard()
 
         val feed = Feed(
             title = "테스트 피드",
@@ -91,22 +61,8 @@ class FeedCommentRepositoryTest {
 
     @Test
     fun `findByFeedAndParentCommentIsNull은 댓글이 없는 피드의 경우 빈 페이지를 반환한다`() {
-        val member = Member(
-            id = "test_member2",
-            nickname = "테스트유저2",
-            role = "USER",
-            profileImage = "profile.jpg",
-            provider = SocialProvider.GOOGLE,
-            socialId = "54321",
-            email = "test2@example.com"
-        )
-        memberRepository.save(member)
-
-        val board = Board(
-            title = "테스트보드2",
-            logo = "logo.jpg"
-        )
-        boardRepository.save(board)
+        val member = createAndSaveMember("test_member2", "테스트유저2")
+        val board = createAndSaveBoard("테스트보드2", "logo.jpg")
 
         val emptyFeed = Feed(
             title = "빈 피드",

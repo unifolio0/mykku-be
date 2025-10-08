@@ -1,50 +1,22 @@
 package com.example.mykku.feed
 
-import com.example.mykku.board.domain.Board
-import com.example.mykku.board.repository.BoardRepository
+import com.example.mykku.BaseControllerTest
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.dto.CreateFeedRequestDto
 import com.example.mykku.feed.repository.FeedRepository
-import com.example.mykku.member.domain.Member
-import com.example.mykku.member.domain.SocialProvider
-import com.example.mykku.member.repository.MemberRepository
-import com.example.mykku.util.DatabaseCleaner
-import com.example.mykku.util.TestTokenGenerator
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.hamcrest.Matchers.*
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.test.context.ActiveProfiles
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-@ExtendWith(DatabaseCleaner::class)
 @DisplayName("FeedController 통합 테스트")
-class FeedControllerTest {
-
-    @LocalServerPort
-    private var port: Int = 0
-
-    @Autowired
-    private lateinit var memberRepository: MemberRepository
-
-    @Autowired
-    private lateinit var boardRepository: BoardRepository
+class FeedControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var feedRepository: FeedRepository
-
-    @BeforeEach
-    fun setUp() {
-        RestAssured.port = port
-    }
 
     @Test
     @DisplayName("피드 생성 - 정상 케이스")

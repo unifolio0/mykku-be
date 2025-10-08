@@ -1,19 +1,15 @@
 package com.example.mykku.feed.tool
 
-import com.example.mykku.board.domain.Board
+import com.example.mykku.BaseToolTest
 import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.feed.exception.FeedErrorCode
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedComment
 import com.example.mykku.feed.repository.FeedCommentRepository
-import com.example.mykku.member.domain.Member
-import com.example.mykku.member.domain.SocialProvider
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
@@ -22,8 +18,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
-@ExtendWith(MockitoExtension::class)
-class FeedCommentReaderTest {
+class FeedCommentReaderTest : BaseToolTest() {
 
     @Mock
     private lateinit var feedCommentRepository: FeedCommentRepository
@@ -32,21 +27,8 @@ class FeedCommentReaderTest {
     private lateinit var feedCommentReader: FeedCommentReader
 
     private fun createMockFeed(): Feed {
-        val member = Member(
-            id = "test_member",
-            nickname = "테스트유저",
-            role = "USER",
-            profileImage = "profile.jpg",
-            provider = SocialProvider.GOOGLE,
-            socialId = "12345",
-            email = "test@example.com"
-        )
-
-        val board = Board(
-            id = 1L,
-            title = "테스트보드",
-            logo = "logo.jpg"
-        )
+        val member = createMockMember("test_member", "테스트유저")
+        val board = createMockBoard()
 
         return Feed(
             id = 1L,

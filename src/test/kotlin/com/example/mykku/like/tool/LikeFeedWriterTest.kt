@@ -1,24 +1,21 @@
 package com.example.mykku.like.tool
 
+import com.example.mykku.BaseToolTest
 import com.example.mykku.board.domain.Board
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.like.domain.LikeFeed
 import com.example.mykku.like.repository.LikeFeedRepository
 import com.example.mykku.member.domain.Member
-import com.example.mykku.member.domain.SocialProvider
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
 
-@ExtendWith(MockitoExtension::class)
-class LikeFeedWriterTest {
+class LikeFeedWriterTest : BaseToolTest() {
 
     @Mock
     private lateinit var likeFeedRepository: LikeFeedRepository
@@ -26,25 +23,8 @@ class LikeFeedWriterTest {
     @InjectMocks
     private lateinit var likeFeedWriter: LikeFeedWriter
 
-    private fun createMockMember(): Member {
-        return Member(
-            id = "member123",
-            nickname = "테스트유저",
-            role = "USER",
-            profileImage = "profile.jpg",
-            provider = SocialProvider.GOOGLE,
-            socialId = "12345",
-            email = "test@example.com"
-        )
-    }
-
     private fun createMockFeed(): Feed {
-        val board = Board(
-            id = 1L,
-            title = "테스트보드",
-            logo = "logo.jpg"
-        )
-        
+        val board = createMockBoard()
         return Feed(
             id = 1L,
             title = "테스트 피드",

@@ -1,25 +1,20 @@
 package com.example.mykku.like.tool
 
-import com.example.mykku.board.domain.Board
+import com.example.mykku.BaseToolTest
 import com.example.mykku.like.exception.LikeException
 import com.example.mykku.like.exception.LikeErrorCode
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.like.repository.LikeFeedRepository
-import com.example.mykku.member.domain.Member
-import com.example.mykku.member.domain.SocialProvider
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-@ExtendWith(MockitoExtension::class)
-class LikeFeedReaderTest {
+class LikeFeedReaderTest : BaseToolTest() {
 
     @Mock
     private lateinit var likeFeedRepository: LikeFeedRepository
@@ -28,22 +23,8 @@ class LikeFeedReaderTest {
     private lateinit var likeFeedReader: LikeFeedReader
 
     private fun createMockFeed(): Feed {
-        val member = Member(
-            id = "test_member",
-            nickname = "테스트유저",
-            role = "USER",
-            profileImage = "profile.jpg",
-            provider = SocialProvider.GOOGLE,
-            socialId = "12345",
-            email = "test@example.com"
-        )
-
-        val board = Board(
-            id = 1L,
-            title = "테스트보드",
-            logo = "logo.jpg"
-        )
-
+        val member = createMockMember("test_member", "테스트유저")
+        val board = createMockBoard()
         return Feed(
             id = 1L,
             title = "테스트 피드",

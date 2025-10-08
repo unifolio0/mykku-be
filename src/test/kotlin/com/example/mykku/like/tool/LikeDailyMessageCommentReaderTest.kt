@@ -1,19 +1,17 @@
 package com.example.mykku.like.tool
 
+import com.example.mykku.BaseToolTest
 import com.example.mykku.like.exception.LikeException
 import com.example.mykku.like.exception.LikeErrorCode
 import com.example.mykku.like.repository.LikeDailyMessageCommentRepository
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 
-@ExtendWith(MockitoExtension::class)
-class LikeDailyMessageCommentReaderTest {
+class LikeDailyMessageCommentReaderTest : BaseToolTest() {
 
     @Mock
     private lateinit var likeDailyMessageCommentRepository: LikeDailyMessageCommentRepository

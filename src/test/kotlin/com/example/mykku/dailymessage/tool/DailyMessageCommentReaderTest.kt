@@ -1,26 +1,22 @@
 package com.example.mykku.dailymessage.tool
 
+import com.example.mykku.BaseToolTest
 import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.domain.DailyMessageComment
 import com.example.mykku.dailymessage.repository.DailyMessageCommentRepository
 import com.example.mykku.dailymessage.exception.DailyMessageException
 import com.example.mykku.dailymessage.exception.DailyMessageErrorCode
-import com.example.mykku.member.domain.Member
-import com.example.mykku.member.domain.SocialProvider
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
 import java.time.LocalDate
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
 
-@ExtendWith(MockitoExtension::class)
-class DailyMessageCommentReaderTest {
+class DailyMessageCommentReaderTest : BaseToolTest() {
 
     @Mock
     private lateinit var dailyMessageCommentRepository: DailyMessageCommentRepository
@@ -29,23 +25,15 @@ class DailyMessageCommentReaderTest {
     private lateinit var dailyMessageCommentReader: DailyMessageCommentReader
 
     private fun createMockComment(id: Long = 1L): DailyMessageComment {
-        val member = Member(
-            id = "test_member",
-            nickname = "테스트유저",
-            role = "USER",
-            profileImage = "profile.jpg",
-            provider = SocialProvider.GOOGLE,
-            socialId = "12345",
-            email = "test@example.com"
-        )
-        
+        val member = createMockMember("test_member", "테스트유저")
+
         val dailyMessage = DailyMessage(
             id = 1L,
             title = "오늘의 메시지",
             content = "테스트 메시지",
             date = LocalDate.now()
         )
-        
+
         return DailyMessageComment(
             id = id,
             content = "테스트 댓글",

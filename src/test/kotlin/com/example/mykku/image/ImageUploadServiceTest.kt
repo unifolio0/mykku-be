@@ -1,14 +1,13 @@
 package com.example.mykku.image
 
+import com.example.mykku.BaseServiceTest
 import com.example.mykku.config.S3Properties
 import com.example.mykku.image.exception.ImageException
 import com.example.mykku.image.exception.ImageErrorCode
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.*
 import org.springframework.web.multipart.MultipartFile
 import software.amazon.awssdk.services.s3.S3Client
@@ -19,8 +18,7 @@ import javax.imageio.ImageIO
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-@ExtendWith(MockitoExtension::class)
-class ImageUploadServiceTest {
+class ImageUploadServiceTest : BaseServiceTest() {
 
     @Mock
     private lateinit var s3Client: S3Client

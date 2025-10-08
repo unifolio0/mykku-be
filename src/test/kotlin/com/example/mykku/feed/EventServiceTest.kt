@@ -1,5 +1,6 @@
 package com.example.mykku.feed
 
+import com.example.mykku.BaseServiceTest
 import com.example.mykku.feed.domain.Event
 import com.example.mykku.feed.domain.EventImage
 import com.example.mykku.feed.domain.EventTag
@@ -7,16 +8,13 @@ import com.example.mykku.feed.dto.CreateEventRequest
 import com.example.mykku.feed.dto.EventImageRequest
 import com.example.mykku.feed.tool.EventWriter
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
 
-@ExtendWith(MockitoExtension::class)
-class EventServiceTest {
+class EventServiceTest : BaseServiceTest() {
 
     @Mock
     private lateinit var eventWriter: EventWriter
@@ -36,19 +34,8 @@ class EventServiceTest {
             isContest = isContest,
             expiredAt = expiredAt
         )
-        initializeBaseEntityFields(event)
+        initializeBaseEntityFieldsFromSuperclass(event)
         return event
-    }
-    
-    private fun initializeBaseEntityFields(entity: Any) {
-        val now = LocalDateTime.now()
-        val createdAtField = entity::class.java.superclass.getDeclaredField("createdAt")
-        createdAtField.isAccessible = true
-        createdAtField.set(entity, now)
-        
-        val updatedAtField = entity::class.java.superclass.getDeclaredField("updatedAt")
-        updatedAtField.isAccessible = true
-        updatedAtField.set(entity, now)
     }
 
     @Test

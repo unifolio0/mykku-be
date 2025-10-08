@@ -1,24 +1,21 @@
 package com.example.mykku.dailymessage
 
+import com.example.mykku.BaseServiceTest
 import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.domain.DailyMessageComment
 import com.example.mykku.dailymessage.domain.SortDirection
 import com.example.mykku.dailymessage.repository.DailyMessageCommentRepository
 import com.example.mykku.dailymessage.tool.DailyMessageReader
 import com.example.mykku.member.domain.Member
-import com.example.mykku.member.domain.SocialProvider
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
 import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
 
-@ExtendWith(MockitoExtension::class)
-class DailyMessageServiceTest {
+class DailyMessageServiceTest : BaseServiceTest() {
 
     @Mock
     private lateinit var dailyMessageReader: DailyMessageReader
@@ -28,7 +25,7 @@ class DailyMessageServiceTest {
 
     @InjectMocks
     private lateinit var dailyMessageService: DailyMessageService
-    
+
     private fun createTestDailyMessage(
         id: Long = 1L,
         title: String,
@@ -41,10 +38,10 @@ class DailyMessageServiceTest {
             content = content,
             date = date
         )
-        initializeBaseEntityFields(dailyMessage)
+        initializeBaseEntityFieldsFromSuperclass(dailyMessage)
         return dailyMessage
     }
-    
+
     private fun createTestComment(
         id: Long = 1L,
         content: String,
@@ -59,30 +56,11 @@ class DailyMessageServiceTest {
             member = member,
             parentComment = parentComment
         )
-        initializeBaseEntityFields(comment)
+        initializeBaseEntityFieldsFromSuperclass(comment)
         return comment
     }
-    
-    private fun initializeBaseEntityFields(entity: Any) {
-        val now = LocalDateTime.now()
-        val createdAtField = entity::class.java.superclass.getDeclaredField("createdAt")
-        createdAtField.isAccessible = true
-        createdAtField.set(entity, now)
-        
-        val updatedAtField = entity::class.java.superclass.getDeclaredField("updatedAt")
-        updatedAtField.isAccessible = true
-        updatedAtField.set(entity, now)
-    }
 
-    private val member = Member(
-        id = "member1",
-        nickname = "testUser",
-        role = "USER",
-        profileImage = "",
-        provider = SocialProvider.GOOGLE,
-        socialId = "123",
-        email = "test@test.com"
-    )
+    private val member = createTestMember(id = "member1", nickname = "testUser", email = "test@test.com")
 
     @Test
     fun `getDailyMessages - 일일 메시지 목록을 반환한다`() {

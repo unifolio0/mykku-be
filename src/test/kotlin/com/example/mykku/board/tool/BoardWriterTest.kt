@@ -1,20 +1,18 @@
 package com.example.mykku.board.tool
 
+import com.example.mykku.BaseToolTest
 import com.example.mykku.board.domain.Board
 import com.example.mykku.board.repository.BoardRepository
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
 
-@ExtendWith(MockitoExtension::class)
-class BoardWriterTest {
+class BoardWriterTest : BaseToolTest() {
 
     @Mock
     private lateinit var boardRepository: BoardRepository

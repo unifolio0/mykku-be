@@ -1,58 +1,31 @@
 package com.example.mykku.home
 
-import com.example.mykku.board.domain.Board
-import com.example.mykku.board.repository.BoardRepository
+import com.example.mykku.BaseControllerTest
 import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.repository.DailyMessageRepository
 import com.example.mykku.feed.domain.Event
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.repository.EventRepository
 import com.example.mykku.feed.repository.FeedRepository
-import com.example.mykku.member.domain.Member
-import com.example.mykku.member.domain.SocialProvider
-import com.example.mykku.member.repository.MemberRepository
-import com.example.mykku.util.DatabaseCleaner
 import io.restassured.RestAssured
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-@ExtendWith(DatabaseCleaner::class)
 @DisplayName("HomeController 통합 테스트")
-class HomeControllerTest {
-
-    @LocalServerPort
-    private var port: Int = 0
+class HomeControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var dailyMessageRepository: DailyMessageRepository
-
-    @Autowired
-    private lateinit var memberRepository: MemberRepository
-
-    @Autowired
-    private lateinit var boardRepository: BoardRepository
 
     @Autowired
     private lateinit var feedRepository: FeedRepository
 
     @Autowired
     private lateinit var eventRepository: EventRepository
-
-    @BeforeEach
-    fun setUp() {
-        RestAssured.port = port
-    }
 
     //    @Test
     @DisplayName("홈 데이터 조회 - 정상 케이스")

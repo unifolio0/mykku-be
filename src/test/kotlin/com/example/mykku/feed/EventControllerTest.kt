@@ -1,33 +1,17 @@
 package com.example.mykku.feed
 
+import com.example.mykku.BaseControllerTest
 import com.example.mykku.feed.dto.CreateEventRequest
 import com.example.mykku.feed.dto.EventImageRequest
-import com.example.mykku.util.DatabaseCleaner
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import org.hamcrest.Matchers.*
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDateTime
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-@ExtendWith(DatabaseCleaner::class)
 @DisplayName("EventController 통합 테스트")
-class EventControllerTest {
-
-    @LocalServerPort
-    private var port: Int = 0
-
-    @BeforeEach
-    fun setUp() {
-        RestAssured.port = port
-    }
+class EventControllerTest : BaseControllerTest() {
 
     @Test
     @DisplayName("이벤트 생성 - 정상 케이스")

@@ -1,45 +1,26 @@
 package com.example.mykku.dailymessage.repository
 
+import com.example.mykku.BaseRepositoryTest
 import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.domain.DailyMessageComment
 import com.example.mykku.member.domain.Member
-import com.example.mykku.member.domain.SocialProvider
-import com.example.mykku.member.repository.MemberRepository
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
-import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-@DataJpaTest
-@ActiveProfiles("test")
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class DailyMessageCommentRepositoryTest {
+class DailyMessageCommentRepositoryTest : BaseRepositoryTest() {
 
     @Autowired
     private lateinit var dailyMessageCommentRepository: DailyMessageCommentRepository
 
     @Autowired
-    private lateinit var memberRepository: MemberRepository
-
-    @Autowired
     private lateinit var dailyMessageRepository: DailyMessageRepository
 
     private fun createTestData(): Triple<Member, DailyMessage, DailyMessageComment> {
-        val member = Member(
-            id = "test_member",
-            nickname = "테스트유저",
-            role = "USER",
-            profileImage = "profile.jpg",
-            provider = SocialProvider.GOOGLE,
-            socialId = "12345",
-            email = "test@example.com"
-        )
-        memberRepository.save(member)
+        val member = createAndSaveMember("test_member", "테스트유저")
 
         val dailyMessage = DailyMessage(
             title = "오늘의 메시지",
@@ -105,16 +86,7 @@ class DailyMessageCommentRepositoryTest {
 
     @Test
     fun `findByDailyMessage는 댓글이 없는 데일리메시지의 경우 빈 리스트를 반환한다`() {
-        val member = Member(
-            id = "test_member2",
-            nickname = "테스트유저2",
-            role = "USER",
-            profileImage = "profile.jpg",
-            provider = SocialProvider.GOOGLE,
-            socialId = "54321",
-            email = "test2@example.com"
-        )
-        memberRepository.save(member)
+        val member = createAndSaveMember("test_member2", "테스트유저2")
 
         val emptyDailyMessage = DailyMessage(
             title = "댓글 없는 메시지",

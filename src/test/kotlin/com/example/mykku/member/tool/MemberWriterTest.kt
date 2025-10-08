@@ -1,20 +1,18 @@
 package com.example.mykku.member.tool
 
+import com.example.mykku.BaseToolTest
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.repository.MemberRepository
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
 
-@ExtendWith(MockitoExtension::class)
-class MemberWriterTest {
+class MemberWriterTest : BaseToolTest() {
 
     @Mock
     private lateinit var memberRepository: MemberRepository

@@ -1,43 +1,21 @@
 package com.example.mykku.auth
 
+import com.example.mykku.BaseControllerTest
 import com.example.mykku.auth.dto.RefreshTokenRequest
 import com.example.mykku.auth.tool.JwtTokenProvider
-import com.example.mykku.member.domain.Member
-import com.example.mykku.member.domain.SocialProvider
-import com.example.mykku.member.repository.MemberRepository
-import com.example.mykku.util.DatabaseCleaner
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.test.context.ActiveProfiles
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-@ExtendWith(DatabaseCleaner::class)
 @DisplayName("AuthController 통합 테스트")
-class AuthControllerTest {
-
-    @LocalServerPort
-    private var port: Int = 0
-
-    @Autowired
-    private lateinit var memberRepository: MemberRepository
+class AuthControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var jwtTokenProvider: JwtTokenProvider
-
-    @BeforeEach
-    fun setUp() {
-        RestAssured.port = port
-    }
 
     @Test
     @DisplayName("리프레시 토큰으로 액세스 토큰 재발급 - 정상 케이스")

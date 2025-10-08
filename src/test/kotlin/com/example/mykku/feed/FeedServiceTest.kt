@@ -1,8 +1,8 @@
 package com.example.mykku.feed
 
+import com.example.mykku.BaseServiceTest
 import com.example.mykku.board.domain.Board
 import com.example.mykku.board.tool.BoardReader
-import com.example.mykku.common.domain.BaseEntity
 import com.example.mykku.image.exception.ImageErrorCode
 import com.example.mykku.image.exception.ImageException
 import com.example.mykku.feed.domain.Feed
@@ -10,10 +10,6 @@ import com.example.mykku.feed.domain.FeedComment
 import com.example.mykku.feed.domain.FeedImage
 import com.example.mykku.feed.domain.FeedTag
 import com.example.mykku.feed.dto.CreateFeedRequest
-import com.example.mykku.feed.repository.EventTagRepository
-import com.example.mykku.feed.repository.FeedCommentRepository
-import com.example.mykku.feed.repository.FeedImageRepository
-import com.example.mykku.feed.repository.FeedTagRepository
 import com.example.mykku.feed.tool.FeedDtoConverter
 import com.example.mykku.feed.tool.FeedReader
 import com.example.mykku.feed.tool.FeedWriter
@@ -21,15 +17,12 @@ import com.example.mykku.image.ImageUploadService
 import com.example.mykku.image.dto.ImageUploadResult
 import com.example.mykku.like.tool.LikeFeedReader
 import com.example.mykku.member.domain.Member
-import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.tool.MemberReader
 import com.example.mykku.member.tool.SaveFeedReader
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.isNull
@@ -38,13 +31,11 @@ import org.mockito.kotlin.whenever
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.web.multipart.MultipartFile
-import java.time.LocalDateTime
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-@ExtendWith(MockitoExtension::class)
-class FeedServiceTest {
+class FeedServiceTest : BaseServiceTest() {
 
     @Mock
     private lateinit var feedReader: FeedReader
@@ -73,21 +64,8 @@ class FeedServiceTest {
     @InjectMocks
     private lateinit var feedService: FeedService
 
-    private val member = Member(
-        id = "member1",
-        nickname = "test",
-        role = "USER",
-        profileImage = "",
-        provider = SocialProvider.GOOGLE,
-        socialId = "123",
-        email = "test@test.com"
-    )
-
-    private val board = Board(
-        id = 1L,
-        title = "보드1",
-        logo = "https://example.com/logo.png"
-    )
+    private val member = createTestMember(id = "member1", nickname = "test", email = "test@test.com")
+    private val board = createTestBoard(id = 1L, title = "보드1", logo = "https://example.com/logo.png")
 
     private fun createTestFeed(
         id: Long? = null,
@@ -103,15 +81,7 @@ class FeedServiceTest {
             board = board,
             member = member
         )
-        // createdAt과 updatedAt 설정 (테스트용)
-        val createdAtField = BaseEntity::class.java.getDeclaredField("createdAt")
-        createdAtField.isAccessible = true
-        createdAtField.set(feed, LocalDateTime.now())
-        
-        val updatedAtField = BaseEntity::class.java.getDeclaredField("updatedAt")
-        updatedAtField.isAccessible = true
-        updatedAtField.set(feed, LocalDateTime.now())
-        
+        initializeBaseEntityFieldsFromSuperclass(feed)
         return feed
     }
 
