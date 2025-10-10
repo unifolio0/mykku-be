@@ -1,26 +1,23 @@
 package com.example.mykku.member.tool
 
+import com.example.mykku.BaseToolTest
 import com.example.mykku.member.exception.MemberException
 import com.example.mykku.member.exception.MemberErrorCode
 import com.example.mykku.member.domain.Follow
 import com.example.mykku.member.domain.Member
-import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.repository.FollowRepository
 import com.example.mykku.member.repository.MemberRepository
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-@ExtendWith(MockitoExtension::class)
-class MemberReaderTest {
+class MemberReaderTest : BaseToolTest() {
 
     @Mock
     private lateinit var followRepository: FollowRepository
@@ -30,18 +27,6 @@ class MemberReaderTest {
 
     @InjectMocks
     private lateinit var memberReader: MemberReader
-
-    private fun createMockMember(id: String, nickname: String): Member {
-        return Member(
-            id = id,
-            nickname = nickname,
-            role = "USER",
-            profileImage = "profile.jpg",
-            provider = SocialProvider.GOOGLE,
-            socialId = "12345",
-            email = "test@example.com"
-        )
-    }
 
     @Test
     fun `getFollowerByMemberId는 팔로워 목록을 반환한다`() {

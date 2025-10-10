@@ -1,5 +1,6 @@
 package com.example.mykku.home
 
+import com.example.mykku.dailymessage.dto.DailyMessageSummaryResponse
 import com.example.mykku.dailymessage.tool.DailyMessageReader
 import com.example.mykku.feed.tool.EventReader
 import com.example.mykku.feed.tool.FeedReader
@@ -20,7 +21,12 @@ class HomeService(
         val feeds = feedReader.getFeedPreviews()
 
         return HomeResponse(
-            dailyMessage = todayDailyMessage.content,
+            dailyMessage = DailyMessageSummaryResponse(
+                id = todayDailyMessage.id!!,
+                title = todayDailyMessage.title,
+                content = todayDailyMessage.content,
+                date = todayDailyMessage.date
+            ),
             events = events,
             feeds = feeds,
             contests = mutableListOf()

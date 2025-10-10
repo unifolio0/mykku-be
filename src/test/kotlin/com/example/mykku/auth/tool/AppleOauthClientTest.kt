@@ -1,19 +1,17 @@
 package com.example.mykku.auth.tool
 
+import com.example.mykku.BaseToolTest
 import com.example.mykku.auth.exception.AuthException
 import com.example.mykku.auth.exception.AuthErrorCode
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.web.client.RestClient
 import kotlin.test.assertEquals
 
-@ExtendWith(MockitoExtension::class)
-class AppleOauthClientTest {
+class AppleOauthClientTest : BaseToolTest() {
 
     @Mock
     private lateinit var restClient: RestClient

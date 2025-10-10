@@ -1,5 +1,6 @@
 package com.example.mykku.dailymessage.tool
 
+import com.example.mykku.BaseToolTest
 import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.domain.SortDirection
 import com.example.mykku.dailymessage.repository.DailyMessageRepository
@@ -7,10 +8,8 @@ import com.example.mykku.dailymessage.exception.DailyMessageException
 import com.example.mykku.dailymessage.exception.DailyMessageErrorCode
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
 import org.springframework.data.domain.PageRequest
 import java.time.LocalDate
@@ -18,8 +17,7 @@ import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
 
-@ExtendWith(MockitoExtension::class)
-class DailyMessageReaderTest {
+class DailyMessageReaderTest : BaseToolTest() {
 
     @Mock
     private lateinit var dailyMessageRepository: DailyMessageRepository

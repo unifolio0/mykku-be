@@ -1,5 +1,6 @@
 package com.example.mykku.fannote.tool
 
+import com.example.mykku.BaseToolTest
 import com.example.mykku.fannote.exception.FanNoteException
 import com.example.mykku.fannote.exception.FanNoteErrorCode
 import com.example.mykku.fannote.domain.FanNote
@@ -9,10 +10,8 @@ import com.example.mykku.fannote.repository.FanNoteRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import org.springframework.data.domain.PageImpl
@@ -20,8 +19,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import java.time.LocalDate
 
-@ExtendWith(MockitoExtension::class)
-class FanNoteReaderTest {
+class FanNoteReaderTest : BaseToolTest() {
 
     @Mock
     private lateinit var fanNoteRepository: FanNoteRepository

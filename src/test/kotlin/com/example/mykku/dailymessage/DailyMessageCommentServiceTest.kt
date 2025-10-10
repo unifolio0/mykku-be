@@ -1,5 +1,6 @@
 package com.example.mykku.dailymessage
 
+import com.example.mykku.BaseServiceTest
 import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.domain.DailyMessageComment
 import com.example.mykku.dailymessage.dto.CreateCommentRequest
@@ -10,21 +11,17 @@ import com.example.mykku.dailymessage.tool.DailyMessageReader
 import com.example.mykku.dailymessage.exception.DailyMessageException
 import com.example.mykku.dailymessage.exception.DailyMessageErrorCode
 import com.example.mykku.member.domain.Member
-import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.tool.MemberReader
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
 import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
 
-@ExtendWith(MockitoExtension::class)
-class DailyMessageCommentServiceTest {
+class DailyMessageCommentServiceTest : BaseServiceTest() {
 
     @Mock
     private lateinit var dailyMessageReader: DailyMessageReader
@@ -40,18 +37,6 @@ class DailyMessageCommentServiceTest {
 
     @InjectMocks
     private lateinit var dailyMessageCommentService: DailyMessageCommentService
-
-    private fun createTestMember(id: String = "member1", nickname: String = "testUser"): Member {
-        return Member(
-            id = id,
-            nickname = nickname,
-            role = "USER",
-            profileImage = "",
-            provider = SocialProvider.GOOGLE,
-            socialId = "123",
-            email = "test@test.com"
-        )
-    }
 
     private fun createTestDailyMessage(id: Long = 1L): DailyMessage {
         return DailyMessage(
@@ -184,7 +169,7 @@ class DailyMessageCommentServiceTest {
         )).thenReturn(updatedComment)
 
         // when
-        val result = dailyMessageCommentService.updateComment(1L, "member1", request)
+        val result = dailyMessageCommentService.updateComment(1L, member.id, request)
 
         // then
         assertEquals(updatedComment.content, result.content)
@@ -208,7 +193,7 @@ class DailyMessageCommentServiceTest {
 
         // when & then
         val exception = assertThrows<DailyMessageException> {
-            dailyMessageCommentService.updateComment(1L, "member1", request)
+            dailyMessageCommentService.updateComment(1L, member.id, request)
         }
         assertEquals(DailyMessageErrorCode.COMMENT_FORBIDDEN_ACCESS, exception.errorCode)
     }

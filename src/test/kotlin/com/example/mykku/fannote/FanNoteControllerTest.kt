@@ -1,42 +1,26 @@
 package com.example.mykku.fannote
 
+import com.example.mykku.BaseControllerTest
 import com.example.mykku.fannote.domain.FanNote
 import com.example.mykku.fannote.domain.FanNotePage
 import com.example.mykku.fannote.repository.FanNotePageRepository
 import com.example.mykku.fannote.repository.FanNoteRepository
-import com.example.mykku.util.DatabaseCleaner
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import org.hamcrest.Matchers.equalTo
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-@ExtendWith(DatabaseCleaner::class)
 @DisplayName("FanNoteController 통합 테스트")
-class FanNoteControllerTest {
-
-    @LocalServerPort
-    private var port: Int = 0
+class FanNoteControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var fanNoteRepository: FanNoteRepository
 
     @Autowired
     private lateinit var fanNotePageRepository: FanNotePageRepository
-
-    @BeforeEach
-    fun setUp() {
-        RestAssured.port = port
-    }
 
     @Test
     @DisplayName("덕질노트 목록 조회 - 정상 케이스")

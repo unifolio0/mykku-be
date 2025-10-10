@@ -1,15 +1,14 @@
 package com.example.mykku.auth.tool
 
+import com.example.mykku.BaseToolTest
 import com.example.mykku.auth.dto.NaverUserInfo
 import com.example.mykku.auth.dto.NaverUserResponse
 import com.example.mykku.auth.exception.AuthException
 import com.example.mykku.auth.exception.AuthErrorCode
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
 import org.springframework.http.HttpHeaders
 import org.springframework.web.client.HttpClientErrorException
@@ -17,8 +16,7 @@ import org.springframework.web.client.HttpServerErrorException
 import org.springframework.web.client.RestClient
 import kotlin.test.assertEquals
 
-@ExtendWith(MockitoExtension::class)
-class NaverOauthClientTest {
+class NaverOauthClientTest : BaseToolTest() {
 
     @Mock
     private lateinit var restClient: RestClient

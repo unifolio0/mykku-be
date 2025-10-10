@@ -1,5 +1,6 @@
 package com.example.mykku.dailymessage
 
+import com.example.mykku.BaseControllerTest
 import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.domain.DailyMessageComment
 import com.example.mykku.dailymessage.dto.CreateCommentRequest
@@ -8,44 +9,23 @@ import com.example.mykku.dailymessage.repository.DailyMessageCommentRepository
 import com.example.mykku.dailymessage.repository.DailyMessageRepository
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
-import com.example.mykku.member.repository.MemberRepository
-import com.example.mykku.util.DatabaseCleaner
 import com.example.mykku.util.TestTokenGenerator
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import org.hamcrest.Matchers.*
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-@ExtendWith(DatabaseCleaner::class)
 @DisplayName("DailyMessageCommentController 통합 테스트")
-class DailyMessageCommentControllerTest {
-
-    @LocalServerPort
-    private var port: Int = 0
-
-    @Autowired
-    private lateinit var memberRepository: MemberRepository
+class DailyMessageCommentControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var dailyMessageRepository: DailyMessageRepository
 
     @Autowired
     private lateinit var dailyMessageCommentRepository: DailyMessageCommentRepository
-
-    @BeforeEach
-    fun setUp() {
-        RestAssured.port = port
-    }
 
     @Test
     @DisplayName("댓글 생성 - 정상 케이스")

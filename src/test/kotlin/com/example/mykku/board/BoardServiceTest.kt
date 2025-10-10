@@ -1,5 +1,6 @@
 package com.example.mykku.board
 
+import com.example.mykku.BaseServiceTest
 import com.example.mykku.board.domain.Board
 import com.example.mykku.board.dto.CreateBoardRequest
 import com.example.mykku.board.dto.UpdateBoardRequest
@@ -8,18 +9,14 @@ import com.example.mykku.board.tool.BoardWriter
 import com.example.mykku.like.domain.LikeBoard
 import com.example.mykku.like.tool.LikeBoardWriter
 import com.example.mykku.member.domain.Member
-import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.tool.MemberReader
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 
-@ExtendWith(MockitoExtension::class)
-class BoardServiceTest {
+class BoardServiceTest : BaseServiceTest() {
 
     @Mock
     private lateinit var boardReader: BoardReader
@@ -36,15 +33,7 @@ class BoardServiceTest {
     @InjectMocks
     private lateinit var boardService: BoardService
 
-    private val member = Member(
-        id = "member1",
-        nickname = "testUser",
-        role = "USER",
-        profileImage = "",
-        provider = SocialProvider.GOOGLE,
-        socialId = "123",
-        email = "test@test.com"
-    )
+    private val member = createTestMember(id = "member1", nickname = "testUser", email = "test@test.com")
 
     @Test
     fun `createBoard - 보드를 정상적으로 생성한다`() {

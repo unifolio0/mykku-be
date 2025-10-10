@@ -1,21 +1,16 @@
 package com.example.mykku.member.tool
 
-import com.example.mykku.board.domain.Board
+import com.example.mykku.BaseToolTest
 import com.example.mykku.feed.domain.Feed
-import com.example.mykku.member.domain.Member
-import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.repository.SaveFeedRepository
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-@ExtendWith(MockitoExtension::class)
-class SaveFeedReaderTest {
+class SaveFeedReaderTest : BaseToolTest() {
 
     @Mock
     private lateinit var saveFeedRepository: SaveFeedRepository
@@ -23,31 +18,15 @@ class SaveFeedReaderTest {
     @InjectMocks
     private lateinit var saveFeedReader: SaveFeedReader
 
-    private fun createMockMember(): Member {
-        return Member(
-            id = "member123",
-            nickname = "테스트유저",
-            role = "USER",
-            profileImage = "profile.jpg",
-            provider = SocialProvider.GOOGLE,
-            socialId = "12345",
-            email = "test@example.com"
-        )
-    }
-
     private fun createMockFeed(): Feed {
-        val board = Board(
-            id = 1L,
-            title = "테스트보드",
-            logo = "logo.jpg"
-        )
-        
+        val board = createMockBoard()
+
         return Feed(
             id = 1L,
             title = "테스트 피드",
             content = "테스트 내용",
             board = board,
-            member = createMockMember()
+            member = createMockMember("member123", "테스트유저")
         )
     }
 

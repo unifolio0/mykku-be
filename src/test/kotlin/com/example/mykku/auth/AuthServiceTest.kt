@@ -12,19 +12,17 @@ import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.tool.MemberReader
 import com.example.mykku.member.tool.MemberWriter
+import com.example.mykku.BaseServiceTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 import java.util.*
 import kotlin.test.assertEquals
 
-@ExtendWith(MockitoExtension::class)
-class AuthServiceTest {
+class AuthServiceTest : BaseServiceTest() {
 
     @Mock
     private lateinit var jwtTokenProvider: JwtTokenProvider

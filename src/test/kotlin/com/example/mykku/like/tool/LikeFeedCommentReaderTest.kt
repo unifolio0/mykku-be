@@ -1,26 +1,21 @@
 package com.example.mykku.like.tool
 
-import com.example.mykku.board.domain.Board
+import com.example.mykku.BaseToolTest
 import com.example.mykku.like.exception.LikeException
 import com.example.mykku.like.exception.LikeErrorCode
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedComment
 import com.example.mykku.like.repository.LikeFeedCommentRepository
-import com.example.mykku.member.domain.Member
-import com.example.mykku.member.domain.SocialProvider
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-@ExtendWith(MockitoExtension::class)
-class LikeFeedCommentReaderTest {
+class LikeFeedCommentReaderTest : BaseToolTest() {
 
     @Mock
     private lateinit var likeFeedCommentRepository: LikeFeedCommentRepository
@@ -29,22 +24,8 @@ class LikeFeedCommentReaderTest {
     private lateinit var likeFeedCommentReader: LikeFeedCommentReader
 
     private fun createMockFeedComment(): FeedComment {
-        val member = Member(
-            id = "test_member",
-            nickname = "테스트유저",
-            role = "USER",
-            profileImage = "profile.jpg",
-            provider = SocialProvider.GOOGLE,
-            socialId = "12345",
-            email = "test@example.com"
-        )
-
-        val board = Board(
-            id = 1L,
-            title = "테스트보드",
-            logo = "logo.jpg"
-        )
-
+        val member = createMockMember("test_member", "테스트유저")
+        val board = createMockBoard()
         val feed = Feed(
             id = 1L,
             title = "테스트 피드",
@@ -52,7 +33,6 @@ class LikeFeedCommentReaderTest {
             board = board,
             member = member
         )
-
         return FeedComment(
             id = 1L,
             content = "테스트 댓글",

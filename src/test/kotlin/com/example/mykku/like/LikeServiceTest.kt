@@ -1,5 +1,6 @@
 package com.example.mykku.like
 
+import com.example.mykku.BaseServiceTest
 import com.example.mykku.board.domain.Board
 import com.example.mykku.board.tool.BoardReader
 import com.example.mykku.dailymessage.domain.DailyMessage
@@ -13,19 +14,15 @@ import com.example.mykku.like.domain.*
 import com.example.mykku.like.dto.*
 import com.example.mykku.like.tool.*
 import com.example.mykku.member.domain.Member
-import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.tool.MemberReader
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
 import java.time.LocalDate
 import kotlin.test.assertEquals
 
-@ExtendWith(MockitoExtension::class)
-class LikeServiceTest {
+class LikeServiceTest : BaseServiceTest() {
 
     @Mock
     private lateinit var memberReader: MemberReader
@@ -69,17 +66,8 @@ class LikeServiceTest {
     @InjectMocks
     private lateinit var likeService: LikeService
 
-    private val member = Member(
-        id = "member1",
-        nickname = "testUser",
-        role = "USER",
-        profileImage = "",
-        provider = SocialProvider.GOOGLE,
-        socialId = "123",
-        email = "test@test.com"
-    )
-
-    private val board = Board(id = 1L, title = "테스트 보드", logo = "")
+    private val member = createTestMember(id = "member1", nickname = "testUser", email = "test@test.com")
+    private val board = createTestBoard(id = 1L, title = "테스트 보드", logo = "")
 
     @Test
     fun `getLikedBoards - 좋아요한 보드 목록을 반환한다`() {

@@ -1,6 +1,6 @@
 package com.example.mykku.feed.tool
 
-import com.example.mykku.board.domain.Board
+import com.example.mykku.BaseToolTest
 import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.feed.exception.FeedErrorCode
 import com.example.mykku.feed.domain.Feed
@@ -13,55 +13,32 @@ import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-@ExtendWith(MockitoExtension::class)
-class FeedReaderTest {
+class FeedReaderTest : BaseToolTest() {
 
     @Mock
     private lateinit var feedRepository: FeedRepository
-    
+
     @Mock
     private lateinit var feedImageRepository: FeedImageRepository
-    
+
     @Mock
     private lateinit var feedTagRepository: FeedTagRepository
-    
+
     @Mock
     private lateinit var feedCommentRepository: FeedCommentRepository
-    
+
     @Mock
     private lateinit var eventTagRepository: EventTagRepository
 
     @InjectMocks
     private lateinit var feedReader: FeedReader
-
-    private fun createMockMember(): Member {
-        return Member(
-            id = "member123",
-            nickname = "테스트유저",
-            role = "USER",
-            profileImage = "profile.jpg",
-            provider = SocialProvider.GOOGLE,
-            socialId = "12345",
-            email = "test@example.com"
-        )
-    }
-
-    private fun createMockBoard(): Board {
-        return Board(
-            id = 1L,
-            title = "테스트보드",
-            logo = "logo.jpg"
-        )
-    }
 
     private fun createMockFeed(id: Long): Feed {
         return Feed(
@@ -69,7 +46,7 @@ class FeedReaderTest {
             title = "테스트 피드 $id",
             content = "테스트 내용",
             board = createMockBoard(),
-            member = createMockMember()
+            member = createMockMember("member123", "테스트유저")
         )
     }
 
@@ -114,16 +91,8 @@ class FeedReaderTest {
 
     @Test
     fun `getFeedsByFollower는 팔로우한 멤버들의 피드 목록을 반환한다`() {
-        val member1 = createMockMember()
-        val member2 = Member(
-            id = "member456",
-            nickname = "테스트유저2",
-            role = "USER",
-            profileImage = "profile2.jpg",
-            provider = SocialProvider.KAKAO,
-            socialId = "67890",
-            email = "test2@example.com"
-        )
+        val member1 = createMockMember("member123", "테스트유저")
+        val member2 = createMockMember("member456", "테스트유저2")
         val members = listOf(member1, member2)
         
         val feed1 = createMockFeed(1L)

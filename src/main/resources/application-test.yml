@@ -1,10 +1,4 @@
 spring:
-  profiles:
-    active: test
-
----
-
-spring:
   config:
     activate:
       on-profile: test
@@ -22,6 +16,8 @@ spring:
     hibernate:
       ddl-auto: create-drop
     defer-datasource-initialization: true
+  flyway:
+    enabled: false
 
 jwt:
   secret: ${JWT_SECRET:your-secret-key-should-be-very-long-and-secure-at-least-32-characters-long}

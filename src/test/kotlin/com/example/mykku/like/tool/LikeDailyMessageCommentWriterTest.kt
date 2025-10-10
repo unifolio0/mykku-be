@@ -1,16 +1,13 @@
 package com.example.mykku.like.tool
 
+import com.example.mykku.BaseToolTest
 import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.domain.DailyMessageComment
 import com.example.mykku.like.domain.LikeDailyMessageComment
 import com.example.mykku.like.repository.LikeDailyMessageCommentRepository
-import com.example.mykku.member.domain.Member
-import com.example.mykku.member.domain.SocialProvider
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -18,26 +15,13 @@ import java.time.LocalDate
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
 
-@ExtendWith(MockitoExtension::class)
-class LikeDailyMessageCommentWriterTest {
+class LikeDailyMessageCommentWriterTest : BaseToolTest() {
 
     @Mock
     private lateinit var likeDailyMessageCommentRepository: LikeDailyMessageCommentRepository
 
     @InjectMocks
     private lateinit var likeDailyMessageCommentWriter: LikeDailyMessageCommentWriter
-
-    private fun createMockMember(): Member {
-        return Member(
-            id = "member123",
-            nickname = "테스트유저",
-            role = "USER",
-            profileImage = "profile.jpg",
-            provider = SocialProvider.GOOGLE,
-            socialId = "12345",
-            email = "test@example.com"
-        )
-    }
 
     private fun createMockDailyMessageComment(): DailyMessageComment {
         val dailyMessage = DailyMessage(
@@ -46,7 +30,6 @@ class LikeDailyMessageCommentWriterTest {
             content = "테스트 메시지",
             date = LocalDate.now()
         )
-        
         return DailyMessageComment(
             id = 1L,
             content = "테스트 댓글",

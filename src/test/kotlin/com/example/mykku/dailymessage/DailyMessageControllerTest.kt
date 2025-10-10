@@ -1,36 +1,20 @@
 package com.example.mykku.dailymessage
 
+import com.example.mykku.BaseControllerTest
 import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.repository.DailyMessageRepository
-import com.example.mykku.util.DatabaseCleaner
 import io.restassured.RestAssured
 import org.hamcrest.Matchers.*
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-@ExtendWith(DatabaseCleaner::class)
 @DisplayName("DailyMessageController 통합 테스트")
-class DailyMessageControllerTest {
-
-    @LocalServerPort
-    private var port: Int = 0
+class DailyMessageControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var dailyMessageRepository: DailyMessageRepository
-
-    @BeforeEach
-    fun setUp() {
-        RestAssured.port = port
-    }
 
     @Test
     @DisplayName("하루 덕담 리스트 조회 - 정상 케이스")

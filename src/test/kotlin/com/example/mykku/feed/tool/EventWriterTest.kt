@@ -1,5 +1,6 @@
 package com.example.mykku.feed.tool
 
+import com.example.mykku.BaseToolTest
 import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.feed.exception.FeedErrorCode
 import com.example.mykku.feed.domain.Event
@@ -11,18 +12,15 @@ import com.example.mykku.feed.repository.EventRepository
 import com.example.mykku.feed.repository.EventTagRepository
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-@ExtendWith(MockitoExtension::class)
-class EventWriterTest {
+class EventWriterTest : BaseToolTest() {
 
     @Mock
     private lateinit var eventRepository: EventRepository
