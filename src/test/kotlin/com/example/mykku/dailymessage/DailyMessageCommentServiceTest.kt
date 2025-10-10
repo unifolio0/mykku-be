@@ -169,7 +169,7 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
         )).thenReturn(updatedComment)
 
         // when
-        val result = dailyMessageCommentService.updateComment(1L, "member1", request)
+        val result = dailyMessageCommentService.updateComment(1L, member.id, request)
 
         // then
         assertEquals(updatedComment.content, result.content)
@@ -193,7 +193,7 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
 
         // when & then
         val exception = assertThrows<DailyMessageException> {
-            dailyMessageCommentService.updateComment(1L, "member1", request)
+            dailyMessageCommentService.updateComment(1L, member.id, request)
         }
         assertEquals(DailyMessageErrorCode.COMMENT_FORBIDDEN_ACCESS, exception.errorCode)
     }
