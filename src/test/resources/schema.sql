@@ -1,7 +1,7 @@
 -- MySQL Test Database Schema for MYKKU Application
 
 -- Create Member table
-CREATE TABLE member (
+CREATE TABLE IF NOT EXISTS member (
     id VARCHAR(255) NOT NULL PRIMARY KEY,
     nickname VARCHAR(10) NOT NULL,
     role VARCHAR(255) NOT NULL,
@@ -16,7 +16,7 @@ CREATE TABLE member (
 );
 
 -- Create Board table
-CREATE TABLE board (
+CREATE TABLE IF NOT EXISTS board (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(16) NOT NULL,
     logo VARCHAR(255) NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE board (
 );
 
 -- Create Feed table
-CREATE TABLE feed (
+CREATE TABLE IF NOT EXISTS feed (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     content VARCHAR(1000) NOT NULL,
@@ -40,7 +40,7 @@ CREATE TABLE feed (
 );
 
 -- Create FeedImage table
-CREATE TABLE feed_image (
+CREATE TABLE IF NOT EXISTS feed_image (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     url VARCHAR(255) NOT NULL,
     width INT NOT NULL,
@@ -52,7 +52,7 @@ CREATE TABLE feed_image (
 );
 
 -- Create FeedTag table (stores tag title directly)
-CREATE TABLE feed_tag (
+CREATE TABLE IF NOT EXISTS feed_tag (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     feed_id BIGINT NOT NULL,
     title VARCHAR(20) NOT NULL,
@@ -62,7 +62,7 @@ CREATE TABLE feed_tag (
 );
 
 -- Create FeedComment table
-CREATE TABLE feed_comment (
+CREATE TABLE IF NOT EXISTS feed_comment (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     content VARCHAR(1000) NOT NULL,
     like_count INT DEFAULT 0,
@@ -77,7 +77,7 @@ CREATE TABLE feed_comment (
 );
 
 -- Create DailyMessage table
-CREATE TABLE daily_message (
+CREATE TABLE IF NOT EXISTS daily_message (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     content VARCHAR(42) NOT NULL,
@@ -87,7 +87,7 @@ CREATE TABLE daily_message (
 );
 
 -- Create DailyMessageComment table
-CREATE TABLE daily_message_comment (
+CREATE TABLE IF NOT EXISTS daily_message_comment (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     content VARCHAR(1000) NOT NULL,
     like_count INT DEFAULT 0,
@@ -102,7 +102,7 @@ CREATE TABLE daily_message_comment (
 );
 
 -- Create Follow table
-CREATE TABLE follow (
+CREATE TABLE IF NOT EXISTS follow (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     follower_id VARCHAR(255) NOT NULL,
     following_id VARCHAR(255) NOT NULL,
@@ -113,7 +113,7 @@ CREATE TABLE follow (
 );
 
 -- Create SaveFeed table
-CREATE TABLE save_feed (
+CREATE TABLE IF NOT EXISTS save_feed (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     member_id VARCHAR(255) NOT NULL,
     feed_id BIGINT NOT NULL,
@@ -124,7 +124,7 @@ CREATE TABLE save_feed (
 );
 
 -- Create SaveDailyMessage table
-CREATE TABLE save_daily_message (
+CREATE TABLE IF NOT EXISTS save_daily_message (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     member_id VARCHAR(255) NOT NULL,
     daily_message_id BIGINT NOT NULL,
@@ -135,7 +135,7 @@ CREATE TABLE save_daily_message (
 );
 
 -- Create LikeFeed table
-CREATE TABLE like_feed (
+CREATE TABLE IF NOT EXISTS like_feed (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     member_id VARCHAR(255) NOT NULL,
     feed_id BIGINT NOT NULL,
@@ -146,7 +146,7 @@ CREATE TABLE like_feed (
 );
 
 -- Create LikeFeedComment table
-CREATE TABLE like_feed_comment (
+CREATE TABLE IF NOT EXISTS like_feed_comment (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     member_id VARCHAR(255) NOT NULL,
     feed_comment_id BIGINT NOT NULL,
@@ -157,7 +157,7 @@ CREATE TABLE like_feed_comment (
 );
 
 -- Create LikeDailyMessageComment table
-CREATE TABLE like_daily_message_comment (
+CREATE TABLE IF NOT EXISTS like_daily_message_comment (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     member_id VARCHAR(255) NOT NULL,
     daily_message_comment_id BIGINT NOT NULL,
@@ -168,7 +168,7 @@ CREATE TABLE like_daily_message_comment (
 );
 
 -- Create LikeBoard table
-CREATE TABLE like_board (
+CREATE TABLE IF NOT EXISTS like_board (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     member_id VARCHAR(255) NOT NULL,
     board_id BIGINT NOT NULL,
@@ -179,7 +179,7 @@ CREATE TABLE like_board (
 );
 
 -- Create Event table
-CREATE TABLE event (
+CREATE TABLE IF NOT EXISTS event (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     is_contest BOOLEAN NOT NULL DEFAULT FALSE,
@@ -189,7 +189,7 @@ CREATE TABLE event (
 );
 
 -- Create EventImage table
-CREATE TABLE event_image (
+CREATE TABLE IF NOT EXISTS event_image (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     url VARCHAR(255) NOT NULL,
     order_index INT NOT NULL,
@@ -200,7 +200,7 @@ CREATE TABLE event_image (
 );
 
 -- Create EventTag table (stores tag title directly)
-CREATE TABLE event_tag (
+CREATE TABLE IF NOT EXISTS event_tag (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(20) NOT NULL,
     event_id BIGINT NOT NULL,
@@ -210,7 +210,7 @@ CREATE TABLE event_tag (
 );
 
 -- Create ContestWinner table
-CREATE TABLE contest_winner (
+CREATE TABLE IF NOT EXISTS contest_winner (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     winner_rank INT NOT NULL,
     description VARCHAR(255) NOT NULL,
@@ -223,7 +223,7 @@ CREATE TABLE contest_winner (
 );
 
 -- Create FanNotes table
-CREATE TABLE fan_note (
+CREATE TABLE IF NOT EXISTS fan_note (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(100) NOT NULL,
     subtitle VARCHAR(200),
@@ -235,7 +235,7 @@ CREATE TABLE fan_note (
 );
 
 -- Create FanNotePages table
-CREATE TABLE fan_note_page (
+CREATE TABLE IF NOT EXISTS fan_note_page (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     page_number INT NOT NULL,
     image_url VARCHAR(500) NOT NULL,
@@ -246,14 +246,14 @@ CREATE TABLE fan_note_page (
 );
 
 -- Create indexes for better performance
-CREATE INDEX idx_feed_board_id ON feed(board_id);
-CREATE INDEX idx_feed_member_id ON feed(member_id);
-CREATE INDEX idx_feed_comment_feed_id ON feed_comment(feed_id);
-CREATE INDEX idx_feed_comment_member_id ON feed_comment(member_id);
-CREATE INDEX idx_daily_message_comment_daily_message_id ON daily_message_comment(daily_message_id);
-CREATE INDEX idx_daily_message_comment_member_id ON daily_message_comment(member_id);
-CREATE INDEX idx_follow_follower_id ON follow(follower_id);
-CREATE INDEX idx_follow_following_id ON follow(following_id);
-CREATE INDEX idx_daily_message_date ON daily_message(date);
-CREATE INDEX idx_fan_note_page_fan_note_id ON fan_note_page(fan_note_id);
-CREATE INDEX idx_fan_note_production_date ON fan_note(production_date);
+CREATE INDEX IF NOT EXISTS idx_feed_board_id ON feed(board_id);
+CREATE INDEX IF NOT EXISTS idx_feed_member_id ON feed(member_id);
+CREATE INDEX IF NOT EXISTS idx_feed_comment_feed_id ON feed_comment(feed_id);
+CREATE INDEX IF NOT EXISTS idx_feed_comment_member_id ON feed_comment(member_id);
+CREATE INDEX IF NOT EXISTS idx_daily_message_comment_daily_message_id ON daily_message_comment(daily_message_id);
+CREATE INDEX IF NOT EXISTS idx_daily_message_comment_member_id ON daily_message_comment(member_id);
+CREATE INDEX IF NOT EXISTS idx_follow_follower_id ON follow(follower_id);
+CREATE INDEX IF NOT EXISTS idx_follow_following_id ON follow(following_id);
+CREATE INDEX IF NOT EXISTS idx_daily_message_date ON daily_message(date);
+CREATE INDEX IF NOT EXISTS idx_fan_note_pages_fan_note_id ON fan_note_page(fan_note_id);
+CREATE INDEX IF NOT EXISTS idx_fan_note_production_date ON fan_note(production_date);
