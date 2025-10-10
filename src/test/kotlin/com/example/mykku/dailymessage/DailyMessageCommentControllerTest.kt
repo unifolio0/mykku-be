@@ -7,6 +7,9 @@ import com.example.mykku.dailymessage.dto.CreateCommentRequest
 import com.example.mykku.dailymessage.dto.UpdateCommentRequest
 import com.example.mykku.dailymessage.repository.DailyMessageCommentRepository
 import com.example.mykku.dailymessage.repository.DailyMessageRepository
+import com.example.mykku.member.domain.Member
+import com.example.mykku.member.domain.SocialProvider
+import com.example.mykku.util.TestTokenGenerator
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import org.hamcrest.Matchers.*

@@ -1,9 +1,13 @@
 package com.example.mykku.feed
 
 import com.example.mykku.BaseControllerTest
+import com.example.mykku.board.domain.Board
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.dto.CreateFeedRequestDto
 import com.example.mykku.feed.repository.FeedRepository
+import com.example.mykku.member.domain.Member
+import com.example.mykku.member.domain.SocialProvider
+import com.example.mykku.util.TestTokenGenerator
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import com.fasterxml.jackson.databind.ObjectMapper

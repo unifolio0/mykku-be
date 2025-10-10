@@ -3,6 +3,8 @@ package com.example.mykku.auth
 import com.example.mykku.BaseControllerTest
 import com.example.mykku.auth.dto.RefreshTokenRequest
 import com.example.mykku.auth.tool.JwtTokenProvider
+import com.example.mykku.member.domain.Member
+import com.example.mykku.member.domain.SocialProvider
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import org.hamcrest.Matchers.equalTo

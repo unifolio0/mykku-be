@@ -9,6 +9,7 @@ import com.example.mykku.feed.repository.FeedCommentRepository
 import com.example.mykku.feed.repository.FeedImageRepository
 import com.example.mykku.feed.repository.FeedRepository
 import com.example.mykku.feed.repository.FeedTagRepository
+import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

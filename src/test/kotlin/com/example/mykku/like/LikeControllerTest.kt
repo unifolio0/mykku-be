@@ -1,7 +1,11 @@
 package com.example.mykku.like
 
 import com.example.mykku.BaseControllerTest
+import com.example.mykku.board.domain.Board
 import com.example.mykku.like.dto.*
+import com.example.mykku.member.domain.Member
+import com.example.mykku.member.domain.SocialProvider
+import com.example.mykku.util.TestTokenGenerator
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import org.hamcrest.Matchers.*

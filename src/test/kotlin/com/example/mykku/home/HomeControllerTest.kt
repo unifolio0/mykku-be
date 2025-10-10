@@ -1,12 +1,15 @@
 package com.example.mykku.home
 
 import com.example.mykku.BaseControllerTest
+import com.example.mykku.board.domain.Board
 import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.repository.DailyMessageRepository
 import com.example.mykku.feed.domain.Event
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.repository.EventRepository
 import com.example.mykku.feed.repository.FeedRepository
+import com.example.mykku.member.domain.Member
+import com.example.mykku.member.domain.SocialProvider
 import io.restassured.RestAssured
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue

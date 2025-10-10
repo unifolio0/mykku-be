@@ -17,6 +17,7 @@ import com.example.mykku.image.ImageUploadService
 import com.example.mykku.image.dto.ImageUploadResult
 import com.example.mykku.like.tool.LikeFeedReader
 import com.example.mykku.member.domain.Member
+import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.tool.MemberReader
 import com.example.mykku.member.tool.SaveFeedReader
 import org.junit.jupiter.api.Test
