@@ -6,6 +6,9 @@ on:
       - "develop"
 
 jobs:
+  test:
+    uses: ./.github/workflows/Dev_CI.yml
+
   build:
     runs-on: ubuntu-latest
 
