@@ -221,6 +221,34 @@ throw FeedException.feedNotFound()
 - Service 계층에서 `@Transactional` 사용
 - 읽기 전용 메서드는 `@Transactional(readOnly = true)` 사용
 
+### Exception Testing Rules
+
+#### 예외 검증 시 ErrorCode Enum 사용 필수
+
+- **테스트에서 예외 검증 시 반드시 ErrorCode enum 사용**
+- **예외 메시지 문자열 직접 비교 금지**
+- ErrorCode를 통한 검증으로 일관성과 유지보수성 확보
+
+```kotlin
+// ❌ 잘못된 예시 - 메시지 문자열 직접 비교
+val exception = assertThrows<ScrapException> {
+    folderReader.getFolderById(999L, member)
+}
+assertEquals("폴더를 찾을 수 없습니다", exception.message)
+
+// ✅ 올바른 예시 - ErrorCode enum 사용
+val exception = assertThrows<ScrapException> {
+    folderReader.getFolderById(999L, member)
+}
+assertEquals(ScrapErrorCode.FOLDER_NOT_FOUND, exception.errorCode)
+```
+
+#### 이유
+- 예외 메시지는 언제든 변경될 수 있음
+- ErrorCode는 계약(Contract)으로서 안정적
+- 리팩토링 시 타입 안정성 제공
+- IDE의 자동 완성 및 타입 체크 활용 가능
+
 ## Directory Structure
 
 ```
