@@ -14,7 +14,7 @@ import com.example.mykku.image.dto.ImageUploadResult
 import com.example.mykku.like.tool.LikeFeedReader
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.tool.MemberReader
-import com.example.mykku.member.tool.SaveFeedReader
+import com.example.mykku.scrap.tool.SaveFeedReader
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service

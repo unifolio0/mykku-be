@@ -1,8 +1,11 @@
 package com.example.mykku.feed.tool
 
+import com.example.mykku.feed.domain.Event
 import com.example.mykku.feed.dto.EventPreviewResponse
+import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.feed.repository.EventImageRepository
 import com.example.mykku.feed.repository.EventRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 
@@ -11,12 +14,17 @@ class EventReader(
     private val eventRepository: EventRepository,
     private val eventImageRepository: EventImageRepository,
 ) {
+    fun getEventById(eventId: Long): Event {
+        return eventRepository.findByIdOrNull(eventId)
+            ?: throw FeedException.feedNotFound()
+    }
+
     fun getProcessingEventPreviews(): List<EventPreviewResponse> {
         val events = eventRepository.getByEventPreviews(LocalDateTime.now()).take(5)
         val eventImages = eventImageRepository.findByEventIn(events)
         val imagesByEvent = eventImages.groupBy { it.event }
-        
-        return events.map { event -> 
+
+        return events.map { event ->
             EventPreviewResponse(event, imagesByEvent[event] ?: emptyList())
         }
     }

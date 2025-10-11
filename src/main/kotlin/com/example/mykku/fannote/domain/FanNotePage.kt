@@ -7,7 +7,7 @@ import jakarta.persistence.*
 class FanNotePage(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    val id: Long? = null,
 
     @Column(nullable = false)
     var pageNumber: Int,

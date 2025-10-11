@@ -8,7 +8,7 @@ import java.time.LocalDate
 class FanNote(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    val id: Long? = null,
 
     @Column(nullable = false, length = 100)
     var title: String,

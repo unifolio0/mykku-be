@@ -7,7 +7,7 @@ import com.example.mykku.feed.domain.FeedTag
 import com.example.mykku.feed.dto.AuthorResponse
 import com.example.mykku.feed.dto.FeedResponse
 import com.example.mykku.like.tool.LikeFeedReader
-import com.example.mykku.member.tool.SaveFeedReader
+import com.example.mykku.scrap.tool.SaveFeedReader
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Component
 

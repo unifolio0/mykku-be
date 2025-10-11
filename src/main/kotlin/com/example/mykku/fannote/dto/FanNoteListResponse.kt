@@ -13,7 +13,7 @@ data class FanNoteListResponse(
     companion object {
         fun from(fanNote: FanNote): FanNoteListResponse {
             return FanNoteListResponse(
-                id = fanNote.id,
+                id = fanNote.id!!,
                 title = fanNote.title,
                 subtitle = fanNote.subtitle,
                 content = fanNote.content,

@@ -102,7 +102,7 @@ class FanNoteControllerTest : BaseControllerTest() {
             .then()
             .statusCode(200)
             .body("message", equalTo("덕질노트 상세 조회 성공"))
-            .body("data.id", equalTo(savedFanNote.id.toInt()))
+            .body("data.id", equalTo(savedFanNote.id!!.toInt()))
             .body("data.title", equalTo("덕질노트 상세"))
             .body("data.subtitle", equalTo("서브타이틀"))
             .body("data.content", equalTo("상세 내용"))
@@ -191,7 +191,7 @@ class FanNoteControllerTest : BaseControllerTest() {
             .then()
             .statusCode(200)
             .body("message", equalTo("덕질노트 상세 조회 성공"))
-            .body("data.id", equalTo(savedFanNote.id.toInt()))
+            .body("data.id", equalTo(savedFanNote.id!!.toInt()))
             .body("data.title", equalTo("페이지 없는 덕질노트"))
             .body("data.pages.size()", equalTo(0))
     }

@@ -1,11 +1,12 @@
-package com.example.mykku.member.domain
+package com.example.mykku.scrap.domain
 
 import com.example.mykku.common.domain.BaseEntity
-import com.example.mykku.feed.domain.Feed
+import com.example.mykku.fannote.domain.FanNote
+import com.example.mykku.member.domain.Member
 import jakarta.persistence.*
 
 @Entity
-class SaveFeed(
+class SaveFanNote(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
@@ -15,7 +16,7 @@ class SaveFeed(
     val member: Member,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "feed_id")
-    val feed: Feed,
+    @JoinColumn(name = "fan_note_id")
+    val fanNote: FanNote
 ) : BaseEntity() {
 }

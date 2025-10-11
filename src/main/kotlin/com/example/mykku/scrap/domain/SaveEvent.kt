@@ -1,11 +1,12 @@
-package com.example.mykku.member.domain
+package com.example.mykku.scrap.domain
 
 import com.example.mykku.common.domain.BaseEntity
-import com.example.mykku.dailymessage.domain.DailyMessage
+import com.example.mykku.feed.domain.Event
+import com.example.mykku.member.domain.Member
 import jakarta.persistence.*
 
 @Entity
-class SaveDailyMessage(
+class SaveEvent(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
@@ -15,7 +16,7 @@ class SaveDailyMessage(
     val member: Member,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "daily_message_id")
-    val dailyMessage: DailyMessage,
+    @JoinColumn(name = "event_id")
+    val event: Event
 ) : BaseEntity() {
 }

@@ -47,7 +47,7 @@ class FanNotePageRepositoryTest : BaseRepositoryTest() {
         testEntityManager.clear()
 
         // when
-        val pages = fanNotePageRepository.findByFanNoteIdOrderByPageNumber(savedFanNote.id)
+        val pages = fanNotePageRepository.findByFanNoteIdOrderByPageNumber(savedFanNote.id!!)
 
         // then
         assertThat(pages).hasSize(3)
