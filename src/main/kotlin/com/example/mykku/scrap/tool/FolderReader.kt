@@ -11,14 +11,8 @@ class FolderReader(
     private val folderRepository: FolderRepository
 ) {
     fun getFolderById(folderId: Long, member: Member): Folder {
-        val folder = folderRepository.findByMemberAndId(member, folderId)
+        return folderRepository.findByMemberAndId(member, folderId)
             ?: throw ScrapException.folderNotFound()
-
-        if (folder.member.id != member.id) {
-            throw ScrapException.folderUnauthorized()
-        }
-
-        return folder
     }
 
     fun getFoldersByMember(member: Member): List<Folder> {
