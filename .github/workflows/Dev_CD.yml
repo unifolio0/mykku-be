@@ -10,6 +10,7 @@ jobs:
     uses: ./.github/workflows/Dev_CI.yml
 
   build:
+    needs: test
     runs-on: ubuntu-latest
 
     steps:
