@@ -5,12 +5,7 @@ import com.example.mykku.fannote.tool.FanNoteReader
 import com.example.mykku.feed.tool.EventReader
 import com.example.mykku.feed.tool.FeedReader
 import com.example.mykku.member.domain.Member
-import com.example.mykku.scrap.domain.SaveDailyMessage
-import com.example.mykku.scrap.domain.SaveEvent
-import com.example.mykku.scrap.domain.SaveFanNote
-import com.example.mykku.scrap.domain.SaveFeed
-import com.example.mykku.scrap.dto.SaveFeedRequest
-import com.example.mykku.scrap.dto.UpdateSaveFeedFolderRequest
+import com.example.mykku.scrap.dto.*
 import com.example.mykku.scrap.tool.*
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -55,9 +50,10 @@ class ScrapService(
     }
 
     @Transactional(readOnly = true)
-    fun getSavedFeeds(member: Member, folderId: Long?, pageable: Pageable): Page<SaveFeed> {
+    fun getSavedFeeds(member: Member, folderId: Long?, pageable: Pageable): Page<SaveFeedResponse> {
         val folder = folderId?.let { folderReader.getFolderById(it, member) }
-        return saveFeedReader.getSavedFeedsByFolder(member, folder, pageable)
+        val saveFeeds = saveFeedReader.getSavedFeedsByFolder(member, folder, pageable)
+        return SaveFeedResponse.fromPage(saveFeeds)
     }
 
     @Transactional
@@ -73,8 +69,9 @@ class ScrapService(
     }
 
     @Transactional(readOnly = true)
-    fun getSavedDailyMessages(member: Member, pageable: Pageable): Page<SaveDailyMessage> {
-        return saveDailyMessageReader.getSavedDailyMessages(member, pageable)
+    fun getSavedDailyMessages(member: Member, pageable: Pageable): Page<SaveDailyMessageResponse> {
+        val saveDailyMessages = saveDailyMessageReader.getSavedDailyMessages(member, pageable)
+        return SaveDailyMessageResponse.fromPage(saveDailyMessages)
     }
 
     @Transactional
@@ -90,8 +87,9 @@ class ScrapService(
     }
 
     @Transactional(readOnly = true)
-    fun getSavedEvents(member: Member, pageable: Pageable): Page<SaveEvent> {
-        return saveEventReader.getSavedEvents(member, pageable)
+    fun getSavedEvents(member: Member, pageable: Pageable): Page<SaveEventResponse> {
+        val saveEvents = saveEventReader.getSavedEvents(member, pageable)
+        return SaveEventResponse.fromPage(saveEvents)
     }
 
     @Transactional
@@ -107,7 +105,8 @@ class ScrapService(
     }
 
     @Transactional(readOnly = true)
-    fun getSavedFanNotes(member: Member, pageable: Pageable): Page<SaveFanNote> {
-        return saveFanNoteReader.getSavedFanNotes(member, pageable)
+    fun getSavedFanNotes(member: Member, pageable: Pageable): Page<SaveFanNoteResponse> {
+        val saveFanNotes = saveFanNoteReader.getSavedFanNotes(member, pageable)
+        return SaveFanNoteResponse.fromPage(saveFanNotes)
     }
 }

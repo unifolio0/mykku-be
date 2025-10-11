@@ -48,14 +48,39 @@ class FanNoteReader {
 
 - **역할**: HTTP 요청/응답 처리, API 엔드포인트 정의
 - **의존성 규칙**: Service 계층에만 의존
-- **금지사항**: Repository나 Tool 계층에 직접 의존 불가
+- **금지사항**:
+  - Repository나 Tool 계층에 직접 의존 불가
+  - **Domain 패키지 import 금지 - DTO만 사용**
+  - **Domain 객체를 직접 반환하거나 받으면 안 됨**
+- **DTO 사용 규칙**:
+  - Controller는 Request DTO를 받아 Service에 전달
+  - Service는 Response DTO로 변환하여 Controller에 반환
+  - Controller에서 Domain 객체를 직접 다루지 않음
 - **예시**:
   ```kotlin
+  // ❌ 잘못된 예시 - Domain 객체 반환
   @RestController
   class FeedController(
-      private val feedService: FeedService,  // ✅ Service 계층만 의존
-      // private val feedRepository: FeedRepository  // ❌ Repository 직접 의존 금지
-  )
+      private val feedService: FeedService
+  ) {
+      @GetMapping
+      fun getFeeds(): ResponseEntity<ApiResponse<Page<Feed>>> {  // Domain 객체 Feed 반환 - 금지!
+          val feeds = feedService.getFeeds()
+          return ResponseEntity.ok(ApiResponse(data = feeds))
+      }
+  }
+
+  // ✅ 올바른 예시 - DTO 반환
+  @RestController
+  class FeedController(
+      private val feedService: FeedService  // ✅ Service 계층만 의존
+  ) {
+      @GetMapping
+      fun getFeeds(): ResponseEntity<ApiResponse<Page<FeedResponse>>> {  // DTO 반환
+          val feeds = feedService.getFeeds()  // Service가 DTO로 변환해서 반환
+          return ResponseEntity.ok(ApiResponse(data = feeds))
+      }
+  }
   ```
 
 #### 2. Service Layer
@@ -482,6 +507,9 @@ class FeedService(
 
 - **절대 Service에서 Repository를 직접 주입하지 마세요**
 - **Controller에서는 오직 Service만 사용하세요**
+- **Controller는 DTO만 사용하고, Domain 객체를 직접 반환하거나 받지 마세요**
+- **Service는 Controller에 Domain이 아닌 DTO를 반환해야 합니다**
+- **Controller에서 domain 패키지를 import하면 안 됩니다**
 - **복잡한 쿼리는 Tool 계층에 캡슐화하세요**
 - **페이지네이션은 항상 적용을 고려하세요**
 - **모든 기능은 5계층 테스트를 완전히 구현하세요**

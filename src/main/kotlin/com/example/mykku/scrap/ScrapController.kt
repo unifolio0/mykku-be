@@ -4,9 +4,9 @@ import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.common.util.PageableValidator
 import com.example.mykku.member.domain.Member
-import com.example.mykku.scrap.dto.SaveFeedRequest
-import com.example.mykku.scrap.dto.UpdateSaveFeedFolderRequest
+import com.example.mykku.scrap.dto.*
 import jakarta.validation.Valid
+import org.springframework.data.domain.Page
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -66,7 +66,7 @@ class ScrapController(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int,
         @CurrentMember member: Member
-    ): ResponseEntity<ApiResponse<Any>> {
+    ): ResponseEntity<ApiResponse<Page<SaveFeedResponse>>> {
         val pageable = PageableValidator.validateAndCreate(page, size)
         val response = scrapService.getSavedFeeds(member, folderId, pageable)
         return ResponseEntity.ok(
@@ -110,7 +110,7 @@ class ScrapController(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int,
         @CurrentMember member: Member
-    ): ResponseEntity<ApiResponse<Any>> {
+    ): ResponseEntity<ApiResponse<Page<SaveDailyMessageResponse>>> {
         val pageable = PageableValidator.validateAndCreate(page, size)
         val response = scrapService.getSavedDailyMessages(member, pageable)
         return ResponseEntity.ok(
@@ -154,7 +154,7 @@ class ScrapController(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int,
         @CurrentMember member: Member
-    ): ResponseEntity<ApiResponse<Any>> {
+    ): ResponseEntity<ApiResponse<Page<SaveEventResponse>>> {
         val pageable = PageableValidator.validateAndCreate(page, size)
         val response = scrapService.getSavedEvents(member, pageable)
         return ResponseEntity.ok(
@@ -198,7 +198,7 @@ class ScrapController(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int,
         @CurrentMember member: Member
-    ): ResponseEntity<ApiResponse<Any>> {
+    ): ResponseEntity<ApiResponse<Page<SaveFanNoteResponse>>> {
         val pageable = PageableValidator.validateAndCreate(page, size)
         val response = scrapService.getSavedFanNotes(member, pageable)
         return ResponseEntity.ok(
