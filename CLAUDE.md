@@ -56,6 +56,10 @@ class FanNoteReader {
   - Controller는 Request DTO를 받아 Service에 전달
   - Service는 Response DTO로 변환하여 Controller에 반환
   - Controller에서 Domain 객체를 직접 다루지 않음
+- **예외**:
+  - **@CurrentMember 어노테이션을 통한 Member 파라미터 수신은 허용**
+  - 이는 인증된 사용자 정보를 Controller에서 Service로 전달하기 위한 필수 패턴
+  - 예: `fun createFolder(@CurrentMember member: Member, ...)`
 - **예시**:
   ```kotlin
   // ❌ 잘못된 예시 - Domain 객체 반환
@@ -510,6 +514,7 @@ class FeedService(
 - **Controller는 DTO만 사용하고, Domain 객체를 직접 반환하거나 받지 마세요**
 - **Service는 Controller에 Domain이 아닌 DTO를 반환해야 합니다**
 - **Controller에서 domain 패키지를 import하면 안 됩니다**
+  - **예외: @CurrentMember 어노테이션을 통한 Member 파라미터 수신은 허용됩니다**
 - **복잡한 쿼리는 Tool 계층에 캡슐화하세요**
 - **페이지네이션은 항상 적용을 고려하세요**
 - **모든 기능은 5계층 테스트를 완전히 구현하세요**
