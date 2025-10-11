@@ -19,7 +19,7 @@ import com.example.mykku.like.tool.LikeFeedReader
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.tool.MemberReader
-import com.example.mykku.member.tool.SaveFeedReader
+import com.example.mykku.scrap.tool.SaveFeedReader
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.InjectMocks

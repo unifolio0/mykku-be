@@ -37,7 +37,7 @@ class FanNoteRepositoryTest : BaseRepositoryTest() {
         testEntityManager.flush()
         testEntityManager.clear()
 
-        val foundFanNote = fanNoteRepository.findById(savedFanNote.id).orElse(null)
+        val foundFanNote = fanNoteRepository.findById(savedFanNote.id!!).orElse(null)
 
         // then
         assertThat(foundFanNote).isNotNull
@@ -64,7 +64,7 @@ class FanNoteRepositoryTest : BaseRepositoryTest() {
         testEntityManager.flush()
         testEntityManager.clear()
 
-        val foundFanNote = fanNoteRepository.findById(savedFanNote.id).orElse(null)
+        val foundFanNote = fanNoteRepository.findById(savedFanNote.id!!).orElse(null)
 
         // then
         assertThat(foundFanNote).isNotNull
@@ -146,7 +146,7 @@ class FanNoteRepositoryTest : BaseRepositoryTest() {
         testEntityManager.flush()
 
         // when
-        val exists = fanNoteRepository.existsById(savedFanNote.id)
+        val exists = fanNoteRepository.existsById(savedFanNote.id!!)
         val notExists = fanNoteRepository.existsById(999L)
 
         // then

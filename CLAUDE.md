@@ -48,14 +48,43 @@ class FanNoteReader {
 
 - **역할**: HTTP 요청/응답 처리, API 엔드포인트 정의
 - **의존성 규칙**: Service 계층에만 의존
-- **금지사항**: Repository나 Tool 계층에 직접 의존 불가
+- **금지사항**:
+  - Repository나 Tool 계층에 직접 의존 불가
+  - **Domain 패키지 import 금지 - DTO만 사용**
+  - **Domain 객체를 직접 반환하거나 받으면 안 됨**
+- **DTO 사용 규칙**:
+  - Controller는 Request DTO를 받아 Service에 전달
+  - Service는 Response DTO로 변환하여 Controller에 반환
+  - Controller에서 Domain 객체를 직접 다루지 않음
+- **예외**:
+  - **@CurrentMember 어노테이션을 통한 Member 파라미터 수신은 허용**
+  - 이는 인증된 사용자 정보를 Controller에서 Service로 전달하기 위한 필수 패턴
+  - 예: `fun createFolder(@CurrentMember member: Member, ...)`
 - **예시**:
   ```kotlin
+  // ❌ 잘못된 예시 - Domain 객체 반환
   @RestController
   class FeedController(
-      private val feedService: FeedService,  // ✅ Service 계층만 의존
-      // private val feedRepository: FeedRepository  // ❌ Repository 직접 의존 금지
-  )
+      private val feedService: FeedService
+  ) {
+      @GetMapping
+      fun getFeeds(): ResponseEntity<ApiResponse<Page<Feed>>> {  // Domain 객체 Feed 반환 - 금지!
+          val feeds = feedService.getFeeds()
+          return ResponseEntity.ok(ApiResponse(data = feeds))
+      }
+  }
+
+  // ✅ 올바른 예시 - DTO 반환
+  @RestController
+  class FeedController(
+      private val feedService: FeedService  // ✅ Service 계층만 의존
+  ) {
+      @GetMapping
+      fun getFeeds(): ResponseEntity<ApiResponse<Page<FeedResponse>>> {  // DTO 반환
+          val feeds = feedService.getFeeds()  // Service가 DTO로 변환해서 반환
+          return ResponseEntity.ok(ApiResponse(data = feeds))
+      }
+  }
   ```
 
 #### 2. Service Layer
@@ -220,6 +249,34 @@ throw FeedException.feedNotFound()
 
 - Service 계층에서 `@Transactional` 사용
 - 읽기 전용 메서드는 `@Transactional(readOnly = true)` 사용
+
+### Exception Testing Rules
+
+#### 예외 검증 시 ErrorCode Enum 사용 필수
+
+- **테스트에서 예외 검증 시 반드시 ErrorCode enum 사용**
+- **예외 메시지 문자열 직접 비교 금지**
+- ErrorCode를 통한 검증으로 일관성과 유지보수성 확보
+
+```kotlin
+// ❌ 잘못된 예시 - 메시지 문자열 직접 비교
+val exception = assertThrows<ScrapException> {
+    folderReader.getFolderById(999L, member)
+}
+assertEquals("폴더를 찾을 수 없습니다", exception.message)
+
+// ✅ 올바른 예시 - ErrorCode enum 사용
+val exception = assertThrows<ScrapException> {
+    folderReader.getFolderById(999L, member)
+}
+assertEquals(ScrapErrorCode.FOLDER_NOT_FOUND, exception.errorCode)
+```
+
+#### 이유
+- 예외 메시지는 언제든 변경될 수 있음
+- ErrorCode는 계약(Contract)으로서 안정적
+- 리팩토링 시 타입 안정성 제공
+- IDE의 자동 완성 및 타입 체크 활용 가능
 
 ## Directory Structure
 
@@ -454,6 +511,10 @@ class FeedService(
 
 - **절대 Service에서 Repository를 직접 주입하지 마세요**
 - **Controller에서는 오직 Service만 사용하세요**
+- **Controller는 DTO만 사용하고, Domain 객체를 직접 반환하거나 받지 마세요**
+- **Service는 Controller에 Domain이 아닌 DTO를 반환해야 합니다**
+- **Controller에서 domain 패키지를 import하면 안 됩니다**
+  - **예외: @CurrentMember 어노테이션을 통한 Member 파라미터 수신은 허용됩니다**
 - **복잡한 쿼리는 Tool 계층에 캡슐화하세요**
 - **페이지네이션은 항상 적용을 고려하세요**
 - **모든 기능은 5계층 테스트를 완전히 구현하세요**
