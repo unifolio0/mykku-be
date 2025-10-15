@@ -12,6 +12,7 @@ class HomeController(
 ) {
     @GetMapping("/api/v1/home")
     fun home(): ResponseEntity<ApiResponse<HomeResponse>> {
+        println("요청 들어옴")
         val response = homeService.getHomeData()
         return ResponseEntity.ok(
             ApiResponse(

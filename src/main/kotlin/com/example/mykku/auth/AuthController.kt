@@ -19,10 +19,11 @@ class AuthController(
 
     @PostMapping("/mobile/login")
     fun mobileLogin(@RequestBody request: MobileLoginRequest): ResponseEntity<ApiResponse<LoginResponse>> {
+        println("로그인 요청 들어옴")
         val loginResponse = authService.handleMobileLogin(request)
         return ResponseEntity.ok(ApiResponse("로그인 성공", loginResponse))
     }
-    
+
     @PostMapping("/refresh")
     fun refreshToken(@RequestBody request: RefreshTokenRequest): ResponseEntity<ApiResponse<RefreshTokenResponse>> {
         val refreshResponse = authService.refreshAccessToken(request)
