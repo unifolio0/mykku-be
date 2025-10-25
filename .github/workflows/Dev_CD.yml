@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'  # 서브모듈(템플릿) 체크아웃
 
       - name: Setting dev-secret.yml
         run: |
