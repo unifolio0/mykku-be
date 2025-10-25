@@ -2,7 +2,7 @@ spring:
   config:
     import: dev-secret.yml
   thymeleaf:
-    prefix: file:./mykku-be-config/templates/
+    prefix: classpath:/templates/
     suffix: .html
     mode: HTML
     encoding: UTF-8

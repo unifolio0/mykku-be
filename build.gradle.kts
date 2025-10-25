@@ -100,4 +100,8 @@ tasks.bootJar {
     from("build/docs/asciidoc") {
         into("static/docs")
     }
+
+    from("mykku-be-config/templates") {
+        into("templates")
+    }
 }
