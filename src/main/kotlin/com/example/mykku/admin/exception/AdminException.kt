@@ -3,7 +3,7 @@ package com.example.mykku.admin.exception
 import com.example.mykku.common.exception.BaseDomainException
 
 class AdminException(
-    val errorCode: AdminErrorCode
+    errorCode: AdminErrorCode
 ) : BaseDomainException(errorCode) {
 
     companion object {

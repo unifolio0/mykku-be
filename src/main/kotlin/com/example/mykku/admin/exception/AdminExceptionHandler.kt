@@ -13,11 +13,12 @@ class AdminExceptionHandler {
 
     @ExceptionHandler(AdminException::class)
     fun handleAdminException(e: AdminException): ResponseEntity<ApiResponse<Nothing?>> {
+        val errorCode = e.errorCode as AdminErrorCode
         return ResponseEntity
-            .status(e.errorCode.status)
+            .status(errorCode.status)
             .body(
                 ApiResponse(
-                    message = e.errorCode.message,
+                    message = errorCode.message,
                     data = null
                 )
             )
