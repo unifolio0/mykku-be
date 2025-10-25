@@ -1,19 +1,15 @@
 spring:
   config:
     import: dev-secret.yml
-
-  # Thymeleaf configuration for admin templates
   thymeleaf:
     prefix: file:mykku-be-config/templates/
     suffix: .html
     mode: HTML
     encoding: UTF-8
-    cache: false  # Development environment
-
+    cache: false
   web:
     resources:
       add-mappings: true
-
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${secret.datasource.url}:${secret.datasource.port}/${secret.datasource.database}?useUnicode=true&characterEncoding=utf8&allowPublicKeyRetrieval=true&autoReconnect=true&serverTimezone=Asia/Seoul&useLegacyDatetimeCode=false
@@ -46,6 +42,5 @@ aws:
     region: ${secret.aws.s3.region}
     bucket-name: ${secret.aws.s3.bucket_name}
 
-# Admin configuration
 admin:
-  token: ${secret.admin.token:change-this-in-production}
+  token: ${secret.admin.token}
