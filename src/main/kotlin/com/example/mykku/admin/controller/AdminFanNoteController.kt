@@ -38,15 +38,25 @@ class AdminFanNoteController(
     @ResponseBody
     fun create(
         @Valid @ModelAttribute request: FanNoteCreateRequest
-    ): ResponseEntity<ApiResponse<Any>> {
-        adminFanNoteService.create(request)
-        return ResponseEntity.ok(ApiResponse(message = "팬노트가 생성되었습니다"))
+    ): ResponseEntity<ApiResponse<com.example.mykku.fannote.dto.FanNoteDetailResponse>> {
+        val created = adminFanNoteService.create(request)
+        return ResponseEntity.ok(
+            ApiResponse(
+                message = "팬노트가 생성되었습니다",
+                data = created
+            )
+        )
     }
 
     @DeleteMapping("/api/{id}")
     @ResponseBody
-    fun delete(@PathVariable id: Long): ResponseEntity<ApiResponse<Any>> {
+    fun delete(@PathVariable id: Long): ResponseEntity<ApiResponse<Nothing?>> {
         adminFanNoteService.deleteById(id)
-        return ResponseEntity.ok(ApiResponse(message = "팬노트가 삭제되었습니다"))
+        return ResponseEntity.ok(
+            ApiResponse(
+                message = "팬노트가 삭제되었습니다",
+                data = null
+            )
+        )
     }
 }
