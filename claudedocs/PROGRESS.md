@@ -2,7 +2,7 @@
 
 **작업 날짜**: 2025-10-25
 
-## ✅ 완료된 작업 (Phase 0-3)
+## ✅ 완료된 작업 (Phase 0-4)
 
 ### Phase 0: 서브모듈 설정 ✓
 - Git 서브모듈 추가 (`https://github.com/unifolio0/mykku-be-config`)
@@ -29,11 +29,17 @@
 - 템플릿 (list.html, create.html)
 - 커밋: `8d49397`
 
-## ⏳ 남은 작업
+### Phase 4: FanNote 관리 ✓
+- FanNoteWriter Tool (cascade delete 포함)
+- AdminFanNoteService (이미지 업로드 지원)
+- AdminFanNoteController (multipart form 처리)
+- DTO (FanNoteCreateRequest)
+- 템플릿 (list.html, create.html)
+- 다중 페이지 이미지 업로드 기능
+- 커버 이미지 및 페이지 이미지 미리보기
+- 커밋: `50d8d72`
 
-### Phase 4: FanNote 관리 (예상 1.5-2h)
-- 다중 페이지 이미지 업로드
-- FanNote + FanNotePage 관리
+## ⏳ 남은 작업
 
 ### Phase 5: Event 관리 (예상 2-3h)
 - Event + EventImage + EventTag
@@ -44,11 +50,13 @@
 
 ### Backend (메인 프로젝트)
 - `admin/config/` - AdminInterceptor, AdminWebConfig
-- `admin/controller/` - AdminViewController, AdminDailyMessageController
-- `admin/service/` - AdminDailyMessageService
+- `admin/controller/` - AdminViewController, AdminDailyMessageController, AdminFanNoteController
+- `admin/service/` - AdminDailyMessageService, AdminFanNoteService
 - `admin/dto/dailymessage/` - CreateRequest, ListResponse
+- `admin/dto/fannote/` - FanNoteCreateRequest
 - `admin/exception/` - ErrorCode, Exception, Handler
 - `dailymessage/tool/DailyMessageWriter.kt`
+- `fannote/tool/FanNoteWriter.kt`
 - `application.yml`
 
 ### Frontend (서브모듈)
@@ -56,6 +64,8 @@
 - `templates/admin/index.html`
 - `templates/admin/dailymessage/list.html`
 - `templates/admin/dailymessage/create.html`
+- `templates/admin/fannote/list.html`
+- `templates/admin/fannote/create.html`
 - `templates/admin/layout/base.html`
 
 ## 🔧 기술 스택
@@ -68,8 +78,8 @@
 
 ## 📊 진행률
 
-**60%** (3/5 Phase 완료)
+**80%** (4/5 Phase 완료)
 
 ---
 
-**다음 작업**: Phase 4 - FanNote 관리
+**다음 작업**: Phase 5 - Event 관리
