@@ -1,0 +1,3 @@
+[submodule "mykku-be-config"]
+	path = mykku-be-config
+	url = https://github.com/unifolio0/mykku-be-config
