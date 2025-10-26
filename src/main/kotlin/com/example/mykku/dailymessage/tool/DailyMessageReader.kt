@@ -4,7 +4,9 @@ import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.domain.SortDirection
 import com.example.mykku.dailymessage.repository.DailyMessageRepository
 import com.example.mykku.dailymessage.exception.DailyMessageException
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Component
 import java.time.LocalDate
 
@@ -29,5 +31,9 @@ class DailyMessageReader(
     fun getDailyMessage(id: Long): DailyMessage {
         return dailyMessageRepository.findById(id)
             .orElseThrow { DailyMessageException.dailyMessageNotFound() }
+    }
+
+    fun findAll(pageable: Pageable): Page<DailyMessage> {
+        return dailyMessageRepository.findAll(pageable)
     }
 }

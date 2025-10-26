@@ -7,5 +7,6 @@ data class S3Properties(
     val accessKey: String? = null,
     val secretKey: String? = null,
     val region: String,
-    val bucketName: String
+    val bucketName: String,
+    val cloudfrontDomain: String
 )
