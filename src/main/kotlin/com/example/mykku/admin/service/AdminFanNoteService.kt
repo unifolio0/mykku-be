@@ -7,7 +7,7 @@ import com.example.mykku.fannote.dto.FanNoteDetailResponse
 import com.example.mykku.fannote.dto.FanNoteListResponse
 import com.example.mykku.fannote.tool.FanNoteReader
 import com.example.mykku.fannote.tool.FanNoteWriter
-import com.example.mykku.image.FanNoteImageUploadService
+import com.example.mykku.image.ImageUploadService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -18,45 +18,36 @@ import org.springframework.transaction.annotation.Transactional
 class AdminFanNoteService(
     private val fanNoteReader: FanNoteReader,
     private val fanNoteWriter: FanNoteWriter,
-    private val fanNoteImageUploadService: FanNoteImageUploadService
+    private val s3ImageUploadService: ImageUploadService
 ) {
 
     @Transactional
     fun create(request: FanNoteCreateRequest): FanNoteDetailResponse {
-        // 1. 팬노트별 고유 폴더 생성 (yyyy-MM-dd-uuid)
-        val folderName = fanNoteImageUploadService.createFanNoteFolder()
+        // 1. 커버와 페이지 이미지 모두 업로드
+        val uploadResult = s3ImageUploadService.uploadFanNoteImages(
+            request.coverImage,
+            request.pageImages
+        )
 
-        // 2. 커버 이미지 업로드 (pageNumber = 0)
-        val coverImageUrl = request.coverImage
-            ?.takeIf { !it.isEmpty }
-            ?.let { fanNoteImageUploadService.uploadImage(it, folderName, 0).url }
-
-        // 3. FanNote 엔티티 저장
+        // 2. FanNote 엔티티 저장
         val fanNote = FanNote(
             title = request.title,
             subtitle = request.subtitle,
             content = request.content,
             productionDate = request.productionDate,
-            coverImageUrl = coverImageUrl
+            coverImageUrl = uploadResult.coverImageUrl
         )
 
         val savedFanNote = fanNoteWriter.save(fanNote)
 
-        // 4. 페이지 이미지 업로드 (pageNumber = 1, 2, 3, ...)
-        val pages = request.pageImages
-            ?.filterNot { it.isEmpty }
-            ?.mapIndexed { index, file ->
-                val imageUrl = fanNoteImageUploadService.uploadImage(
-                    file,
-                    folderName,
-                    index + 1  // 1부터 시작
-                ).url
-                FanNotePage(
-                    pageNumber = index + 1,
-                    imageUrl = imageUrl,
-                    fanNote = savedFanNote
-                )
-            } ?: emptyList()
+        // 3. 페이지 엔티티들 저장
+        val pages = uploadResult.pageImageUrls.mapIndexed { index, imageUrl ->
+            FanNotePage(
+                pageNumber = index + 1,
+                imageUrl = imageUrl,
+                fanNote = savedFanNote
+            )
+        }
 
         if (pages.isNotEmpty()) {
             fanNoteWriter.saveAllPages(pages)
