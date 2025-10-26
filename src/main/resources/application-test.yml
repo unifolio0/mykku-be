@@ -39,6 +39,7 @@ aws:
     secret-key: ${AWS_S3_SECRET_KEY:your-s3-secret-key}
     region: ${AWS_S3_REGION:ap-northeast-2}
     bucket-name: ${AWS_S3_BUCKET_NAME:mykku-bucket}
+    cloudfront-domain: "test"
 
 admin:
   token: "test-admin-token"

@@ -68,9 +68,7 @@ class S3ImageUploadService(
             RequestBody.fromBytes(imageBytes)
         )
 
-        val url = s3Client.utilities()
-            .getUrl { it.bucket(s3Properties.bucketName).key(key) }
-            .toString()
+        val url = buildImageUrl(key)
         return ImageUploadResult(
             url = url,
             width = dimensions.first,
@@ -102,6 +100,20 @@ class S3ImageUploadService(
 
     private fun getFileExtension(filename: String?): String {
         return filename?.substringAfterLast(".", "")?.lowercase() ?: ""
+    }
+
+    /**
+     * 이미지 URL 생성
+     * CloudFront 도메인이 설정되어 있으면 CloudFront URL, 없으면 S3 직접 URL 반환
+     */
+    private fun buildImageUrl(key: String): String {
+        return if (!s3Properties.cloudfrontDomain.isNullOrBlank()) {
+            "https://${s3Properties.cloudfrontDomain}/$key"
+        } else {
+            s3Client.utilities()
+                .getUrl { it.bucket(s3Properties.bucketName).key(key) }
+                .toString()
+        }
     }
 
     private fun extractImageDimensions(imageBytes: ByteArray): Pair<Int, Int> {
@@ -190,9 +202,7 @@ class S3ImageUploadService(
             RequestBody.fromBytes(imageBytes)
         )
 
-        return s3Client.utilities()
-            .getUrl { it.bucket(s3Properties.bucketName).key(key) }
-            .toString()
+        return buildImageUrl(key)
     }
 
     /**

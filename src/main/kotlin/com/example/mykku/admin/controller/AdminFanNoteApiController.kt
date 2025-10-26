@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*
 class AdminFanNoteApiController(
     private val adminFanNoteService: AdminFanNoteService
 ) {
-
+    
     @PostMapping(consumes = ["multipart/form-data"])
     fun create(
         @Valid @ModelAttribute request: FanNoteCreateRequest
