@@ -1,6 +1,11 @@
 spring:
   config:
     import: dev-secret.yml
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 50MB
+      enabled: true
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
