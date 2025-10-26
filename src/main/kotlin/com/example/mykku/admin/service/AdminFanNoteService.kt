@@ -7,7 +7,7 @@ import com.example.mykku.fannote.dto.FanNoteDetailResponse
 import com.example.mykku.fannote.dto.FanNoteListResponse
 import com.example.mykku.fannote.tool.FanNoteReader
 import com.example.mykku.fannote.tool.FanNoteWriter
-import com.example.mykku.image.ImageUploadService
+import com.example.mykku.image.FanNoteImageUploadService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -18,15 +18,20 @@ import org.springframework.transaction.annotation.Transactional
 class AdminFanNoteService(
     private val fanNoteReader: FanNoteReader,
     private val fanNoteWriter: FanNoteWriter,
-    private val imageUploadService: ImageUploadService
+    private val fanNoteImageUploadService: FanNoteImageUploadService
 ) {
 
     @Transactional
     fun create(request: FanNoteCreateRequest): FanNoteDetailResponse {
+        // 1. 팬노트별 고유 폴더 생성 (yyyy-MM-dd-uuid)
+        val folderName = fanNoteImageUploadService.createFanNoteFolder()
+
+        // 2. 커버 이미지 업로드 (pageNumber = 0)
         val coverImageUrl = request.coverImage
             ?.takeIf { !it.isEmpty }
-            ?.let { imageUploadService.uploadImage(it).url }
+            ?.let { fanNoteImageUploadService.uploadImage(it, folderName, 0).url }
 
+        // 3. FanNote 엔티티 저장
         val fanNote = FanNote(
             title = request.title,
             subtitle = request.subtitle,
@@ -37,10 +42,15 @@ class AdminFanNoteService(
 
         val savedFanNote = fanNoteWriter.save(fanNote)
 
+        // 4. 페이지 이미지 업로드 (pageNumber = 1, 2, 3, ...)
         val pages = request.pageImages
             ?.filterNot { it.isEmpty }
             ?.mapIndexed { index, file ->
-                val imageUrl = imageUploadService.uploadImage(file).url
+                val imageUrl = fanNoteImageUploadService.uploadImage(
+                    file,
+                    folderName,
+                    index + 1  // 1부터 시작
+                ).url
                 FanNotePage(
                     pageNumber = index + 1,
                     imageUrl = imageUrl,
