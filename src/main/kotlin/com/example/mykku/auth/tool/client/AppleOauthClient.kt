@@ -1,4 +1,4 @@
-package com.example.mykku.auth.tool
+package com.example.mykku.auth.tool.client
 
 import com.example.mykku.auth.dto.AppleUserInfo
 import com.example.mykku.auth.exception.AuthException
@@ -21,21 +21,16 @@ import java.util.concurrent.ConcurrentHashMap
 class AppleOauthClient(
     private val restClient: RestClient,
     private val objectMapper: ObjectMapper
-) {
+) : AbstractOauthClient() {
     private val logger = LoggerFactory.getLogger(AppleOauthClient::class.java)
     private val appleKeysUrl = "https://appleid.apple.com/auth/keys"
-    
-    // Apple 공개 키 TTL 기반 캐싱
+
     private val cachedAppleKeys = ConcurrentHashMap<String, PublicKey>()
     private var cacheTimestamp: LocalDateTime? = null
-    private val cacheTtlMinutes = 60L // 1시간 캐시 유지
+    private val cacheTtlMinutes = 60L
 
-    /**
-     * 모바일 앱에서 받은 ID Token을 검증하여 Apple 사용자 정보를 추출합니다.
-     */
     fun verifyAndGetUserInfo(idToken: String): AppleUserInfo {
-        try {
-            // ID Token을 Base64 디코딩하여 헤더 추출
+        return executeOauthRequest("APPLE", "ID_TOKEN_VERIFY") {
             val tokenParts = idToken.split(".")
             if (tokenParts.size != 3) {
                 throw AuthException.oauthInvalidToken()
@@ -46,7 +41,6 @@ class AppleOauthClient(
             val kid = header["kid"]?.asText()
                 ?: throw AuthException.oauthInvalidToken()
 
-            // Apple 공개 키를 사용하여 ID Token 검증
             val publicKey = getApplePublicKey(kid)
             val claims = Jwts.parser()
                 .verifyWith(publicKey as RSAPublicKey)
@@ -54,7 +48,6 @@ class AppleOauthClient(
                 .parseSignedClaims(idToken)
                 .payload
 
-            // 토큰 유효성 검증
             val issuer = claims.issuer
             val expiration = claims.expiration
 
@@ -66,32 +59,25 @@ class AppleOauthClient(
                 throw AuthException.oauthInvalidToken()
             }
 
-            // 사용자 정보 추출
             val sub = claims.subject ?: throw AuthException.oauthUserInfoFailed()
             val email = claims["email"] as? String
 
-            return AppleUserInfo(
+            AppleUserInfo(
                 sub = sub,
                 email = email
             )
-        } catch (e: AuthException) {
-            throw e
-        } catch (e: Exception) {
-            logger.error("Apple ID Token verification failed: ${e.message}")
-            throw AuthException.oauthUserInfoFailed()
         }
     }
 
     private fun getApplePublicKey(kid: String): PublicKey {
-        // 캐시 확인
         val now = LocalDateTime.now()
-        if (cacheTimestamp != null && 
-            cachedAppleKeys.containsKey(kid) && 
-            now.isBefore(cacheTimestamp!!.plusMinutes(cacheTtlMinutes))) {
+        if (cacheTimestamp != null &&
+            cachedAppleKeys.containsKey(kid) &&
+            now.isBefore(cacheTimestamp!!.plusMinutes(cacheTtlMinutes))
+        ) {
             return cachedAppleKeys[kid]!!
         }
 
-        // Apple 공개 키 가져오기
         try {
             val keysResponse = restClient.get()
                 .uri(appleKeysUrl)

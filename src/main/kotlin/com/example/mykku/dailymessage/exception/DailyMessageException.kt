@@ -2,9 +2,6 @@ package com.example.mykku.dailymessage.exception
 
 import com.example.mykku.common.exception.BaseDomainException
 
-/**
- * DailyMessage 도메인 예외 클래스
- */
 class DailyMessageException(
     errorCode: DailyMessageErrorCode,
     additionalMessage: String? = null,

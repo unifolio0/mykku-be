@@ -23,13 +23,12 @@ class AdminFanNoteService(
 
     @Transactional
     fun create(request: FanNoteCreateRequest): FanNoteDetailResponse {
-        // 1. 커버와 페이지 이미지 모두 업로드
+        
         val uploadResult = s3ImageUploadService.uploadFanNoteImages(
             request.coverImage,
             request.pageImages
         )
 
-        // 2. FanNote 엔티티 저장
         val fanNote = FanNote(
             title = request.title,
             subtitle = request.subtitle,
@@ -40,7 +39,6 @@ class AdminFanNoteService(
 
         val savedFanNote = fanNoteWriter.save(fanNote)
 
-        // 3. 페이지 엔티티들 저장
         val pages = uploadResult.pageImageUrls.mapIndexed { index, imageUrl ->
             FanNotePage(
                 pageNumber = index + 1,

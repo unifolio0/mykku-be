@@ -29,7 +29,7 @@ class FeedWriter(
         imageResults: List<ImageUploadResult>,
         tagTitles: List<String>
     ): Triple<Feed, List<FeedImage>, List<FeedTag>> {
-        // 이미지 개수 제한 검증
+        
         if (imageResults.size > Feed.IMAGE_MAX_COUNT) {
             throw FeedException.feedImageLimitExceeded()
         }
@@ -40,7 +40,6 @@ class FeedWriter(
             .distinct()
             .toList()
 
-        // 태그 개수 제한 검증
         if (normalizedDistinctTags.size > Feed.TAG_MAX_COUNT) {
             throw FeedException.feedTagLimitExceeded()
         }
@@ -54,9 +53,8 @@ class FeedWriter(
 
         val savedFeed = feedRepository.save(feed)
 
-        // Save images using saveAll for better performance
         val feedImages = imageResults.map { imageResult ->
-            // 이미지 크기 검증
+            
             if (imageResult.width <= 0 || imageResult.height <= 0) {
                 throw FeedException.imageInvalidDimensions()
             }
@@ -70,7 +68,6 @@ class FeedWriter(
         }
         val savedFeedImages = feedImageRepository.saveAll(feedImages)
 
-        // Save tags using saveAll
         val feedTags = normalizedDistinctTags.map { tagTitle ->
             FeedTag(
                 feed = savedFeed,

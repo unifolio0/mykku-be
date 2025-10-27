@@ -27,19 +27,17 @@ class EventWriter(
         imageRequests: List<EventImageRequest>,
         tagTitles: List<String>
     ): Triple<Event, List<EventImage>, List<EventTag>> {
-        // 이미지 개수 제한 검증
+        
         if (imageRequests.size > Event.IMAGE_MAX_COUNT) {
             throw FeedException.eventImageLimitExceeded()
         }
 
-        // 태그 유효성 검증 및 정규화
         val normalizedDistinctTags = tagTitles.asSequence()
             .map { it.trim() }
             .filter { it.isNotBlank() }
             .distinct()
             .toList()
 
-        // 태그 개수 제한 검증
         if (normalizedDistinctTags.size > Event.TAG_MAX_COUNT) {
             throw FeedException.eventTagLimitExceeded()
         }
@@ -52,7 +50,6 @@ class EventWriter(
 
         val savedEvent = eventRepository.save(event)
 
-        // Save images using saveAll for better performance
         val eventImages = imageRequests.map { imageRequest ->
             EventImage(
                 url = imageRequest.url,
@@ -61,8 +58,6 @@ class EventWriter(
             )
         }
         val savedEventImages = eventImageRepository.saveAll(eventImages)
-
-        // Save tags using saveAll
 
         val eventTags = normalizedDistinctTags.map { tagTitle ->
             EventTag(

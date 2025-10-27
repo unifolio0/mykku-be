@@ -1,9 +1,5 @@
 package com.example.mykku.common.exception
 
-/**
- * 공통 예외 클래스
- * 도메인에 속하지 않는 일반적인 예외를 처리
- */
 class CommonException(
     errorCode: CommonErrorCode,
     additionalMessage: String? = null,

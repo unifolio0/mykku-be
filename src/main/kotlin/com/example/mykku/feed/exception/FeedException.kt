@@ -2,9 +2,6 @@ package com.example.mykku.feed.exception
 
 import com.example.mykku.common.exception.BaseDomainException
 
-/**
- * Feed 도메인 예외 클래스
- */
 class FeedException(
     errorCode: FeedErrorCode,
     additionalMessage: String? = null,

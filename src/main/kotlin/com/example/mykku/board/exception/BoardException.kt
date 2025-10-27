@@ -2,9 +2,6 @@ package com.example.mykku.board.exception
 
 import com.example.mykku.common.exception.BaseDomainException
 
-/**
- * Board 도메인 예외 클래스
- */
 class BoardException(
     errorCode: BoardErrorCode,
     additionalMessage: String? = null,

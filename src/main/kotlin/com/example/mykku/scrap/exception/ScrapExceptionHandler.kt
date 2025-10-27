@@ -1,6 +1,8 @@
 package com.example.mykku.scrap.exception
 
 import com.example.mykku.common.exception.ErrorResponse
+import com.example.mykku.common.exception.ExceptionLoggingSupport
+import org.slf4j.LoggerFactory
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import org.springframework.http.MediaType
@@ -12,8 +14,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
 class ScrapExceptionHandler {
 
+    private val logger = LoggerFactory.getLogger(ScrapExceptionHandler::class.java)
+
     @ExceptionHandler(ScrapException::class)
     fun handleScrapException(exception: ScrapException): ResponseEntity<ErrorResponse> {
+        ExceptionLoggingSupport.logException(logger, exception)
+
         return ResponseEntity
             .status(exception.errorCode.status)
             .contentType(MediaType.APPLICATION_JSON)

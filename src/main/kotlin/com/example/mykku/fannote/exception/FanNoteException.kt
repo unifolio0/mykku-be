@@ -2,9 +2,6 @@ package com.example.mykku.fannote.exception
 
 import com.example.mykku.common.exception.BaseDomainException
 
-/**
- * FanNote 도메인 예외 클래스
- */
 class FanNoteException(
     errorCode: FanNoteErrorCode,
     additionalMessage: String? = null,

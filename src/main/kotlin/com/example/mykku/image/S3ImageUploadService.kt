@@ -40,7 +40,6 @@ class S3ImageUploadService(
     override fun uploadImage(image: MultipartFile): ImageUploadResult {
         validateImage(image)
 
-        // 이미지 크기 추출
         val imageBytes = image.bytes
         val dimensions = extractImageDimensions(imageBytes)
 
@@ -102,10 +101,6 @@ class S3ImageUploadService(
         return filename?.substringAfterLast(".", "")?.lowercase() ?: ""
     }
 
-    /**
-     * 이미지 URL 생성
-     * CloudFront 도메인이 설정되어 있으면 CloudFront URL, 없으면 S3 직접 URL 반환
-     */
     private fun buildImageUrl(key: String): String {
         return if (!s3Properties.cloudfrontDomain.isNullOrBlank()) {
             "https://${s3Properties.cloudfrontDomain}/$key"
@@ -123,19 +118,13 @@ class S3ImageUploadService(
 
             Pair(bufferedImage.width, bufferedImage.height)
         } catch (e: ImageException) {
-            // 도메인 예외는 그대로 전달
+            
             throw e
         } catch (e: Exception) {
             throw ImageException.imageSizeExtractionFailed()
         }
     }
 
-    /**
-     * 팬노트 이미지 업로드 (커버 + 페이지)
-     * @param coverImage 커버 이미지 (optional)
-     * @param pageImages 페이지 이미지 리스트 (optional)
-     * @return 업로드된 이미지 URL 정보
-     */
     override fun uploadFanNoteImages(
         coverImage: MultipartFile?,
         pageImages: List<MultipartFile>?
@@ -153,23 +142,12 @@ class S3ImageUploadService(
         return FanNoteImagesUploadResult(coverUrl, pageUrls)
     }
 
-    /**
-     * 팬노트별 고유 폴더명 생성
-     * 형식: yyyy-MM-dd-{UUID 앞 8자리}
-     */
     private fun createFanNoteFolder(): String {
         val date = LocalDate.now().format(DATE_FORMATTER)
         val uuid = UUID.randomUUID().toString().replace("-", "").substring(0, 8)
         return "$date-$uuid"
     }
 
-    /**
-     * 팬노트 이미지를 S3에 업로드
-     * @param image 업로드할 이미지
-     * @param folderName 팬노트 폴더명
-     * @param pageNumber 페이지 번호 (0=커버, 1~=페이지)
-     * @return 업로드된 이미지 URL
-     */
     private fun uploadFanNoteImageToS3(
         image: MultipartFile,
         folderName: String,
@@ -205,10 +183,6 @@ class S3ImageUploadService(
         return buildImageUrl(key)
     }
 
-    /**
-     * 팬노트 파일명 생성
-     * 형식: yyyyMMdd-{pageNumber}.{extension}
-     */
     private fun generateFanNoteFileName(originalFilename: String?, pageNumber: Int): String {
         val extension = getFileExtension(originalFilename)
         val date = LocalDate.now().format(FILENAME_DATE_FORMATTER)

@@ -4,9 +4,6 @@ import com.example.mykku.board.domain.Board
 import com.example.mykku.common.exception.DomainErrorCode
 import org.springframework.http.HttpStatus
 
-/**
- * Board 도메인 에러 코드
- */
 enum class BoardErrorCode(
     override val status: HttpStatus,
     override val message: String

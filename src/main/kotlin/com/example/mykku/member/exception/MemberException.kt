@@ -2,9 +2,6 @@ package com.example.mykku.member.exception
 
 import com.example.mykku.common.exception.BaseDomainException
 
-/**
- * Member 도메인 예외 클래스
- */
 class MemberException(
     errorCode: MemberErrorCode,
     additionalMessage: String? = null,

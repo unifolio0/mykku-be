@@ -2,9 +2,6 @@ package com.example.mykku.image.exception
 
 import com.example.mykku.common.exception.BaseDomainException
 
-/**
- * Image 도메인 예외 클래스
- */
 class ImageException(
     errorCode: ImageErrorCode,
     additionalMessage: String? = null,

@@ -2,9 +2,6 @@ package com.example.mykku.auth.exception
 
 import com.example.mykku.common.exception.BaseDomainException
 
-/**
- * Auth 도메인 예외 클래스
- */
 class AuthException(
     errorCode: AuthErrorCode,
     additionalMessage: String? = null,
