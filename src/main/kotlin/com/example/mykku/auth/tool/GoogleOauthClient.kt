@@ -15,7 +15,7 @@ class GoogleOauthClient(
         return executeOauthRequest("GOOGLE") {
             restClient.get()
                 .uri("https://www.googleapis.com/oauth2/v2/userinfo")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer ${accessToken.take(10)}...")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
                 .retrieve()
                 .body(GoogleUserInfo::class.java)
                 ?: throw AuthException.oauthUserInfoFailed()

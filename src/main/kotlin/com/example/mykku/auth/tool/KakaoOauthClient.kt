@@ -15,7 +15,7 @@ class KakaoOauthClient(
         return executeOauthRequest("KAKAO") {
             restClient.get()
                 .uri("https://kapi.kakao.com/v2/user/me")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer ${accessToken.take(10)}...")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken")
                 .retrieve()
                 .body(KakaoUserInfo::class.java)
                 ?: throw AuthException.oauthUserInfoFailed()
