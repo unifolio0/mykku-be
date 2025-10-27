@@ -4,21 +4,37 @@
     <property name="LOG_PATH" value="logs"/>
     <property name="LOG_FILE_NAME" value="mykku"/>
 
-    <!-- 콘솔 출력 패턴 (색상 적용) -->
+    <!-- 콘솔 출력 패턴 (색상 적용 - local 전용) -->
     <property name="CONSOLE_LOG_PATTERN"
               value="%clr([%d{yyyy-MM-dd HH:mm:ss.SSS}]){faint} %clr([%thread]){magenta} %clr(%-5level){highlight} %clr(%logger{36}){cyan} %clr(-){faint} %msg%n"/>
+
+    <!-- 콘솔 출력 패턴 (색상 없음 - dev/prod) -->
+    <property name="CONSOLE_LOG_PATTERN_SIMPLE"
+              value="[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] %-5level %logger{36} - %msg%n"/>
 
     <!-- 파일 출력 패턴 -->
     <property name="FILE_LOG_PATTERN"
               value="[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] %-5level %logger{36} - %msg%n"/>
 
-    <!-- 콘솔 Appender -->
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
-            <charset>UTF-8</charset>
-        </encoder>
-    </appender>
+    <!-- 콘솔 Appender (local 프로파일 - 색상 포함) -->
+    <springProfile name="local">
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+                <charset>UTF-8</charset>
+            </encoder>
+        </appender>
+    </springProfile>
+
+    <!-- 콘솔 Appender (dev 프로파일 - 색상 없음) -->
+    <springProfile name="dev">
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>${CONSOLE_LOG_PATTERN_SIMPLE}</pattern>
+                <charset>UTF-8</charset>
+            </encoder>
+        </appender>
+    </springProfile>
 
     <!-- 파일 Appender (일별 롤링) -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
