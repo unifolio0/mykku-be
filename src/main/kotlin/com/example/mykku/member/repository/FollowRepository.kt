@@ -10,8 +10,7 @@ import org.springframework.stereotype.Repository
 @Repository
 interface FollowRepository : JpaRepository<Follow, Long> {
     fun findByFollowerId(followerId: String): List<Follow>
-    
-    // 성능 최적화: EXISTS 사용 및 서브쿼리 최소화
+
     @Query("""
         SELECT DISTINCT f2.following 
         FROM Follow f1 
@@ -30,8 +29,7 @@ interface FollowRepository : JpaRepository<Follow, Long> {
         @Param("memberId") memberId: String,
         @Param("minCommonFollowers") minCommonFollowers: Long = 10
     ): List<Member>
-    
-    // 더 간단한 추천 쿼리 - 공통 팔로워가 많은 순으로 정렬
+
     @Query("""
         SELECT f2.following, COUNT(DISTINCT f1.following) as commonCount
         FROM Follow f1 

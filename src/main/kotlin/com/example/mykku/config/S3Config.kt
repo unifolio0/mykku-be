@@ -20,9 +20,7 @@ class S3Config(
     fun s3Client(): S3Client {
         val builder = S3Client.builder()
             .region(Region.of(s3Properties.region))
-        
-        // accessKey와 secretKey가 설정되어 있으면 StaticCredentialsProvider 사용
-        // 그렇지 않으면 DefaultCredentialsProvider 사용 (환경변수, IAM 역할 등)
+
         if (!s3Properties.accessKey.isNullOrBlank() && !s3Properties.secretKey.isNullOrBlank()) {
             val credentials = AwsBasicCredentials.create(
                 s3Properties.accessKey,

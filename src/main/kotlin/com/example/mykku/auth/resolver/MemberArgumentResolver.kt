@@ -52,11 +52,9 @@ class MemberArgumentResolver(
     }
     
     private fun handleNullableParameter(parameter: MethodParameter): Member? {
-        // If the parameter is nullable (Member?), return null
-        // If the parameter is non-nullable (Member), throw exception
+
         val annotation = parameter.getParameterAnnotation(CurrentMember::class.java)
-        
-        // Check if the parameter is nullable by checking if it's not required
+
         return if (annotation != null && !annotation.required) {
             null
         } else {

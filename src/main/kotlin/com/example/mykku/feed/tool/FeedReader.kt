@@ -68,8 +68,7 @@ class FeedReader(
     fun getEventTagsByTitles(titles: List<String>): List<EventTag> {
         return eventTagRepository.findAllByTitleIn(titles)
     }
-    
-    // Batch methods to prevent N+1 queries
+
     fun getFeedImagesByFeeds(feeds: List<Feed>): Map<Long, List<FeedImage>> {
         val images = feedImageRepository.findByFeedIn(feeds)
         return images.groupBy { it.feed.id!! }

@@ -3,18 +3,14 @@ package com.example.mykku.auth.exception
 import com.example.mykku.common.exception.DomainErrorCode
 import org.springframework.http.HttpStatus
 
-/**
- * Auth 도메인 에러 코드
- */
 enum class AuthErrorCode(
     override val status: HttpStatus,
     override val message: String
 ) : DomainErrorCode {
-    // General Auth
+
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증이 필요합니다"),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다"),
-    
-    // OAuth
+
     OAUTH_USER_INFO_FAILED(HttpStatus.BAD_REQUEST, "사용자 정보를 가져오는데 실패했습니다"),
     OAUTH_EXTERNAL_SERVICE_ERROR(HttpStatus.SERVICE_UNAVAILABLE, "외부 서비스 오류가 발생했습니다"),
     OAUTH_INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다"),
