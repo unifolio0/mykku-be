@@ -5,6 +5,7 @@ import com.example.mykku.auth.exception.AuthException
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.jsonwebtoken.Jwts
 import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestClient
@@ -24,16 +25,17 @@ class AppleOauthClient(
 ) {
     private val logger = LoggerFactory.getLogger(AppleOauthClient::class.java)
     private val appleKeysUrl = "https://appleid.apple.com/auth/keys"
-    
+
     // Apple 공개 키 TTL 기반 캐싱
     private val cachedAppleKeys = ConcurrentHashMap<String, PublicKey>()
     private var cacheTimestamp: LocalDateTime? = null
     private val cacheTtlMinutes = 60L // 1시간 캐시 유지
 
-    /**
-     * 모바일 앱에서 받은 ID Token을 검증하여 Apple 사용자 정보를 추출합니다.
-     */
     fun verifyAndGetUserInfo(idToken: String): AppleUserInfo {
+        val requestId = MDC.get("req-id") ?: "unknown"
+        val startTime = System.currentTimeMillis()
+        logger.info("[$requestId] OAuth 요청 시작: provider=APPLE, type=ID_TOKEN_VERIFY")
+
         try {
             // ID Token을 Base64 디코딩하여 헤더 추출
             val tokenParts = idToken.split(".")
@@ -70,6 +72,9 @@ class AppleOauthClient(
             val sub = claims.subject ?: throw AuthException.oauthUserInfoFailed()
             val email = claims["email"] as? String
 
+            val duration = System.currentTimeMillis() - startTime
+            logger.info("[$requestId] OAuth 응답 성공: provider=APPLE (${duration}ms)")
+
             return AppleUserInfo(
                 sub = sub,
                 email = email
@@ -77,7 +82,8 @@ class AppleOauthClient(
         } catch (e: AuthException) {
             throw e
         } catch (e: Exception) {
-            logger.error("Apple ID Token verification failed: ${e.message}")
+            val duration = System.currentTimeMillis() - startTime
+            logger.error("[$requestId] Apple ID Token verification failed: ${e.message} (${duration}ms)")
             throw AuthException.oauthUserInfoFailed()
         }
     }
@@ -85,9 +91,10 @@ class AppleOauthClient(
     private fun getApplePublicKey(kid: String): PublicKey {
         // 캐시 확인
         val now = LocalDateTime.now()
-        if (cacheTimestamp != null && 
-            cachedAppleKeys.containsKey(kid) && 
-            now.isBefore(cacheTimestamp!!.plusMinutes(cacheTtlMinutes))) {
+        if (cacheTimestamp != null &&
+            cachedAppleKeys.containsKey(kid) &&
+            now.isBefore(cacheTimestamp!!.plusMinutes(cacheTtlMinutes))
+        ) {
             return cachedAppleKeys[kid]!!
         }
 

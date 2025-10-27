@@ -9,7 +9,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 @Configuration
 class WebConfig(
-    private val memberArgumentResolver: MemberArgumentResolver
+    private val memberArgumentResolver: MemberArgumentResolver,
+    private val loggingInterceptor: LoggingInterceptor
 ) : WebMvcConfigurer {
 
     override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
@@ -23,5 +24,9 @@ class WebConfig(
 
     override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {
         resolvers.add(memberArgumentResolver)
+    }
+
+    override fun addInterceptors(registry: org.springframework.web.servlet.config.annotation.InterceptorRegistry) {
+        registry.addInterceptor(loggingInterceptor)
     }
 }
