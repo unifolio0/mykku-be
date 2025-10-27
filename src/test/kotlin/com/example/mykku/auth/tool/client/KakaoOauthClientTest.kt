@@ -1,9 +1,9 @@
-package com.example.mykku.auth.tool
+package com.example.mykku.auth.tool.client
 
 import com.example.mykku.BaseToolTest
-import com.example.mykku.auth.dto.GoogleUserInfo
-import com.example.mykku.auth.exception.AuthException
+import com.example.mykku.auth.dto.KakaoUserInfo
 import com.example.mykku.auth.exception.AuthErrorCode
+import com.example.mykku.auth.exception.AuthException
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.InjectMocks
@@ -17,7 +17,7 @@ import org.springframework.web.client.HttpServerErrorException
 import org.springframework.web.client.RestClient
 import kotlin.test.assertEquals
 
-class GoogleOauthClientTest : BaseToolTest() {
+class KakaoOauthClientTest : BaseToolTest() {
 
     @Mock
     private lateinit var restClient: RestClient
@@ -32,49 +32,63 @@ class GoogleOauthClientTest : BaseToolTest() {
     private lateinit var responseSpec: RestClient.ResponseSpec
 
     @InjectMocks
-    private lateinit var googleOauthClient: GoogleOauthClient
+    private lateinit var kakaoOauthClient: KakaoOauthClient
 
     @Test
     fun `verifyAndGetUserInfo는 유효한 액세스 토큰으로 사용자 정보를 반환한다`() {
-        val accessToken = "valid_access_token"
-        val expectedUserInfo = GoogleUserInfo(
-            id = "123456789",
-            email = "test@gmail.com",
-            name = "Test User",
-            givenName = "Test",
-            familyName = "User",
-            picture = "https://profile.example.com/photo.jpg",
-            verifiedEmail = true
+        val accessToken = "valid_kakao_token"
+        val expectedUserInfo = KakaoUserInfo(
+            id = 12345678L,
+            connectedAt = "2024-01-01T00:00:00Z",
+            properties = KakaoUserInfo.Properties(
+                nickname = "카카오유저",
+                profileImage = "https://kakao.profile.jpg",
+                thumbnailImage = "https://kakao.thumb.jpg"
+            ),
+            kakaoAccount = KakaoUserInfo.KakaoAccount(
+                profileNicknameNeedsAgreement = false,
+                profileImageNeedsAgreement = false,
+                profile = KakaoUserInfo.KakaoAccount.Profile(
+                    nickname = "카카오유저",
+                    profileImageUrl = "https://kakao.profile.jpg",
+                    thumbnailImageUrl = "https://kakao.thumb.jpg",
+                    isDefaultImage = false
+                ),
+                hasEmail = true,
+                emailNeedsAgreement = false,
+                email = "test@kakao.com",
+                isEmailValid = true,
+                isEmailVerified = true
+            )
         )
 
         whenever(restClient.get()).thenReturn(requestHeadersUriSpec)
-        whenever(requestHeadersUriSpec.uri("https://www.googleapis.com/oauth2/v2/userinfo"))
+        whenever(requestHeadersUriSpec.uri("https://kapi.kakao.com/v2/user/me"))
             .thenReturn(requestHeadersSpec)
         whenever(requestHeadersSpec.header(HttpHeaders.AUTHORIZATION, "Bearer $accessToken"))
             .thenReturn(requestHeadersSpec)
         whenever(requestHeadersSpec.retrieve()).thenReturn(responseSpec)
-        whenever(responseSpec.body(GoogleUserInfo::class.java)).thenReturn(expectedUserInfo)
+        whenever(responseSpec.body(KakaoUserInfo::class.java)).thenReturn(expectedUserInfo)
 
-        val result = googleOauthClient.verifyAndGetUserInfo(accessToken)
+        val result = kakaoOauthClient.verifyAndGetUserInfo(accessToken)
 
         assertEquals(expectedUserInfo.id, result.id)
-        assertEquals(expectedUserInfo.email, result.email)
-        assertEquals(expectedUserInfo.name, result.name)
-        assertEquals(expectedUserInfo.picture, result.picture)
+        assertEquals(expectedUserInfo.kakaoAccount?.email, result.kakaoAccount?.email)
+        assertEquals(expectedUserInfo.kakaoAccount?.profile?.nickname, result.kakaoAccount?.profile?.nickname)
     }
 
     @Test
     fun `verifyAndGetUserInfo는 응답이 null일 때 예외를 발생시킨다`() {
-        val accessToken = "access_token"
+        val accessToken = "null_response_token"
 
         whenever(restClient.get()).thenReturn(requestHeadersUriSpec)
         whenever(requestHeadersUriSpec.uri(any<String>())).thenReturn(requestHeadersSpec)
         whenever(requestHeadersSpec.header(any(), any())).thenReturn(requestHeadersSpec)
         whenever(requestHeadersSpec.retrieve()).thenReturn(responseSpec)
-        whenever(responseSpec.body(GoogleUserInfo::class.java)).thenReturn(null)
+        whenever(responseSpec.body(KakaoUserInfo::class.java)).thenReturn(null)
 
         val exception = assertThrows<AuthException> {
-            googleOauthClient.verifyAndGetUserInfo(accessToken)
+            kakaoOauthClient.verifyAndGetUserInfo(accessToken)
         }
 
         assertEquals(AuthErrorCode.OAUTH_USER_INFO_FAILED, exception.errorCode)
@@ -82,22 +96,24 @@ class GoogleOauthClientTest : BaseToolTest() {
 
     @Test
     fun `verifyAndGetUserInfo는 401 에러시 OAUTH_INVALID_TOKEN 예외를 발생시킨다`() {
-        val accessToken = "invalid_access_token"
+        val accessToken = "invalid_kakao_token"
 
         whenever(restClient.get()).thenReturn(requestHeadersUriSpec)
         whenever(requestHeadersUriSpec.uri(any<String>())).thenReturn(requestHeadersSpec)
         whenever(requestHeadersSpec.header(any(), any())).thenReturn(requestHeadersSpec)
         whenever(requestHeadersSpec.retrieve())
-            .thenThrow(HttpClientErrorException.create(
-                HttpStatus.UNAUTHORIZED,
-                "Unauthorized",
-                HttpHeaders.EMPTY,
-                ByteArray(0),
-                null
-            ))
+            .thenThrow(
+                HttpClientErrorException.create(
+                    HttpStatus.UNAUTHORIZED,
+                    "Unauthorized",
+                    HttpHeaders.EMPTY,
+                    ByteArray(0),
+                    null
+                )
+            )
 
         val exception = assertThrows<AuthException> {
-            googleOauthClient.verifyAndGetUserInfo(accessToken)
+            kakaoOauthClient.verifyAndGetUserInfo(accessToken)
         }
 
         assertEquals(AuthErrorCode.OAUTH_INVALID_TOKEN, exception.errorCode)
@@ -105,22 +121,24 @@ class GoogleOauthClientTest : BaseToolTest() {
 
     @Test
     fun `verifyAndGetUserInfo는 403 에러시 OAUTH_ACCESS_DENIED 예외를 발생시킨다`() {
-        val accessToken = "forbidden_token"
+        val accessToken = "forbidden_kakao_token"
 
         whenever(restClient.get()).thenReturn(requestHeadersUriSpec)
         whenever(requestHeadersUriSpec.uri(any<String>())).thenReturn(requestHeadersSpec)
         whenever(requestHeadersSpec.header(any(), any())).thenReturn(requestHeadersSpec)
         whenever(requestHeadersSpec.retrieve())
-            .thenThrow(HttpClientErrorException.create(
-                HttpStatus.FORBIDDEN,
-                "Forbidden",
-                HttpHeaders.EMPTY,
-                ByteArray(0),
-                null
-            ))
+            .thenThrow(
+                HttpClientErrorException.create(
+                    HttpStatus.FORBIDDEN,
+                    "Forbidden",
+                    HttpHeaders.EMPTY,
+                    ByteArray(0),
+                    null
+                )
+            )
 
         val exception = assertThrows<AuthException> {
-            googleOauthClient.verifyAndGetUserInfo(accessToken)
+            kakaoOauthClient.verifyAndGetUserInfo(accessToken)
         }
 
         assertEquals(AuthErrorCode.OAUTH_ACCESS_DENIED, exception.errorCode)
@@ -128,22 +146,24 @@ class GoogleOauthClientTest : BaseToolTest() {
 
     @Test
     fun `verifyAndGetUserInfo는 기타 4xx 에러시 OAUTH_USER_INFO_FAILED 예외를 발생시킨다`() {
-        val accessToken = "bad_request_token"
+        val accessToken = "bad_request_kakao_token"
 
         whenever(restClient.get()).thenReturn(requestHeadersUriSpec)
         whenever(requestHeadersUriSpec.uri(any<String>())).thenReturn(requestHeadersSpec)
         whenever(requestHeadersSpec.header(any(), any())).thenReturn(requestHeadersSpec)
         whenever(requestHeadersSpec.retrieve())
-            .thenThrow(HttpClientErrorException.create(
-                HttpStatus.BAD_REQUEST,
-                "Bad Request",
-                HttpHeaders.EMPTY,
-                ByteArray(0),
-                null
-            ))
+            .thenThrow(
+                HttpClientErrorException.create(
+                    HttpStatus.NOT_FOUND,
+                    "Not Found",
+                    HttpHeaders.EMPTY,
+                    ByteArray(0),
+                    null
+                )
+            )
 
         val exception = assertThrows<AuthException> {
-            googleOauthClient.verifyAndGetUserInfo(accessToken)
+            kakaoOauthClient.verifyAndGetUserInfo(accessToken)
         }
 
         assertEquals(AuthErrorCode.OAUTH_USER_INFO_FAILED, exception.errorCode)
@@ -151,22 +171,24 @@ class GoogleOauthClientTest : BaseToolTest() {
 
     @Test
     fun `verifyAndGetUserInfo는 서버 에러시 OAUTH_SERVER_ERROR 예외를 발생시킨다`() {
-        val accessToken = "server_error_token"
+        val accessToken = "server_error_kakao_token"
 
         whenever(restClient.get()).thenReturn(requestHeadersUriSpec)
         whenever(requestHeadersUriSpec.uri(any<String>())).thenReturn(requestHeadersSpec)
         whenever(requestHeadersSpec.header(any(), any())).thenReturn(requestHeadersSpec)
         whenever(requestHeadersSpec.retrieve())
-            .thenThrow(HttpServerErrorException.create(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "Internal Server Error",
-                HttpHeaders.EMPTY,
-                ByteArray(0),
-                null
-            ))
+            .thenThrow(
+                HttpServerErrorException.create(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Internal Server Error",
+                    HttpHeaders.EMPTY,
+                    ByteArray(0),
+                    null
+                )
+            )
 
         val exception = assertThrows<AuthException> {
-            googleOauthClient.verifyAndGetUserInfo(accessToken)
+            kakaoOauthClient.verifyAndGetUserInfo(accessToken)
         }
 
         assertEquals(AuthErrorCode.OAUTH_SERVER_ERROR, exception.errorCode)
@@ -174,16 +196,16 @@ class GoogleOauthClientTest : BaseToolTest() {
 
     @Test
     fun `verifyAndGetUserInfo는 예상치 못한 예외시 OAUTH_USER_INFO_FAILED 예외를 발생시킨다`() {
-        val accessToken = "runtime_error_token"
+        val accessToken = "runtime_error_kakao_token"
 
         whenever(restClient.get()).thenReturn(requestHeadersUriSpec)
         whenever(requestHeadersUriSpec.uri(any<String>())).thenReturn(requestHeadersSpec)
         whenever(requestHeadersSpec.header(any(), any())).thenReturn(requestHeadersSpec)
         whenever(requestHeadersSpec.retrieve())
-            .thenThrow(RuntimeException("Unexpected error"))
+            .thenThrow(RuntimeException("Kakao API connection failed"))
 
         val exception = assertThrows<AuthException> {
-            googleOauthClient.verifyAndGetUserInfo(accessToken)
+            kakaoOauthClient.verifyAndGetUserInfo(accessToken)
         }
 
         assertEquals(AuthErrorCode.OAUTH_USER_INFO_FAILED, exception.errorCode)

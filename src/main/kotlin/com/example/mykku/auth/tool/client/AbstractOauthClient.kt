@@ -1,4 +1,4 @@
-package com.example.mykku.auth.tool
+package com.example.mykku.auth.tool.client
 
 import com.example.mykku.auth.exception.AuthException
 import org.slf4j.LoggerFactory

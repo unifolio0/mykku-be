@@ -1,8 +1,8 @@
-package com.example.mykku.auth.tool
+package com.example.mykku.auth.tool.client
 
 import com.example.mykku.BaseToolTest
-import com.example.mykku.auth.exception.AuthException
 import com.example.mykku.auth.exception.AuthErrorCode
+import com.example.mykku.auth.exception.AuthException
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
