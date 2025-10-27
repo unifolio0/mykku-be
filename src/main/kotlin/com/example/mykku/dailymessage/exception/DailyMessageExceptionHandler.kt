@@ -1,8 +1,8 @@
 package com.example.mykku.dailymessage.exception
 
 import com.example.mykku.common.exception.ErrorResponse
+import com.example.mykku.common.exception.ExceptionLoggingSupport
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import org.springframework.http.MediaType
@@ -18,8 +18,7 @@ class DailyMessageExceptionHandler {
 
     @ExceptionHandler(DailyMessageException::class)
     fun handleDailyMessageException(exception: DailyMessageException): ResponseEntity<ErrorResponse> {
-        val requestId = MDC.get("req-id") ?: "unknown"
-        logger.error("[$requestId] ${exception::class.simpleName}: ${exception.message}", exception)
+        ExceptionLoggingSupport.logException(logger, exception)
 
         return ResponseEntity
             .status(exception.errorCode.status)

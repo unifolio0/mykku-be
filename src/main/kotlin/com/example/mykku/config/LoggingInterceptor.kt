@@ -58,18 +58,16 @@ class LoggingInterceptor : HandlerInterceptor {
     }
 
     private fun getStatusText(status: Int): String {
-        return when (status) {
-            in 200..299 -> "OK"
-            in 300..399 -> "REDIRECT"
-            in 400..499 -> when (status) {
-                400 -> "BAD_REQUEST"
-                401 -> "UNAUTHORIZED"
-                403 -> "FORBIDDEN"
-                404 -> "NOT_FOUND"
-                else -> "CLIENT_ERROR"
-            }
+        if (status in 200..299) return "OK"
+        if (status in 300..399) return "REDIRECT"
+        if (status in 500..599) return "SERVER_ERROR"
 
-            in 500..599 -> "SERVER_ERROR"
+        return when (status) {
+            400 -> "BAD_REQUEST"
+            401 -> "UNAUTHORIZED"
+            403 -> "FORBIDDEN"
+            404 -> "NOT_FOUND"
+            in 400..499 -> "CLIENT_ERROR"
             else -> "UNKNOWN"
         }
     }

@@ -1,7 +1,6 @@
 package com.example.mykku.common.exception
 
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import org.springframework.http.MediaType
@@ -9,10 +8,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 
-/**
- * 모든 BaseException을 처리하는 공통 핸들러
- * 도메인별 핸들러에서 처리되지 않은 예외를 처리
- */
 @RestControllerAdvice
 @Order(Ordered.LOWEST_PRECEDENCE)
 class BaseExceptionHandler {
@@ -21,9 +16,8 @@ class BaseExceptionHandler {
 
     @ExceptionHandler(BaseException::class)
     fun handleBaseException(exception: BaseException): ResponseEntity<ErrorResponse> {
-        val requestId = MDC.get("req-id") ?: "unknown"
-        logger.error("[$requestId] ${exception::class.simpleName}: ${exception.message}", exception)
-        
+        ExceptionLoggingSupport.logException(logger, exception)
+
         return ResponseEntity
             .status(exception.errorCode.status)
             .contentType(MediaType.APPLICATION_JSON)
@@ -32,9 +26,8 @@ class BaseExceptionHandler {
 
     @ExceptionHandler(Exception::class)
     fun handleException(exception: Exception): ResponseEntity<ErrorResponse> {
-        val requestId = MDC.get("req-id") ?: "unknown"
-        logger.error("[$requestId] Unexpected exception: ${exception.message}", exception)
-        
+        ExceptionLoggingSupport.logException(logger, exception)
+
         return ResponseEntity
             .status(CommonErrorCode.INTERNAL_SERVER_ERROR.status)
             .contentType(MediaType.APPLICATION_JSON)
