@@ -62,7 +62,7 @@ class PreferenceControllerRestDocsTest : BaseControllerRestDocsTest() {
                     ),
                     requestFields(
                         fieldWithPath("genreTypes").type(JsonFieldType.ARRAY)
-                            .description("장르 취향 목록 (KPOP, WEBTOON_WEBNOVEL, MANGA_ANIME, GAME_ESPORTS, DRAMA_MOVIE, THEATER_MUSICAL, BAND_ROCK)")
+                            .description("장르 취향 목록 (${GenreType.entries.joinToString { it.name }})")
                     ),
                     responseFields(
                         fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
@@ -99,7 +99,7 @@ class PreferenceControllerRestDocsTest : BaseControllerRestDocsTest() {
                         fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                         fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
                         fieldWithPath("data.genreTypes").type(JsonFieldType.ARRAY)
-                            .description("장르 취향 목록 (KPOP, WEBTOON_WEBNOVEL, MANGA_ANIME, GAME_ESPORTS, DRAMA_MOVIE, THEATER_MUSICAL, BAND_ROCK)")
+                            .description("장르 취향 목록 (${GenreType.entries.joinToString { it.name }}")
                     )
                 )
             )
@@ -130,7 +130,7 @@ class PreferenceControllerRestDocsTest : BaseControllerRestDocsTest() {
                     ),
                     requestFields(
                         fieldWithPath("goodsTypes").type(JsonFieldType.ARRAY)
-                            .description("굿즈 취향 목록 (ITABAG, PHOTOCARD_HOLDER, UCHIWA, NAME_BOARD, DESK_TERIOR, LED_SIGN, SLOGAN, CUSHION)")
+                            .description("굿즈 취향 목록 (${GoodsType.entries.joinToString { it.name }})")
                     ),
                     responseFields(
                         fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
@@ -167,7 +167,7 @@ class PreferenceControllerRestDocsTest : BaseControllerRestDocsTest() {
                         fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                         fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
                         fieldWithPath("data.goodsTypes").type(JsonFieldType.ARRAY)
-                            .description("굿즈 취향 목록 (ITABAG, PHOTOCARD_HOLDER, UCHIWA, NAME_BOARD, DESK_TERIOR, LED_SIGN, SLOGAN, CUSHION)")
+                            .description("굿즈 취향 목록 (${GoodsType.entries.joinToString { it.name }})")
                     )
                 )
             )
@@ -198,7 +198,7 @@ class PreferenceControllerRestDocsTest : BaseControllerRestDocsTest() {
                     ),
                     requestFields(
                         fieldWithPath("moodTypes").type(JsonFieldType.ARRAY)
-                            .description("분위기 취향 목록 (COZY, MINIMALIST, KITSCH, FRESH, DANDY, SPORTY, Y2K, STREET)")
+                            .description("분위기 취향 목록 (${MoodType.entries.joinToString { it.name }})")
                     ),
                     responseFields(
                         fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
@@ -235,7 +235,7 @@ class PreferenceControllerRestDocsTest : BaseControllerRestDocsTest() {
                         fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                         fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
                         fieldWithPath("data.moodTypes").type(JsonFieldType.ARRAY)
-                            .description("분위기 취향 목록 (COZY, MINIMALIST, KITSCH, FRESH, DANDY, SPORTY, Y2K, STREET)")
+                            .description("분위기 취향 목록 (${MoodType.entries.joinToString { it.name }})")
                     )
                 )
             )
