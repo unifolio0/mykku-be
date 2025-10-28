@@ -341,6 +341,45 @@ operation::scrap-fan-note-unsave[snippets='http-request,path-parameters,request-
 
 operation::scrap-fan-note-list[snippets='http-request,request-headers,query-parameters,http-response,response-fields']
 
+[[preference-api]]
+== 취향 API
+
+=== 장르 취향 저장
+
+사용자의 장르 취향을 저장합니다. 기존 장르 취향은 모두 삭제되고 새로운 취향으로 대체됩니다.
+
+operation::preference-genre-update[snippets='http-request,request-headers,request-fields,http-response,response-fields']
+
+=== 장르 취향 조회
+
+사용자의 저장된 장르 취향을 조회합니다.
+
+operation::preference-genre-get[snippets='http-request,request-headers,http-response,response-fields']
+
+=== 굿즈 취향 저장
+
+사용자의 굿즈 취향을 저장합니다. 기존 굿즈 취향은 모두 삭제되고 새로운 취향으로 대체됩니다.
+
+operation::preference-goods-update[snippets='http-request,request-headers,request-fields,http-response,response-fields']
+
+=== 굿즈 취향 조회
+
+사용자의 저장된 굿즈 취향을 조회합니다.
+
+operation::preference-goods-get[snippets='http-request,request-headers,http-response,response-fields']
+
+=== 분위기 취향 저장
+
+사용자의 분위기 취향을 저장합니다. 기존 분위기 취향은 모두 삭제되고 새로운 취향으로 대체됩니다.
+
+operation::preference-mood-update[snippets='http-request,request-headers,request-fields,http-response,response-fields']
+
+=== 분위기 취향 조회
+
+사용자의 저장된 분위기 취향을 조회합니다.
+
+operation::preference-mood-get[snippets='http-request,request-headers,http-response,response-fields']
+
 [[error-api]]
 == 에러 응답
 
