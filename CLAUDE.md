@@ -165,6 +165,35 @@ Controller → Service → Tool → Repository
 
 ## Code Style Guidelines
 
+### Code Comments
+
+- **절대 주석을 작성하지 마세요**
+- 코드는 자체적으로 명확해야 하며, 주석이 필요하다면 코드를 리팩토링하세요
+- 예외: 
+  - 복잡한 알고리즘의 수학적 설명이 필요한 경우
+  - 외부 API나 라이브러리의 특이한 동작을 설명해야 하는 경우
+- 일반적인 비즈니스 로직이나 단순한 구현에는 주석을 사용하지 마세요
+
+```kotlin
+// ❌ 잘못된 예시
+fun sendEmail(email: String) {
+    // 이메일 유효성 검사
+    if (!isValidEmail(email)) {
+        throw InvalidEmailException()
+    }
+    // 이메일 발송
+    emailSender.send(email)
+}
+
+// ✅ 올바른 예시 - 주석 없이 명확한 코드
+fun sendEmail(email: String) {
+    validateEmail(email)
+    emailSender.send(email)
+}
+```
+
+## Code Style Guidelines
+
 ### Kotlin Conventions
 
 - 함수명과 변수명은 camelCase 사용

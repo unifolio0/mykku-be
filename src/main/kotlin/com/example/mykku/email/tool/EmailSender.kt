@@ -1,5 +1,5 @@
-package com.example.mykku.email
+package com.example.mykku.email.tool
 
-interface EmailService {
+interface EmailSender {
     fun sendVerificationCode(to: String, code: String, purpose: String)
 }

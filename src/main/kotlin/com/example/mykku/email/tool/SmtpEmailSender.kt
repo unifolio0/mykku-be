@@ -1,16 +1,16 @@
-package com.example.mykku.email
+package com.example.mykku.email.tool
 
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMessageHelper
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Component
 import org.thymeleaf.TemplateEngine
 import org.thymeleaf.context.Context
 
-@Service
-class SmtpEmailService(
+@Component
+class SmtpEmailSender(
     private val mailSender: JavaMailSender,
     private val templateEngine: TemplateEngine
-) : EmailService {
+) : EmailSender {
 
     override fun sendVerificationCode(to: String, code: String, purpose: String) {
         val subject = when (purpose) {

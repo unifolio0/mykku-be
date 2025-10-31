@@ -29,6 +29,10 @@ class MemberReader(
     fun existsByNickname(nickname: String): Boolean {
         return memberRepository.existsByNickname(nickname)
     }
+
+    fun existsByEmail(email: String): Boolean {
+        return memberRepository.existsByEmail(email)
+    }
     
     fun getRecommendedMembersByCommonFollowers(
         memberId: String, 
