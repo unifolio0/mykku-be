@@ -2,6 +2,7 @@ package com.example.mykku.email
 
 import com.example.mykku.auth.dto.LoginResponse
 import com.example.mykku.common.dto.ApiResponse
+import com.example.mykku.email.dto.EmailLoginRequest
 import com.example.mykku.email.dto.SendVerificationCodeRequest
 import com.example.mykku.email.dto.SignupRequest
 import com.example.mykku.email.dto.VerifyCodeRequest
@@ -44,5 +45,16 @@ class EmailAuthController(
             nickname = request.nickname
         )
         return ResponseEntity.ok(ApiResponse("회원가입이 완료되었습니다", loginResponse))
+    }
+
+    @PostMapping("/login")
+    fun login(
+        @Valid @RequestBody request: EmailLoginRequest
+    ): ResponseEntity<ApiResponse<LoginResponse>> {
+        val loginResponse = emailAuthService.login(
+            email = request.email,
+            password = request.password
+        )
+        return ResponseEntity.ok(ApiResponse("로그인 성공", loginResponse))
     }
 }

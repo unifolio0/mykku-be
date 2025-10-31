@@ -73,6 +73,18 @@ class EmailAuthService(
 
         memberWriter.save(member)
 
-        return jwtTokenProvider.createLoginResponse(member, false)
+        return jwtTokenProvider.createLoginResponse(member, email, false)
+    }
+
+    @Transactional(readOnly = true)
+    fun login(email: String, password: String): LoginResponse {
+        val member = memberReader.findByEmail(email)
+            ?: throw EmailAuthException.invalidEmailOrPassword()
+
+        if (member.password == null || !passwordEncoder.matches(password, member.password)) {
+            throw EmailAuthException.invalidEmailOrPassword()
+        }
+
+        return jwtTokenProvider.createLoginResponse(member, email, true)
     }
 }
