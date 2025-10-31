@@ -1,7 +1,7 @@
 package com.example.mykku.member.tool
 
-import com.example.mykku.member.exception.MemberException
 import com.example.mykku.member.domain.Member
+import com.example.mykku.member.exception.MemberException
 import com.example.mykku.member.repository.FollowRepository
 import com.example.mykku.member.repository.MemberRepository
 import org.springframework.stereotype.Component
@@ -29,9 +29,17 @@ class MemberReader(
     fun existsByNickname(nickname: String): Boolean {
         return memberRepository.existsByNickname(nickname)
     }
-    
+
+    fun existsByEmail(email: String): Boolean {
+        return memberRepository.existsByEmail(email)
+    }
+
+    fun findByEmail(email: String): Member? {
+        return memberRepository.findByEmail(email)
+    }
+
     fun getRecommendedMembersByCommonFollowers(
-        memberId: String, 
+        memberId: String,
         minCommonFollowers: Long = 10
     ): List<Member> {
         return followRepository.findRecommendedMembersByCommonFollowers(memberId, minCommonFollowers)

@@ -4,5 +4,6 @@ enum class SocialProvider {
     GOOGLE,
     KAKAO,
     NAVER,
-    APPLE
+    APPLE,
+    EMAIL
 }

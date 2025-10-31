@@ -19,6 +19,9 @@ data class MobileLoginRequest(
                     "Apple 로그인 시 idToken은 필수입니다"
                 }
             }
+            SocialProvider.EMAIL -> {
+                throw IllegalArgumentException("EMAIL 제공자는 모바일 로그인을 지원하지 않습니다")
+            }
         }
     }
 }

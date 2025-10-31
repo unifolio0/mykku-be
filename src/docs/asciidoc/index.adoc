@@ -380,6 +380,39 @@ operation::preference-mood-update[snippets='http-request,request-headers,request
 
 operation::preference-mood-get[snippets='http-request,request-headers,http-response,response-fields']
 
+[[email-auth-api]]
+== 이메일 인증 API
+
+=== 인증 코드 발송
+
+이메일로 6자리 인증 코드를 발송합니다. 회원가입 또는 비밀번호 재설정 목적으로 사용할 수 있습니다.
+
+operation::email-auth-send-code[snippets='http-request,request-fields,http-response,response-fields']
+
+=== 인증 코드 검증
+
+발송받은 인증 코드를 검증합니다. 인증 코드는 5분간 유효합니다.
+
+operation::email-auth-verify-code[snippets='http-request,request-fields,http-response,response-fields']
+
+=== 회원가입
+
+이메일로 회원가입을 진행합니다. 회원가입 후 자동으로 로그인되어 JWT 토큰이 발급됩니다.
+
+operation::email-auth-signup[snippets='http-request,request-fields,http-response,response-fields']
+
+=== 이메일 로그인
+
+이메일과 비밀번호로 로그인합니다.
+
+operation::email-auth-login[snippets='http-request,request-fields,http-response,response-fields']
+
+=== 비밀번호 재설정
+
+인증 코드를 사용하여 비밀번호를 재설정합니다.
+
+operation::email-auth-reset-password[snippets='http-request,request-fields,http-response,response-fields']
+
 [[error-api]]
 == 에러 응답
 
