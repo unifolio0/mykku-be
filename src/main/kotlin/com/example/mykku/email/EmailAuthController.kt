@@ -1,7 +1,9 @@
 package com.example.mykku.email
 
+import com.example.mykku.auth.dto.LoginResponse
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.email.dto.SendVerificationCodeRequest
+import com.example.mykku.email.dto.SignupRequest
 import com.example.mykku.email.dto.VerifyCodeRequest
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
@@ -30,5 +32,17 @@ class EmailAuthController(
     ): ResponseEntity<ApiResponse<Unit>> {
         emailAuthService.verifyCode(request.email, request.code, request.purpose)
         return ResponseEntity.ok(ApiResponse("인증이 완료되었습니다", Unit))
+    }
+
+    @PostMapping("/signup")
+    fun signup(
+        @Valid @RequestBody request: SignupRequest
+    ): ResponseEntity<ApiResponse<LoginResponse>> {
+        val loginResponse = emailAuthService.signup(
+            email = request.email,
+            password = request.password,
+            nickname = request.nickname
+        )
+        return ResponseEntity.ok(ApiResponse("회원가입이 완료되었습니다", loginResponse))
     }
 }
