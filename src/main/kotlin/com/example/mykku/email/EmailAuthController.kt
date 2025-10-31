@@ -2,10 +2,7 @@ package com.example.mykku.email
 
 import com.example.mykku.auth.dto.LoginResponse
 import com.example.mykku.common.dto.ApiResponse
-import com.example.mykku.email.dto.EmailLoginRequest
-import com.example.mykku.email.dto.SendVerificationCodeRequest
-import com.example.mykku.email.dto.SignupRequest
-import com.example.mykku.email.dto.VerifyCodeRequest
+import com.example.mykku.email.dto.*
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -56,5 +53,17 @@ class EmailAuthController(
             password = request.password
         )
         return ResponseEntity.ok(ApiResponse("로그인 성공", loginResponse))
+    }
+
+    @PostMapping("/reset-password")
+    fun resetPassword(
+        @Valid @RequestBody request: ResetPasswordRequest
+    ): ResponseEntity<ApiResponse<Unit>> {
+        emailAuthService.resetPassword(
+            email = request.email,
+            code = request.code,
+            newPassword = request.newPassword
+        )
+        return ResponseEntity.ok(ApiResponse("비밀번호가 재설정되었습니다", Unit))
     }
 }

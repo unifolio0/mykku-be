@@ -87,4 +87,23 @@ class EmailAuthService(
 
         return jwtTokenProvider.createLoginResponse(member, email, true)
     }
+
+    @Transactional
+    fun resetPassword(email: String, code: String, newPassword: String) {
+        val savedCode = redisVerificationCodeManager.getVerificationCode(email, VerificationPurpose.PASSWORD_RESET.name)
+            ?: throw EmailAuthException.verificationCodeExpired()
+
+        if (savedCode != code) {
+            throw EmailAuthException.invalidVerificationCode()
+        }
+
+        val member = memberReader.findByEmail(email)
+            ?: throw EmailAuthException.invalidEmailOrPassword()
+
+        val encodedPassword = passwordEncoder.encode(newPassword)
+        member.password = encodedPassword
+        memberWriter.save(member)
+
+        redisVerificationCodeManager.deleteVerificationCode(email, VerificationPurpose.PASSWORD_RESET.name)
+    }
 }
