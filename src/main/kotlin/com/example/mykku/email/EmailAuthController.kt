@@ -2,6 +2,7 @@ package com.example.mykku.email
 
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.email.dto.SendVerificationCodeRequest
+import com.example.mykku.email.dto.VerifyCodeRequest
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -21,5 +22,13 @@ class EmailAuthController(
     ): ResponseEntity<ApiResponse<Unit>> {
         emailAuthService.sendVerificationCode(request.email, request.purpose)
         return ResponseEntity.ok(ApiResponse("인증 코드가 발송되었습니다", Unit))
+    }
+
+    @PostMapping("/verify-code")
+    fun verifyCode(
+        @Valid @RequestBody request: VerifyCodeRequest
+    ): ResponseEntity<ApiResponse<Unit>> {
+        emailAuthService.verifyCode(request.email, request.code, request.purpose)
+        return ResponseEntity.ok(ApiResponse("인증이 완료되었습니다", Unit))
     }
 }

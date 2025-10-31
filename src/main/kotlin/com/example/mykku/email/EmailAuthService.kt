@@ -33,4 +33,17 @@ class EmailAuthService(
             throw EmailAuthException.emailSendFailed(e)
         }
     }
+
+
+    @Transactional
+    fun verifyCode(email: String, code: String, purpose: VerificationPurpose) {
+        val savedCode = redisVerificationCodeManager.getVerificationCode(email, purpose.name)
+            ?: throw EmailAuthException.verificationCodeExpired()
+
+        if (savedCode != code) {
+            throw EmailAuthException.invalidVerificationCode()
+        }
+
+        redisVerificationCodeManager.deleteVerificationCode(email, purpose.name)
+    }
 }
