@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #f4f4f4; 
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 20px auto; 
+            background-color: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+        }
+        .header { 
+            text-align: center; 
+            color: #333; 
+            margin-bottom: 30px; 
+        }
+        .code-box { 
+            background-color: #f8f9fa; 
+            border: 2px solid #e9ecef; 
+            border-radius: 8px; 
+            padding: 20px; 
+            text-align: center; 
+            margin: 20px 0; 
+        }
+        .code { 
+            font-size: 32px; 
+            font-weight: bold; 
+            color: #007bff; 
+            letter-spacing: 5px; 
+        }
+        .info { 
+            color: #666; 
+            margin-top: 20px; 
+            font-size: 14px; 
+        }
+        .warning { 
+            color: #dc3545; 
+            margin-top: 10px; 
+            font-size: 13px; 
+        }
+        .footer { 
+            text-align: center; 
+            color: #999; 
+            font-size: 12px; 
+            margin-top: 30px; 
+            padding-top: 20px; 
+            border-top: 1px solid #eee; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 th:text="${title}">인증</h1>
+            <p>MyKKU 인증 코드를 확인해주세요</p>
+        </div>
+        
+        <div class="code-box">
+            <div class="code" th:text="${code}">123456</div>
+        </div>
+        
+        <div class="info">
+            <p>위 인증 코드를 화면에 입력해주세요.</p>
+            <p>이 코드는 발송 후 <strong>5분간</strong> 유효합니다.</p>
+        </div>
+        
+        <div class="warning">
+            ⚠️ 본인이 요청하지 않은 경우 이 이메일을 무시하시기 바랍니다.
+        </div>
+        
+        <div class="footer">
+            <p>© 2025 MyKKU. All rights reserved.</p>
+            <p>이 이메일은 발신 전용입니다.</p>
+        </div>
+    </div>
+</body>
+</html>
