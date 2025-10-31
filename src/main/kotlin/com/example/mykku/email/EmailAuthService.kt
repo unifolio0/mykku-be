@@ -36,7 +36,7 @@ class EmailAuthService(
             emailSender.sendVerificationCode(
                 to = email,
                 code = code,
-                purpose = purpose.name
+                purpose = purpose
             )
         } catch (e: Exception) {
             throw EmailAuthException.emailSendFailed(e)
@@ -90,12 +90,7 @@ class EmailAuthService(
 
     @Transactional
     fun resetPassword(email: String, code: String, newPassword: String) {
-        val savedCode = redisVerificationCodeManager.getVerificationCode(email, VerificationPurpose.PASSWORD_RESET.name)
-            ?: throw EmailAuthException.verificationCodeExpired()
-
-        if (savedCode != code) {
-            throw EmailAuthException.invalidVerificationCode()
-        }
+        verifyCode(email, code, VerificationPurpose.PASSWORD_RESET)
 
         val member = memberReader.findByEmail(email)
             ?: throw EmailAuthException.invalidEmailOrPassword()
@@ -103,7 +98,5 @@ class EmailAuthService(
         val encodedPassword = passwordEncoder.encode(newPassword)
         member.password = encodedPassword
         memberWriter.save(member)
-
-        redisVerificationCodeManager.deleteVerificationCode(email, VerificationPurpose.PASSWORD_RESET.name)
     }
 }

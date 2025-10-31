@@ -60,7 +60,7 @@ class EmailAuthServiceTest : BaseServiceTest() {
 
         verify(memberReader).existsByEmail(email)
         verify(redisVerificationCodeManager).saveVerificationCode(email, VerificationPurpose.SIGNUP.name)
-        verify(emailSender).sendVerificationCode(email, code, VerificationPurpose.SIGNUP.name)
+        verify(emailSender).sendVerificationCode(email, code, VerificationPurpose.SIGNUP)
     }
 
     @Test
@@ -87,7 +87,7 @@ class EmailAuthServiceTest : BaseServiceTest() {
         emailAuthService.sendVerificationCode(email, VerificationPurpose.PASSWORD_RESET)
 
         verify(redisVerificationCodeManager).saveVerificationCode(email, VerificationPurpose.PASSWORD_RESET.name)
-        verify(emailSender).sendVerificationCode(email, code, VerificationPurpose.PASSWORD_RESET.name)
+        verify(emailSender).sendVerificationCode(email, code, VerificationPurpose.PASSWORD_RESET)
     }
 
     @Test

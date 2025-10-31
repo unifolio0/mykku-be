@@ -6,8 +6,8 @@ import org.springframework.core.annotation.Order
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.MethodArgumentNotValidException
+import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 
 @RestControllerAdvice
@@ -23,7 +23,7 @@ class BaseExceptionHandler {
         ExceptionLoggingSupport.logException(logger, exception)
 
         val errorMessage = exception.bindingResult.fieldErrors
-            .joinToString(", ") { it.defaultMessage ?: "입력값이 올바르지 않습니다" }
+            .joinToString(", ") { it.defaultMessage ?: CommonErrorCode.INVALID_INPUT.message }
 
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)

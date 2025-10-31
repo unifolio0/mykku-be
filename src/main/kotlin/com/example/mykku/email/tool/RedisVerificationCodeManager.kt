@@ -2,6 +2,7 @@ package com.example.mykku.email.tool
 
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Component
+import java.security.SecureRandom
 import java.util.concurrent.TimeUnit
 
 @Component
@@ -17,7 +18,7 @@ class RedisVerificationCodeManager(
     fun saveVerificationCode(email: String, purpose: String): String {
         val code = generateCode()
         val key = generateKey(email, purpose)
-        
+
         redisTemplate.opsForValue().set(key, code, EXPIRATION_MINUTES, TimeUnit.MINUTES)
         return code
     }
@@ -37,8 +38,10 @@ class RedisVerificationCodeManager(
     }
 
     private fun generateCode(): String {
-        return (0 until CODE_LENGTH)
-            .map { (0..9).random() }
-            .joinToString("")
+        return SecureRandom().let { random ->
+            (0 until CODE_LENGTH)
+                .map { random.nextInt(10) }
+                .joinToString("")
+        }
     }
 }
