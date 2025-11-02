@@ -1,13 +1,13 @@
 package com.example.mykku.email.tool
 
-import org.springframework.data.redis.core.RedisTemplate
+import org.redisson.api.RedissonClient
 import org.springframework.stereotype.Component
 import java.security.SecureRandom
-import java.util.concurrent.TimeUnit
+import java.time.Duration
 
 @Component
 class RedisVerificationCodeManager(
-    private val redisTemplate: RedisTemplate<String, String>
+    private val redissonClient: RedissonClient
 ) {
     companion object {
         private const val CODE_LENGTH = 6
@@ -19,18 +19,21 @@ class RedisVerificationCodeManager(
         val code = generateCode()
         val key = generateKey(email, purpose)
 
-        redisTemplate.opsForValue().set(key, code, EXPIRATION_MINUTES, TimeUnit.MINUTES)
+        val bucket = redissonClient.getBucket<String>(key)
+        bucket.set(code, Duration.ofMinutes(EXPIRATION_MINUTES))
         return code
     }
 
     fun getVerificationCode(email: String, purpose: String): String? {
         val key = generateKey(email, purpose)
-        return redisTemplate.opsForValue().get(key)
+        val bucket = redissonClient.getBucket<String>(key)
+        return bucket.get()
     }
 
     fun deleteVerificationCode(email: String, purpose: String) {
         val key = generateKey(email, purpose)
-        redisTemplate.delete(key)
+        val bucket = redissonClient.getBucket<String>(key)
+        bucket.delete()
     }
 
     private fun generateKey(email: String, purpose: String): String {
@@ -43,5 +46,9 @@ class RedisVerificationCodeManager(
                 .map { random.nextInt(10) }
                 .joinToString("")
         }
+    }
+
+    fun deleteReservationLock() {
+        redissonClient.keys.flushall()
     }
 }

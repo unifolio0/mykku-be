@@ -2,7 +2,6 @@ package com.example.mykku
 
 import com.example.mykku.board.domain.Board
 import com.example.mykku.board.repository.BoardRepository
-import com.example.mykku.config.TestRedisConfig
 import com.example.mykku.config.TestEmailConfig
 import com.example.mykku.config.TestEmailSenderConfig
 import com.example.mykku.member.domain.Member
@@ -21,7 +20,7 @@ import org.springframework.test.context.ActiveProfiles
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-@Import(TestRedisConfig::class, TestEmailConfig::class, TestEmailSenderConfig::class)
+@Import(TestEmailConfig::class, TestEmailSenderConfig::class)
 @ExtendWith(DatabaseCleaner::class)
 abstract class BaseControllerTest {
 

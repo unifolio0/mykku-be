@@ -46,6 +46,12 @@ spring:
             enable: true
           timeout: 5000
           connection-timeout: 5000
+  data:
+    redis:
+      host: ${secret.redis.host}
+      port: ${secret.redis.port}
+      ssl:
+        enabled: true
 
 jwt:
   secret: ${secret.jwt.secret_key}

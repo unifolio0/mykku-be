@@ -1,5 +1,6 @@
 package com.example.mykku.common.exception
 
+import org.redisson.client.RedisException
 import org.slf4j.LoggerFactory
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
@@ -39,6 +40,16 @@ class BaseExceptionHandler {
             .status(exception.errorCode.status)
             .contentType(MediaType.APPLICATION_JSON)
             .body(ErrorResponse(exception.errorCode.message))
+    }
+
+    @ExceptionHandler(RedisException::class)
+    fun handleRedisException(exception: RedisException): ResponseEntity<ErrorResponse> {
+        ExceptionLoggingSupport.logException(logger, exception)
+
+        return ResponseEntity
+            .status(CommonErrorCode.REDIS_CONNECTION_FAILURE.status)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(ErrorResponse(CommonErrorCode.REDIS_CONNECTION_FAILURE.message))
     }
 
     @ExceptionHandler(Exception::class)

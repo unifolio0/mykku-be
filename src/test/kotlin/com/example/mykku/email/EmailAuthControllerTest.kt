@@ -3,16 +3,17 @@ package com.example.mykku.email
 import com.example.mykku.BaseControllerTest
 import com.example.mykku.email.domain.VerificationPurpose
 import com.example.mykku.email.dto.*
+import com.example.mykku.email.tool.RedisVerificationCodeManager
 import com.example.mykku.member.domain.Member
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.security.crypto.password.PasswordEncoder
-import java.util.concurrent.TimeUnit
 
 @DisplayName("EmailAuthController 통합 테스트")
 class EmailAuthControllerTest : BaseControllerTest() {
@@ -21,7 +22,12 @@ class EmailAuthControllerTest : BaseControllerTest() {
     private lateinit var passwordEncoder: PasswordEncoder
 
     @Autowired
-    private lateinit var redisTemplate: RedisTemplate<String, String>
+    private lateinit var redisVerificationCodeManager: RedisVerificationCodeManager
+
+    @BeforeEach
+    fun setUp() {
+        redisVerificationCodeManager.deleteReservationLock()
+    }
 
     @Test
     @DisplayName("인증 코드 발송 - 회원가입용")
@@ -90,12 +96,9 @@ class EmailAuthControllerTest : BaseControllerTest() {
     @DisplayName("인증 코드 검증 - 성공")
     fun `verifyCode - 유효한 인증 코드 검증 성공`() {
         val email = "verify@example.com"
-        val code = "123456"
-        redisTemplate.opsForValue().set(
-            "email:verification:$email:${VerificationPurpose.SIGNUP.name}",
-            code,
-            5L,
-            TimeUnit.MINUTES
+        val code = redisVerificationCodeManager.saveVerificationCode(
+            email = email,
+            purpose = VerificationPurpose.SIGNUP.name
         )
 
         val request = VerifyCodeRequest(
@@ -118,16 +121,14 @@ class EmailAuthControllerTest : BaseControllerTest() {
     @DisplayName("인증 코드 검증 - 잘못된 코드")
     fun `verifyCode - 잘못된 인증 코드 검증 시 실패`() {
         val email = "verify@example.com"
-        redisTemplate.opsForValue().set(
-            "email:verification:$email:${VerificationPurpose.SIGNUP.name}",
-            "123456",
-            5L,
-            TimeUnit.MINUTES
+        redisVerificationCodeManager.saveVerificationCode(
+            email = email,
+            purpose = VerificationPurpose.SIGNUP.name
         )
 
         val request = VerifyCodeRequest(
             email = email,
-            code = "654321",
+            code = "999999",
             purpose = VerificationPurpose.SIGNUP
         )
 
@@ -307,7 +308,6 @@ class EmailAuthControllerTest : BaseControllerTest() {
     @DisplayName("비밀번호 재설정 - 성공")
     fun `resetPassword - 비밀번호 재설정 성공`() {
         val email = "reset@example.com"
-        val code = "123456"
         val member = Member.createEmailMember(
             id = "resetMember",
             email = email,
@@ -316,11 +316,9 @@ class EmailAuthControllerTest : BaseControllerTest() {
         )
         memberRepository.save(member)
 
-        redisTemplate.opsForValue().set(
-            "email:verification:$email:${VerificationPurpose.PASSWORD_RESET.name}",
-            code,
-            5L,
-            TimeUnit.MINUTES
+        val code = redisVerificationCodeManager.saveVerificationCode(
+            email = email,
+            purpose = VerificationPurpose.PASSWORD_RESET.name
         )
 
         val request = ResetPasswordRequest(
@@ -343,16 +341,14 @@ class EmailAuthControllerTest : BaseControllerTest() {
     @DisplayName("비밀번호 재설정 - 잘못된 인증 코드")
     fun `resetPassword - 잘못된 인증 코드로 비밀번호 재설정 시 실패`() {
         val email = "reset@example.com"
-        redisTemplate.opsForValue().set(
-            "email:verification:$email:${VerificationPurpose.PASSWORD_RESET.name}",
-            "123456",
-            5L,
-            TimeUnit.MINUTES
+        redisVerificationCodeManager.saveVerificationCode(
+            email = email,
+            purpose = VerificationPurpose.PASSWORD_RESET.name
         )
 
         val request = ResetPasswordRequest(
             email = email,
-            code = "654321",
+            code = "999999",
             newPassword = "newPassword123!"
         )
 

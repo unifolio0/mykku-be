@@ -6,22 +6,21 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import org.springframework.data.redis.core.RedisTemplate
-import org.springframework.data.redis.core.ValueOperations
-import java.util.concurrent.TimeUnit
+import org.redisson.api.RBucket
+import org.redisson.api.RedissonClient
+import java.time.Duration
 
 @ExtendWith(MockitoExtension::class)
 class RedisVerificationCodeManagerTest {
 
     @Mock
-    private lateinit var redisTemplate: RedisTemplate<String, String>
+    private lateinit var redissonClient: RedissonClient
 
     @Mock
-    private lateinit var valueOperations: ValueOperations<String, String>
+    private lateinit var bucket: RBucket<String>
 
     @InjectMocks
     private lateinit var redisVerificationCodeManager: RedisVerificationCodeManager
@@ -30,20 +29,16 @@ class RedisVerificationCodeManagerTest {
     fun `인증 코드 저장 성공`() {
         val email = "test@example.com"
         val purpose = "SIGNUP"
+        val key = "email:verification:$email:$purpose"
 
-        whenever(redisTemplate.opsForValue()).thenReturn(valueOperations)
+        whenever(redissonClient.getBucket<String>(key)).thenReturn(bucket)
 
         val code = redisVerificationCodeManager.saveVerificationCode(email, purpose)
 
         assertNotNull(code)
         assertEquals(6, code.length)
         assertTrue(code.all { it.isDigit() })
-        verify(valueOperations).set(
-            eq("email:verification:$email:$purpose"),
-            eq(code),
-            eq(5L),
-            eq(TimeUnit.MINUTES)
-        )
+        verify(bucket).set(eq(code), eq(Duration.ofMinutes(5)))
     }
 
     @Test
@@ -51,38 +46,43 @@ class RedisVerificationCodeManagerTest {
         val email = "test@example.com"
         val purpose = "SIGNUP"
         val savedCode = "123456"
+        val key = "email:verification:$email:$purpose"
 
-        whenever(redisTemplate.opsForValue()).thenReturn(valueOperations)
-        whenever(valueOperations.get("email:verification:$email:$purpose")).thenReturn(savedCode)
+        whenever(redissonClient.getBucket<String>(key)).thenReturn(bucket)
+        whenever(bucket.get()).thenReturn(savedCode)
 
         val code = redisVerificationCodeManager.getVerificationCode(email, purpose)
 
         assertEquals(savedCode, code)
-        verify(valueOperations).get("email:verification:$email:$purpose")
+        verify(bucket).get()
     }
 
     @Test
     fun `만료된 인증 코드 조회 시 null 반환`() {
         val email = "test@example.com"
         val purpose = "SIGNUP"
+        val key = "email:verification:$email:$purpose"
 
-        whenever(redisTemplate.opsForValue()).thenReturn(valueOperations)
-        whenever(valueOperations.get("email:verification:$email:$purpose")).thenReturn(null)
+        whenever(redissonClient.getBucket<String>(key)).thenReturn(bucket)
+        whenever(bucket.get()).thenReturn(null)
 
         val code = redisVerificationCodeManager.getVerificationCode(email, purpose)
 
         assertNull(code)
-        verify(valueOperations).get("email:verification:$email:$purpose")
+        verify(bucket).get()
     }
 
     @Test
     fun `인증 코드 삭제 성공`() {
         val email = "test@example.com"
         val purpose = "SIGNUP"
+        val key = "email:verification:$email:$purpose"
+
+        whenever(redissonClient.getBucket<String>(key)).thenReturn(bucket)
 
         redisVerificationCodeManager.deleteVerificationCode(email, purpose)
 
-        verify(redisTemplate).delete("email:verification:$email:$purpose")
+        verify(bucket).delete()
     }
 
     @Test
@@ -90,24 +90,20 @@ class RedisVerificationCodeManagerTest {
         val email = "test@example.com"
         val signupPurpose = "SIGNUP"
         val resetPurpose = "PASSWORD_RESET"
+        val signupKey = "email:verification:$email:$signupPurpose"
+        val resetKey = "email:verification:$email:$resetPurpose"
 
-        whenever(redisTemplate.opsForValue()).thenReturn(valueOperations)
+        val signupBucket = org.mockito.kotlin.mock<RBucket<String>>()
+        val resetBucket = org.mockito.kotlin.mock<RBucket<String>>()
+
+        whenever(redissonClient.getBucket<String>(signupKey)).thenReturn(signupBucket)
+        whenever(redissonClient.getBucket<String>(resetKey)).thenReturn(resetBucket)
 
         val signupCode = redisVerificationCodeManager.saveVerificationCode(email, signupPurpose)
         val resetCode = redisVerificationCodeManager.saveVerificationCode(email, resetPurpose)
 
         assertNotEquals(signupCode, resetCode)
-        verify(valueOperations).set(
-            eq("email:verification:$email:$signupPurpose"),
-            any(),
-            any(),
-            any()
-        )
-        verify(valueOperations).set(
-            eq("email:verification:$email:$resetPurpose"),
-            any(),
-            any(),
-            any()
-        )
+        verify(signupBucket).set(eq(signupCode), eq(Duration.ofMinutes(5)))
+        verify(resetBucket).set(eq(resetCode), eq(Duration.ofMinutes(5)))
     }
 }
