@@ -1,15 +1,25 @@
 package com.example.mykku.feed
 
-import com.example.mykku.feed.dto.CreateEventRequest
-import com.example.mykku.feed.dto.CreateEventResponse
-import com.example.mykku.feed.dto.EventImageResponse
+import com.example.mykku.common.util.PageableValidator
+import com.example.mykku.feed.domain.EventSortType
+import com.example.mykku.feed.dto.*
+import com.example.mykku.feed.domain.Event
+import com.example.mykku.feed.tool.EventDtoConverter
+import com.example.mykku.feed.tool.EventReader
 import com.example.mykku.feed.tool.EventWriter
+import com.example.mykku.member.domain.Member
+import com.example.mykku.scrap.tool.SaveEventReader
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 class EventService(
-    private val eventWriter: EventWriter
+    private val eventWriter: EventWriter,
+    private val eventReader: EventReader,
+    private val saveEventReader: SaveEventReader,
+    private val eventDtoConverter: EventDtoConverter
 ) {
 
     @Transactional
@@ -33,5 +43,46 @@ class EventService(
             tags = eventTags.map { it.title },
             createdAt = event.createdAt
         )
+    }
+
+    @Transactional(readOnly = true)
+    fun getEvents(
+        status: String,
+        sortType: EventSortType,
+        page: Int,
+        size: Int,
+        member: Member
+    ): PagedEventsResponse {
+        val pageable = PageableValidator.validateAndCreate(page, size)
+        val eventPage = eventReader.getEventsWithPagination(status, sortType, pageable, LocalDateTime.now())
+        
+        val eventListResponses = convertToEventListResponses(eventPage.content, member)
+        val responsePage = eventPage.map { event ->
+            eventListResponses.find { it.id == event.id }!!
+        }
+        
+        return PagedEventsResponse.from(responsePage)
+    }
+
+    private fun convertToEventListResponses(events: List<Event>, member: Member): List<EventListResponse> {
+        val imagesByEventId = eventReader.getEventImages(events)
+        val tagsByEventId = eventReader.getEventTags(events)
+        
+        return events.map { event ->
+            val images = imagesByEventId[event.id!!] ?: emptyList()
+            val tags = tagsByEventId[event.id!!] ?: emptyList()
+            val isSaved = saveEventReader.isSaved(member, event)
+            eventDtoConverter.toEventListResponse(event, images, tags, isSaved)
+        }
+    }
+
+    @Transactional(readOnly = true)
+    fun getEventDetail(eventId: Long, member: Member): EventDetailResponse {
+        val event = eventReader.getEventByIdWithRelations(eventId)
+        val images = eventReader.getEventImages(listOf(event))[event.id] ?: emptyList()
+        val tags = eventReader.getEventTags(listOf(event))[event.id] ?: emptyList()
+        val isSaved = saveEventReader.isSaved(member, event)
+        
+        return eventDtoConverter.toEventDetailResponse(event, images, tags, isSaved)
     }
 }

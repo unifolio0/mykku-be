@@ -18,6 +18,9 @@ class Event(
 
     @Column(name = "expired_at")
     var expiredAt: LocalDateTime,
+
+    @Column(name = "scrap_count")
+    var scrapCount: Int = 0,
 ) : BaseEntity() {
     companion object {
         const val IMAGE_MAX_COUNT = 10

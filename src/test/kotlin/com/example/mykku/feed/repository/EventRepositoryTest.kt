@@ -8,6 +8,9 @@ import java.time.LocalDateTime
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+import com.example.mykku.feed.domain.EventSortType
+import org.springframework.data.domain.PageRequest
+
 class EventRepositoryTest : BaseRepositoryTest() {
 
     @Autowired
@@ -91,5 +94,163 @@ class EventRepositoryTest : BaseRepositoryTest() {
         val result = eventRepository.getByEventPreviews(currentTime)
 
         assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun `findActiveEventsByLatest는 활성 이벤트를 최신순으로 정렬하여 조회한다`() {
+        val currentTime = LocalDateTime.now()
+        val pageable = PageRequest.of(0, 10)
+
+        val oldEvent = Event(
+            isContest = false,
+            title = "오래된 이벤트",
+            expiredAt = currentTime.plusDays(10)
+        )
+        eventRepository.save(oldEvent)
+        Thread.sleep(10)
+
+        val newEvent = Event(
+            isContest = false,
+            title = "최신 이벤트",
+            expiredAt = currentTime.plusDays(10)
+        )
+        eventRepository.save(newEvent)
+
+        val expiredEvent = Event(
+            isContest = false,
+            title = "만료된 이벤트",
+            expiredAt = currentTime.minusDays(1)
+        )
+        eventRepository.save(expiredEvent)
+
+        val result = eventRepository.findActiveEventsByLatest(currentTime, pageable)
+
+        assertEquals(2, result.totalElements)
+        assertEquals("최신 이벤트", result.content[0].title)
+        assertEquals("오래된 이벤트", result.content[1].title)
+    }
+
+    @Test
+    fun `findActiveEventsByOldest는 활성 이벤트를 오래된순으로 정렬하여 조회한다`() {
+        val currentTime = LocalDateTime.now()
+        val pageable = PageRequest.of(0, 10)
+
+        val oldEvent = Event(
+            isContest = false,
+            title = "오래된 이벤트",
+            expiredAt = currentTime.plusDays(10)
+        )
+        eventRepository.save(oldEvent)
+        Thread.sleep(10)
+
+        val newEvent = Event(
+            isContest = false,
+            title = "최신 이벤트",
+            expiredAt = currentTime.plusDays(10)
+        )
+        eventRepository.save(newEvent)
+
+        val result = eventRepository.findActiveEventsByOldest(currentTime, pageable)
+
+        assertEquals(2, result.totalElements)
+        assertEquals("오래된 이벤트", result.content[0].title)
+        assertEquals("최신 이벤트", result.content[1].title)
+    }
+
+    @Test
+    fun `findActiveEventsByPopular는 활성 이벤트를 인기순으로 정렬하여 조회한다`() {
+        val currentTime = LocalDateTime.now()
+        val pageable = PageRequest.of(0, 10)
+
+        val popularEvent = Event(
+            isContest = false,
+            title = "인기 이벤트",
+            expiredAt = currentTime.plusDays(10),
+            scrapCount = 100
+        )
+        eventRepository.save(popularEvent)
+
+        val normalEvent = Event(
+            isContest = false,
+            title = "일반 이벤트",
+            expiredAt = currentTime.plusDays(10),
+            scrapCount = 10
+        )
+        eventRepository.save(normalEvent)
+
+        val unpopularEvent = Event(
+            isContest = false,
+            title = "비인기 이벤트",
+            expiredAt = currentTime.plusDays(10),
+            scrapCount = 0
+        )
+        eventRepository.save(unpopularEvent)
+
+        val result = eventRepository.findActiveEventsByPopular(currentTime, pageable)
+
+        assertEquals(3, result.totalElements)
+        assertEquals("인기 이벤트", result.content[0].title)
+        assertEquals("일반 이벤트", result.content[1].title)
+        assertEquals("비인기 이벤트", result.content[2].title)
+    }
+
+    @Test
+    fun `findExpiredEventsWithPagination은 만료된 이벤트만 조회한다`() {
+        val currentTime = LocalDateTime.now()
+        val pageable = PageRequest.of(0, 10)
+
+        val expiredEvent1 = Event(
+            isContest = false,
+            title = "만료된 이벤트1",
+            expiredAt = currentTime.minusDays(1)
+        )
+        eventRepository.save(expiredEvent1)
+
+        val expiredEvent2 = Event(
+            isContest = false,
+            title = "만료된 이벤트2",
+            expiredAt = currentTime.minusHours(1)
+        )
+        eventRepository.save(expiredEvent2)
+
+        val activeEvent = Event(
+            isContest = false,
+            title = "활성 이벤트",
+            expiredAt = currentTime.plusDays(1)
+        )
+        eventRepository.save(activeEvent)
+
+        val result = eventRepository.findExpiredEventsWithPagination(currentTime, pageable)
+
+        assertEquals(2, result.totalElements)
+        assertTrue(result.content.any { it.title == "만료된 이벤트1" })
+        assertTrue(result.content.any { it.title == "만료된 이벤트2" })
+        assertTrue(result.content.none { it.title == "활성 이벤트" })
+    }
+
+    @Test
+    fun `findAllEventsWithPagination은 모든 이벤트를 조회한다`() {
+        val currentTime = LocalDateTime.now()
+        val pageable = PageRequest.of(0, 10)
+
+        val activeEvent = Event(
+            isContest = false,
+            title = "활성 이벤트",
+            expiredAt = currentTime.plusDays(1)
+        )
+        eventRepository.save(activeEvent)
+
+        val expiredEvent = Event(
+            isContest = false,
+            title = "만료된 이벤트",
+            expiredAt = currentTime.minusDays(1)
+        )
+        eventRepository.save(expiredEvent)
+
+        val result = eventRepository.findAllEventsWithPagination(pageable)
+
+        assertEquals(2, result.totalElements)
+        assertTrue(result.content.any { it.title == "활성 이벤트" })
+        assertTrue(result.content.any { it.title == "만료된 이벤트" })
     }
 }
