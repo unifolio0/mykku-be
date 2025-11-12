@@ -19,10 +19,9 @@ import com.example.mykku.feed.domain.EventTag
 import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.feed.repository.EventTagRepository
 import org.junit.jupiter.api.assertThrows
-import org.mockito.Mock
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.repository.findByIdOrNull
+import java.util.Optional
 
 class EventReaderTest : BaseToolTest() {
 
@@ -213,7 +212,7 @@ class EventReaderTest : BaseToolTest() {
     fun `getEventByIdWithRelations는 이벤트를 조회한다`() {
         val event = createMockEvent(1L)
 
-        whenever(eventRepository.findByIdOrNull(1L)).thenReturn(event)
+        whenever(eventRepository.findById(1L)).thenReturn(Optional.of(event))
 
         val result = eventReader.getEventByIdWithRelations(1L)
 
@@ -222,7 +221,7 @@ class EventReaderTest : BaseToolTest() {
 
     @Test
     fun `getEventByIdWithRelations는 존재하지 않는 이벤트 조회 시 예외를 발생시킨다`() {
-        whenever(eventRepository.findByIdOrNull(999L)).thenReturn(null)
+        whenever(eventRepository.findById(999L)).thenReturn(Optional.empty())
 
         assertThrows<FeedException> {
             eventReader.getEventByIdWithRelations(999L)

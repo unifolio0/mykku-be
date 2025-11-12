@@ -17,12 +17,16 @@ class EventDtoConverterTest : BaseToolTest() {
     private lateinit var eventDtoConverter: EventDtoConverter
 
     private fun createMockEvent(id: Long): Event {
-        return Event(
+        val event = Event(
             id = id,
             isContest = false,
             title = "테스트 이벤트 $id",
             expiredAt = LocalDateTime.now().plusDays(7)
         )
+        val createdAtField = event.javaClass.superclass.getDeclaredField("createdAt")
+        createdAtField.isAccessible = true
+        createdAtField.set(event, LocalDateTime.now())
+        return event
     }
 
     @Test

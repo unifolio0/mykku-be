@@ -19,9 +19,9 @@ import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.feed.tool.EventDtoConverter
 import com.example.mykku.feed.tool.EventReader
 import com.example.mykku.member.domain.Member
+import org.mockito.kotlin.mock
 import com.example.mykku.scrap.tool.SaveEventReader
 import org.junit.jupiter.api.assertThrows
-import org.mockito.Mock
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.springframework.data.domain.PageImpl
@@ -197,7 +197,7 @@ class EventServiceTest : BaseServiceTest() {
 
     @Test
     fun `getEvents - 이벤트 목록을 정상적으로 조회한다`() {
-        val member = Member(id = 1L, email = "test@test.com", nickname = "테스터")
+        val member = mock<Member>()
         val event = createTestEvent(title = "이벤트", isContest = false, expiredAt = LocalDateTime.now().plusDays(7))
         val pageable = PageRequest.of(0, 20)
         val eventPage = PageImpl(listOf(event), pageable, 1)
@@ -215,7 +215,7 @@ class EventServiceTest : BaseServiceTest() {
 
     @Test
     fun `getEventDetail - 이벤트 상세를 정상적으로 조회한다`() {
-        val member = Member(id = 1L, email = "test@test.com", nickname = "테스터")
+        val member = mock<Member>()
         val event = createTestEvent(title = "이벤트", isContest = false, expiredAt = LocalDateTime.now().plusDays(7))
 
         whenever(eventReader.getEventByIdWithRelations(1L)).thenReturn(event)
@@ -232,7 +232,7 @@ class EventServiceTest : BaseServiceTest() {
 
     @Test
     fun `getEventDetail - 존재하지 않는 이벤트 조회 시 예외를 발생시킨다`() {
-        val member = Member(id = 1L, email = "test@test.com", nickname = "테스터")
+        val member = mock<Member>()
 
         whenever(eventReader.getEventByIdWithRelations(999L)).thenThrow(FeedException.eventNotFound())
 

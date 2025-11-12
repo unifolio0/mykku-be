@@ -119,11 +119,13 @@ class EventControllerRestDocsTest : BaseControllerRestDocsTest() {
     @Test
     fun `이벤트 목록 조회 API 문서화`() {
         val response = com.example.mykku.feed.dto.PagedEventsResponse(
-            content = listOf(),
+            events = listOf(),
             currentPage = 0,
-            pageSize = 20,
+            totalPages = 0,
             totalElements = 0,
-            totalPages = 0
+            size = 20,
+            hasNext = false,
+            hasPrevious = false
         )
 
         `when`(eventService.getEvents(any(), any(), any(), any(), any())).thenReturn(response)
@@ -158,11 +160,13 @@ class EventControllerRestDocsTest : BaseControllerRestDocsTest() {
                     responseFields(
                         fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                         fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
-                        fieldWithPath("data.content").type(JsonFieldType.ARRAY).description("이벤트 목록"),
+                        fieldWithPath("data.events").type(JsonFieldType.ARRAY).description("이벤트 목록"),
                         fieldWithPath("data.currentPage").type(JsonFieldType.NUMBER).description("현재 페이지"),
-                        fieldWithPath("data.pageSize").type(JsonFieldType.NUMBER).description("페이지 크기"),
+                        fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
                         fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 요소 수"),
-                        fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수")
+                        fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
+                        fieldWithPath("data.hasNext").type(JsonFieldType.BOOLEAN).description("다음 페이지 존재 여부"),
+                        fieldWithPath("data.hasPrevious").type(JsonFieldType.BOOLEAN).description("이전 페이지 존재 여부")
                     )
                 )
             )

@@ -6,12 +6,18 @@ import com.example.mykku.feed.dto.EventImageRequest
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import org.hamcrest.Matchers.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 @DisplayName("EventController 통합 테스트")
 class EventControllerTest : BaseControllerTest() {
+
+    @BeforeEach
+    fun setUp() {
+        createAndSaveMember(id = "testMember")
+    }
 
     @Test
     @DisplayName("이벤트 생성 - 정상 케이스")
@@ -94,9 +100,10 @@ class EventControllerTest : BaseControllerTest() {
     fun `getEvents - 이벤트 목록을 정상적으로 조회한다`() {
         RestAssured.given()
             .contentType(ContentType.JSON)
+            .headers(createAuthHeaders("testMember"))
         .`when`()
             .get("/api/v1/events")
-        .then()()
+        .then()
             .statusCode(200)
             .body("message", equalTo("이벤트 목록을 성공적으로 조회했습니다."))
             .body("data", notNullValue())
@@ -107,6 +114,7 @@ class EventControllerTest : BaseControllerTest() {
     fun `getEvents - 최신순 정렬로 이벤트를 조회한다`() {
         RestAssured.given()
             .contentType(ContentType.JSON)
+            .headers(createAuthHeaders("testMember"))
             .queryParam("sortType", "LATEST")
         .`when`()
             .get("/api/v1/events")
@@ -120,6 +128,7 @@ class EventControllerTest : BaseControllerTest() {
     fun `getEvents - 인기순 정렬로 이벤트를 조회한다`() {
         RestAssured.given()
             .contentType(ContentType.JSON)
+            .headers(createAuthHeaders("testMember"))
             .queryParam("sortType", "POPULAR")
         .`when`()
             .get("/api/v1/events")
@@ -133,6 +142,7 @@ class EventControllerTest : BaseControllerTest() {
     fun `getEvents - 활성 이벤트만 조회한다`() {
         RestAssured.given()
             .contentType(ContentType.JSON)
+            .headers(createAuthHeaders("testMember"))
             .queryParam("status", "active")
         .`when`()
             .get("/api/v1/events")
@@ -160,10 +170,12 @@ class EventControllerTest : BaseControllerTest() {
         .then()
             .statusCode(200)
             .extract()
-            .path<Long>("data.id")
+            .path<Int>("data.id")
+            .toLong()
 
         RestAssured.given()
             .contentType(ContentType.JSON)
+            .headers(createAuthHeaders("testMember"))
         .`when`()
             .get("/api/v1/events/$createResponse")
         .then()
