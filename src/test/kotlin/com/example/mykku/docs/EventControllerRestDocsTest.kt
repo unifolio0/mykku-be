@@ -114,4 +114,109 @@ class EventControllerRestDocsTest : BaseControllerRestDocsTest() {
                 )
             )
     }
+
+
+    @Test
+    fun `이벤트 목록 조회 API 문서화`() {
+        val response = com.example.mykku.feed.dto.PagedEventsResponse(
+            events = listOf(),
+            currentPage = 0,
+            totalPages = 0,
+            totalElements = 0,
+            size = 20,
+            hasNext = false,
+            hasPrevious = false
+        )
+
+        `when`(eventService.getEvents(any(), any(), any(), any(), any())).thenReturn(response)
+
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.get("/api/v1/events")
+                .param("status", "ACTIVE")
+                .param("sortType", "LATEST")
+                .param("page", "0")
+                .param("size", "20")
+                .header("Authorization", "Bearer accessToken")
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isOk)
+            .andDo(MockMvcResultHandlers.print())
+            .andDo(
+                document(
+                    "event-list",
+                    requestHeaders(
+                        headerWithName("Authorization").description("액세스 토큰")
+                    ),
+                    org.springframework.restdocs.request.RequestDocumentation.queryParameters(
+                        org.springframework.restdocs.request.RequestDocumentation.parameterWithName("status")
+                            .description("이벤트 상태 (ACTIVE: 활성, EXPIRED: 만료, ALL: 전체)").optional(),
+                        org.springframework.restdocs.request.RequestDocumentation.parameterWithName("sortType")
+                            .description("정렬 방식 (LATEST: 최신순, OLDEST: 오래된순, POPULAR: 인기순)").optional(),
+                        org.springframework.restdocs.request.RequestDocumentation.parameterWithName("page")
+                            .description("페이지 번호 (0부터 시작)").optional(),
+                        org.springframework.restdocs.request.RequestDocumentation.parameterWithName("size")
+                            .description("페이지 크기").optional()
+                    ),
+                    responseFields(
+                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
+                        fieldWithPath("data.events").type(JsonFieldType.ARRAY).description("이벤트 목록"),
+                        fieldWithPath("data.currentPage").type(JsonFieldType.NUMBER).description("현재 페이지"),
+                        fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
+                        fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 요소 수"),
+                        fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
+                        fieldWithPath("data.hasNext").type(JsonFieldType.BOOLEAN).description("다음 페이지 존재 여부"),
+                        fieldWithPath("data.hasPrevious").type(JsonFieldType.BOOLEAN).description("이전 페이지 존재 여부")
+                    )
+                )
+            )
+    }
+
+    @Test
+    fun `이벤트 상세 조회 API 문서화`() {
+        val response = com.example.mykku.feed.dto.EventDetailResponse(
+            id = 1L,
+            title = "테스트 이벤트",
+            isContest = false,
+            expiredAt = LocalDateTime.of(2024, 12, 31, 23, 59, 59),
+            images = listOf(),
+            tags = listOf("태그1", "태그2"),
+            isSaved = true,
+            createdAt = LocalDateTime.of(2024, 1, 1, 10, 0, 0)
+        )
+
+        `when`(eventService.getEventDetail(any(), any())).thenReturn(response)
+
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.get("/api/v1/events/{eventId}", 1L)
+                .header("Authorization", "Bearer accessToken")
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isOk)
+            .andDo(MockMvcResultHandlers.print())
+            .andDo(
+                document(
+                    "event-detail",
+                    requestHeaders(
+                        headerWithName("Authorization").description("액세스 토큰")
+                    ),
+                    org.springframework.restdocs.request.RequestDocumentation.pathParameters(
+                        org.springframework.restdocs.request.RequestDocumentation.parameterWithName("eventId")
+                            .description("이벤트 ID")
+                    ),
+                    responseFields(
+                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
+                        fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("이벤트 ID"),
+                        fieldWithPath("data.title").type(JsonFieldType.STRING).description("이벤트 제목"),
+                        fieldWithPath("data.isContest").type(JsonFieldType.BOOLEAN).description("콘테스트 여부"),
+                        fieldWithPath("data.expiredAt").type(JsonFieldType.STRING).description("만료 일시"),
+                        fieldWithPath("data.images").type(JsonFieldType.ARRAY).description("이미지 목록"),
+                        fieldWithPath("data.tags").type(JsonFieldType.ARRAY).description("태그 목록"),
+                        fieldWithPath("data.isSaved").type(JsonFieldType.BOOLEAN).description("저장 여부"),
+                        fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성 일시")
+                    )
+                )
+            )
+    }
 }

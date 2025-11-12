@@ -19,4 +19,10 @@ class SaveEventReader(
     fun getSavedEvents(member: Member, pageable: Pageable): Page<SaveEvent> {
         return saveEventRepository.findByMember(member, pageable)
     }
+
+    fun getSavedEventIds(member: Member, events: List<Event>): Set<Long> {
+        return saveEventRepository.findByMemberAndEventIn(member, events)
+            .mapNotNull { it.event.id }
+            .toSet()
+    }
 }

@@ -14,10 +14,33 @@ import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
 
+import com.example.mykku.feed.domain.EventSortType
+import com.example.mykku.feed.domain.EventStatusType
+import com.example.mykku.feed.exception.FeedException
+import com.example.mykku.feed.tool.EventDtoConverter
+import com.example.mykku.feed.tool.EventReader
+import com.example.mykku.member.domain.Member
+import org.mockito.kotlin.mock
+import com.example.mykku.scrap.tool.SaveEventReader
+import org.junit.jupiter.api.assertThrows
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
+
 class EventServiceTest : BaseServiceTest() {
 
     @Mock
     private lateinit var eventWriter: EventWriter
+
+    @Mock
+    private lateinit var eventReader: EventReader
+
+    @Mock
+    private lateinit var saveEventReader: SaveEventReader
+
+    @Mock
+    private lateinit var eventDtoConverter: EventDtoConverter
 
     @InjectMocks
     private lateinit var eventService: EventService
@@ -170,5 +193,52 @@ class EventServiceTest : BaseServiceTest() {
         assertEquals(event.title, result.title)
         assertEquals(0, result.images.size)
         assertEquals(0, result.tags.size)
+    }
+
+
+    @Test
+    fun `getEvents - 이벤트 목록을 정상적으로 조회한다`() {
+        val member = mock<Member>()
+        val event = createTestEvent(title = "이벤트", isContest = false, expiredAt = LocalDateTime.now().plusDays(7))
+        val pageable = PageRequest.of(0, 20)
+        val eventPage = PageImpl(listOf(event), pageable, 1)
+
+        whenever(eventReader.getEventsWithPagination(eq(EventStatusType.ACTIVE), eq(EventSortType.LATEST), any(), any())).thenReturn(eventPage)
+        whenever(eventReader.getEventImages(any())).thenReturn(emptyMap())
+        whenever(eventReader.getEventTags(any())).thenReturn(emptyMap())
+        whenever(saveEventReader.getSavedEventIds(any(), any())).thenReturn(emptySet())
+        whenever(eventDtoConverter.toEventListResponse(any(), any(), any(), any())).thenCallRealMethod()
+
+        val result = eventService.getEvents(EventStatusType.ACTIVE, EventSortType.LATEST, 0, 20, member)
+
+        assertEquals(1, result.totalElements)
+    }
+
+    @Test
+    fun `getEventDetail - 이벤트 상세를 정상적으로 조회한다`() {
+        val member = mock<Member>()
+        val event = createTestEvent(title = "이벤트", isContest = false, expiredAt = LocalDateTime.now().plusDays(7))
+
+        whenever(eventReader.getEventByIdWithRelations(1L)).thenReturn(event)
+        whenever(eventReader.getEventImages(any())).thenReturn(emptyMap())
+        whenever(eventReader.getEventTags(any())).thenReturn(emptyMap())
+        whenever(saveEventReader.isSaved(any(), any())).thenReturn(true)
+        whenever(eventDtoConverter.toEventDetailResponse(any(), any(), any(), any())).thenCallRealMethod()
+
+        val result = eventService.getEventDetail(1L, member)
+
+        assertEquals(1L, result.id)
+        assertEquals(true, result.isSaved)
+    }
+
+    @Test
+    fun `getEventDetail - 존재하지 않는 이벤트 조회 시 예외를 발생시킨다`() {
+        val member = mock<Member>()
+
+        whenever(eventReader.getEventByIdWithRelations(999L)).thenThrow(FeedException.eventNotFound())
+
+        assertThrows<FeedException> {
+            eventService.getEventDetail(999L, member)
+        }
     }
 }
