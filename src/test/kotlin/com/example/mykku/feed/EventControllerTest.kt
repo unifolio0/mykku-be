@@ -143,7 +143,7 @@ class EventControllerTest : BaseControllerTest() {
         RestAssured.given()
             .contentType(ContentType.JSON)
             .headers(createAuthHeaders("testMember"))
-            .queryParam("status", "active")
+            .queryParam("status", "ACTIVE")
         .`when`()
             .get("/api/v1/events")
         .then()

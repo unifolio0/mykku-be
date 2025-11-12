@@ -3,6 +3,7 @@ package com.example.mykku.feed.tool
 import com.example.mykku.feed.domain.Event
 import com.example.mykku.feed.domain.EventImage
 import com.example.mykku.feed.domain.EventSortType
+import com.example.mykku.feed.domain.EventStatusType
 import com.example.mykku.feed.domain.EventTag
 import com.example.mykku.feed.dto.EventPreviewResponse
 import com.example.mykku.feed.exception.FeedException
@@ -27,7 +28,7 @@ class EventReader(
     }
 
     fun getProcessingEventPreviews(): List<EventPreviewResponse> {
-        val events = eventRepository.getByEventPreviews(LocalDateTime.now()).take(5)
+        val events = eventRepository.findByExpiredAtAfter(LocalDateTime.now()).take(5)
         val eventImages = eventImageRepository.findByEventIn(events)
         val imagesByEvent = eventImages.groupBy { it.event }
 
@@ -37,16 +38,15 @@ class EventReader(
     }
 
     fun getEventsWithPagination(
-        status: String,
+        status: EventStatusType,
         sortType: EventSortType,
         pageable: Pageable,
         currentTime: LocalDateTime
     ): Page<Event> {
         return when (status) {
-            "active" -> getActiveEventsBySortType(sortType, currentTime, pageable)
-            "expired" -> eventRepository.findExpiredEventsWithPagination(currentTime, pageable)
-            "all" -> eventRepository.findAllEventsWithPagination(pageable)
-            else -> throw FeedException.invalidEventStatus()
+            EventStatusType.ACTIVE -> getActiveEventsBySortType(sortType, currentTime, pageable)
+            EventStatusType.EXPIRED -> eventRepository.findByExpiredAtLessThanEqualOrderByCreatedAtDesc(currentTime, pageable)
+            EventStatusType.ALL -> eventRepository.findAllByOrderByCreatedAtDesc(pageable)
         }
     }
 
@@ -56,8 +56,8 @@ class EventReader(
         pageable: Pageable
     ): Page<Event> {
         return when (sortType) {
-            EventSortType.LATEST -> eventRepository.findActiveEventsByLatest(currentTime, pageable)
-            EventSortType.OLDEST -> eventRepository.findActiveEventsByOldest(currentTime, pageable)
+            EventSortType.LATEST -> eventRepository.findByExpiredAtAfterOrderByCreatedAtDesc(currentTime, pageable)
+            EventSortType.OLDEST -> eventRepository.findByExpiredAtAfterOrderByCreatedAtAsc(currentTime, pageable)
             EventSortType.POPULAR -> eventRepository.findActiveEventsByPopular(currentTime, pageable)
         }
     }

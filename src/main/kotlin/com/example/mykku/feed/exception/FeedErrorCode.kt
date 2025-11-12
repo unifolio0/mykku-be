@@ -23,7 +23,7 @@ enum class FeedErrorCode(
     EVENT_NOT_FOUND(HttpStatus.NOT_FOUND, "이벤트를 찾을 수 없습니다"),
     EVENT_IMAGE_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "이벤트 이미지는 ${Event.IMAGE_MAX_COUNT}개 이하여야 합니다"),
     EVENT_TAG_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "이벤트 태그는 ${Event.TAG_MAX_COUNT}개 이하여야 합니다"),
-    INVALID_EVENT_STATUS(HttpStatus.BAD_REQUEST, "이벤트 상태는 'active', 'expired', 'all' 중 하나여야 합니다"),
+    INVALID_EVENT_STATUS(HttpStatus.BAD_REQUEST, "이벤트 상태는 'ACTIVE', 'EXPIRED', 'ALL' 중 하나여야 합니다"),
 
     TAG_TITLE_TOO_LONG(HttpStatus.BAD_REQUEST, "태그는 ${EventTag.TITLE_MAX_LENGTH}자 이하여야 합니다"),
     TAG_INVALID_FORMAT(HttpStatus.BAD_REQUEST, "태그는 한글, 영문, 숫자만 사용할 수 있습니다"),

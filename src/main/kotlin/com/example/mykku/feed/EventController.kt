@@ -3,6 +3,7 @@ package com.example.mykku.feed
 import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.feed.domain.EventSortType
+import com.example.mykku.feed.domain.EventStatusType
 import com.example.mykku.feed.dto.CreateEventRequest
 import com.example.mykku.feed.dto.CreateEventResponse
 import com.example.mykku.feed.dto.EventDetailResponse
@@ -32,7 +33,7 @@ class EventController(
 
     @GetMapping
     fun getEvents(
-        @RequestParam(defaultValue = "active") status: String,
+        @RequestParam(defaultValue = "ACTIVE") status: EventStatusType,
         @RequestParam(defaultValue = "LATEST") sortType: EventSortType,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int,

@@ -132,7 +132,7 @@ class EventControllerRestDocsTest : BaseControllerRestDocsTest() {
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/api/v1/events")
-                .param("status", "active")
+                .param("status", "ACTIVE")
                 .param("sortType", "LATEST")
                 .param("page", "0")
                 .param("size", "20")
@@ -149,7 +149,7 @@ class EventControllerRestDocsTest : BaseControllerRestDocsTest() {
                     ),
                     org.springframework.restdocs.request.RequestDocumentation.queryParameters(
                         org.springframework.restdocs.request.RequestDocumentation.parameterWithName("status")
-                            .description("이벤트 상태 (active: 활성, expired: 만료, all: 전체)").optional(),
+                            .description("이벤트 상태 (ACTIVE: 활성, EXPIRED: 만료, ALL: 전체)").optional(),
                         org.springframework.restdocs.request.RequestDocumentation.parameterWithName("sortType")
                             .description("정렬 방식 (LATEST: 최신순, OLDEST: 오래된순, POPULAR: 인기순)").optional(),
                         org.springframework.restdocs.request.RequestDocumentation.parameterWithName("page")

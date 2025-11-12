@@ -15,6 +15,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 import com.example.mykku.feed.domain.EventSortType
+import com.example.mykku.feed.domain.EventStatusType
 import com.example.mykku.feed.domain.EventTag
 import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.feed.repository.EventTagRepository
@@ -66,7 +67,7 @@ class EventReaderTest : BaseToolTest() {
         )
         val eventImages = listOf(eventImage1, eventImage2)
 
-        whenever(eventRepository.getByEventPreviews(any<LocalDateTime>())).thenReturn(events)
+        whenever(eventRepository.findByExpiredAtAfter(any<LocalDateTime>())).thenReturn(events)
         whenever(eventImageRepository.findByEventIn(events)).thenReturn(eventImages)
 
         val result = eventReader.getProcessingEventPreviews()
@@ -86,7 +87,7 @@ class EventReaderTest : BaseToolTest() {
         val event = createMockEvent(1L)
         val events = listOf(event)
 
-        whenever(eventRepository.getByEventPreviews(any<LocalDateTime>())).thenReturn(events)
+        whenever(eventRepository.findByExpiredAtAfter(any<LocalDateTime>())).thenReturn(events)
         whenever(eventImageRepository.findByEventIn(events)).thenReturn(emptyList())
 
         val result = eventReader.getProcessingEventPreviews()
@@ -98,7 +99,7 @@ class EventReaderTest : BaseToolTest() {
 
     @Test
     fun `getProcessingEventPreviews는 이벤트가 없을 때 빈 목록을 반환한다`() {
-        whenever(eventRepository.getByEventPreviews(any<LocalDateTime>())).thenReturn(emptyList())
+        whenever(eventRepository.findByExpiredAtAfter(any<LocalDateTime>())).thenReturn(emptyList())
         whenever(eventImageRepository.findByEventIn(emptyList())).thenReturn(emptyList())
 
         val result = eventReader.getProcessingEventPreviews()
@@ -111,7 +112,7 @@ class EventReaderTest : BaseToolTest() {
         val events = (1..10L).map { createMockEvent(it) }
         val limitedEvents = events.take(5)
 
-        whenever(eventRepository.getByEventPreviews(any<LocalDateTime>())).thenReturn(limitedEvents)
+        whenever(eventRepository.findByExpiredAtAfter(any<LocalDateTime>())).thenReturn(limitedEvents)
         whenever(eventImageRepository.findByEventIn(limitedEvents)).thenReturn(emptyList())
 
         val result = eventReader.getProcessingEventPreviews()
@@ -128,9 +129,9 @@ class EventReaderTest : BaseToolTest() {
         val pageable = PageRequest.of(0, 20)
         val eventPage = PageImpl(events, pageable, events.size.toLong())
 
-        whenever(eventRepository.findActiveEventsByLatest(any(), any())).thenReturn(eventPage)
+        whenever(eventRepository.findByExpiredAtAfterOrderByCreatedAtDesc(any(), any())).thenReturn(eventPage)
 
-        val result = eventReader.getEventsWithPagination("active", EventSortType.LATEST, pageable, LocalDateTime.now())
+        val result = eventReader.getEventsWithPagination(EventStatusType.ACTIVE, EventSortType.LATEST, pageable, LocalDateTime.now())
 
         assertEquals(2, result.totalElements)
         assertEquals(events, result.content)
@@ -144,9 +145,9 @@ class EventReaderTest : BaseToolTest() {
         val pageable = PageRequest.of(0, 20)
         val eventPage = PageImpl(events, pageable, events.size.toLong())
 
-        whenever(eventRepository.findActiveEventsByOldest(any(), any())).thenReturn(eventPage)
+        whenever(eventRepository.findByExpiredAtAfterOrderByCreatedAtAsc(any(), any())).thenReturn(eventPage)
 
-        val result = eventReader.getEventsWithPagination("active", EventSortType.OLDEST, pageable, LocalDateTime.now())
+        val result = eventReader.getEventsWithPagination(EventStatusType.ACTIVE, EventSortType.OLDEST, pageable, LocalDateTime.now())
 
         assertEquals(2, result.totalElements)
         assertEquals(events, result.content)
@@ -162,7 +163,7 @@ class EventReaderTest : BaseToolTest() {
 
         whenever(eventRepository.findActiveEventsByPopular(any(), any())).thenReturn(eventPage)
 
-        val result = eventReader.getEventsWithPagination("active", EventSortType.POPULAR, pageable, LocalDateTime.now())
+        val result = eventReader.getEventsWithPagination(EventStatusType.ACTIVE, EventSortType.POPULAR, pageable, LocalDateTime.now())
 
         assertEquals(2, result.totalElements)
         assertEquals(events, result.content)
@@ -175,9 +176,9 @@ class EventReaderTest : BaseToolTest() {
         val pageable = PageRequest.of(0, 20)
         val eventPage = PageImpl(events, pageable, events.size.toLong())
 
-        whenever(eventRepository.findExpiredEventsWithPagination(any(), any())).thenReturn(eventPage)
+        whenever(eventRepository.findByExpiredAtLessThanEqualOrderByCreatedAtDesc(any(), any())).thenReturn(eventPage)
 
-        val result = eventReader.getEventsWithPagination("expired", EventSortType.LATEST, pageable, LocalDateTime.now())
+        val result = eventReader.getEventsWithPagination(EventStatusType.EXPIRED, EventSortType.LATEST, pageable, LocalDateTime.now())
 
         assertEquals(1, result.totalElements)
         assertEquals(events, result.content)
@@ -191,21 +192,12 @@ class EventReaderTest : BaseToolTest() {
         val pageable = PageRequest.of(0, 20)
         val eventPage = PageImpl(events, pageable, events.size.toLong())
 
-        whenever(eventRepository.findAllEventsWithPagination(any())).thenReturn(eventPage)
+        whenever(eventRepository.findAllByOrderByCreatedAtDesc(any())).thenReturn(eventPage)
 
-        val result = eventReader.getEventsWithPagination("all", EventSortType.LATEST, pageable, LocalDateTime.now())
+        val result = eventReader.getEventsWithPagination(EventStatusType.ALL, EventSortType.LATEST, pageable, LocalDateTime.now())
 
         assertEquals(2, result.totalElements)
         assertEquals(events, result.content)
-    }
-
-    @Test
-    fun `getEventsWithPagination은 잘못된 status로 조회 시 예외를 발생시킨다`() {
-        val pageable = PageRequest.of(0, 20)
-
-        assertThrows<FeedException> {
-            eventReader.getEventsWithPagination("invalid", EventSortType.LATEST, pageable, LocalDateTime.now())
-        }
     }
 
     @Test

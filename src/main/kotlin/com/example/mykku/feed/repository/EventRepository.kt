@@ -11,34 +11,11 @@ import java.time.LocalDateTime
 
 @Repository
 interface EventRepository : JpaRepository<Event, Long> {
-    @Query(
-        """
-            SELECT e
-            FROM Event e
-            WHERE e.expiredAt > :dateTime
-        """
-    )
-    fun getByEventPreviews(dateTime: LocalDateTime): List<Event>
+    fun findByExpiredAtAfter(dateTime: LocalDateTime): List<Event>
 
-    @Query(
-        """
-            SELECT e
-            FROM Event e
-            WHERE e.expiredAt > :dateTime
-            ORDER BY e.createdAt DESC
-        """
-    )
-    fun findActiveEventsByLatest(dateTime: LocalDateTime, pageable: Pageable): Page<Event>
+    fun findByExpiredAtAfterOrderByCreatedAtDesc(dateTime: LocalDateTime, pageable: Pageable): Page<Event>
 
-    @Query(
-        """
-            SELECT e
-            FROM Event e
-            WHERE e.expiredAt > :dateTime
-            ORDER BY e.createdAt ASC
-        """
-    )
-    fun findActiveEventsByOldest(dateTime: LocalDateTime, pageable: Pageable): Page<Event>
+    fun findByExpiredAtAfterOrderByCreatedAtAsc(dateTime: LocalDateTime, pageable: Pageable): Page<Event>
 
     @Query(
         """
@@ -50,22 +27,7 @@ interface EventRepository : JpaRepository<Event, Long> {
     )
     fun findActiveEventsByPopular(dateTime: LocalDateTime, pageable: Pageable): Page<Event>
 
-    @Query(
-        """
-            SELECT e
-            FROM Event e
-            WHERE e.expiredAt <= :dateTime
-            ORDER BY e.createdAt DESC
-        """
-    )
-    fun findExpiredEventsWithPagination(dateTime: LocalDateTime, pageable: Pageable): Page<Event>
+    fun findByExpiredAtLessThanEqualOrderByCreatedAtDesc(dateTime: LocalDateTime, pageable: Pageable): Page<Event>
 
-    @Query(
-        """
-            SELECT e
-            FROM Event e
-            ORDER BY e.createdAt DESC
-        """
-    )
-    fun findAllEventsWithPagination(pageable: Pageable): Page<Event>
+    fun findAllByOrderByCreatedAtDesc(pageable: Pageable): Page<Event>
 }

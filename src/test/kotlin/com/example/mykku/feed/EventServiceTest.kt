@@ -15,6 +15,7 @@ import java.time.LocalDateTime
 import kotlin.test.assertEquals
 
 import com.example.mykku.feed.domain.EventSortType
+import com.example.mykku.feed.domain.EventStatusType
 import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.feed.tool.EventDtoConverter
 import com.example.mykku.feed.tool.EventReader
@@ -202,13 +203,13 @@ class EventServiceTest : BaseServiceTest() {
         val pageable = PageRequest.of(0, 20)
         val eventPage = PageImpl(listOf(event), pageable, 1)
 
-        whenever(eventReader.getEventsWithPagination(eq("active"), eq(EventSortType.LATEST), any(), any())).thenReturn(eventPage)
+        whenever(eventReader.getEventsWithPagination(eq(EventStatusType.ACTIVE), eq(EventSortType.LATEST), any(), any())).thenReturn(eventPage)
         whenever(eventReader.getEventImages(any())).thenReturn(emptyMap())
         whenever(eventReader.getEventTags(any())).thenReturn(emptyMap())
         whenever(saveEventReader.getSavedEventIds(any(), any())).thenReturn(emptySet())
         whenever(eventDtoConverter.toEventListResponse(any(), any(), any(), any())).thenCallRealMethod()
 
-        val result = eventService.getEvents("active", EventSortType.LATEST, 0, 20, member)
+        val result = eventService.getEvents(EventStatusType.ACTIVE, EventSortType.LATEST, 0, 20, member)
 
         assertEquals(1, result.totalElements)
     }

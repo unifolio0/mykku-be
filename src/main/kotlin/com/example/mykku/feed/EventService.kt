@@ -3,6 +3,7 @@ package com.example.mykku.feed
 import com.example.mykku.common.util.PageableValidator
 import com.example.mykku.feed.domain.Event
 import com.example.mykku.feed.domain.EventSortType
+import com.example.mykku.feed.domain.EventStatusType
 import com.example.mykku.feed.dto.*
 import com.example.mykku.feed.tool.EventDtoConverter
 import com.example.mykku.feed.tool.EventReader
@@ -46,7 +47,7 @@ class EventService(
 
     @Transactional(readOnly = true)
     fun getEvents(
-        status: String,
+        status: EventStatusType,
         sortType: EventSortType,
         page: Int,
         size: Int,
