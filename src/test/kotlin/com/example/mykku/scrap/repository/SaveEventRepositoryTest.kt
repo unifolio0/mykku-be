@@ -121,4 +121,31 @@ class SaveEventRepositoryTest : BaseRepositoryTest() {
         val exists = saveEventRepository.existsByMemberAndEvent(member, event)
         assertThat(exists).isFalse()
     }
+
+
+    @Test
+    @DisplayName("회원과 여러 이벤트로 저장된 이벤트 목록을 조회한다")
+    fun `회원과 여러 이벤트로 저장된 이벤트 목록을 조회한다`() {
+        val member = createAndSaveMember()
+        val event1 = eventRepository.save(
+            Event(title = "이벤트1", isContest = false, expiredAt = LocalDateTime.now().plusDays(1))
+        )
+        val event2 = eventRepository.save(
+            Event(title = "이벤트2", isContest = false, expiredAt = LocalDateTime.now().plusDays(2))
+        )
+        val event3 = eventRepository.save(
+            Event(title = "이벤트3", isContest = false, expiredAt = LocalDateTime.now().plusDays(3))
+        )
+
+        saveEventRepository.save(SaveEvent(member = member, event = event1))
+        saveEventRepository.save(SaveEvent(member = member, event = event3))
+        testEntityManager.flush()
+        testEntityManager.clear()
+
+        val events = listOf(event1, event2, event3)
+        val savedEvents = saveEventRepository.findByMemberAndEventIn(member, events)
+
+        assertThat(savedEvents).hasSize(2)
+        assertThat(savedEvents.map { it.event.id }).containsExactlyInAnyOrder(event1.id, event3.id)
+    }
 }

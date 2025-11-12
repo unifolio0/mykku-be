@@ -205,7 +205,7 @@ class EventServiceTest : BaseServiceTest() {
         whenever(eventReader.getEventsWithPagination(eq("active"), eq(EventSortType.LATEST), any(), any())).thenReturn(eventPage)
         whenever(eventReader.getEventImages(any())).thenReturn(emptyMap())
         whenever(eventReader.getEventTags(any())).thenReturn(emptyMap())
-        whenever(saveEventReader.isSaved(any(), any())).thenReturn(false)
+        whenever(saveEventReader.getSavedEventIds(any(), any())).thenReturn(emptySet())
         whenever(eventDtoConverter.toEventListResponse(any(), any(), any(), any())).thenCallRealMethod()
 
         val result = eventService.getEvents("active", EventSortType.LATEST, 0, 20, member)

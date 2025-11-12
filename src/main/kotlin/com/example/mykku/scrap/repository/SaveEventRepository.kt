@@ -14,4 +14,5 @@ interface SaveEventRepository : JpaRepository<SaveEvent, Long> {
     fun findByMember(member: Member, pageable: Pageable): Page<SaveEvent>
     fun findByMemberAndEvent(member: Member, event: Event): SaveEvent?
     fun deleteByMemberAndEvent(member: Member, event: Event)
+    fun findByMemberAndEventIn(member: Member, events: List<Event>): List<SaveEvent>
 }

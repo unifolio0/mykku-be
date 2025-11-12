@@ -162,7 +162,7 @@ class EventControllerTest : BaseControllerTest() {
             tags = listOf("태그")
         )
 
-        val createResponse = RestAssured.given()
+        val eventId = RestAssured.given()
             .contentType(ContentType.JSON)
             .body(request)
         .`when`()
@@ -170,18 +170,18 @@ class EventControllerTest : BaseControllerTest() {
         .then()
             .statusCode(200)
             .extract()
-            .path<Int>("data.id")
+            .path<Number>("data.id")
             .toLong()
 
         RestAssured.given()
             .contentType(ContentType.JSON)
             .headers(createAuthHeaders("testMember"))
         .`when`()
-            .get("/api/v1/events/$createResponse")
+            .get("/api/v1/events/$eventId")
         .then()
             .statusCode(200)
             .body("message", equalTo("이벤트 상세 정보를 성공적으로 조회했습니다."))
-            .body("data.id", equalTo(createResponse.toInt()))
+            .body("data.id", equalTo(eventId.toInt()))
             .body("data.title", equalTo("테스트 이벤트"))
     }
 }
