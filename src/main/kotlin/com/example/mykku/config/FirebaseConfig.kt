@@ -23,12 +23,13 @@ class FirebaseConfig(
                 return
             }
 
-            val serviceAccount = FileInputStream(serviceAccountKeyPath)
-            val options = FirebaseOptions.builder()
-                .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                .build()
+            FileInputStream(serviceAccountKeyPath).use { serviceAccount ->
+                val options = FirebaseOptions.builder()
+                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .build()
 
-            FirebaseApp.initializeApp(options)
+                FirebaseApp.initializeApp(options)
+            }
         }
     }
 }
