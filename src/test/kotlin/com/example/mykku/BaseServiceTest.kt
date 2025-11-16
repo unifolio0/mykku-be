@@ -53,7 +53,15 @@ abstract class BaseServiceTest {
      * BaseEntity 상속 객체의 createdAt, updatedAt 필드 초기화
      * (리플렉션을 사용하여 private 필드에 접근)
      */
-    protected fun initializeBaseEntityFields(entity: Any, createdAt: LocalDateTime = LocalDateTime.now()) {
+    protected fun initializeBaseEntityFields(entity: Any, createdAt: LocalDateTime = LocalDateTime.now(), id: Long = 1L) {
+        try {
+            val idField = entity::class.java.getDeclaredField("id")
+            idField.isAccessible = true
+            idField.set(entity, id)
+        } catch (e: NoSuchFieldException) {
+            // id 필드가 없는 경우 무시
+        }
+
         try {
             val createdAtField = BaseEntity::class.java.getDeclaredField("createdAt")
             createdAtField.isAccessible = true

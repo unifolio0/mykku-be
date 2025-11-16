@@ -5,6 +5,8 @@ import com.example.mykku.board.repository.BoardRepository
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.repository.MemberRepository
+import com.example.mykku.util.DatabaseCleaner
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -13,6 +15,7 @@ import org.springframework.test.context.ActiveProfiles
 @DataJpaTest
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ExtendWith(DatabaseCleaner::class)
 abstract class BaseRepositoryTest {
 
     @Autowired

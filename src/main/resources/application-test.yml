@@ -26,9 +26,6 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: create-drop
-    defer-datasource-initialization: true
-  flyway:
-    enabled: false
   mail:
     host: localhost
     port: 25
@@ -56,3 +53,6 @@ aws:
 
 admin:
   token: "test-admin-token"
+
+firebase:
+  service-account-key-path: config/firebase/service-account-key-dev.json

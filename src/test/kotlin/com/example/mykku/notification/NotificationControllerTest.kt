@@ -1,0 +1,284 @@
+package com.example.mykku.notification
+
+import com.example.mykku.BaseControllerTest
+import com.example.mykku.notification.domain.Notification
+import com.example.mykku.notification.domain.NotificationType
+import com.example.mykku.notification.repository.NotificationRepository
+import com.example.mykku.util.TestTokenGenerator
+import io.restassured.RestAssured
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.hasSize
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+
+@DisplayName("NotificationController 통합 테스트")
+class NotificationControllerTest : BaseControllerTest() {
+
+    @Autowired
+    private lateinit var notificationRepository: NotificationRepository
+
+    @Test
+    @DisplayName("알림 목록 조회 - 정상 케이스")
+    fun `getNotifications - 정상적으로 알림 목록을 조회한다`() {
+        val sender = createAndSaveMember(id = "sender1", nickname = "Sender")
+        val receiver = createAndSaveMember(id = "receiver1", nickname = "Receiver")
+
+        notificationRepository.save(
+            Notification.create(
+                type = NotificationType.FEED_LIKE,
+                sender = sender,
+                receiver = receiver,
+                content = "sender1님이 회원님의 피드를 좋아합니다"
+            )
+        )
+        notificationRepository.save(
+            Notification.create(
+                type = NotificationType.FOLLOW,
+                sender = sender,
+                receiver = receiver,
+                content = "sender1님이 회원님을 팔로우하기 시작했습니다"
+            )
+        )
+
+        val authHeader = TestTokenGenerator.getBearerToken("receiver1")
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .queryParam("page", 0)
+            .queryParam("size", 10)
+            .`when`()
+            .get("/api/v1/notifications")
+            .then()
+            .statusCode(200)
+            .body("message", equalTo("알림 목록을 성공적으로 조회했습니다."))
+            .body("data.content", hasSize<Any>(2))
+    }
+
+    @Test
+    @DisplayName("알림 목록 조회 - 인증되지 않은 사용자")
+    fun `getNotifications - 인증되지 않은 사용자는 조회할 수 없다`() {
+        RestAssured.given()
+            .`when`()
+            .get("/api/v1/notifications")
+            .then()
+            .statusCode(401)
+    }
+
+    @Test
+    @DisplayName("읽지 않은 알림 목록 조회 - 정상 케이스")
+    fun `getUnreadNotifications - 읽지 않은 알림만 조회한다`() {
+        val sender = createAndSaveMember(id = "sender1")
+        val receiver = createAndSaveMember(id = "receiver1")
+
+        val notification = Notification.create(
+            type = NotificationType.FEED_LIKE,
+            sender = sender,
+            receiver = receiver,
+            content = "읽은 알림"
+        )
+        notification.markAsRead()
+        notificationRepository.save(notification)
+
+        notificationRepository.save(
+            Notification.create(
+                type = NotificationType.FEED_COMMENT,
+                sender = sender,
+                receiver = receiver,
+                content = "읽지 않은 알림"
+            )
+        )
+
+        val authHeader = TestTokenGenerator.getBearerToken("receiver1")
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .`when`()
+            .get("/api/v1/notifications/unread")
+            .then()
+            .statusCode(200)
+            .body("message", equalTo("읽지 않은 알림 목록을 성공적으로 조회했습니다."))
+            .body("data.content", hasSize<Any>(1))
+    }
+
+    @Test
+    @DisplayName("읽지 않은 알림 개수 조회 - 정상 케이스")
+    fun `getUnreadCount - 읽지 않은 알림 개수를 조회한다`() {
+        val sender = createAndSaveMember(id = "sender1")
+        val receiver = createAndSaveMember(id = "receiver1")
+
+        notificationRepository.save(
+            Notification.create(
+                type = NotificationType.FEED_LIKE,
+                sender = sender,
+                receiver = receiver,
+                content = "알림1"
+            )
+        )
+        notificationRepository.save(
+            Notification.create(
+                type = NotificationType.FEED_COMMENT,
+                sender = sender,
+                receiver = receiver,
+                content = "알림2"
+            )
+        )
+
+        val authHeader = TestTokenGenerator.getBearerToken("receiver1")
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .`when`()
+            .get("/api/v1/notifications/unread/count")
+            .then()
+            .statusCode(200)
+            .body("message", equalTo("읽지 않은 알림 개수를 성공적으로 조회했습니다."))
+            .body("data", equalTo(2))
+    }
+
+    @Test
+    @DisplayName("알림 읽음 처리 - 정상 케이스")
+    fun `markAsRead - 알림을 읽음 처리한다`() {
+        val sender = createAndSaveMember(id = "sender1")
+        val receiver = createAndSaveMember(id = "receiver1")
+
+        val notification = notificationRepository.save(
+            Notification.create(
+                type = NotificationType.FEED_LIKE,
+                sender = sender,
+                receiver = receiver,
+                content = "알림"
+            )
+        )
+
+        val authHeader = TestTokenGenerator.getBearerToken("receiver1")
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .`when`()
+            .patch("/api/v1/notifications/${notification.id}/read")
+            .then()
+            .statusCode(200)
+            .body("message", equalTo("알림을 읽음 처리했습니다."))
+
+        val updatedNotification = notificationRepository.findById(notification.id!!).get()
+        assert(updatedNotification.isRead)
+    }
+
+    @Test
+    @DisplayName("알림 읽음 처리 - 권한 없음")
+    fun `markAsRead - 다른 사용자의 알림은 읽음 처리할 수 없다`() {
+        val sender = createAndSaveMember(id = "sender1")
+        val receiver = createAndSaveMember(id = "receiver1")
+        createAndSaveMember(id = "other")
+
+        val notification = notificationRepository.save(
+            Notification.create(
+                type = NotificationType.FEED_LIKE,
+                sender = sender,
+                receiver = receiver,
+                content = "알림"
+            )
+        )
+
+        val authHeader = TestTokenGenerator.getBearerToken("other")
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .`when`()
+            .patch("/api/v1/notifications/${notification.id}/read")
+            .then()
+            .statusCode(403)
+    }
+
+    @Test
+    @DisplayName("모든 알림 읽음 처리 - 정상 케이스")
+    fun `markAllAsRead - 모든 읽지 않은 알림을 읽음 처리한다`() {
+        val sender = createAndSaveMember(id = "sender1")
+        val receiver = createAndSaveMember(id = "receiver1")
+
+        notificationRepository.save(
+            Notification.create(
+                type = NotificationType.FEED_LIKE,
+                sender = sender,
+                receiver = receiver,
+                content = "알림1"
+            )
+        )
+        notificationRepository.save(
+            Notification.create(
+                type = NotificationType.FEED_COMMENT,
+                sender = sender,
+                receiver = receiver,
+                content = "알림2"
+            )
+        )
+
+        val authHeader = TestTokenGenerator.getBearerToken("receiver1")
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .`when`()
+            .patch("/api/v1/notifications/read-all")
+            .then()
+            .statusCode(200)
+            .body("message", equalTo("모든 알림을 읽음 처리했습니다."))
+
+        val unreadCount = notificationRepository.countByReceiverAndIsRead(receiver, false)
+        assert(unreadCount == 0L)
+    }
+
+    @Test
+    @DisplayName("알림 삭제 - 정상 케이스")
+    fun `deleteNotification - 알림을 삭제한다`() {
+        val sender = createAndSaveMember(id = "sender1")
+        val receiver = createAndSaveMember(id = "receiver1")
+
+        val notification = notificationRepository.save(
+            Notification.create(
+                type = NotificationType.FEED_LIKE,
+                sender = sender,
+                receiver = receiver,
+                content = "알림"
+            )
+        )
+
+        val authHeader = TestTokenGenerator.getBearerToken("receiver1")
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .`when`()
+            .delete("/api/v1/notifications/${notification.id}")
+            .then()
+            .statusCode(200)
+            .body("message", equalTo("알림을 삭제했습니다."))
+
+        assert(!notificationRepository.existsById(notification.id!!))
+    }
+
+    @Test
+    @DisplayName("알림 삭제 - 권한 없음")
+    fun `deleteNotification - 다른 사용자의 알림은 삭제할 수 없다`() {
+        val sender = createAndSaveMember(id = "sender1")
+        val receiver = createAndSaveMember(id = "receiver1")
+        createAndSaveMember(id = "other")
+
+        val notification = notificationRepository.save(
+            Notification.create(
+                type = NotificationType.FEED_LIKE,
+                sender = sender,
+                receiver = receiver,
+                content = "알림"
+            )
+        )
+
+        val authHeader = TestTokenGenerator.getBearerToken("other")
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .`when`()
+            .delete("/api/v1/notifications/${notification.id}")
+            .then()
+            .statusCode(403)
+    }
+}

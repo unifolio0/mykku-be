@@ -7,6 +7,8 @@ import com.example.mykku.feed.tool.FeedReader
 import com.example.mykku.like.dto.*
 import com.example.mykku.like.tool.*
 import com.example.mykku.member.tool.MemberReader
+import com.example.mykku.notification.event.FeedLikedEvent
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -28,7 +30,9 @@ class LikeService(
 
     private val feedReader: FeedReader,
     private val likeFeedWriter: LikeFeedWriter,
-    private val likeFeedReader: LikeFeedReader
+    private val likeFeedReader: LikeFeedReader,
+
+    private val eventPublisher: ApplicationEventPublisher
 ) {
     @Transactional(readOnly = true)
     fun getLikedBoards(memberId: String): List<LikeBoardInfoResponse> {
@@ -57,6 +61,15 @@ class LikeService(
         val member = memberReader.getMemberById(memberId)
         val feed = feedReader.getFeedById(request.feedId)
         val likeFeed = likeFeedWriter.createLikeFeed(feed = feed, member = member)
+
+        eventPublisher.publishEvent(
+            FeedLikedEvent(
+                feedId = feed.id!!,
+                feedAuthor = feed.member,
+                liker = member
+            )
+        )
+
         return LikeFeedResponse(likeFeed)
     }
 
