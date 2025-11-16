@@ -10,7 +10,7 @@ import java.io.FileInputStream
 
 @Configuration
 class FirebaseConfig(
-    @Value("\${firebase.service-account-key-path:}")
+    @Value("\${firebase.service-account-key-path}")
     private val serviceAccountKeyPath: String
 ) {
 

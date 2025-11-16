@@ -50,6 +50,3 @@ Thumbs.db
 
 src/main/resources/application-local.yml
 src/main/resources/dev-secret.yml
-
-### Firebase ###
-config/firebase/**/*.json
