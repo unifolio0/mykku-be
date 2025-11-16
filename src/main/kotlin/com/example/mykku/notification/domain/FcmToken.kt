@@ -15,7 +15,7 @@ class FcmToken(
     @JoinColumn(name = "member_id", nullable = false)
     val member: Member,
 
-    @Column(nullable = false, unique = true, length = 500)
+    @Column(nullable = false, length = 500)
     var token: String,
 
     @Column(nullable = false, length = 100)

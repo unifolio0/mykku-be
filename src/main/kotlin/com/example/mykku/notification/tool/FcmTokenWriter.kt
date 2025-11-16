@@ -19,6 +19,8 @@ class FcmTokenWriter(
         deviceId: String,
         deviceType: String?
     ): FcmToken {
+        releaseTokenFromPreviousOwner(token, member)
+
         val existingToken = fcmTokenReader.getTokenByMemberAndDeviceId(member, deviceId)
 
         return if (existingToken != null) {
@@ -32,6 +34,14 @@ class FcmTokenWriter(
                 deviceType = deviceType
             )
             fcmTokenRepository.save(fcmToken)
+        }
+    }
+
+    private fun releaseTokenFromPreviousOwner(token: String, currentMember: Member) {
+        fcmTokenReader.getTokenByTokenString(token)?.let { existingToken ->
+            if (existingToken.member.id != currentMember.id) {
+                fcmTokenRepository.deleteByToken(token)
+            }
         }
     }
 

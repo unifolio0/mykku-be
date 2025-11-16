@@ -118,16 +118,19 @@ class FcmTokenRepositoryTest : BaseRepositoryTest() {
     }
 
     @Test
-    fun `동일한 토큰 문자열은 유니크 제약 조건을 위반한다`() {
+    fun `동일한 토큰 문자열을 다른 사용자가 사용할 수 있다`() {
         val member1 = createAndSaveMember(id = "member1")
         val member2 = createAndSaveMember(id = "member2")
         val sameToken = "duplicate_token"
 
         fcmTokenRepository.save(FcmToken.create(member1, sameToken, "device_001"))
+        fcmTokenRepository.save(FcmToken.create(member2, sameToken, "device_002"))
+        fcmTokenRepository.flush()
 
-        assertThrows<DataIntegrityViolationException> {
-            fcmTokenRepository.save(FcmToken.create(member2, sameToken, "device_002"))
-            fcmTokenRepository.flush()
-        }
+        val tokensWithSameValue = fcmTokenRepository.findAll()
+            .filter { it.token == sameToken }
+
+        assertEquals(2, tokensWithSameValue.size)
+        assertEquals(setOf(member1.id, member2.id), tokensWithSameValue.map { it.member.id }.toSet())
     }
 }

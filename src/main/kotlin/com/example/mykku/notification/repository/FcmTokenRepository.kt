@@ -18,5 +18,7 @@ interface FcmTokenRepository : JpaRepository<FcmToken, Long> {
 
     fun deleteAllByMember(member: Member)
 
+    fun deleteByToken(token: String)
+
     fun existsByMemberAndDeviceId(member: Member, deviceId: String): Boolean
 }

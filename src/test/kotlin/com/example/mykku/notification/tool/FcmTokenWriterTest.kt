@@ -31,6 +31,8 @@ class FcmTokenWriterTest : BaseToolTest() {
         val deviceId = "device_001"
         val deviceType = "ANDROID"
 
+        whenever(fcmTokenReader.getTokenByTokenString(token))
+            .thenReturn(null)
         whenever(fcmTokenReader.getTokenByMemberAndDeviceId(member, deviceId))
             .thenReturn(null)
         whenever(fcmTokenRepository.save(any<FcmToken>()))
@@ -54,6 +56,8 @@ class FcmTokenWriterTest : BaseToolTest() {
 
         val existingToken = FcmToken.create(member, oldToken, deviceId, deviceType)
 
+        whenever(fcmTokenReader.getTokenByTokenString(newToken))
+            .thenReturn(null)
         whenever(fcmTokenReader.getTokenByMemberAndDeviceId(member, deviceId))
             .thenReturn(existingToken)
 
@@ -87,5 +91,58 @@ class FcmTokenWriterTest : BaseToolTest() {
         fcmTokenWriter.deleteAllByMember(member)
 
         verify(fcmTokenRepository).deleteAllByMember(member)
+    }
+
+    @Test
+    fun `registerOrUpdateToken은 다른 사용자가 사용 중인 토큰을 재할당한다`() {
+        val token = "reassigned_token"
+        val deviceId = "device_001"
+        val deviceType = "ANDROID"
+
+        val previousOwner = createMockMember(
+            id = "member2",
+            nickname = "이전유저",
+            email = "previous@example.com",
+            socialId = "67890"
+        )
+        val existingToken = FcmToken.create(previousOwner, token, "device_002")
+
+        whenever(fcmTokenReader.getTokenByTokenString(token))
+            .thenReturn(existingToken)
+        whenever(fcmTokenReader.getTokenByMemberAndDeviceId(member, deviceId))
+            .thenReturn(null)
+        whenever(fcmTokenRepository.save(any<FcmToken>()))
+            .thenAnswer { it.arguments[0] as FcmToken }
+
+        val result = fcmTokenWriter.registerOrUpdateToken(member, token, deviceId, deviceType)
+
+        assertNotNull(result)
+        assertEquals(token, result.token)
+        assertEquals(member, result.member)
+        verify(fcmTokenRepository).deleteByToken(token)
+        verify(fcmTokenRepository).save(any<FcmToken>())
+    }
+
+    @Test
+    fun `registerOrUpdateToken은 동일 사용자가 이미 사용 중인 토큰은 삭제하지 않는다`() {
+        val token = "same_user_token"
+        val deviceId1 = "device_001"
+        val deviceId2 = "device_002"
+
+        val existingToken = FcmToken.create(member, token, deviceId1)
+
+        whenever(fcmTokenReader.getTokenByTokenString(token))
+            .thenReturn(existingToken)
+        whenever(fcmTokenReader.getTokenByMemberAndDeviceId(member, deviceId2))
+            .thenReturn(null)
+        whenever(fcmTokenRepository.save(any<FcmToken>()))
+            .thenAnswer { it.arguments[0] as FcmToken }
+
+        val result = fcmTokenWriter.registerOrUpdateToken(member, token, deviceId2, null)
+
+        assertNotNull(result)
+        assertEquals(token, result.token)
+        verify(fcmTokenRepository, org.mockito.kotlin.never()).deleteByToken(token)
+        verify(fcmTokenRepository).save(any<FcmToken>())
     }
 }
