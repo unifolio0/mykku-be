@@ -43,6 +43,11 @@ class NotificationWriter(
     }
 
     @Transactional
+    fun markAllAsReadByReceiver(receiver: Member): Int {
+        return notificationRepository.markAllAsReadByReceiver(receiver)
+    }
+
+    @Transactional
     fun deleteNotification(notification: Notification) {
         notificationRepository.delete(notification)
     }

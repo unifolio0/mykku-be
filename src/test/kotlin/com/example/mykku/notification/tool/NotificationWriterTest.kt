@@ -134,6 +134,17 @@ class NotificationWriterTest : BaseToolTest() {
     }
 
     @Test
+    fun `markAllAsReadByReceiver는 사용자의 모든 읽지 않은 알림을 읽음 처리한다`() {
+        whenever(notificationRepository.markAllAsReadByReceiver(receiver))
+            .thenReturn(5)
+
+        val count = notificationWriter.markAllAsReadByReceiver(receiver)
+
+        assertEquals(5, count)
+        verify(notificationRepository).markAllAsReadByReceiver(receiver)
+    }
+
+    @Test
     fun `deleteAllByReceiver는 사용자의 모든 알림을 삭제한다`() {
         notificationWriter.deleteAllByReceiver(receiver)
 

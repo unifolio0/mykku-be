@@ -50,12 +50,7 @@ class NotificationService(
 
     @Transactional
     fun markAllAsRead(member: Member) {
-        val notifications = notificationReader.getUnreadNotifications(
-            member,
-            Pageable.unpaged()
-        ).content
-
-        notificationWriter.markAllAsRead(notifications)
+        notificationWriter.markAllAsReadByReceiver(member)
     }
 
     @Transactional

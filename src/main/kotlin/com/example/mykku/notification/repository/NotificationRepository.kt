@@ -6,6 +6,9 @@ import com.example.mykku.notification.domain.NotificationType
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
+import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -25,6 +28,10 @@ interface NotificationRepository : JpaRepository<Notification, Long> {
     ): Page<Notification>
 
     fun countByReceiverAndIsRead(receiver: Member, isRead: Boolean): Long
+
+    @Modifying
+    @Query("UPDATE Notification n SET n.isRead = true WHERE n.receiver = :receiver AND n.isRead = false")
+    fun markAllAsReadByReceiver(@Param("receiver") receiver: Member): Int
 
     fun deleteAllByReceiver(receiver: Member)
 }

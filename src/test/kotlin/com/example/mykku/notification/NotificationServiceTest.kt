@@ -127,16 +127,12 @@ class NotificationServiceTest : BaseServiceTest() {
 
     @Test
     fun `모든 알림을 읽음 처리한다`() {
-        val notification1 = createTestNotification(id = 1L, isRead = false)
-        val notification2 = createTestNotification(id = 2L, isRead = false)
-        val page = PageImpl(listOf(notification1, notification2))
-
-        whenever(notificationReader.getUnreadNotifications(eq(receiver), any()))
-            .thenReturn(page)
+        whenever(notificationWriter.markAllAsReadByReceiver(receiver))
+            .thenReturn(2)
 
         notificationService.markAllAsRead(receiver)
 
-        verify(notificationWriter).markAllAsRead(listOf(notification1, notification2))
+        verify(notificationWriter).markAllAsReadByReceiver(receiver)
     }
 
     @Test

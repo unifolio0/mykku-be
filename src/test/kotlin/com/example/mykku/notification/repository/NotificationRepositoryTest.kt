@@ -217,6 +217,46 @@ class NotificationRepositoryTest : BaseRepositoryTest() {
     }
 
     @Test
+    fun `markAllAsReadByReceiver는 사용자의 모든 읽지 않은 알림을 읽음 처리한다`() {
+        val sender = createAndSaveMember(id = "sender1")
+        val receiver = createAndSaveMember(id = "receiver1")
+
+        repeat(3) {
+            notificationRepository.save(
+                Notification.create(
+                    type = NotificationType.FEED_LIKE,
+                    sender = sender,
+                    receiver = receiver,
+                    content = "읽지 않은 알림 $it"
+                )
+            )
+        }
+
+        repeat(2) {
+            val readNotification = notificationRepository.save(
+                Notification.create(
+                    type = NotificationType.FEED_COMMENT,
+                    sender = sender,
+                    receiver = receiver,
+                    content = "이미 읽은 알림 $it"
+                )
+            )
+            readNotification.markAsRead()
+            notificationRepository.save(readNotification)
+        }
+
+        val updatedCount = notificationRepository.markAllAsReadByReceiver(receiver)
+
+        assertEquals(3, updatedCount)
+
+        val unreadCount = notificationRepository.countByReceiverAndIsRead(receiver, false)
+        assertEquals(0L, unreadCount)
+
+        val readCount = notificationRepository.countByReceiverAndIsRead(receiver, true)
+        assertEquals(5L, readCount)
+    }
+
+    @Test
     fun `sender가 null인 시스템 알림을 생성할 수 있다`() {
         val receiver = createAndSaveMember(id = "receiver1")
 
