@@ -69,3 +69,6 @@ aws:
 
 admin:
   token: ${secret.admin.token}
+
+firebase:
+  service-account-key-path: ${secret.firebase.service_account_key_path}

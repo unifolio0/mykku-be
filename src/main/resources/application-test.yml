@@ -26,7 +26,6 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: create-drop
-    defer-datasource-initialization: true
   flyway:
     enabled: false
   mail:
