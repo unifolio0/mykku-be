@@ -27,7 +27,7 @@ jobs:
 
       - name: Setting secret-account-key-dev.json
         run: |
-          echo "${{ secrets.FIREBASE_KEY_JSON }}" > ./config/firebase/service-account-key-dev.json
+          echo "${{ secrets.FIREBASE_KEY_JSON }}" > ./src/main/resources/firebase/service-account-key-dev.json
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4

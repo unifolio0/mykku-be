@@ -55,4 +55,4 @@ admin:
   token: "test-admin-token"
 
 firebase:
-  service-account-key-path: config/firebase/service-account-key-dev.json
+  service-account-key-path: "classpath:firebase/service-account-key-dev.json"
