@@ -53,6 +53,3 @@ aws:
 
 admin:
   token: "test-admin-token"
-
-firebase:
-  service-account-key-path: "classpath:firebase/service-account-key-dev.json"

@@ -18,7 +18,13 @@ class FirebaseConfig(
 
     @PostConstruct
     fun initialize() {
-        println("Initializing Firebase with service account key at: $serviceAccountKeyPath")
+        if (FirebaseApp.getApps().isNotEmpty()) {
+            return
+        }
+        if (serviceAccountKeyPath.isBlank()) {
+            return
+        }
+
         val inputStream = if (serviceAccountKeyPath.startsWith("classpath:")) {
             val path = serviceAccountKeyPath.removePrefix("classpath:")
             this::class.java.classLoader.getResourceAsStream(path)
