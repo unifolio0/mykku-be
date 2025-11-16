@@ -26,8 +26,6 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: create-drop
-  flyway:
-    enabled: false
   mail:
     host: localhost
     port: 25
