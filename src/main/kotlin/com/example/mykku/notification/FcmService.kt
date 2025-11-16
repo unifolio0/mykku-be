@@ -1,10 +1,9 @@
 package com.example.mykku.notification
 
 import com.example.mykku.member.domain.Member
-import com.example.mykku.notification.domain.FcmToken
 import com.example.mykku.notification.tool.FcmTokenReader
 import com.google.firebase.messaging.FirebaseMessaging
-import com.google.firebase.messaging.Message
+import com.google.firebase.messaging.MulticastMessage
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
@@ -30,33 +29,34 @@ class FcmService(
             return
         }
 
-        tokens.forEach { token ->
-            sendNotificationToToken(token, title, body, data)
-        }
-    }
-
-    private fun sendNotificationToToken(
-        fcmToken: FcmToken,
-        title: String,
-        body: String,
-        data: Map<String, String>
-    ) {
         try {
+            val tokenStrings = tokens.map { it.token }
+
             val notification = FcmNotification.builder()
                 .setTitle(title)
                 .setBody(body)
                 .build()
 
-            val message = Message.builder()
-                .setToken(fcmToken.token)
+            val message = MulticastMessage.builder()
+                .addAllTokens(tokenStrings)
                 .setNotification(notification)
                 .putAllData(data)
                 .build()
 
-            val response = FirebaseMessaging.getInstance().send(message)
-            logger.info("Successfully sent FCM message: $response")
+            val response = FirebaseMessaging.getInstance().sendEachForMulticast(message)
+            logger.info("Successfully sent ${response.successCount}/${tokenStrings.size} FCM messages to member: ${member.id}")
+
+            if (response.failureCount > 0) {
+                response.responses.forEachIndexed { index, sendResponse ->
+                    if (!sendResponse.isSuccessful) {
+                        logger.error(
+                            "Failed to send FCM message to device: ${tokens[index].deviceId}, error: ${sendResponse.exception?.message}"
+                        )
+                    }
+                }
+            }
         } catch (e: Exception) {
-            logger.error("Failed to send FCM message to token: ${fcmToken.deviceId}", e)
+            logger.error("Failed to send FCM messages to member: ${member.id}", e)
         }
     }
 }

@@ -31,7 +31,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.redisson:redisson:3.50.0")
     implementation("org.springframework.security:spring-security-crypto")
-    implementation("com.google.firebase:firebase-admin:9.2.0")
+    implementation("com.google.firebase:firebase-admin:9.3.0")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("io.jsonwebtoken:jjwt-api:0.12.3")

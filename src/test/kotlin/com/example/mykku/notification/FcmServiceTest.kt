@@ -3,18 +3,14 @@ package com.example.mykku.notification
 import com.example.mykku.BaseServiceTest
 import com.example.mykku.notification.domain.FcmToken
 import com.example.mykku.notification.tool.FcmTokenReader
-import com.google.firebase.messaging.FirebaseMessaging
-import com.google.firebase.messaging.Message
+import com.google.firebase.messaging.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.MockedStatic
 import org.mockito.Mockito.mockStatic
-import org.mockito.kotlin.any
-import org.mockito.kotlin.never
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
 
 class FcmServiceTest : BaseServiceTest() {
 
@@ -49,8 +45,13 @@ class FcmServiceTest : BaseServiceTest() {
         val token2 = FcmToken.create(member, "device2", "token2")
         val tokens = listOf(token1, token2)
 
+        val batchResponse = mock<BatchResponse> {
+            on { successCount } doReturn 2
+            on { failureCount } doReturn 0
+        }
+
         whenever(fcmTokenReader.getTokensByMember(member)).thenReturn(tokens)
-        whenever(firebaseMessaging.send(any<Message>())).thenReturn("message-id")
+        whenever(firebaseMessaging.sendEachForMulticast(any<MulticastMessage>())).thenReturn(batchResponse)
 
         fcmService.sendNotificationToMember(
             member = member,
@@ -60,7 +61,7 @@ class FcmServiceTest : BaseServiceTest() {
 
         Thread.sleep(100)
 
-        verify(firebaseMessaging, org.mockito.kotlin.times(2)).send(any<Message>())
+        verify(firebaseMessaging, times(1)).sendEachForMulticast(any<MulticastMessage>())
     }
 
     @Test
@@ -69,8 +70,13 @@ class FcmServiceTest : BaseServiceTest() {
         val tokens = listOf(token)
         val data = mapOf("key1" to "value1", "key2" to "value2")
 
+        val batchResponse = mock<BatchResponse> {
+            on { successCount } doReturn 1
+            on { failureCount } doReturn 0
+        }
+
         whenever(fcmTokenReader.getTokensByMember(member)).thenReturn(tokens)
-        whenever(firebaseMessaging.send(any<Message>())).thenReturn("message-id")
+        whenever(firebaseMessaging.sendEachForMulticast(any<MulticastMessage>())).thenReturn(batchResponse)
 
         fcmService.sendNotificationToMember(
             member = member,
@@ -81,7 +87,7 @@ class FcmServiceTest : BaseServiceTest() {
 
         Thread.sleep(100)
 
-        verify(firebaseMessaging).send(any<Message>())
+        verify(firebaseMessaging).sendEachForMulticast(any<MulticastMessage>())
     }
 
     @Test
@@ -96,7 +102,7 @@ class FcmServiceTest : BaseServiceTest() {
 
         Thread.sleep(100)
 
-        verify(firebaseMessaging, never()).send(any<Message>())
+        verify(firebaseMessaging, never()).sendEachForMulticast(any<MulticastMessage>())
     }
 
     @Test
@@ -105,10 +111,22 @@ class FcmServiceTest : BaseServiceTest() {
         val token2 = FcmToken.create(member, "device2", "token2")
         val tokens = listOf(token1, token2)
 
+        val failedException = mock<FirebaseMessagingException>()
+        val failedResponse = mock<SendResponse> {
+            on { isSuccessful } doReturn false
+            on { exception } doReturn failedException
+        }
+        val successResponse = mock<SendResponse> {
+            on { isSuccessful } doReturn true
+        }
+        val batchResponse = mock<BatchResponse> {
+            on { successCount } doReturn 1
+            on { failureCount } doReturn 1
+            on { responses } doReturn listOf(failedResponse, successResponse)
+        }
+
         whenever(fcmTokenReader.getTokensByMember(member)).thenReturn(tokens)
-        whenever(firebaseMessaging.send(any<Message>()))
-            .thenThrow(RuntimeException("FCM error"))
-            .thenReturn("message-id")
+        whenever(firebaseMessaging.sendEachForMulticast(any<MulticastMessage>())).thenReturn(batchResponse)
 
         fcmService.sendNotificationToMember(
             member = member,
@@ -118,6 +136,6 @@ class FcmServiceTest : BaseServiceTest() {
 
         Thread.sleep(100)
 
-        verify(firebaseMessaging, org.mockito.kotlin.times(2)).send(any<Message>())
+        verify(firebaseMessaging, times(1)).sendEachForMulticast(any<MulticastMessage>())
     }
 }
