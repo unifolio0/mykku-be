@@ -18,6 +18,7 @@ class FirebaseConfig(
 
     @PostConstruct
     fun initialize() {
+        println("Initializing Firebase with service account key at: $serviceAccountKeyPath")
         if (FirebaseApp.getApps().isEmpty()) {
             if (serviceAccountKeyPath.isBlank()) {
                 return
