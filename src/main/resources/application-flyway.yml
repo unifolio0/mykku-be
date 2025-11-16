@@ -1,0 +1,10 @@
+spring:
+  config:
+    activate:
+      on-profile: flyway
+  jpa:
+    hibernate:
+      ddl-auto: validate  # Entity와 DB 스키마 불일치 시 즉시 실패
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
