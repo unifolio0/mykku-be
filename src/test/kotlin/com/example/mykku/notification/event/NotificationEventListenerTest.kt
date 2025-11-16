@@ -6,6 +6,7 @@ import com.example.mykku.notification.domain.NotificationType
 import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 
@@ -96,12 +97,12 @@ class NotificationEventListenerTest : BaseToolTest() {
         notificationEventListener.handleFeedCommentedEvent(event)
 
         verify(notificationService, never()).createAndSendNotification(
-            type = NotificationType.FEED_COMMENT,
-            sender = author,
-            receiver = author,
-            content = "${author.nickname}님이 회원님의 피드에 댓글을 남겼습니다: 추가 설명입니다",
-            relatedResourceId = 1L,
-            relatedResourceType = "FEED"
+            type = eq(NotificationType.FEED_COMMENT),
+            sender = eq(author),
+            receiver = eq(author),
+            content = eq("${author.nickname}님이 회원님의 피드에 댓글을 남겼습니다: 추가 설명입니다"),
+            relatedResourceId = eq(1L),
+            relatedResourceType = eq("FEED")
         )
     }
 
@@ -119,7 +120,7 @@ class NotificationEventListenerTest : BaseToolTest() {
             sender = follower,
             receiver = following,
             content = "${follower.nickname}님이 회원님을 팔로우했습니다.",
-            relatedResourceId = follower.id.toLong(),
+            relatedResourceId = null,
             relatedResourceType = "MEMBER"
         )
     }
@@ -160,8 +161,8 @@ class NotificationEventListenerTest : BaseToolTest() {
         notificationEventListener.handleFeedCreatedByFollowingEvent(event)
 
         verify(notificationService, never()).createAndSendNotification(
-            type = NotificationType.FOLLOWING_POST,
-            sender = author,
+            type = eq(NotificationType.FOLLOWING_POST),
+            sender = eq(author),
             receiver = org.mockito.kotlin.any(),
             content = org.mockito.kotlin.any(),
             relatedResourceId = org.mockito.kotlin.any(),

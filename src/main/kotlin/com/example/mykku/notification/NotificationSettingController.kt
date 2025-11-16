@@ -19,7 +19,7 @@ class NotificationSettingController(
     fun getSettings(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<List<NotificationSettingResponse>>> {
-        val settings = notificationSettingService.getSettings(member)
+        val settings = notificationSettingService.getOrCreateSettings(member)
 
         return ResponseEntity.ok(
             ApiResponse(

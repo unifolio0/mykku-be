@@ -14,8 +14,8 @@ class NotificationSettingService(
     private val notificationSettingWriter: NotificationSettingWriter
 ) {
 
-    @Transactional(readOnly = true)
-    fun getSettings(member: Member): List<NotificationSettingResponse> {
+    @Transactional
+    fun getOrCreateSettings(member: Member): List<NotificationSettingResponse> {
         var settings = notificationSettingReader.getSettingsByMember(member)
 
         if (settings.isEmpty()) {

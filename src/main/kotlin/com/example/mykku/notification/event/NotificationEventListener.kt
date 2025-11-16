@@ -54,7 +54,7 @@ class NotificationEventListener(
             sender = event.follower,
             receiver = event.following,
             content = "${event.follower.nickname}님이 회원님을 팔로우했습니다.",
-            relatedResourceId = event.follower.id.toLong(),
+            relatedResourceId = null,
             relatedResourceType = "MEMBER"
         )
     }

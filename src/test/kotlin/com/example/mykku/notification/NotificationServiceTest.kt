@@ -13,6 +13,7 @@ import org.junit.jupiter.api.assertThrows
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.data.domain.PageImpl
@@ -54,10 +55,7 @@ class NotificationServiceTest : BaseServiceTest() {
             content = content,
             isRead = isRead
         ).also {
-            val idField = Notification::class.java.getDeclaredField("id")
-            idField.isAccessible = true
-            idField.set(it, id)
-            initializeBaseEntityFields(it)
+            initializeBaseEntityFields(it, id = id)
         }
     }
 
@@ -133,7 +131,7 @@ class NotificationServiceTest : BaseServiceTest() {
         val notification2 = createTestNotification(id = 2L, isRead = false)
         val page = PageImpl(listOf(notification1, notification2))
 
-        whenever(notificationReader.getUnreadNotifications(receiver, any()))
+        whenever(notificationReader.getUnreadNotifications(eq(receiver), any()))
             .thenReturn(page)
 
         notificationService.markAllAsRead(receiver)

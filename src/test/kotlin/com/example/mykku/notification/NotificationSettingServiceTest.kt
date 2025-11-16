@@ -28,16 +28,18 @@ class NotificationSettingServiceTest : BaseServiceTest() {
     private val member = createTestMember(id = "user1", nickname = "User1")
 
     @Test
-    fun `getSettings는 기존 설정이 있으면 조회한다`() {
-        val settings = listOf(
-            NotificationSetting.create(member, NotificationType.FEED_LIKE, true),
-            NotificationSetting.create(member, NotificationType.FEED_COMMENT, false)
-        )
+    fun `getOrCreateSettings는 기존 설정이 있으면 조회한다`() {
+        val setting1 = NotificationSetting.create(member, NotificationType.FEED_LIKE, true)
+        val setting2 = NotificationSetting.create(member, NotificationType.FEED_COMMENT, false)
+        initializeBaseEntityFields(setting1, id = 1L)
+        initializeBaseEntityFields(setting2, id = 2L)
+
+        val settings = listOf(setting1, setting2)
 
         whenever(notificationSettingReader.getSettingsByMember(member))
             .thenReturn(settings)
 
-        val result = notificationSettingService.getSettings(member)
+        val result = notificationSettingService.getOrCreateSettings(member)
 
         assertEquals(2, result.size)
         assertEquals(NotificationType.FEED_LIKE, result[0].notificationType)
@@ -45,15 +47,18 @@ class NotificationSettingServiceTest : BaseServiceTest() {
     }
 
     @Test
-    fun `getSettings는 설정이 없으면 기본 설정을 생성한다`() {
+    fun `getOrCreateSettings는 설정이 없으면 기본 설정을 생성한다`() {
         val defaultSettings = NotificationSetting.createDefaultSettings(member)
+        defaultSettings.forEachIndexed { index, setting ->
+            initializeBaseEntityFields(setting, id = index.toLong() + 1)
+        }
 
         whenever(notificationSettingReader.getSettingsByMember(member))
             .thenReturn(emptyList())
         whenever(notificationSettingWriter.createDefaultSettings(member))
             .thenReturn(defaultSettings)
 
-        val result = notificationSettingService.getSettings(member)
+        val result = notificationSettingService.getOrCreateSettings(member)
 
         assertEquals(5, result.size)
         verify(notificationSettingWriter).createDefaultSettings(member)
@@ -71,6 +76,7 @@ class NotificationSettingServiceTest : BaseServiceTest() {
             notificationType = NotificationType.FEED_LIKE,
             isEnabled = false
         )
+        initializeBaseEntityFields(setting, id = 1L)
 
         whenever(notificationSettingWriter.createOrUpdateSetting(any(), any(), any()))
             .thenReturn(setting)
@@ -98,6 +104,7 @@ class NotificationSettingServiceTest : BaseServiceTest() {
             notificationType = NotificationType.FOLLOW,
             isEnabled = true
         )
+        initializeBaseEntityFields(setting, id = 2L)
 
         whenever(notificationSettingWriter.createOrUpdateSetting(any(), any(), any()))
             .thenReturn(setting)

@@ -6,7 +6,6 @@ import com.example.mykku.notification.NotificationSettingService
 import com.example.mykku.notification.domain.NotificationType
 import com.example.mykku.notification.dto.NotificationSettingResponse
 import com.example.mykku.notification.dto.UpdateNotificationSettingRequest
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
@@ -65,7 +64,7 @@ class NotificationSettingControllerRestDocsTest : BaseControllerRestDocsTest() {
             )
         )
 
-        `when`(notificationSettingService.getSettings(any())).thenReturn(settings)
+        `when`(notificationSettingService.getOrCreateSettings(any())).thenReturn(settings)
 
         mockMvc.perform(
             RestDocumentationRequestBuilders.get("/api/v1/notification-settings")
