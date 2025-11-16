@@ -19,14 +19,7 @@ fi
 
 JAR_FILE=$(ls /home/ubuntu/app/*.jar | head -n 1)
 
-# 로그 디렉토리 생성
-LOG_DIR="/home/ubuntu/app/logs"
-mkdir -p "$LOG_DIR"
-
-# 현재 시간으로 로그 파일명 생성
-LOG_FILE="$LOG_DIR/mykku-$(date +%Y%m%d_%H%M%S).log"
-
-echo "Starting application with log file: $LOG_FILE"
+echo "Starting application..."
 
 sudo nohup java \
     -Dspring.profiles.active=dev \
@@ -34,8 +27,8 @@ sudo nohup java \
     -Dserver.port=8080 \
     -Ddd.service=mykku \
     -Ddd.env=dev \
-    -jar "$JAR_FILE" > "$LOG_FILE" 2>&1 &
+    -jar "$JAR_FILE" > /dev/null 2>&1 &
 
 echo "Application started. PID: $!"
-echo "Log file: $LOG_FILE"
-echo "To view logs: tail -f $LOG_FILE"
+echo "Logs are managed by Logback: /home/ubuntu/app/logs/mykku.log"
+echo "To view logs: tail -f /home/ubuntu/app/logs/mykku.log"

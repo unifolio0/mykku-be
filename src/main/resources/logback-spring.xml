@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <!-- 로그 파일 저장 경로 -->
-    <property name="LOG_PATH" value="logs"/>
+    <property name="LOG_PATH" value="/home/ubuntu/app/logs"/>
     <property name="LOG_FILE_NAME" value="mykku"/>
 
     <!-- 콘솔 출력 패턴 (색상 적용 - local 전용) -->
