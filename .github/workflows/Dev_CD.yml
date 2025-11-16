@@ -27,7 +27,7 @@ jobs:
 
       - name: Setting secret-account-key-dev.json
         run: |
-          echo "${{ secrets.FIREBASE_KEY_JSON }}" > ./src/main/resources/firebase/service-account-key-dev.json
+          echo '${{ secrets.FIREBASE_KEY_JSON }}' | base64 -d > ./src/main/resources/firebase/service-account-key-dev.json
           echo "Firebase service account key:"
           cat ./src/main/resources/firebase/service-account-key-dev.json
 
