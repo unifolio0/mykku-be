@@ -41,4 +41,22 @@ class SmtpEmailSender(
 
         mailSender.send(message)
     }
+
+    override fun sendTemporaryPassword(to: String, temporaryPassword: String) {
+        val subject = "[MyKKU] 임시 비밀번호 발급"
+
+        val context = Context()
+        context.setVariable("temporaryPassword", temporaryPassword)
+
+        val content = templateEngine.process("email/temporary-password", context)
+
+        val message = mailSender.createMimeMessage()
+        val helper = MimeMessageHelper(message, true, "UTF-8")
+
+        helper.setTo(to)
+        helper.setSubject(subject)
+        helper.setText(content, true)
+
+        mailSender.send(message)
+    }
 }

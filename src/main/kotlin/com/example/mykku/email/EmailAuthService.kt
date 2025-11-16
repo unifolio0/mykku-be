@@ -6,6 +6,7 @@ import com.example.mykku.email.domain.VerificationPurpose
 import com.example.mykku.email.exception.EmailAuthException
 import com.example.mykku.email.tool.EmailSender
 import com.example.mykku.email.tool.RedisVerificationCodeManager
+import com.example.mykku.email.util.TemporaryPasswordGenerator
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.tool.MemberReader
 import com.example.mykku.member.tool.MemberWriter
@@ -98,5 +99,26 @@ class EmailAuthService(
         val encodedPassword = passwordEncoder.encode(newPassword)
         member.password = encodedPassword
         memberWriter.save(member)
+    }
+
+    @Transactional
+    fun sendTemporaryPassword(email: String) {
+        val member = memberReader.findByEmail(email)
+            ?: throw EmailAuthException.invalidEmailOrPassword()
+
+        val temporaryPassword = TemporaryPasswordGenerator.generate()
+        val encodedPassword = passwordEncoder.encode(temporaryPassword)
+
+        member.password = encodedPassword
+        memberWriter.save(member)
+
+        try {
+            emailSender.sendTemporaryPassword(
+                to = email,
+                temporaryPassword = temporaryPassword
+            )
+        } catch (e: Exception) {
+            throw EmailAuthException.emailSendFailed(e)
+        }
     }
 }

@@ -10,9 +10,11 @@ class MemberException(
     
     companion object {
         fun memberNotFound(): MemberException = MemberException(MemberErrorCode.MEMBER_NOT_FOUND)
-        
+
         fun memberNicknameTooLong(): MemberException = MemberException(MemberErrorCode.MEMBER_NICKNAME_TOO_LONG)
-        
+
         fun memberNicknameInvalidFormat(): MemberException = MemberException(MemberErrorCode.MEMBER_NICKNAME_INVALID_FORMAT)
+
+        fun invalidCurrentPassword(): MemberException = MemberException(MemberErrorCode.INVALID_CURRENT_PASSWORD)
     }
 }

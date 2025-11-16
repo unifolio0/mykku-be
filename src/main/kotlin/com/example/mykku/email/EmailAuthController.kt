@@ -66,4 +66,12 @@ class EmailAuthController(
         )
         return ResponseEntity.ok(ApiResponse("비밀번호가 재설정되었습니다", Unit))
     }
+
+    @PostMapping("/send-temporary-password")
+    fun sendTemporaryPassword(
+        @Valid @RequestBody request: SendTemporaryPasswordRequest
+    ): ResponseEntity<ApiResponse<Unit>> {
+        emailAuthService.sendTemporaryPassword(request.email)
+        return ResponseEntity.ok(ApiResponse("임시 비밀번호가 발송되었습니다", Unit))
+    }
 }
