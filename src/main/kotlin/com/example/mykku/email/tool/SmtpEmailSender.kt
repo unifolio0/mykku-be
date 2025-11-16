@@ -17,13 +17,11 @@ class SmtpEmailSender(
         val subject = when (purpose) {
             VerificationPurpose.SIGNUP -> "[MyKKU] 회원가입 인증 코드"
             VerificationPurpose.PASSWORD_RESET -> "[MyKKU] 비밀번호 재설정 인증 코드"
-            else -> "[MyKKU] 인증 코드"
         }
 
         val title = when (purpose) {
             VerificationPurpose.SIGNUP -> "회원가입 인증"
             VerificationPurpose.PASSWORD_RESET -> "비밀번호 재설정"
-            else -> "인증"
         }
 
         val context = Context()
