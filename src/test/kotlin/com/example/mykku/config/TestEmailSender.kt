@@ -16,6 +16,10 @@ class TestEmailSenderConfig {
             override fun sendVerificationCode(to: String, code: String, purpose: VerificationPurpose) {
                 // Do nothing in tests
             }
+
+            override fun sendTemporaryPassword(to: String, temporaryPassword: String) {
+                // Do nothing in tests
+            }
         }
     }
 }

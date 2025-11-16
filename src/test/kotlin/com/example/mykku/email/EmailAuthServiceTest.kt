@@ -337,4 +337,70 @@ class EmailAuthServiceTest : BaseServiceTest() {
 
         assertEquals(EmailAuthErrorCode.INVALID_VERIFICATION_CODE, exception.errorCode)
     }
+
+    @Test
+    fun `임시 비밀번호 발송 성공`() {
+        val email = "test@example.com"
+        val temporaryPassword = "aB3!k9@mP2"
+        val encodedPassword = "encodedTemporaryPassword"
+        val member = Member(
+            id = "memberId",
+            nickname = "테스트",
+            role = "USER",
+            profileImage = "",
+            provider = SocialProvider.EMAIL,
+            socialId = null,
+            email = email,
+            password = "oldPassword"
+        )
+
+        whenever(memberReader.findByEmail(email)).thenReturn(member)
+        whenever(passwordEncoder.encode(any())).thenReturn(encodedPassword)
+
+        emailAuthService.sendTemporaryPassword(email)
+
+        assertEquals(encodedPassword, member.password)
+        verify(memberReader).findByEmail(email)
+        verify(passwordEncoder).encode(any())
+        verify(memberWriter).save(member)
+        verify(emailSender).sendTemporaryPassword(any(), any())
+    }
+
+    @Test
+    fun `존재하지 않는 이메일로 임시 비밀번호 발송 시 예외 발생`() {
+        val email = "nonexistent@example.com"
+
+        whenever(memberReader.findByEmail(email)).thenReturn(null)
+
+        val exception = assertThrows<EmailAuthException> {
+            emailAuthService.sendTemporaryPassword(email)
+        }
+
+        assertEquals(EmailAuthErrorCode.INVALID_EMAIL_OR_PASSWORD, exception.errorCode)
+    }
+
+    @Test
+    fun `이메일 발송 실패 시 예외 발생`() {
+        val email = "test@example.com"
+        val member = Member(
+            id = "memberId",
+            nickname = "테스트",
+            role = "USER",
+            profileImage = "",
+            provider = SocialProvider.EMAIL,
+            socialId = null,
+            email = email,
+            password = "oldPassword"
+        )
+
+        whenever(memberReader.findByEmail(email)).thenReturn(member)
+        whenever(passwordEncoder.encode(any())).thenReturn("encodedPassword")
+        whenever(emailSender.sendTemporaryPassword(any(), any())).thenThrow(RuntimeException("Email send failed"))
+
+        val exception = assertThrows<EmailAuthException> {
+            emailAuthService.sendTemporaryPassword(email)
+        }
+
+        assertEquals(EmailAuthErrorCode.EMAIL_SEND_FAILED, exception.errorCode)
+    }
 }

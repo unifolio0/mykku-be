@@ -18,18 +18,27 @@ class FirebaseConfig(
 
     @PostConstruct
     fun initialize() {
-        if (FirebaseApp.getApps().isEmpty()) {
-            if (serviceAccountKeyPath.isBlank()) {
-                return
-            }
+        if (FirebaseApp.getApps().isNotEmpty()) {
+            return
+        }
+        if (serviceAccountKeyPath.isBlank()) {
+            return
+        }
 
-            FileInputStream(serviceAccountKeyPath).use { serviceAccount ->
-                val options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    .build()
+        val inputStream = if (serviceAccountKeyPath.startsWith("classpath:")) {
+            val path = serviceAccountKeyPath.removePrefix("classpath:")
+            this::class.java.classLoader.getResourceAsStream(path)
+                ?: throw IllegalStateException("Firebase service account key not found: $serviceAccountKeyPath")
+        } else {
+            FileInputStream(serviceAccountKeyPath)
+        }
 
-                FirebaseApp.initializeApp(options)
-            }
+        inputStream.use { serviceAccount ->
+            val options = FirebaseOptions.builder()
+                .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                .build()
+
+            FirebaseApp.initializeApp(options)
         }
     }
 }

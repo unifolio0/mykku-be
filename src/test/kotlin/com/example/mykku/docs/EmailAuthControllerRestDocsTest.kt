@@ -272,4 +272,35 @@ class EmailAuthControllerRestDocsTest : BaseControllerRestDocsTest() {
                 )
             )
     }
+
+    @Test
+    fun `임시 비밀번호 발송 API 문서화`() {
+        val request = SendTemporaryPasswordRequest(
+            email = "user@example.com"
+        )
+
+        doNothing().`when`(emailAuthService).sendTemporaryPassword(request.email)
+
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.post("/api/v1/email-auth/send-temporary-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+        )
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.message").value("임시 비밀번호가 발송되었습니다"))
+            .andDo(
+                document(
+                    "email-auth-send-temporary-password",
+                    requestFields(
+                        fieldWithPath("email").type(JsonFieldType.STRING)
+                            .description("임시 비밀번호를 받을 이메일 주소")
+                    ),
+                    responseFields(
+                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터 (없음)").optional()
+                    )
+                )
+            )
+    }
 }
