@@ -6,9 +6,8 @@ import com.example.mykku.notification.domain.NotificationType
 import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.kotlin.eq
-import org.mockito.kotlin.never
-import org.mockito.kotlin.verify
+import org.mockito.kotlin.*
+import kotlin.test.assertTrue
 
 class NotificationEventListenerTest : BaseToolTest() {
 
@@ -163,10 +162,66 @@ class NotificationEventListenerTest : BaseToolTest() {
         verify(notificationService, never()).createAndSendNotification(
             type = eq(NotificationType.FOLLOWING_POST),
             sender = eq(author),
-            receiver = org.mockito.kotlin.any(),
-            content = org.mockito.kotlin.any(),
-            relatedResourceId = org.mockito.kotlin.any(),
-            relatedResourceType = org.mockito.kotlin.any()
+            receiver = any(),
+            content = any(),
+            relatedResourceId = any(),
+            relatedResourceType = any()
         )
+    }
+
+    @Test
+    fun `handleFeedCommentedEvent는 긴 댓글 내용을 500자로 제한한다`() {
+        val longComment = "정말 멋진 피드네요! 저도 이런 걸 만들어보고 싶어요. ".repeat(50)
+        val event = FeedCommentedEvent(
+            feedId = 1L,
+            feedAuthor = author,
+            commenter = commenter,
+            commentContent = longComment
+        )
+
+        notificationEventListener.handleFeedCommentedEvent(event)
+
+        argumentCaptor<String>().apply {
+            verify(notificationService).createAndSendNotification(
+                type = eq(NotificationType.FEED_COMMENT),
+                sender = eq(commenter),
+                receiver = eq(author),
+                content = capture(),
+                relatedResourceId = eq(1L),
+                relatedResourceType = eq("FEED")
+            )
+
+            assertTrue(firstValue.length <= 500, "Content length ${firstValue.length} exceeds 500")
+            assertTrue(firstValue.endsWith("..."), "Long content should end with ellipsis")
+            assertTrue(firstValue.startsWith("${commenter.nickname}님이 회원님의 피드에 댓글을 남겼습니다: "))
+        }
+    }
+
+    @Test
+    fun `handleFeedCreatedByFollowingEvent는 긴 피드 제목을 500자로 제한한다`() {
+        val longTitle = "오늘 아침에 본 정말 아름다운 일출 사진입니다 모두 보세요! ".repeat(20)
+        val event = FeedCreatedByFollowingEvent(
+            feedId = 1L,
+            feedTitle = longTitle,
+            author = author,
+            followers = listOf(follower)
+        )
+
+        notificationEventListener.handleFeedCreatedByFollowingEvent(event)
+
+        argumentCaptor<String>().apply {
+            verify(notificationService).createAndSendNotification(
+                type = eq(NotificationType.FOLLOWING_POST),
+                sender = eq(author),
+                receiver = eq(follower),
+                content = capture(),
+                relatedResourceId = eq(1L),
+                relatedResourceType = eq("FEED")
+            )
+
+            assertTrue(firstValue.length <= 500, "Content length ${firstValue.length} exceeds 500")
+            assertTrue(firstValue.endsWith("..."), "Long content should end with ellipsis")
+            assertTrue(firstValue.startsWith("${author.nickname}님이 새 게시글을 작성했습니다: "))
+        }
     }
 }

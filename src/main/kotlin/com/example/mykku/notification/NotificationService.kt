@@ -78,6 +78,10 @@ class NotificationService(
         relatedResourceId: Long? = null,
         relatedResourceType: String? = null
     ) {
+        require(content.length <= 500) {
+            "Notification content exceeds maximum length of 500 characters: ${content.length}"
+        }
+
         if (!notificationSettingReader.isNotificationEnabled(receiver, type)) {
             return
         }

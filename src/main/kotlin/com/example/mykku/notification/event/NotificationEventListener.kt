@@ -2,6 +2,7 @@ package com.example.mykku.notification.event
 
 import com.example.mykku.notification.NotificationService
 import com.example.mykku.notification.domain.NotificationType
+import com.example.mykku.notification.util.NotificationContentUtil
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
@@ -40,7 +41,11 @@ class NotificationEventListener(
             type = NotificationType.FEED_COMMENT,
             sender = event.commenter,
             receiver = event.feedAuthor,
-            content = "${event.commenter.nickname}님이 회원님의 피드에 댓글을 남겼습니다: ${event.commentContent}",
+            content = NotificationContentUtil.buildContent(
+                "%s님이 회원님의 피드에 댓글을 남겼습니다: ",
+                event.commentContent,
+                event.commenter.nickname
+            ),
             relatedResourceId = event.feedId,
             relatedResourceType = "FEED"
         )
@@ -67,7 +72,11 @@ class NotificationEventListener(
                 type = NotificationType.FOLLOWING_POST,
                 sender = event.author,
                 receiver = follower,
-                content = "${event.author.nickname}님이 새 게시글을 작성했습니다: ${event.feedTitle}",
+                content = NotificationContentUtil.buildContent(
+                    "%s님이 새 게시글을 작성했습니다: ",
+                    event.feedTitle,
+                    event.author.nickname
+                ),
                 relatedResourceId = event.feedId,
                 relatedResourceType = "FEED"
             )
