@@ -1,18 +1,14 @@
 package com.example.mykku.role.repository
 
+import com.example.mykku.BaseRepositoryTest
 import com.example.mykku.role.domain.Role
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 
-@DataJpaTest
-class RoleRepositoryTest {
-
-    @Autowired
-    private lateinit var roleRepository: RoleRepository
+class RoleRepositoryTest : BaseRepositoryTest() {
 
     @Autowired
     private lateinit var entityManager: TestEntityManager

@@ -15,7 +15,6 @@ import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import com.example.mykku.role.domain.Role
 
 @DisplayName("FeedController 통합 테스트")
 class FeedControllerTest : BaseControllerTest() {
@@ -34,7 +33,7 @@ class FeedControllerTest : BaseControllerTest() {
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
                 nickname = "Member1",
-                role = Role(name = "일반 덕후", description = "테스트용 칭호"),
+                role = null,
                 profileImage = ""
             )
         )
@@ -108,7 +107,7 @@ class FeedControllerTest : BaseControllerTest() {
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
                 nickname = "Member1",
-                role = Role(name = "일반 덕후", description = "테스트용 칭호"),
+                role = null,
                 profileImage = ""
             )
         )
@@ -148,7 +147,7 @@ class FeedControllerTest : BaseControllerTest() {
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
                 nickname = "Member1",
-                role = Role(name = "일반 덕후", description = "테스트용 칭호"),
+                role = null,
                 profileImage = ""
             )
         )
@@ -193,7 +192,7 @@ class FeedControllerTest : BaseControllerTest() {
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
                 nickname = "Member1",
-                role = Role(name = "일반 덕후", description = "테스트용 칭호"),
+                role = null,
                 profileImage = ""
             )
         )
@@ -235,7 +234,7 @@ class FeedControllerTest : BaseControllerTest() {
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
                 nickname = "Member1",
-                role = Role(name = "일반 덕후", description = "테스트용 칭호"),
+                role = null,
                 profileImage = ""
             )
         )
@@ -288,7 +287,7 @@ class FeedControllerTest : BaseControllerTest() {
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
                 nickname = "Member1",
-                role = Role(name = "일반 덕후", description = "테스트용 칭호"),
+                role = null,
                 profileImage = ""
             )
         )
@@ -333,7 +332,7 @@ class FeedControllerTest : BaseControllerTest() {
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
                 nickname = "Member1",
-                role = Role(name = "일반 덕후", description = "테스트용 칭호"),
+                role = null,
                 profileImage = ""
             )
         )
@@ -376,7 +375,7 @@ class FeedControllerTest : BaseControllerTest() {
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
                 nickname = "Member1",
-                role = Role(name = "일반 덕후", description = "테스트용 칭호"),
+                role = null,
                 profileImage = ""
             )
         )

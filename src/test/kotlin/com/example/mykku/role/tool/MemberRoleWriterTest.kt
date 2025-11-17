@@ -38,7 +38,6 @@ class MemberRoleWriterTest {
             email = "test@example.com",
             password = "password",
             nickname = "테스터",
-            defaultRole = role
         )
     }
 

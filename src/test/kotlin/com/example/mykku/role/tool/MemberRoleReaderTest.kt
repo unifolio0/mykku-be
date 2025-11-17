@@ -37,7 +37,6 @@ class MemberRoleReaderTest {
             email = "test@example.com",
             password = "password",
             nickname = "테스터",
-            defaultRole = role
         )
     }
 
@@ -94,7 +93,6 @@ class MemberRoleReaderTest {
             email = "other@example.com",
             password = "password",
             nickname = "다른사람",
-            defaultRole = role
         )
         val memberRole = MemberRole(id = 1L, member = otherMember, role = role)
         whenever(memberRoleRepository.findById(1L)).thenReturn(Optional.of(memberRole))

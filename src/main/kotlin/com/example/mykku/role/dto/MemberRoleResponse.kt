@@ -13,7 +13,7 @@ data class MemberRoleResponse(
     constructor(memberRole: MemberRole, member: Member) : this(
         id = memberRole.id!!,
         role = RoleResponse(memberRole.role),
-        isRepresentative = member.role.id == memberRole.role.id,
+        isRepresentative = member.role?.id == memberRole.role.id,
         earnedAt = memberRole.createdAt
     )
 }

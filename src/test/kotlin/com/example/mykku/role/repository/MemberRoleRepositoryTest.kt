@@ -1,27 +1,19 @@
 package com.example.mykku.role.repository
 
+import com.example.mykku.BaseRepositoryTest
 import com.example.mykku.member.domain.Member
-import com.example.mykku.member.repository.MemberRepository
 import com.example.mykku.role.domain.MemberRole
 import com.example.mykku.role.domain.Role
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 
-@DataJpaTest
-class MemberRoleRepositoryTest {
+class MemberRoleRepositoryTest : BaseRepositoryTest() {
 
     @Autowired
     private lateinit var memberRoleRepository: MemberRoleRepository
-
-    @Autowired
-    private lateinit var memberRepository: MemberRepository
-
-    @Autowired
-    private lateinit var roleRepository: RoleRepository
 
     @Autowired
     private lateinit var entityManager: TestEntityManager
@@ -50,7 +42,6 @@ class MemberRoleRepositoryTest {
             email = "test@example.com",
             password = "encodedPassword",
             nickname = "테스터",
-            defaultRole = role1
         )
         entityManager.persist(member)
 

@@ -7,3 +7,12 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
+
+  mysql-test:
+    image: mysql:8.0
+    container_name: mysql-mykku-test
+    environment:
+      MYSQL_DATABASE: mykku_test
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3311:3306"

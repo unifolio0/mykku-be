@@ -14,8 +14,8 @@ class Member(
     var nickname: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_id", nullable = false)
-    var role: Role,
+    @JoinColumn(name = "role_id")
+    var role: Role? = null,
 
     @Column(name = "profile_image")
     var profileImage: String,
@@ -51,13 +51,11 @@ class Member(
             email: String,
             password: String,
             nickname: String,
-            defaultRole: Role,
             profileImage: String = ""
         ): Member {
             return Member(
                 id = id,
                 nickname = nickname,
-                role = defaultRole,
                 profileImage = profileImage,
                 provider = SocialProvider.EMAIL,
                 socialId = null,
@@ -73,13 +71,11 @@ class Member(
             profileImage: String,
             provider: SocialProvider,
             socialId: String,
-            email: String,
-            defaultRole: Role
+            email: String
         ): Member {
             return Member(
                 id = id,
                 nickname = nickname,
-                role = defaultRole,
                 profileImage = profileImage,
                 provider = provider,
                 socialId = socialId,

@@ -59,7 +59,6 @@ class EmailAuthControllerTest : BaseControllerTest() {
             email = existingEmail,
             password = "password",
             nickname = "기존유저",
-            defaultRole = role
         )
         memberRepository.save(member)
 
@@ -198,7 +197,6 @@ class EmailAuthControllerTest : BaseControllerTest() {
             email = existingEmail,
             password = "password",
             nickname = "기존유저",
-            defaultRole = role
         )
         memberRepository.save(member)
 
@@ -248,7 +246,6 @@ class EmailAuthControllerTest : BaseControllerTest() {
             email = email,
             password = passwordEncoder.encode(password),
             nickname = "로그인유저",
-            defaultRole = role
         )
         memberRepository.save(member)
 
@@ -298,7 +295,6 @@ class EmailAuthControllerTest : BaseControllerTest() {
             email = email,
             password = passwordEncoder.encode("correctPassword123!"),
             nickname = "유저",
-            defaultRole = role
         )
         memberRepository.save(member)
 
@@ -328,7 +324,6 @@ class EmailAuthControllerTest : BaseControllerTest() {
             email = email,
             password = passwordEncoder.encode("oldPassword123!"),
             nickname = "재설정유저",
-            defaultRole = role
         )
         memberRepository.save(member)
 

@@ -12,6 +12,6 @@ data class AuthorResponse(
         memberId = member.id,
         nickname = member.nickname,
         profileImage = member.profileImage,
-        role = member.role.name,
+        role = member.role?.name ?: "",
     )
 }

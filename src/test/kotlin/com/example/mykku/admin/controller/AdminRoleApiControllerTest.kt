@@ -1,132 +1,123 @@
 package com.example.mykku.admin.controller
 
-import com.example.mykku.admin.service.AdminRoleService
-import com.example.mykku.member.domain.Member
-import com.example.mykku.role.domain.MemberRole
+import com.example.mykku.BaseControllerTest
 import com.example.mykku.role.domain.Role
 import com.example.mykku.role.dto.CreateRoleRequest
-import com.example.mykku.role.dto.MemberRoleResponse
-import com.example.mykku.role.dto.RoleResponse
 import com.example.mykku.role.dto.UpdateRoleRequest
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.example.mykku.role.repository.MemberRoleRepository
+import io.restassured.RestAssured
+import io.restassured.http.ContentType
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.http.MediaType
-import org.springframework.security.test.context.support.WithMockUser
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-@WebMvcTest(AdminRoleApiController::class)
-class AdminRoleApiControllerTest {
+@DisplayName("AdminRoleApiController 통합 테스트")
+class AdminRoleApiControllerTest : BaseControllerTest() {
 
     @Autowired
-    private lateinit var mockMvc: MockMvc
+    private lateinit var memberRoleRepository: MemberRoleRepository
 
-    @Autowired
-    private lateinit var objectMapper: ObjectMapper
-
-    @MockBean
-    private lateinit var adminRoleService: AdminRoleService
-
-    private lateinit var role: Role
+    private lateinit var role1: Role
+    private lateinit var role2: Role
 
     @BeforeEach
     fun setUp() {
-        role = Role(id = 1L, name = "테스트 칭호", description = "테스트 설명")
+        role1 = roleRepository.save(Role(name = "칭호1", description = "설명1"))
+        role2 = roleRepository.save(Role(name = "칭호2", description = "설명2"))
     }
 
     @Test
-    @WithMockUser
-    fun `모든 칭호를 조회할 수 있다`() {
-        val roles = listOf(
-            RoleResponse(Role(id = 1L, name = "칭호1", description = "설명1")),
-            RoleResponse(Role(id = 2L, name = "칭호2", description = "설명2"))
-        )
-        whenever(adminRoleService.getAllRoles()).thenReturn(roles)
-
-        mockMvc.perform(
-            get("/admin/api/v1/roles")
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("$.message").value("칭호 목록 조회 성공"))
-            .andExpect(jsonPath("$.data").isArray)
-            .andExpect(jsonPath("$.data.length()").value(2))
+    @DisplayName("모든 칭호를 조회할 수 있다")
+    fun `getAllRoles - 모든 칭호를 조회한다`() {
+        // when & then
+        RestAssured
+            .given()
+                .contentType(ContentType.JSON)
+            .`when`()
+                .get("/admin/api/v1/roles")
+            .then()
+                .statusCode(200)
+                .body("message", equalTo("칭호 목록 조회 성공"))
+                .body("data", hasSize<Any>(greaterThanOrEqualTo(2)))
     }
 
     @Test
-    @WithMockUser
-    fun `새로운 칭호를 생성할 수 있다`() {
-        val request = CreateRoleRequest(name = "새 칭호", description = "새 설명")
-        val response = RoleResponse(role)
-        whenever(adminRoleService.createRole(any<CreateRoleRequest>())).thenReturn(response)
+    @DisplayName("새로운 칭호를 생성할 수 있다")
+    fun `createRole - 새로운 칭호를 생성한다`() {
+        // given
+        val request = CreateRoleRequest(name = "새로운칭호", description = "새로운 설명")
 
-        mockMvc.perform(
-            post("/admin/api/v1/roles")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
-                .with(csrf())
-        )
-            .andExpect(status().isCreated)
-            .andExpect(jsonPath("$.message").value("칭호 생성 성공"))
-            .andExpect(jsonPath("$.data.name").value("테스트 칭호"))
+        // when & then
+        RestAssured
+            .given()
+                .contentType(ContentType.JSON)
+                .body(request)
+            .`when`()
+                .post("/admin/api/v1/roles")
+            .then()
+                .statusCode(201)
+                .body("message", equalTo("칭호 생성 성공"))
+                .body("data.name", equalTo("새로운칭호"))
+                .body("data.description", equalTo("새로운 설명"))
     }
 
     @Test
-    @WithMockUser
-    fun `칭호를 수정할 수 있다`() {
-        val request = UpdateRoleRequest(name = "수정된 칭호", description = "수정된 설명")
-        val response = RoleResponse(role)
-        whenever(adminRoleService.updateRole(any<Long>(), any<UpdateRoleRequest>())).thenReturn(response)
+    @DisplayName("칭호를 수정할 수 있다")
+    fun `updateRole - 칭호를 수정한다`() {
+        // given
+        val request = UpdateRoleRequest(name = "수정된칭호", description = "수정된 설명")
 
-        mockMvc.perform(
-            put("/admin/api/v1/roles/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
-                .with(csrf())
-        )
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("$.message").value("칭호 수정 성공"))
+        // when & then
+        RestAssured
+            .given()
+                .contentType(ContentType.JSON)
+                .body(request)
+            .`when`()
+                .put("/admin/api/v1/roles/${role1.id}")
+            .then()
+                .statusCode(200)
+                .body("message", equalTo("칭호 수정 성공"))
+                .body("data.name", equalTo("수정된칭호"))
     }
 
     @Test
-    @WithMockUser
-    fun `칭호를 삭제할 수 있다`() {
-        mockMvc.perform(
-            delete("/admin/api/v1/roles/1")
-                .with(csrf())
-        )
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("$.message").value("칭호 삭제 성공"))
+    @DisplayName("칭호를 삭제할 수 있다")
+    fun `deleteRole - 칭호를 삭제한다`() {
+        // given
+        val roleToDelete = roleRepository.save(Role(name = "삭제될칭호", description = "설명"))
+
+        // when & then
+        RestAssured
+            .given()
+                .contentType(ContentType.JSON)
+            .`when`()
+                .delete("/admin/api/v1/roles/${roleToDelete.id}")
+            .then()
+                .statusCode(200)
+                .body("message", equalTo("칭호 삭제 성공"))
     }
 
     @Test
-    @WithMockUser
-    fun `회원에게 칭호를 부여할 수 있다`() {
-        val member = Member.createEmailMember(
-            id = "test-id",
-            email = "test@example.com",
-            password = "password",
+    @DisplayName("회원에게 칭호를 부여할 수 있다")
+    fun `assignRoleToMember - 회원에게 칭호를 부여한다`() {
+        // given
+        val member = createAndSaveMember(
+            id = "test-member",
             nickname = "테스터",
-            defaultRole = role
+            role = role1
         )
-        val memberRole = MemberRole(id = 1L, member = member, role = role)
-        val response = MemberRoleResponse(memberRole, member)
-        whenever(adminRoleService.assignRoleToMember(any<Long>(), any<String>())).thenReturn(response)
 
-        mockMvc.perform(
-            post("/admin/api/v1/roles/1/members/test-id")
-                .with(csrf())
-        )
-            .andExpect(status().isCreated)
-            .andExpect(jsonPath("$.message").value("칭호 부여 성공"))
+        // when & then
+        RestAssured
+            .given()
+                .contentType(ContentType.JSON)
+            .`when`()
+                .post("/admin/api/v1/roles/${role2.id}/members/${member.id}")
+            .then()
+                .statusCode(201)
+                .body("message", equalTo("칭호 부여 성공"))
+                .body("data.role.name", equalTo(role2.name))
     }
 }

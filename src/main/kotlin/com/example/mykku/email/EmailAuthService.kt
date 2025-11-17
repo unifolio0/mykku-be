@@ -68,18 +68,15 @@ class EmailAuthService(
 
         val encodedPassword = passwordEncoder.encode(password)
         val memberId = UUID.randomUUID().toString()
-        val defaultRole = roleReader.getRoleByName("신입 덕후")
 
         val member = Member.createEmailMember(
             id = memberId,
             email = email,
             password = encodedPassword,
-            nickname = nickname,
-            defaultRole = defaultRole
+            nickname = nickname
         )
 
         memberWriter.save(member)
-        memberRoleWriter.assignRole(member, defaultRole)
 
         return jwtTokenProvider.createLoginResponse(member, email, false)
     }

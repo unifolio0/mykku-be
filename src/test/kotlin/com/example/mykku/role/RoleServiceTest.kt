@@ -7,7 +7,6 @@ import com.example.mykku.role.domain.Role
 import com.example.mykku.role.exception.RoleErrorCode
 import com.example.mykku.role.exception.RoleException
 import com.example.mykku.role.tool.MemberRoleReader
-import com.example.mykku.role.tool.MemberRoleWriter
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -24,9 +23,6 @@ class RoleServiceTest {
 
     @Mock
     private lateinit var memberRoleReader: MemberRoleReader
-
-    @Mock
-    private lateinit var memberRoleWriter: MemberRoleWriter
 
     @Mock
     private lateinit var memberWriter: MemberWriter
@@ -46,17 +42,24 @@ class RoleServiceTest {
             id = "test-id",
             email = "test@example.com",
             password = "password",
-            nickname = "테스터",
-            defaultRole = role1
+            nickname = "테스터"
         )
+        member.role = role1
     }
 
     @Test
     fun `내 칭호 목록을 조회할 수 있다`() {
-        val memberRoles = listOf(
-            MemberRole(id = 1L, member = member, role = role1),
-            MemberRole(id = 2L, member = member, role = role2)
-        )
+        val memberRole1 = org.mockito.kotlin.mock<MemberRole>()
+        whenever(memberRole1.id).thenReturn(1L)
+        whenever(memberRole1.role).thenReturn(role1)
+        whenever(memberRole1.createdAt).thenReturn(java.time.LocalDateTime.now())
+
+        val memberRole2 = org.mockito.kotlin.mock<MemberRole>()
+        whenever(memberRole2.id).thenReturn(2L)
+        whenever(memberRole2.role).thenReturn(role2)
+        whenever(memberRole2.createdAt).thenReturn(java.time.LocalDateTime.now())
+
+        val memberRoles = listOf(memberRole1, memberRole2)
         whenever(memberRoleReader.getMemberRolesByMember(member)).thenReturn(memberRoles)
 
         val result = roleService.getMyRoles(member)

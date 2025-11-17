@@ -24,6 +24,7 @@ class AuthControllerTest : BaseControllerTest() {
     @DisplayName("리프레시 토큰으로 액세스 토큰 재발급 - 정상 케이스")
     fun `refreshToken - 유효한 리프레시 토큰으로 새로운 액세스 토큰을 발급받는다`() {
         // given
+        val role = roleRepository.save(Role(name = "일반 덕후", description = "테스트용 칭호"))
         val member = memberRepository.save(
             Member(
                 id = "member1",
@@ -31,7 +32,7 @@ class AuthControllerTest : BaseControllerTest() {
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
                 nickname = "Member1",
-                role = Role(name = "일반 덕후", description = "테스트용 칭호"),
+                role = role,
                 profileImage = ""
             )
         )
@@ -74,6 +75,7 @@ class AuthControllerTest : BaseControllerTest() {
     @DisplayName("리프레시 토큰으로 액세스 토큰 재발급 - 액세스 토큰으로 요청시 실패")
     fun `refreshToken - 액세스 토큰으로 리프레시 요청시 실패한다`() {
         // given
+        val role = roleRepository.save(Role(name = "일반 덕후", description = "테스트용 칭호"))
         val member = memberRepository.save(
             Member(
                 id = "member2",
@@ -81,7 +83,7 @@ class AuthControllerTest : BaseControllerTest() {
                 provider = SocialProvider.GOOGLE,
                 email = "member2@example.com",
                 nickname = "Member2",
-                role = Role(name = "일반 덕후", description = "테스트용 칭호"),
+                role = role,
                 profileImage = ""
             )
         )
@@ -105,6 +107,7 @@ class AuthControllerTest : BaseControllerTest() {
     fun `refreshToken - 존재하지 않는 회원의 리프레시 토큰으로 요청시 실패한다`() {
         // given
         // 토큰 생성 후 회원 삭제 시나리오
+        val role = roleRepository.save(Role(name = "일반 덕후", description = "테스트용 칭호"))
         val member = memberRepository.save(
             Member(
                 id = "member_to_delete",
@@ -112,7 +115,7 @@ class AuthControllerTest : BaseControllerTest() {
                 provider = SocialProvider.GOOGLE,
                 email = "delete@example.com",
                 nickname = "ToDelete",
-                role = Role(name = "일반 덕후", description = "테스트용 칭호"),
+                role = role,
                 profileImage = ""
             )
         )

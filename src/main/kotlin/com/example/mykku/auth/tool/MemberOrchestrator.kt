@@ -35,8 +35,7 @@ class MemberOrchestrator(
             profileImage = memberInfo.profileImage,
             provider = memberInfo.provider,
             socialId = memberInfo.socialId,
-            email = memberInfo.email,
-            defaultRole = defaultRole
+            email = memberInfo.email
         )
 
         memberWriter.save(member)

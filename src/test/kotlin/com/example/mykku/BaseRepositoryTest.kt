@@ -38,12 +38,9 @@ abstract class BaseRepositoryTest {
         email: String = "test@example.com",
         socialId: String = "12345",
         provider: SocialProvider = SocialProvider.GOOGLE,
-        roleName: String = "일반 덕후",
+        role: Role? = null,
         profileImage: String = ""
     ): Member {
-        val role = roleRepository.findByName(roleName)
-            ?: roleRepository.save(Role(name = roleName, description = "테스트용 칭호"))
-
         val member = Member(
             id = id,
             nickname = nickname,

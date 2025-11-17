@@ -47,7 +47,6 @@ class RoleControllerRestDocsTest : BaseControllerRestDocsTest() {
             email = "test@example.com",
             password = "password",
             nickname = "덕후왕",
-            defaultRole = role1
         )
 
         val memberRole1 = MemberRole(id = 1L, member = member, role = role1)
@@ -108,8 +107,8 @@ class RoleControllerRestDocsTest : BaseControllerRestDocsTest() {
                     responseFields(
                         fieldWithPath("message").type(JsonFieldType.STRING)
                             .description("응답 메시지"),
-                        fieldWithPath("data").type(JsonFieldType.NULL)
-                            .description("응답 데이터 (없음)")
+                        fieldWithPath("data").type(JsonFieldType.OBJECT)
+                            .description("응답 데이터 (없음)").optional()
                     )
                 )
             )

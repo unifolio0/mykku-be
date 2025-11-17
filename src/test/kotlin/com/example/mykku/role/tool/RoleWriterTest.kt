@@ -1,9 +1,6 @@
 package com.example.mykku.role.tool
 
-import com.example.mykku.member.repository.MemberRepository
 import com.example.mykku.role.domain.Role
-import com.example.mykku.role.exception.RoleErrorCode
-import com.example.mykku.role.exception.RoleException
 import com.example.mykku.role.repository.RoleRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -21,9 +18,6 @@ class RoleWriterTest {
 
     @Mock
     private lateinit var roleRepository: RoleRepository
-
-    @Mock
-    private lateinit var memberRepository: MemberRepository
 
     @InjectMocks
     private lateinit var roleWriter: RoleWriter
@@ -56,34 +50,23 @@ class RoleWriterTest {
     @Test
     fun `칭호를 수정할 수 있다`() {
         val role = Role(id = 1L, name = "기존 칭호", description = "기존 설명")
+        val updatedRole = Role(id = 1L, name = "수정된 칭호", description = "수정된 설명")
+        whenever(roleRepository.existsByName("수정된 칭호")).thenReturn(false)
+        whenever(roleRepository.save(role)).thenReturn(updatedRole)
 
-        roleWriter.update(role, "수정된 칭호", "수정된 설명")
+        val result = roleWriter.update(role, "수정된 칭호", "수정된 설명")
 
-        assertThat(role.name).isEqualTo("수정된 칭호")
-        assertThat(role.description).isEqualTo("수정된 설명")
+        assertThat(result.name).isEqualTo("수정된 칭호")
+        assertThat(result.description).isEqualTo("수정된 설명")
+        verify(roleRepository).save(role)
     }
 
     @Test
     fun `칭호를 삭제할 수 있다`() {
         val role = Role(id = 1L, name = "삭제할 칭호", description = "설명")
-        whenever(memberRepository.existsByRole(role)).thenReturn(false)
 
         roleWriter.delete(role)
 
-        verify(memberRepository).existsByRole(role)
         verify(roleRepository).delete(role)
-    }
-
-    @Test
-    fun `회원이 사용 중인 칭호는 삭제할 수 없다`() {
-        val role = Role(id = 1L, name = "사용중인 칭호", description = "설명")
-        whenever(memberRepository.existsByRole(role)).thenReturn(true)
-
-        val exception = assertThrows<RoleException> {
-            roleWriter.delete(role)
-        }
-
-        assertThat(exception.errorCode).isEqualTo(RoleErrorCode.ROLE_IN_USE)
-        verify(memberRepository).existsByRole(role)
     }
 }

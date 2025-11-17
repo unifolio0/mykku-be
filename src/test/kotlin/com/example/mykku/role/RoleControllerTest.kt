@@ -1,84 +1,80 @@
 package com.example.mykku.role
 
-import com.example.mykku.member.domain.Member
+import com.example.mykku.BaseControllerTest
 import com.example.mykku.role.domain.MemberRole
 import com.example.mykku.role.domain.Role
-import com.example.mykku.role.dto.MemberRoleResponse
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.example.mykku.role.repository.MemberRoleRepository
+import io.restassured.RestAssured
+import io.restassured.http.ContentType
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.http.MediaType
-import org.springframework.security.test.context.support.WithMockUser
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-@WebMvcTest(RoleController::class)
-class RoleControllerTest {
+@DisplayName("RoleController 통합 테스트")
+class RoleControllerTest : BaseControllerTest() {
 
     @Autowired
-    private lateinit var mockMvc: MockMvc
+    private lateinit var memberRoleRepository: MemberRoleRepository
 
-    @Autowired
-    private lateinit var objectMapper: ObjectMapper
-
-    @MockBean
-    private lateinit var roleService: RoleService
-
-    private lateinit var member: Member
-    private lateinit var role: Role
+    private lateinit var role1: Role
+    private lateinit var role2: Role
 
     @BeforeEach
     fun setUp() {
-        role = Role(id = 1L, name = "테스트 칭호", description = "설명")
-        member = Member.createEmailMember(
-            id = "test-id",
-            email = "test@example.com",
-            password = "password",
+        role1 = roleRepository.save(Role(name = "칭호1", description = "설명1"))
+        role2 = roleRepository.save(Role(name = "칭호2", description = "설명2"))
+    }
+
+    @Test
+    @DisplayName("내 칭호 목록을 조회할 수 있다")
+    fun `getMyRoles - 내 칭호 목록을 조회한다`() {
+        // given
+        val member = createAndSaveMember(
+            id = "test-member",
             nickname = "테스터",
-            defaultRole = role
+            role = role1
         )
+        memberRoleRepository.save(MemberRole(member = member, role = role1))
+        memberRoleRepository.save(MemberRole(member = member, role = role2))
+
+        // when & then
+        RestAssured
+            .given()
+                .contentType(ContentType.JSON)
+                .headers(createAuthHeaders(member.id))
+            .`when`()
+                .get("/api/v1/roles/me")
+            .then()
+                .statusCode(200)
+                .body("message", equalTo("내 칭호 목록 조회 성공"))
+                .body("data", hasSize<Any>(2))
+                .body("data[0].role.name", notNullValue())
+                .body("data[0].isRepresentative", notNullValue())
     }
 
     @Test
-    @WithMockUser
-    fun `내 칭호 목록을 조회할 수 있다`() {
-        val role2 = Role(id = 2L, name = "다른 칭호", description = "")
-        val memberRole1 = MemberRole(id = 1L, member = member, role = role)
-        val memberRole2 = MemberRole(id = 2L, member = member, role = role2)
-        val memberRoles = listOf(
-            MemberRoleResponse(memberRole1, member),
-            MemberRoleResponse(memberRole2, member)
+    @DisplayName("대표 칭호를 변경할 수 있다")
+    fun `changeRepresentativeRole - 대표 칭호를 변경한다`() {
+        // given
+        val member = createAndSaveMember(
+            id = "test-member",
+            nickname = "테스터",
+            role = role1
         )
-        whenever(roleService.getMyRoles(any<Member>())).thenReturn(memberRoles)
+        val memberRole1 = memberRoleRepository.save(MemberRole(member = member, role = role1))
+        val memberRole2 = memberRoleRepository.save(MemberRole(member = member, role = role2))
 
-        mockMvc.perform(
-            get("/api/v1/roles/me")
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("$.message").value("내 칭호 목록 조회 성공"))
-            .andExpect(jsonPath("$.data").isArray)
-            .andExpect(jsonPath("$.data.length()").value(2))
-    }
-
-    @Test
-    @WithMockUser
-    fun `대표 칭호를 변경할 수 있다`() {
-        mockMvc.perform(
-            patch("/api/v1/roles/1/representative")
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(csrf())
-        )
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("$.message").value("대표 칭호 변경 성공"))
+        // when & then
+        RestAssured
+            .given()
+                .contentType(ContentType.JSON)
+                .headers(createAuthHeaders(member.id))
+            .`when`()
+                .patch("/api/v1/roles/${memberRole2.id}/representative")
+            .then()
+                .statusCode(200)
+                .body("message", equalTo("대표 칭호 변경 성공"))
     }
 }

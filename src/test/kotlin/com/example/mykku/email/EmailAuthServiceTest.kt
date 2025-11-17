@@ -45,6 +45,12 @@ class EmailAuthServiceTest : BaseServiceTest() {
     @Mock
     private lateinit var jwtTokenProvider: JwtTokenProvider
 
+    @Mock
+    private lateinit var roleReader: com.example.mykku.role.tool.RoleReader
+
+    @Mock
+    private lateinit var memberRoleWriter: com.example.mykku.role.tool.MemberRoleWriter
+
     @InjectMocks
     private lateinit var emailAuthService: EmailAuthService
 
@@ -142,13 +148,11 @@ class EmailAuthServiceTest : BaseServiceTest() {
         val password = "password123!"
         val nickname = "테스트"
         val encodedPassword = "encodedPassword"
-        val role = Role(name = "일반 덕후", description = "테스트용 칭호")
         val member = Member.createEmailMember(
             id = "memberId",
             email = email,
             password = encodedPassword,
-            nickname = nickname,
-            defaultRole = role
+            nickname = nickname
         )
         val loginResponse = LoginResponse(
             accessToken = "accessToken",

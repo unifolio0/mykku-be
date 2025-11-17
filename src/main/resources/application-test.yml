@@ -15,9 +15,9 @@ spring:
       add-mappings: true
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/mykku_test
+    url: jdbc:mysql://localhost:3311/mykku_test
     username: root
-    password:
+    password: root
   jpa:
     show-sql: true
     properties:
@@ -25,7 +25,7 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
   mail:
     host: localhost
     port: 25
