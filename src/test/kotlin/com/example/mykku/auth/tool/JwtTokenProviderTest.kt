@@ -6,6 +6,7 @@ import com.example.mykku.member.domain.SocialProvider
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import com.example.mykku.role.domain.Role
 
 class JwtTokenProviderTest {
 
@@ -139,7 +140,7 @@ class JwtTokenProviderTest {
         val member = Member(
             id = "google_123456",
             nickname = "testuser",
-            role = "USER",
+            role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "https://example.com/profile.jpg",
             provider = SocialProvider.GOOGLE,
             socialId = "123456",

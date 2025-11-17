@@ -14,6 +14,7 @@ import org.mockito.Mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.security.crypto.password.PasswordEncoder
+import com.example.mykku.role.domain.Role
 
 class MemberServiceTest : BaseServiceTest() {
 
@@ -35,7 +36,7 @@ class MemberServiceTest : BaseServiceTest() {
         val member = Member(
             id = "memberId",
             nickname = "테스트",
-            role = "USER",
+            role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "",
             provider = SocialProvider.EMAIL,
             socialId = null,
@@ -62,7 +63,7 @@ class MemberServiceTest : BaseServiceTest() {
         val member = Member(
             id = "memberId",
             nickname = "테스트",
-            role = "USER",
+            role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "",
             provider = SocialProvider.EMAIL,
             socialId = null,
@@ -86,7 +87,7 @@ class MemberServiceTest : BaseServiceTest() {
         val member = Member(
             id = "memberId",
             nickname = "테스트",
-            role = "USER",
+            role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "",
             provider = SocialProvider.EMAIL,
             socialId = null,

@@ -10,6 +10,8 @@ import com.example.mykku.email.util.TemporaryPasswordGenerator
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.tool.MemberReader
 import com.example.mykku.member.tool.MemberWriter
+import com.example.mykku.role.tool.MemberRoleWriter
+import com.example.mykku.role.tool.RoleReader
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -22,7 +24,9 @@ class EmailAuthService(
     private val memberReader: MemberReader,
     private val memberWriter: MemberWriter,
     private val passwordEncoder: PasswordEncoder,
-    private val jwtTokenProvider: JwtTokenProvider
+    private val jwtTokenProvider: JwtTokenProvider,
+    private val roleReader: RoleReader,
+    private val memberRoleWriter: MemberRoleWriter
 ) {
 
     @Transactional

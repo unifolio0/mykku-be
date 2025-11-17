@@ -51,6 +51,7 @@ class MemberRepositoryTest : BaseRepositoryTest() {
     @Test
     fun `이메일 회원과 소셜 회원이 다른 이메일을 가진 경우 구분됨`() {
         val email = "test@example.com"
+
         val emailMember = Member.createEmailMember(
             id = "emailMember",
             email = email,

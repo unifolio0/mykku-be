@@ -2,6 +2,7 @@ package com.example.mykku.member.domain
 
 import com.example.mykku.common.domain.BaseEntity
 import com.example.mykku.member.exception.MemberException
+import com.example.mykku.role.domain.Role
 import jakarta.persistence.*
 
 @Entity
@@ -12,8 +13,9 @@ class Member(
     @Column(name = "nickname")
     var nickname: String,
 
-    @Column(name = "role")
-    var role: String,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_id")
+    var role: Role? = null,
 
     @Column(name = "profile_image")
     var profileImage: String,
@@ -54,7 +56,6 @@ class Member(
             return Member(
                 id = id,
                 nickname = nickname,
-                role = "USER",
                 profileImage = profileImage,
                 provider = SocialProvider.EMAIL,
                 socialId = null,
@@ -75,7 +76,6 @@ class Member(
             return Member(
                 id = id,
                 nickname = nickname,
-                role = "USER",
                 profileImage = profileImage,
                 provider = provider,
                 socialId = socialId,

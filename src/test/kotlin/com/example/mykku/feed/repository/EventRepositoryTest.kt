@@ -4,12 +4,10 @@ import com.example.mykku.BaseRepositoryTest
 import com.example.mykku.feed.domain.Event
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.PageRequest
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-
-import com.example.mykku.feed.domain.EventSortType
-import org.springframework.data.domain.PageRequest
 
 class EventRepositoryTest : BaseRepositoryTest() {
 

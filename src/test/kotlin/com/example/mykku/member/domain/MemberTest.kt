@@ -5,6 +5,7 @@ import com.example.mykku.member.exception.MemberErrorCode
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
+import com.example.mykku.role.domain.Role
 
 class MemberTest {
 
@@ -15,7 +16,7 @@ class MemberTest {
         Member(
             id = "test_member",
             nickname = validNickname,
-            role = "USER",
+            role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "profile.jpg",
             provider = SocialProvider.GOOGLE,
             socialId = "12345",
@@ -31,7 +32,7 @@ class MemberTest {
             Member(
                 id = "test_member",
                 nickname = invalidNickname,
-                role = "USER",
+                role = Role(name = "일반 덕후", description = "테스트용 칭호"),
                 profileImage = "profile.jpg",
                 provider = SocialProvider.GOOGLE,
                 socialId = "12345",
@@ -47,7 +48,7 @@ class MemberTest {
         Member(
             id = "test_member",
             nickname = "한글123",
-            role = "USER",
+            role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "profile.jpg",
             provider = SocialProvider.GOOGLE,
             socialId = "12345",
@@ -57,7 +58,7 @@ class MemberTest {
         Member(
             id = "test_member2",
             nickname = "English123",
-            role = "USER",
+            role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "profile.jpg",
             provider = SocialProvider.GOOGLE,
             socialId = "12345",
@@ -67,7 +68,7 @@ class MemberTest {
         Member(
             id = "test_member3",
             nickname = "123456",
-            role = "USER",
+            role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "profile.jpg",
             provider = SocialProvider.GOOGLE,
             socialId = "12345",
@@ -81,7 +82,7 @@ class MemberTest {
             Member(
                 id = "test_member",
                 nickname = "닉네임!",
-                role = "USER",
+                role = Role(name = "일반 덕후", description = "테스트용 칭호"),
                 profileImage = "profile.jpg",
                 provider = SocialProvider.GOOGLE,
                 socialId = "12345",

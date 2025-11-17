@@ -33,7 +33,7 @@ class FeedControllerTest : BaseControllerTest() {
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
                 nickname = "Member1",
-                role = "USER",
+                role = null,
                 profileImage = ""
             )
         )
@@ -107,7 +107,7 @@ class FeedControllerTest : BaseControllerTest() {
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
                 nickname = "Member1",
-                role = "USER",
+                role = null,
                 profileImage = ""
             )
         )
@@ -147,7 +147,7 @@ class FeedControllerTest : BaseControllerTest() {
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
                 nickname = "Member1",
-                role = "USER",
+                role = null,
                 profileImage = ""
             )
         )
@@ -192,7 +192,7 @@ class FeedControllerTest : BaseControllerTest() {
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
                 nickname = "Member1",
-                role = "USER",
+                role = null,
                 profileImage = ""
             )
         )
@@ -234,7 +234,7 @@ class FeedControllerTest : BaseControllerTest() {
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
                 nickname = "Member1",
-                role = "USER",
+                role = null,
                 profileImage = ""
             )
         )
@@ -287,7 +287,7 @@ class FeedControllerTest : BaseControllerTest() {
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
                 nickname = "Member1",
-                role = "USER",
+                role = null,
                 profileImage = ""
             )
         )
@@ -332,7 +332,7 @@ class FeedControllerTest : BaseControllerTest() {
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
                 nickname = "Member1",
-                role = "USER",
+                role = null,
                 profileImage = ""
             )
         )
@@ -375,7 +375,7 @@ class FeedControllerTest : BaseControllerTest() {
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
                 nickname = "Member1",
-                role = "USER",
+                role = null,
                 profileImage = ""
             )
         )

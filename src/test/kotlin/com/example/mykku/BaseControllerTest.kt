@@ -7,6 +7,8 @@ import com.example.mykku.config.TestEmailSenderConfig
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.repository.MemberRepository
+import com.example.mykku.role.domain.Role
+import com.example.mykku.role.repository.RoleRepository
 import com.example.mykku.util.DatabaseCleaner
 import com.example.mykku.util.TestTokenGenerator
 import io.restassured.RestAssured
@@ -33,6 +35,9 @@ abstract class BaseControllerTest {
     @Autowired
     protected lateinit var boardRepository: BoardRepository
 
+    @Autowired
+    protected lateinit var roleRepository: RoleRepository
+
     @BeforeEach
     fun baseSetUp() {
         RestAssured.port = port
@@ -47,7 +52,7 @@ abstract class BaseControllerTest {
         email: String = "test@example.com",
         socialId: String = "12345",
         provider: SocialProvider = SocialProvider.GOOGLE,
-        role: String = "USER",
+        role: Role? = null,
         profileImage: String = ""
     ): Member {
         val member = Member(
@@ -88,5 +93,21 @@ abstract class BaseControllerTest {
      */
     protected fun createAuthHeaders(memberId: String): Map<String, String> {
         return TestTokenGenerator.createAuthHeaders(memberId)
+    }
+
+    /**
+     * 관리자 세션 생성 및 SessionId 반환
+     */
+    protected fun getAdminSessionId(): String {
+        return RestAssured
+            .given()
+                .formParam("token", "test-admin-token")
+                .redirects().follow(false)
+            .`when`()
+                .post("/admin/api/login")
+            .then()
+                .statusCode(302)
+                .extract()
+                .sessionId()
     }
 }

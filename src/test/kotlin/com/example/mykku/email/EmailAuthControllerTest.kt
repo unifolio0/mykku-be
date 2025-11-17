@@ -5,6 +5,7 @@ import com.example.mykku.email.domain.VerificationPurpose
 import com.example.mykku.email.dto.*
 import com.example.mykku.email.tool.RedisVerificationCodeManager
 import com.example.mykku.member.domain.Member
+import com.example.mykku.role.domain.Role
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import org.hamcrest.Matchers.equalTo
@@ -51,11 +52,13 @@ class EmailAuthControllerTest : BaseControllerTest() {
     @DisplayName("인증 코드 발송 - 이미 존재하는 이메일로 회원가입 시도")
     fun `sendVerificationCode - 이미 존재하는 이메일로 회원가입 인증 코드 발송 시 실패`() {
         val existingEmail = "existing@example.com"
+        val role = roleRepository.findByName("일반 덕후")
+            ?: roleRepository.save(Role(name = "일반 덕후", description = "테스트용 칭호"))
         val member = Member.createEmailMember(
             id = "existingMember",
             email = existingEmail,
             password = "password",
-            nickname = "기존유저"
+            nickname = "기존유저",
         )
         memberRepository.save(member)
 
@@ -187,11 +190,13 @@ class EmailAuthControllerTest : BaseControllerTest() {
     @DisplayName("회원가입 - 이미 존재하는 이메일")
     fun `signup - 이미 존재하는 이메일로 회원가입 시 실패`() {
         val existingEmail = "existing@example.com"
+        val role = roleRepository.findByName("일반 덕후")
+            ?: roleRepository.save(Role(name = "일반 덕후", description = "테스트용 칭호"))
         val member = Member.createEmailMember(
             id = "existingMember",
             email = existingEmail,
             password = "password",
-            nickname = "기존유저"
+            nickname = "기존유저",
         )
         memberRepository.save(member)
 
@@ -234,11 +239,13 @@ class EmailAuthControllerTest : BaseControllerTest() {
     fun `login - 이메일 로그인 성공`() {
         val email = "user@example.com"
         val password = "password123!"
+        val role = roleRepository.findByName("일반 덕후")
+            ?: roleRepository.save(Role(name = "일반 덕후", description = "테스트용 칭호"))
         val member = Member.createEmailMember(
             id = "loginMember",
             email = email,
             password = passwordEncoder.encode(password),
-            nickname = "로그인유저"
+            nickname = "로그인유저",
         )
         memberRepository.save(member)
 
@@ -281,11 +288,13 @@ class EmailAuthControllerTest : BaseControllerTest() {
     @DisplayName("로그인 - 잘못된 비밀번호")
     fun `login - 잘못된 비밀번호로 로그인 시 실패`() {
         val email = "user@example.com"
+        val role = roleRepository.findByName("일반 덕후")
+            ?: roleRepository.save(Role(name = "일반 덕후", description = "테스트용 칭호"))
         val member = Member.createEmailMember(
             id = "wrongPasswordMember",
             email = email,
             password = passwordEncoder.encode("correctPassword123!"),
-            nickname = "유저"
+            nickname = "유저",
         )
         memberRepository.save(member)
 
@@ -308,11 +317,13 @@ class EmailAuthControllerTest : BaseControllerTest() {
     @DisplayName("비밀번호 재설정 - 성공")
     fun `resetPassword - 비밀번호 재설정 성공`() {
         val email = "reset@example.com"
+        val role = roleRepository.findByName("일반 덕후")
+            ?: roleRepository.save(Role(name = "일반 덕후", description = "테스트용 칭호"))
         val member = Member.createEmailMember(
             id = "resetMember",
             email = email,
             password = passwordEncoder.encode("oldPassword123!"),
-            nickname = "재설정유저"
+            nickname = "재설정유저",
         )
         memberRepository.save(member)
 

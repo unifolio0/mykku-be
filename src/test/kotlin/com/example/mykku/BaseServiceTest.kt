@@ -4,6 +4,7 @@ import com.example.mykku.board.domain.Board
 import com.example.mykku.common.domain.BaseEntity
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
+import com.example.mykku.role.domain.Role
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.junit.jupiter.MockitoExtension
 import java.time.LocalDateTime
@@ -20,7 +21,7 @@ abstract class BaseServiceTest {
         email: String = "test@example.com",
         socialId: String = "12345",
         provider: SocialProvider = SocialProvider.GOOGLE,
-        role: String = "USER",
+        role: Role? = null,
         profileImage: String = ""
     ): Member {
         return Member(
