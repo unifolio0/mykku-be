@@ -27,8 +27,6 @@ class MemberOrchestrator(
     }
 
     private fun createMember(memberInfo: OAuthMemberInfo): Member {
-        val defaultRole = roleReader.getRoleByName("신입 덕후")
-
         val member = Member.createSocialMember(
             id = memberInfo.memberId,
             nickname = memberInfo.nickname,
@@ -39,8 +37,6 @@ class MemberOrchestrator(
         )
 
         memberWriter.save(member)
-        memberRoleWriter.assignRole(member, defaultRole)
-
         return member
     }
 }
