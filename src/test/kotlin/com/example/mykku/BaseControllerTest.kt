@@ -94,4 +94,20 @@ abstract class BaseControllerTest {
     protected fun createAuthHeaders(memberId: String): Map<String, String> {
         return TestTokenGenerator.createAuthHeaders(memberId)
     }
+
+    /**
+     * 관리자 세션 생성 및 SessionId 반환
+     */
+    protected fun getAdminSessionId(): String {
+        return RestAssured
+            .given()
+                .formParam("token", "test-admin-token")
+                .redirects().follow(false)
+            .`when`()
+                .post("/admin/api/login")
+            .then()
+                .statusCode(302)
+                .extract()
+                .sessionId()
+    }
 }

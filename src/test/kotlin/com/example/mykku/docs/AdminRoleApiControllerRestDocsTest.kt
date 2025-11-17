@@ -3,6 +3,7 @@ package com.example.mykku.docs
 import com.example.mykku.BaseControllerRestDocsTest
 import com.example.mykku.admin.controller.AdminRoleApiController
 import com.example.mykku.admin.service.AdminRoleService
+import com.example.mykku.common.domain.BaseEntity
 import com.example.mykku.member.domain.Member
 import com.example.mykku.role.domain.MemberRole
 import com.example.mykku.role.domain.Role
@@ -26,6 +27,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPat
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
+import java.time.LocalDateTime
 
 class AdminRoleApiControllerRestDocsTest : BaseControllerRestDocsTest() {
 
@@ -197,7 +199,11 @@ class AdminRoleApiControllerRestDocsTest : BaseControllerRestDocsTest() {
             password = "password",
             nickname = "덕후왕",
         )
-        val memberRole = MemberRole(id = 1L, member = member, role = role)
+        val memberRole = MemberRole(id = 1L, member = member, role = role).apply {
+            val field = BaseEntity::class.java.getDeclaredField("createdAt")
+            field.isAccessible = true
+            field.set(this, LocalDateTime.now())
+        }
         val response = MemberRoleResponse(memberRole, member)
 
         whenever(adminRoleService.assignRoleToMember(any<Long>(), any<String>())).thenReturn(response)
@@ -229,8 +235,10 @@ class AdminRoleApiControllerRestDocsTest : BaseControllerRestDocsTest() {
                             .description("칭호 이름"),
                         fieldWithPath("data.role.description").type(JsonFieldType.STRING)
                             .description("칭호 설명").optional(),
-                        fieldWithPath("data.assignedAt").type(JsonFieldType.STRING)
-                            .description("칭호 부여 일시")
+                        fieldWithPath("data.earnedAt").type(JsonFieldType.STRING)
+                            .description("칭호 부여 일시"),
+                        fieldWithPath("data.isRepresentative").type(JsonFieldType.BOOLEAN)
+                            .description("대표 칭호 여부")
                     )
                 )
             )

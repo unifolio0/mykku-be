@@ -21,11 +21,13 @@ class AdminRoleApiControllerTest : BaseControllerTest() {
 
     private lateinit var role1: Role
     private lateinit var role2: Role
+    private lateinit var adminSessionId: String
 
     @BeforeEach
     fun setUp() {
         role1 = roleRepository.save(Role(name = "칭호1", description = "설명1"))
         role2 = roleRepository.save(Role(name = "칭호2", description = "설명2"))
+        adminSessionId = getAdminSessionId()
     }
 
     @Test
@@ -34,6 +36,7 @@ class AdminRoleApiControllerTest : BaseControllerTest() {
         // when & then
         RestAssured
             .given()
+                .sessionId(adminSessionId)
                 .contentType(ContentType.JSON)
             .`when`()
                 .get("/admin/api/v1/roles")
@@ -52,6 +55,7 @@ class AdminRoleApiControllerTest : BaseControllerTest() {
         // when & then
         RestAssured
             .given()
+                .sessionId(adminSessionId)
                 .contentType(ContentType.JSON)
                 .body(request)
             .`when`()
@@ -72,6 +76,7 @@ class AdminRoleApiControllerTest : BaseControllerTest() {
         // when & then
         RestAssured
             .given()
+                .sessionId(adminSessionId)
                 .contentType(ContentType.JSON)
                 .body(request)
             .`when`()
@@ -91,6 +96,7 @@ class AdminRoleApiControllerTest : BaseControllerTest() {
         // when & then
         RestAssured
             .given()
+                .sessionId(adminSessionId)
                 .contentType(ContentType.JSON)
             .`when`()
                 .delete("/admin/api/v1/roles/${roleToDelete.id}")
@@ -112,6 +118,7 @@ class AdminRoleApiControllerTest : BaseControllerTest() {
         // when & then
         RestAssured
             .given()
+                .sessionId(adminSessionId)
                 .contentType(ContentType.JSON)
             .`when`()
                 .post("/admin/api/v1/roles/${role2.id}/members/${member.id}")

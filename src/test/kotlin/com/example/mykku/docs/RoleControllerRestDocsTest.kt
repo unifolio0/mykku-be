@@ -1,6 +1,7 @@
 package com.example.mykku.docs
 
 import com.example.mykku.BaseControllerRestDocsTest
+import com.example.mykku.common.domain.BaseEntity
 import com.example.mykku.member.domain.Member
 import com.example.mykku.role.RoleController
 import com.example.mykku.role.RoleService
@@ -25,6 +26,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPat
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
+import java.time.LocalDateTime
 
 class RoleControllerRestDocsTest : BaseControllerRestDocsTest() {
 
@@ -49,8 +51,16 @@ class RoleControllerRestDocsTest : BaseControllerRestDocsTest() {
             nickname = "덕후왕",
         )
 
-        val memberRole1 = MemberRole(id = 1L, member = member, role = role1)
-        val memberRole2 = MemberRole(id = 2L, member = member, role = role2)
+        val memberRole1 = MemberRole(id = 1L, member = member, role = role1).apply {
+            val field = BaseEntity::class.java.getDeclaredField("createdAt")
+            field.isAccessible = true
+            field.set(this, LocalDateTime.now())
+        }
+        val memberRole2 = MemberRole(id = 2L, member = member, role = role2).apply {
+            val field = BaseEntity::class.java.getDeclaredField("createdAt")
+            field.isAccessible = true
+            field.set(this, LocalDateTime.now())
+        }
         val memberRoles = listOf(
             MemberRoleResponse(memberRole1, member),
             MemberRoleResponse(memberRole2, member)
@@ -83,8 +93,10 @@ class RoleControllerRestDocsTest : BaseControllerRestDocsTest() {
                             .description("칭호 이름"),
                         fieldWithPath("data[].role.description").type(JsonFieldType.STRING)
                             .description("칭호 설명").optional(),
-                        fieldWithPath("data[].assignedAt").type(JsonFieldType.STRING)
-                            .description("칭호 획득 일시")
+                        fieldWithPath("data[].earnedAt").type(JsonFieldType.STRING)
+                            .description("칭호 획득 일시"),
+                        fieldWithPath("data[].isRepresentative").type(JsonFieldType.BOOLEAN)
+                            .description("대표 칭호 여부")
                     )
                 )
             )
