@@ -7,6 +7,7 @@ import com.example.mykku.role.dto.CreateRoleRequest
 import com.example.mykku.role.dto.UpdateRoleRequest
 import com.example.mykku.role.exception.RoleErrorCode
 import com.example.mykku.role.exception.RoleException
+import com.example.mykku.role.tool.MemberRoleReader
 import com.example.mykku.role.tool.MemberRoleWriter
 import com.example.mykku.role.tool.RoleReader
 import com.example.mykku.role.tool.RoleWriter
@@ -33,6 +34,9 @@ class AdminRoleServiceTest {
 
     @Mock
     private lateinit var memberReader: MemberReader
+
+    @Mock
+    private lateinit var memberRoleReader: MemberRoleReader
 
     @Mock
     private lateinit var memberRoleWriter: MemberRoleWriter
@@ -116,10 +120,14 @@ class AdminRoleServiceTest {
     @Test
     fun `칭호를 삭제할 수 있다`() {
         whenever(roleReader.getRoleById(1L)).thenReturn(role)
+        whenever(memberReader.existsByRole(role)).thenReturn(false)
+        whenever(memberRoleReader.existsByRole(role)).thenReturn(false)
 
         adminRoleService.deleteRole(1L)
 
         verify(roleReader).getRoleById(1L)
+        verify(memberReader).existsByRole(role)
+        verify(memberRoleReader).existsByRole(role)
         verify(roleWriter).delete(role)
     }
 

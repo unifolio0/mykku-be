@@ -1,13 +1,12 @@
 package com.example.mykku.admin.service
 
-import com.example.mykku.member.repository.MemberRepository
 import com.example.mykku.member.tool.MemberReader
 import com.example.mykku.role.dto.CreateRoleRequest
 import com.example.mykku.role.dto.MemberRoleResponse
 import com.example.mykku.role.dto.RoleResponse
 import com.example.mykku.role.dto.UpdateRoleRequest
 import com.example.mykku.role.exception.RoleException
-import com.example.mykku.role.repository.MemberRoleRepository
+import com.example.mykku.role.tool.MemberRoleReader
 import com.example.mykku.role.tool.MemberRoleWriter
 import com.example.mykku.role.tool.RoleReader
 import com.example.mykku.role.tool.RoleWriter
@@ -20,9 +19,8 @@ class AdminRoleService(
     private val roleReader: RoleReader,
     private val roleWriter: RoleWriter,
     private val memberRoleWriter: MemberRoleWriter,
-    private val memberReader: MemberReader,
-    private val memberRepository: MemberRepository,
-    private val memberRoleRepository: MemberRoleRepository
+    private val memberRoleReader: MemberRoleReader,
+    private val memberReader: MemberReader
 ) {
     fun getAllRoles(): List<RoleResponse> {
         val roles = roleReader.getAllRoles()
@@ -46,11 +44,11 @@ class AdminRoleService(
     fun deleteRole(roleId: Long) {
         val role = roleReader.getRoleById(roleId)
 
-        if (memberRepository.existsByRole(role)) {
+        if (memberReader.existsByRole(role)) {
             throw RoleException.roleInUse()
         }
 
-        if (memberRoleRepository.existsByRole(role)) {
+        if (memberRoleReader.existsByRole(role)) {
             throw RoleException.roleInUse()
         }
 

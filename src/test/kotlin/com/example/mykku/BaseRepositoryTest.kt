@@ -5,6 +5,8 @@ import com.example.mykku.board.repository.BoardRepository
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.repository.MemberRepository
+import com.example.mykku.role.domain.Role
+import com.example.mykku.role.repository.RoleRepository
 import com.example.mykku.util.DatabaseCleaner
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,6 +26,9 @@ abstract class BaseRepositoryTest {
     @Autowired
     protected lateinit var boardRepository: BoardRepository
 
+    @Autowired
+    protected lateinit var roleRepository: RoleRepository
+
     /**
      * 테스트용 Member 엔티티 생성 및 저장
      */
@@ -33,9 +38,12 @@ abstract class BaseRepositoryTest {
         email: String = "test@example.com",
         socialId: String = "12345",
         provider: SocialProvider = SocialProvider.GOOGLE,
-        role: String = "USER",
+        roleName: String = "일반 덕후",
         profileImage: String = ""
     ): Member {
+        val role = roleRepository.findByName(roleName)
+            ?: roleRepository.save(Role(name = roleName, description = "테스트용 칭호"))
+
         val member = Member(
             id = id,
             nickname = nickname,

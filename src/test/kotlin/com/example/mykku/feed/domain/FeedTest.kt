@@ -8,6 +8,7 @@ import com.example.mykku.member.domain.SocialProvider
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
+import com.example.mykku.role.domain.Role
 
 class FeedTest {
 
@@ -15,7 +16,7 @@ class FeedTest {
         val member = Member(
             id = "test_member",
             nickname = "테스트유저",
-            role = "USER",
+            role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "profile.jpg",
             provider = SocialProvider.GOOGLE,
             socialId = "12345",

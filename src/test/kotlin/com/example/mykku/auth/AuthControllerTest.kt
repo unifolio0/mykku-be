@@ -12,6 +12,7 @@ import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import com.example.mykku.role.domain.Role
 
 @DisplayName("AuthController 통합 테스트")
 class AuthControllerTest : BaseControllerTest() {
@@ -30,7 +31,7 @@ class AuthControllerTest : BaseControllerTest() {
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
                 nickname = "Member1",
-                role = "USER",
+                role = Role(name = "일반 덕후", description = "테스트용 칭호"),
                 profileImage = ""
             )
         )
@@ -80,7 +81,7 @@ class AuthControllerTest : BaseControllerTest() {
                 provider = SocialProvider.GOOGLE,
                 email = "member2@example.com",
                 nickname = "Member2",
-                role = "USER",
+                role = Role(name = "일반 덕후", description = "테스트용 칭호"),
                 profileImage = ""
             )
         )
@@ -111,7 +112,7 @@ class AuthControllerTest : BaseControllerTest() {
                 provider = SocialProvider.GOOGLE,
                 email = "delete@example.com",
                 nickname = "ToDelete",
-                role = "USER",
+                role = Role(name = "일반 덕후", description = "테스트용 칭호"),
                 profileImage = ""
             )
         )

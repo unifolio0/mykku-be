@@ -13,6 +13,7 @@ import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.tool.MemberReader
 import com.example.mykku.member.tool.MemberWriter
+import com.example.mykku.role.domain.Role
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
@@ -141,11 +142,13 @@ class EmailAuthServiceTest : BaseServiceTest() {
         val password = "password123!"
         val nickname = "테스트"
         val encodedPassword = "encodedPassword"
+        val role = Role(name = "일반 덕후", description = "테스트용 칭호")
         val member = Member.createEmailMember(
             id = "memberId",
             email = email,
             password = encodedPassword,
-            nickname = nickname
+            nickname = nickname,
+            defaultRole = role
         )
         val loginResponse = LoginResponse(
             accessToken = "accessToken",
@@ -196,10 +199,11 @@ class EmailAuthServiceTest : BaseServiceTest() {
         val email = "test@example.com"
         val password = "password123!"
         val encodedPassword = "encodedPassword"
+        val role = Role(name = "일반 덕후", description = "테스트용 칭호")
         val member = Member(
             id = "memberId",
             nickname = "테스트",
-            role = "USER",
+            role = role,
             profileImage = "",
             provider = SocialProvider.EMAIL,
             socialId = null,
@@ -255,7 +259,7 @@ class EmailAuthServiceTest : BaseServiceTest() {
         val member = Member(
             id = "memberId",
             nickname = "테스트",
-            role = "USER",
+            role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "",
             provider = SocialProvider.EMAIL,
             socialId = null,
@@ -282,7 +286,7 @@ class EmailAuthServiceTest : BaseServiceTest() {
         val member = Member(
             id = "memberId",
             nickname = "테스트",
-            role = "USER",
+            role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "",
             provider = SocialProvider.EMAIL,
             socialId = null,
@@ -346,7 +350,7 @@ class EmailAuthServiceTest : BaseServiceTest() {
         val member = Member(
             id = "memberId",
             nickname = "테스트",
-            role = "USER",
+            role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "",
             provider = SocialProvider.EMAIL,
             socialId = null,
@@ -385,7 +389,7 @@ class EmailAuthServiceTest : BaseServiceTest() {
         val member = Member(
             id = "memberId",
             nickname = "테스트",
-            role = "USER",
+            role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "",
             provider = SocialProvider.EMAIL,
             socialId = null,

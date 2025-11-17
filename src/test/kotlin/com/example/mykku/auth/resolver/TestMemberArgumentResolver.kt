@@ -8,6 +8,7 @@ import org.springframework.web.bind.support.WebDataBinderFactory
 import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.method.support.ModelAndViewContainer
+import com.example.mykku.role.domain.Role
 
 class TestMemberArgumentResolver : HandlerMethodArgumentResolver {
 
@@ -15,7 +16,7 @@ class TestMemberArgumentResolver : HandlerMethodArgumentResolver {
         val TEST_MEMBER = Member(
             id = "member123",
             nickname = "testuser",
-            role = "USER",
+            role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "https://example.com/profile.jpg",
             provider = SocialProvider.GOOGLE,
             socialId = "123456",

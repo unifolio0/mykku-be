@@ -11,6 +11,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
+import com.example.mykku.role.domain.Role
 
 class MemberWriterTest : BaseToolTest() {
 
@@ -25,7 +26,7 @@ class MemberWriterTest : BaseToolTest() {
         val member = Member(
             id = "member123",
             nickname = "테스트유저",
-            role = "USER",
+            role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "profile.jpg",
             provider = SocialProvider.GOOGLE,
             socialId = "12345",
@@ -34,7 +35,7 @@ class MemberWriterTest : BaseToolTest() {
         val savedMember = Member(
             id = "member123",
             nickname = "테스트유저",
-            role = "USER",
+            role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "profile.jpg",
             provider = SocialProvider.GOOGLE,
             socialId = "12345",
@@ -57,7 +58,7 @@ class MemberWriterTest : BaseToolTest() {
         val existingMember = Member(
             id = "member123",
             nickname = "기존닉네임",
-            role = "USER",
+            role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "old_profile.jpg",
             provider = SocialProvider.GOOGLE,
             socialId = "12345",
@@ -66,7 +67,7 @@ class MemberWriterTest : BaseToolTest() {
         val updatedMember = Member(
             id = "member123",
             nickname = "새로운닉네임",
-            role = "ADMIN",
+            role = Role(name = "관리자", description = "테스트용 칭호"),
             profileImage = "new_profile.jpg",
             provider = SocialProvider.GOOGLE,
             socialId = "12345",

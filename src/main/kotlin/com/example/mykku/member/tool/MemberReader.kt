@@ -4,6 +4,7 @@ import com.example.mykku.member.domain.Member
 import com.example.mykku.member.exception.MemberException
 import com.example.mykku.member.repository.FollowRepository
 import com.example.mykku.member.repository.MemberRepository
+import com.example.mykku.role.domain.Role
 import org.springframework.stereotype.Component
 import java.util.*
 
@@ -43,5 +44,9 @@ class MemberReader(
         minCommonFollowers: Long = 10
     ): List<Member> {
         return followRepository.findRecommendedMembersByCommonFollowers(memberId, minCommonFollowers)
+    }
+
+    fun existsByRole(role: Role): Boolean {
+        return memberRepository.existsByRole(role)
     }
 }

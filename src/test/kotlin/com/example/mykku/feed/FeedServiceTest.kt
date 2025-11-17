@@ -35,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import com.example.mykku.role.domain.Role
 
 class FeedServiceTest : BaseServiceTest() {
 
@@ -293,7 +294,7 @@ class FeedServiceTest : BaseServiceTest() {
         val followingMember = Member(
             id = "member2",
             nickname = "following",
-            role = "USER",
+            role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "",
             provider = SocialProvider.GOOGLE,
             socialId = "456",
@@ -302,7 +303,7 @@ class FeedServiceTest : BaseServiceTest() {
         val recommendedMember = Member(
             id = "member3",
             nickname = "recommend",
-            role = "USER",
+            role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "",
             provider = SocialProvider.GOOGLE,
             socialId = "789",
@@ -573,7 +574,7 @@ class FeedServiceTest : BaseServiceTest() {
         val recommendedMember = Member(
             id = "member2",
             nickname = "recommend",
-            role = "USER",
+            role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "",
             provider = SocialProvider.GOOGLE,
             socialId = "789",

@@ -11,6 +11,7 @@ import io.restassured.http.ContentType
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import com.example.mykku.role.domain.Role
 
 @DisplayName("LikeController 통합 테스트")
 class LikeControllerTest : BaseControllerTest() {
@@ -26,7 +27,7 @@ class LikeControllerTest : BaseControllerTest() {
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
                 nickname = "Member1",
-                role = "USER",
+                role = Role(name = "일반 덕후", description = "테스트용 칭호"),
                 profileImage = ""
             )
         )
@@ -65,7 +66,7 @@ class LikeControllerTest : BaseControllerTest() {
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
                 nickname = "Member1",
-                role = "USER",
+                role = Role(name = "일반 덕후", description = "테스트용 칭호"),
                 profileImage = ""
             )
         )

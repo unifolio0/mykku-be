@@ -17,6 +17,7 @@ import org.mockito.kotlin.whenever
 import org.springframework.core.MethodParameter
 import org.springframework.web.context.request.NativeWebRequest
 import java.util.*
+import com.example.mykku.role.domain.Role
 
 class MemberArgumentResolverTest {
 
@@ -73,7 +74,7 @@ class MemberArgumentResolverTest {
         val member = Member(
             id = memberId,
             nickname = "testuser",
-            role = "USER",
+            role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "https://example.com/profile.jpg",
             provider = SocialProvider.GOOGLE,
             socialId = "123456",

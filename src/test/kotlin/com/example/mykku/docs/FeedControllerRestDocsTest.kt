@@ -29,6 +29,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
 import java.time.LocalDateTime
+import com.example.mykku.role.domain.Role
 
 class FeedControllerRestDocsTest : BaseControllerRestDocsTest() {
 
@@ -57,7 +58,7 @@ class FeedControllerRestDocsTest : BaseControllerRestDocsTest() {
                         memberId = memberId,
                         nickname = "닉네임1",
                         profileImage = "https://example.com/profile1.jpg",
-                        role = "USER"
+                        role = "일반 덕후"
                     ),
                     board = "자유게시판",
                     createdAt = LocalDateTime.of(2024, 1, 1, 12, 0),
@@ -94,7 +95,7 @@ class FeedControllerRestDocsTest : BaseControllerRestDocsTest() {
                         memberId = memberId,
                         nickname = "닉네임2",
                         profileImage = "https://example.com/profile2.jpg",
-                        role = "USER"
+                        role = "일반 덕후"
                     ),
                     board = "질문게시판",
                     createdAt = LocalDateTime.of(2024, 1, 2, 13, 30),
@@ -442,7 +443,7 @@ class FeedControllerRestDocsTest : BaseControllerRestDocsTest() {
                         memberId = "member1",
                         nickname = "닉네임1",
                         profileImage = "https://example.com/profile1.jpg",
-                        role = "USER"
+                        role = "일반 덕후"
                     ),
                     board = "자유게시판",
                     createdAt = LocalDateTime.of(2024, 1, 1, 12, 0),
@@ -555,7 +556,7 @@ class FeedControllerRestDocsTest : BaseControllerRestDocsTest() {
                 memberId = "member1",
                 nickname = "작성자닉네임",
                 profileImage = "https://example.com/profile.jpg",
-                role = "USER"
+                role = "일반 덕후"
             ),
             boardId = 1L,
             boardTitle = "자유게시판",
