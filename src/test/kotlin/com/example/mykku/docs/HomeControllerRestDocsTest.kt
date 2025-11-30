@@ -1,10 +1,9 @@
 package com.example.mykku.docs
 
 import com.example.mykku.BaseControllerRestDocsTest
+import com.example.mykku.contest.dto.ContestPreviewResponse
 import com.example.mykku.dailymessage.dto.DailyMessageSummaryResponse
-import com.example.mykku.feed.dto.ContestWinnerResponse
-import com.example.mykku.feed.dto.ContestWinnersResponse
-import com.example.mykku.feed.dto.EventPreviewResponse
+import com.example.mykku.event.dto.EventPreviewResponse
 import com.example.mykku.feed.dto.FeedPreviewResponse
 import com.example.mykku.home.HomeController
 import com.example.mykku.home.HomeService
@@ -90,24 +89,17 @@ class HomeControllerRestDocsTest : BaseControllerRestDocsTest() {
                 )
             ),
             contests = listOf(
-                ContestWinnersResponse(
-                    title = "12월 사진 콘테스트",
-                    winners = listOf(
-                        ContestWinnerResponse(
-                            id = 1L,
-                            image = "https://example.com/contest-winner1.jpg",
-                            rank = 1
-                        ),
-                        ContestWinnerResponse(
-                            id = 2L,
-                            image = "https://example.com/contest-winner2.jpg",
-                            rank = 2
-                        ),
-                        ContestWinnerResponse(
-                            id = 3L,
-                            image = "https://example.com/contest-winner3.jpg",
-                            rank = 3
-                        )
+                ContestPreviewResponse(
+                    id = 1L,
+                    images = listOf(
+                        "https://example.com/contest1-banner1.jpg",
+                        "https://example.com/contest1-banner2.jpg"
+                    )
+                ),
+                ContestPreviewResponse(
+                    id = 2L,
+                    images = listOf(
+                        "https://example.com/contest2-banner1.jpg"
                     )
                 )
             )
@@ -146,12 +138,9 @@ class HomeControllerRestDocsTest : BaseControllerRestDocsTest() {
                         fieldWithPath("data.feeds[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                         fieldWithPath("data.feeds[].commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
                         fieldWithPath("data.contests").type(JsonFieldType.ARRAY).description("콘테스트 목록"),
-                        fieldWithPath("data.contests[].title").type(JsonFieldType.STRING).description("콘테스트 제목"),
-                        fieldWithPath("data.contests[].winners").type(JsonFieldType.ARRAY).description("콘테스트 수상자 목록"),
-                        fieldWithPath("data.contests[].winners[].id").type(JsonFieldType.NUMBER).description("수상자 ID"),
-                        fieldWithPath("data.contests[].winners[].image").type(JsonFieldType.STRING)
-                            .description("수상작 이미지 URL"),
-                        fieldWithPath("data.contests[].winners[].rank").type(JsonFieldType.NUMBER).description("순위")
+                        fieldWithPath("data.contests[].id").type(JsonFieldType.NUMBER).description("콘테스트 ID"),
+                        fieldWithPath("data.contests[].images").type(JsonFieldType.ARRAY)
+                            .description("콘테스트 배너 이미지 URL 목록")
                     )
                 )
             )

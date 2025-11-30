@@ -1,11 +1,13 @@
 package com.example.mykku.home
 
 import com.example.mykku.BaseServiceTest
+import com.example.mykku.contest.dto.ContestPreviewResponse
+import com.example.mykku.contest.tool.ContestReader
 import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.tool.DailyMessageReader
-import com.example.mykku.feed.dto.EventPreviewResponse
+import com.example.mykku.event.dto.EventPreviewResponse
+import com.example.mykku.event.tool.EventReader
 import com.example.mykku.feed.dto.FeedPreviewResponse
-import com.example.mykku.feed.tool.EventReader
 import com.example.mykku.feed.tool.FeedReader
 import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks
@@ -25,6 +27,9 @@ class HomeServiceTest : BaseServiceTest() {
     @Mock
     private lateinit var eventReader: EventReader
 
+    @Mock
+    private lateinit var contestReader: ContestReader
+
     @InjectMocks
     private lateinit var homeService: HomeService
 
@@ -39,10 +44,12 @@ class HomeServiceTest : BaseServiceTest() {
         )
         val events = listOf<EventPreviewResponse>()
         val feeds = listOf<FeedPreviewResponse>()
+        val contests = listOf<ContestPreviewResponse>()
 
         whenever(dailyMessageReader.getTodayDailyMessage()).thenReturn(dailyMessage)
         whenever(eventReader.getProcessingEventPreviews()).thenReturn(events)
         whenever(feedReader.getFeedPreviews()).thenReturn(feeds)
+        whenever(contestReader.getProcessingContestPreviews()).thenReturn(contests)
 
         // when
         val result = homeService.getHomeData()
@@ -54,6 +61,6 @@ class HomeServiceTest : BaseServiceTest() {
         assertEquals(dailyMessage.date, result.dailyMessage.date)
         assertEquals(events, result.events)
         assertEquals(feeds, result.feeds)
-        assertEquals(mutableListOf(), result.contests)
+        assertEquals(contests, result.contests)
     }
 }

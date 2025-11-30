@@ -69,9 +69,7 @@ class FeedDtoConverter(
     }
 
     private fun getEventTagTitles(feedTags: List<FeedTag>): Set<String> {
-        val tagTitles = feedTags.map { it.title }
-        val eventTags = feedReader.getEventTagsByTitles(tagTitles)
-        return eventTags.map { it.title }.toSet()
+        return emptySet()
     }
 
     private fun buildFeedResponse(
@@ -126,8 +124,7 @@ class FeedDtoConverter(
     }
 
     private fun fetchEventTagsMap(feedTagsMap: Map<Long, List<FeedTag>>): Map<String, Any> {
-        val allFeedTags = feedTagsMap.values.flatten()
-        return feedReader.getEventTagsByFeedTags(allFeedTags)
+        return emptyMap()
     }
 
     private fun createFeedResponseFromBatch(

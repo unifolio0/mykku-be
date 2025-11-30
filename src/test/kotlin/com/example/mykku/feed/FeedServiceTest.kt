@@ -512,7 +512,6 @@ class FeedServiceTest : BaseServiceTest() {
         whenever(saveFeedReader.isSaved(memberId, feed)).thenReturn(false)
         whenever(feedReader.getFeedImagesByFeed(feed)).thenReturn(listOf(feedImage))
         whenever(feedReader.getFeedTagsByFeed(feed)).thenReturn(listOf(feedTag))
-        whenever(feedReader.getEventTagsByTitles(listOf("태그1"))).thenReturn(emptyList())
         
         // when
         val result = feedService.getFeedDetail(feedId, memberId)
@@ -553,7 +552,6 @@ class FeedServiceTest : BaseServiceTest() {
         whenever(feedReader.getFeedById(feedId)).thenReturn(feed)
         whenever(feedReader.getFeedImagesByFeed(feed)).thenReturn(listOf(feedImage))
         whenever(feedReader.getFeedTagsByFeed(feed)).thenReturn(listOf(feedTag))
-        whenever(feedReader.getEventTagsByTitles(listOf("공개태그"))).thenReturn(emptyList())
         
         // when
         val result = feedService.getFeedDetail(feedId, memberId)

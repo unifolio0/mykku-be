@@ -2,13 +2,11 @@ package com.example.mykku.feed.tool
 
 import com.example.mykku.board.domain.Board
 import com.example.mykku.feed.exception.FeedException
-import com.example.mykku.feed.domain.EventTag
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedComment
 import com.example.mykku.feed.domain.FeedImage
 import com.example.mykku.feed.domain.FeedTag
 import com.example.mykku.feed.dto.FeedPreviewResponse
-import com.example.mykku.feed.repository.EventTagRepository
 import com.example.mykku.feed.repository.FeedCommentRepository
 import com.example.mykku.feed.repository.FeedImageRepository
 import com.example.mykku.feed.repository.FeedRepository
@@ -23,8 +21,7 @@ class FeedReader(
     private val feedRepository: FeedRepository,
     private val feedImageRepository: FeedImageRepository,
     private val feedTagRepository: FeedTagRepository,
-    private val feedCommentRepository: FeedCommentRepository,
-    private val eventTagRepository: EventTagRepository
+    private val feedCommentRepository: FeedCommentRepository
 ) {
     fun getFeedPreviews(): List<FeedPreviewResponse> {
         return feedRepository.findAll()
@@ -65,10 +62,6 @@ class FeedReader(
         return feedCommentRepository.findByFeedAndParentCommentIsNull(feed, pageable)
     }
     
-    fun getEventTagsByTitles(titles: List<String>): List<EventTag> {
-        return eventTagRepository.findAllByTitleIn(titles)
-    }
-
     fun getFeedImagesByFeeds(feeds: List<Feed>): Map<Long, List<FeedImage>> {
         val images = feedImageRepository.findByFeedIn(feeds)
         return images.groupBy { it.feed.id!! }
@@ -85,11 +78,5 @@ class FeedReader(
             result[feed.id!!] = feedCommentRepository.findByFeedAndParentCommentIsNull(feed, pageable)
         }
         return result
-    }
-    
-    fun getEventTagsByFeedTags(feedTags: List<FeedTag>): Map<String, EventTag> {
-        val titles = feedTags.map { it.title }.distinct()
-        val eventTags = eventTagRepository.findAllByTitleIn(titles)
-        return eventTags.associateBy { it.title }
     }
 }

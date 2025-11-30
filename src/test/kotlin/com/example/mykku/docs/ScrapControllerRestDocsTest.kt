@@ -596,6 +596,131 @@ class ScrapControllerRestDocsTest : BaseControllerRestDocsTest() {
     }
 
     @Test
+    fun `콘테스트 저장 API 문서화`() {
+        // given
+        val contestId = 1L
+
+        // when & then
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.post("/api/v1/scraps/contests/{contestId}", contestId)
+                .header("Authorization", "Bearer jwt-token")
+        )
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.message").value("콘테스트가 성공적으로 저장되었습니다."))
+            .andDo(
+                document(
+                    "scrap-contest-save",
+                    pathParameters(
+                        parameterWithName("contestId").description("저장할 콘테스트 ID")
+                    ),
+                    requestHeaders(
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
+                    ),
+                    responseFields(
+                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                        fieldWithPath("data").description("응답 데이터 (없음)")
+                    )
+                )
+            )
+    }
+
+    @Test
+    fun `콘테스트 저장 취소 API 문서화`() {
+        // given
+        val contestId = 1L
+
+        // when & then
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.delete("/api/v1/scraps/contests/{contestId}", contestId)
+                .header("Authorization", "Bearer jwt-token")
+        )
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.message").value("콘테스트 저장이 취소되었습니다."))
+            .andDo(
+                document(
+                    "scrap-contest-unsave",
+                    pathParameters(
+                        parameterWithName("contestId").description("저장 취소할 콘테스트 ID")
+                    ),
+                    requestHeaders(
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
+                    ),
+                    responseFields(
+                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                        fieldWithPath("data").description("응답 데이터 (없음)")
+                    )
+                )
+            )
+    }
+
+    @Test
+    fun `저장된 콘테스트 목록 조회 API 문서화`() {
+        // given
+        val pageable = PageRequest.of(0, 20)
+        val content = listOf(
+            SaveContestResponse(id = 1L, contestId = 10L),
+            SaveContestResponse(id = 2L, contestId = 20L)
+        )
+        val page = PageImpl(content, pageable, content.size.toLong())
+
+        `when`(scrapService.getSavedContests(any(), any())).thenReturn(page)
+
+        // when & then
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.get("/api/v1/scraps/contests")
+                .header("Authorization", "Bearer jwt-token")
+                .param("page", "0")
+                .param("size", "20")
+        )
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.message").value("저장한 콘테스트 목록을 성공적으로 조회했습니다."))
+            .andDo(
+                document(
+                    "scrap-contest-list",
+                    requestHeaders(
+                        headerWithName("Authorization").description("JWT 인증 토큰 (Bearer {token})")
+                    ),
+                    queryParameters(
+                        parameterWithName("page").description("페이지 번호 (0부터 시작)"),
+                        parameterWithName("size").description("페이지 크기")
+                    ),
+                    responseFields(
+                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
+                        fieldWithPath("data.content").type(JsonFieldType.ARRAY).description("저장된 콘테스트 목록"),
+                        fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("저장 ID"),
+                        fieldWithPath("data.content[].contestId").type(JsonFieldType.NUMBER).description("콘테스트 ID"),
+                        fieldWithPath("data.pageable").type(JsonFieldType.OBJECT).description("페이지 정보"),
+                        fieldWithPath("data.pageable.pageNumber").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
+                        fieldWithPath("data.pageable.pageSize").type(JsonFieldType.NUMBER).description("페이지 크기"),
+                        fieldWithPath("data.pageable.sort").type(JsonFieldType.OBJECT).description("정렬 정보"),
+                        fieldWithPath("data.pageable.sort.empty").type(JsonFieldType.BOOLEAN).description("정렬 정보 비어있는지 여부"),
+                        fieldWithPath("data.pageable.sort.sorted").type(JsonFieldType.BOOLEAN).description("정렬 여부"),
+                        fieldWithPath("data.pageable.sort.unsorted").type(JsonFieldType.BOOLEAN).description("비정렬 여부"),
+                        fieldWithPath("data.pageable.offset").type(JsonFieldType.NUMBER).description("오프셋"),
+                        fieldWithPath("data.pageable.paged").type(JsonFieldType.BOOLEAN).description("페이징 여부"),
+                        fieldWithPath("data.pageable.unpaged").type(JsonFieldType.BOOLEAN).description("비페이징 여부"),
+                        fieldWithPath("data.last").type(JsonFieldType.BOOLEAN).description("마지막 페이지 여부"),
+                        fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
+                        fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 요소 수"),
+                        fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
+                        fieldWithPath("data.number").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
+                        fieldWithPath("data.sort").type(JsonFieldType.OBJECT).description("정렬 정보"),
+                        fieldWithPath("data.sort.empty").type(JsonFieldType.BOOLEAN).description("정렬 정보 비어있는지 여부"),
+                        fieldWithPath("data.sort.sorted").type(JsonFieldType.BOOLEAN).description("정렬 여부"),
+                        fieldWithPath("data.sort.unsorted").type(JsonFieldType.BOOLEAN).description("비정렬 여부"),
+                        fieldWithPath("data.first").type(JsonFieldType.BOOLEAN).description("첫 페이지 여부"),
+                        fieldWithPath("data.numberOfElements").type(JsonFieldType.NUMBER).description("현재 페이지 요소 수"),
+                        fieldWithPath("data.empty").type(JsonFieldType.BOOLEAN).description("비어있는지 여부")
+                    )
+                )
+            )
+    }
+
+    @Test
     fun `피드 저장 시 이미 저장된 경우 에러 API 문서화`() {
         // given
         val feedId = 1L

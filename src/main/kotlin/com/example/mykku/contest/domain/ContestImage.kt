@@ -1,0 +1,22 @@
+package com.example.mykku.contest.domain
+
+import com.example.mykku.common.domain.BaseEntity
+import jakarta.persistence.*
+
+@Entity
+@Table(name = "contest_image")
+class ContestImage(
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long? = null,
+
+    @Column(name = "url")
+    var url: String,
+
+    @Column(name = "order_index")
+    var orderIndex: Int,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "contest_id")
+    val contest: Contest,
+) : BaseEntity()

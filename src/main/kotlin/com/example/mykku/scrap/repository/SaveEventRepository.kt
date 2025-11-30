@@ -1,6 +1,6 @@
 package com.example.mykku.scrap.repository
 
-import com.example.mykku.feed.domain.Event
+import com.example.mykku.event.domain.Event
 import com.example.mykku.member.domain.Member
 import com.example.mykku.scrap.domain.SaveEvent
 import org.springframework.data.domain.Page

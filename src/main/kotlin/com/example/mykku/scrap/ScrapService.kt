@@ -2,7 +2,8 @@ package com.example.mykku.scrap
 
 import com.example.mykku.dailymessage.tool.DailyMessageReader
 import com.example.mykku.fannote.tool.FanNoteReader
-import com.example.mykku.feed.tool.EventReader
+import com.example.mykku.contest.tool.ContestReader
+import com.example.mykku.event.tool.EventReader
 import com.example.mykku.feed.tool.FeedReader
 import com.example.mykku.member.domain.Member
 import com.example.mykku.scrap.dto.*
@@ -20,12 +21,15 @@ class ScrapService(
     private val saveDailyMessageWriter: SaveDailyMessageWriter,
     private val saveEventReader: SaveEventReader,
     private val saveEventWriter: SaveEventWriter,
+    private val saveContestReader: SaveContestReader,
+    private val saveContestWriter: SaveContestWriter,
     private val saveFanNoteReader: SaveFanNoteReader,
     private val saveFanNoteWriter: SaveFanNoteWriter,
     private val folderReader: FolderReader,
     private val feedReader: FeedReader,
     private val dailyMessageReader: DailyMessageReader,
     private val eventReader: EventReader,
+    private val contestReader: ContestReader,
     private val fanNoteReader: FanNoteReader
 ) {
 
@@ -90,6 +94,24 @@ class ScrapService(
     fun getSavedEvents(member: Member, pageable: Pageable): Page<SaveEventResponse> {
         val saveEvents = saveEventReader.getSavedEvents(member, pageable)
         return SaveEventResponse.fromPage(saveEvents)
+    }
+
+    @Transactional
+    fun saveContest(contestId: Long, member: Member) {
+        val contest = contestReader.getContestById(contestId)
+        saveContestWriter.saveContest(member, contest)
+    }
+
+    @Transactional
+    fun unsaveContest(contestId: Long, member: Member) {
+        val contest = contestReader.getContestById(contestId)
+        saveContestWriter.unsaveContest(member, contest)
+    }
+
+    @Transactional(readOnly = true)
+    fun getSavedContests(member: Member, pageable: Pageable): Page<SaveContestResponse> {
+        val saveContests = saveContestReader.getSavedContests(member, pageable)
+        return SaveContestResponse.fromPage(saveContests)
     }
 
     @Transactional

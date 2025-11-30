@@ -166,9 +166,7 @@ class FeedService(
     }
 
     private fun fetchEventTagTitles(feedTags: List<FeedTag>): Set<String> {
-        val tagTitles = feedTags.map { it.title }
-        val eventTags = feedReader.getEventTagsByTitles(tagTitles)
-        return eventTags.map { it.title }.toSet()
+        return emptySet()
     }
 
     private fun buildFeedDetailResponse(

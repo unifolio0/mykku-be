@@ -21,18 +21,10 @@ class FeedException(
         
         fun feedCommentContentTooLong(): FeedException = FeedException(FeedErrorCode.FEED_COMMENT_CONTENT_TOO_LONG)
 
-        fun eventNotFound(): FeedException = FeedException(FeedErrorCode.EVENT_NOT_FOUND)
-
-        fun eventImageLimitExceeded(): FeedException = FeedException(FeedErrorCode.EVENT_IMAGE_LIMIT_EXCEEDED)
-        
-        fun eventTagLimitExceeded(): FeedException = FeedException(FeedErrorCode.EVENT_TAG_LIMIT_EXCEEDED)
-        
-        fun tagTitleTooLong(): FeedException = FeedException(FeedErrorCode.TAG_TITLE_TOO_LONG)
-        
-        fun tagInvalidFormat(): FeedException = FeedException(FeedErrorCode.TAG_INVALID_FORMAT)
-
         fun imageInvalidDimensions(): FeedException = FeedException(FeedErrorCode.IMAGE_INVALID_DIMENSIONS)
 
-        fun invalidEventStatus(): FeedException = FeedException(FeedErrorCode.INVALID_EVENT_STATUS)
+        fun tagTitleTooLong(): FeedException = FeedException(FeedErrorCode.TAG_TITLE_TOO_LONG)
+
+        fun tagInvalidFormat(): FeedException = FeedException(FeedErrorCode.TAG_INVALID_FORMAT)
     }
 }

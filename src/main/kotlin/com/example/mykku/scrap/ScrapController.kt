@@ -165,6 +165,50 @@ class ScrapController(
         )
     }
 
+    @PostMapping("/contests/{contestId}")
+    fun saveContest(
+        @PathVariable contestId: Long,
+        @CurrentMember member: Member
+    ): ResponseEntity<ApiResponse<Unit>> {
+        scrapService.saveContest(contestId, member)
+        return ResponseEntity.ok(
+            ApiResponse(
+                message = "콘테스트가 성공적으로 저장되었습니다.",
+                data = Unit
+            )
+        )
+    }
+
+    @DeleteMapping("/contests/{contestId}")
+    fun unsaveContest(
+        @PathVariable contestId: Long,
+        @CurrentMember member: Member
+    ): ResponseEntity<ApiResponse<Unit>> {
+        scrapService.unsaveContest(contestId, member)
+        return ResponseEntity.ok(
+            ApiResponse(
+                message = "콘테스트 저장이 취소되었습니다.",
+                data = Unit
+            )
+        )
+    }
+
+    @GetMapping("/contests")
+    fun getSavedContests(
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "20") size: Int,
+        @CurrentMember member: Member
+    ): ResponseEntity<ApiResponse<Page<SaveContestResponse>>> {
+        val pageable = PageableValidator.validateAndCreate(page, size)
+        val response = scrapService.getSavedContests(member, pageable)
+        return ResponseEntity.ok(
+            ApiResponse(
+                message = "저장한 콘테스트 목록을 성공적으로 조회했습니다.",
+                data = response
+            )
+        )
+    }
+
     @PostMapping("/fan-notes/{fanNoteId}")
     fun saveFanNote(
         @PathVariable fanNoteId: Long,

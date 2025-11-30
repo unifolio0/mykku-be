@@ -25,5 +25,8 @@ class ScrapException(
 
         fun saveFanNoteNotFound(): ScrapException = ScrapException(ScrapErrorCode.SAVE_FAN_NOTE_NOT_FOUND)
         fun saveFanNoteAlreadyExists(): ScrapException = ScrapException(ScrapErrorCode.SAVE_FAN_NOTE_ALREADY_EXISTS)
+
+        fun saveContestNotFound(): ScrapException = ScrapException(ScrapErrorCode.SAVE_CONTEST_NOT_FOUND)
+        fun saveContestAlreadyExists(): ScrapException = ScrapException(ScrapErrorCode.SAVE_CONTEST_ALREADY_EXISTS)
     }
 }

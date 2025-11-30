@@ -3,11 +3,12 @@ package com.example.mykku.scrap
 import com.example.mykku.BaseServiceTest
 import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.tool.DailyMessageReader
+import com.example.mykku.contest.tool.ContestReader
+import com.example.mykku.event.domain.Event
+import com.example.mykku.event.tool.EventReader
 import com.example.mykku.fannote.domain.FanNote
 import com.example.mykku.fannote.tool.FanNoteReader
-import com.example.mykku.feed.domain.Event
 import com.example.mykku.feed.domain.Feed
-import com.example.mykku.feed.tool.EventReader
 import com.example.mykku.feed.tool.FeedReader
 import com.example.mykku.scrap.domain.Folder
 import com.example.mykku.scrap.domain.SaveDailyMessage
@@ -49,6 +50,12 @@ class ScrapServiceTest : BaseServiceTest() {
     private lateinit var saveEventWriter: SaveEventWriter
 
     @Mock
+    private lateinit var saveContestReader: SaveContestReader
+
+    @Mock
+    private lateinit var saveContestWriter: SaveContestWriter
+
+    @Mock
     private lateinit var saveFanNoteReader: SaveFanNoteReader
 
     @Mock
@@ -65,6 +72,9 @@ class ScrapServiceTest : BaseServiceTest() {
 
     @Mock
     private lateinit var eventReader: EventReader
+
+    @Mock
+    private lateinit var contestReader: ContestReader
 
     @Mock
     private lateinit var fanNoteReader: FanNoteReader
@@ -287,7 +297,6 @@ class ScrapServiceTest : BaseServiceTest() {
         val eventId = 1L
         val event = Event(
             id = eventId,
-            isContest = false,
             title = "테스트 이벤트",
             expiredAt = LocalDateTime.now().plusDays(7)
         )
@@ -309,7 +318,6 @@ class ScrapServiceTest : BaseServiceTest() {
         val eventId = 1L
         val event = Event(
             id = eventId,
-            isContest = false,
             title = "테스트 이벤트",
             expiredAt = LocalDateTime.now().plusDays(7)
         )
@@ -330,7 +338,6 @@ class ScrapServiceTest : BaseServiceTest() {
         val member = createTestMember()
         val event = Event(
             id = 1L,
-            isContest = false,
             title = "이벤트",
             expiredAt = LocalDateTime.now().plusDays(7)
         )

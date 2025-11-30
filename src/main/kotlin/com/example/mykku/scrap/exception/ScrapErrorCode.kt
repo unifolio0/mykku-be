@@ -22,5 +22,8 @@ enum class ScrapErrorCode(
     SAVE_EVENT_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 저장된 이벤트입니다"),
 
     SAVE_FAN_NOTE_NOT_FOUND(HttpStatus.NOT_FOUND, "저장된 덕질노트를 찾을 수 없습니다"),
-    SAVE_FAN_NOTE_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 저장된 덕질노트입니다")
+    SAVE_FAN_NOTE_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 저장된 덕질노트입니다"),
+
+    SAVE_CONTEST_NOT_FOUND(HttpStatus.NOT_FOUND, "저장된 콘테스트를 찾을 수 없습니다"),
+    SAVE_CONTEST_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 저장된 콘테스트입니다")
 }
