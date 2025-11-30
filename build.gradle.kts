@@ -97,7 +97,7 @@ tasks.build {
 }
 
 tasks.processResources {
-    dependsOn("copyOpenApiSpec")
+    exclude("static/api-docs/**")
 }
 
 tasks.bootJar {
