@@ -1,6 +1,7 @@
 package com.example.mykku.dailymessage
 
 import com.example.mykku.dailymessage.domain.DailyMessage
+import com.example.mykku.dailymessage.domain.DailyMessageComment
 import com.example.mykku.dailymessage.domain.SortDirection
 import com.example.mykku.dailymessage.dto.CommentResponse
 import com.example.mykku.dailymessage.dto.DailyMessageResponse
@@ -49,7 +50,7 @@ class DailyMessageService(
         )
     }
 
-    private fun getReplies(allComments: List<com.example.mykku.dailymessage.domain.DailyMessageComment>): Map<Long?, List<ReplyResponse>> {
+    private fun getReplies(allComments: List<DailyMessageComment>): Map<Long?, List<ReplyResponse>> {
         val repliesByParentId = allComments
             .filter { it.parentComment != null }
             .groupBy { it.parentComment!!.id }
@@ -68,7 +69,7 @@ class DailyMessageService(
     }
 
     private fun getCommentResponses(
-        allComments: List<com.example.mykku.dailymessage.domain.DailyMessageComment>,
+        allComments: List<DailyMessageComment>,
         repliesByParentId: Map<Long?, List<ReplyResponse>>
     ): List<CommentResponse> {
         val comments = allComments
