@@ -44,9 +44,7 @@ out/
 Thumbs.db
 
 ### Generated API Documentation ###
-# Uncomment the line below if you want to generate docs locally but not commit them
-# src/main/resources/static/docs/index.html
-# src/main/resources/static/docs/images/
+src/main/resources/static/api-docs/openapi3.yaml
 
 src/main/resources/application-local.yml
 src/main/resources/dev-secret.yml
