@@ -4,7 +4,7 @@ plugins {
     id("org.springframework.boot") version "3.4.5"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.jpa") version "1.9.25"
-    id("org.asciidoctor.jvm.convert") version "3.3.2"
+    id("com.epages.restdocs-api-spec") version "0.19.2"
 }
 
 group = "com.example"
@@ -19,8 +19,6 @@ java {
 repositories {
     mavenCentral()
 }
-
-val asciidoctorExt: Configuration by configurations.creating
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -45,11 +43,11 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
+    testImplementation("com.epages:restdocs-api-spec-mockmvc:0.19.2")
     testImplementation("io.rest-assured:rest-assured:5.4.0")
     testImplementation("io.rest-assured:spring-mock-mvc:5.4.0")
     testImplementation("com.h2database:h2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    asciidoctorExt("org.springframework.restdocs:spring-restdocs-asciidoctor")
 }
 
 kotlin {
@@ -69,41 +67,39 @@ tasks.withType<Test> {
     outputs.dir("build/generated-snippets")
 }
 
-tasks.asciidoctor {
-    dependsOn(tasks.test)
-    configurations(asciidoctorExt.name)
-    baseDirFollowsSourceFile()
-    inputs.dir("build/generated-snippets")
-    doFirst {
-        file("build/generated-snippets").mkdirs()
-    }
+openapi3 {
+    setServer("https://api.mykku.com")
+    title = "MyKKU API"
+    description = "MyKKU 백엔드 API 문서"
+    version = "1.0.0"
+    format = "yaml"
 }
 
-tasks.register("copyDocument", Copy::class) {
-    dependsOn(tasks.asciidoctor)
-    from("build/docs/asciidoc")
-    into("src/main/resources/static/docs")
+tasks.register<Copy>("copyOpenApiSpec") {
+    dependsOn("openapi3")
+    from("build/api-spec")
+    into("src/main/resources/static/api-docs")
 }
 
 tasks.register("generateDocs") {
     group = "documentation"
     description = "Generate API documentation from tests"
-    dependsOn(tasks.test, tasks.asciidoctor)
-    finalizedBy("copyDocument")
+    dependsOn(tasks.test, "openapi3")
+    finalizedBy("copyOpenApiSpec")
     doLast {
-        println("API documentation generated at: src/main/resources/static/docs/")
-        println("Don't forget to commit the generated files!")
+        println("API documentation generated at: src/main/resources/static/api-docs/")
+        println("Access Swagger UI at: /api-docs")
     }
 }
 
 tasks.build {
-    dependsOn(tasks.getByName("copyDocument"))
+    dependsOn("copyOpenApiSpec")
 }
 
 tasks.bootJar {
-    dependsOn(tasks.asciidoctor)
-    from("build/docs/asciidoc") {
-        into("static/docs")
+    dependsOn("openapi3")
+    from("build/api-spec") {
+        into("static/api-docs")
     }
 
     from("mykku-be-config/templates") {

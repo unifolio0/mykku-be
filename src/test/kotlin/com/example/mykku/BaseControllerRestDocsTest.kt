@@ -10,12 +10,15 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
+import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper
 import org.springframework.restdocs.RestDocumentationContextProvider
 import org.springframework.restdocs.RestDocumentationExtension
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
 import org.springframework.restdocs.operation.preprocess.Preprocessors.*
+import org.springframework.restdocs.snippet.Snippet
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.ResultHandler
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
 
 @ActiveProfiles("test")
@@ -63,4 +66,13 @@ abstract class BaseControllerRestDocsTest {
                     .remove("X-Frame-Options"),
                 prettyPrint()
             )
+
+    protected fun document(identifier: String, vararg snippets: Snippet): ResultHandler {
+        return MockMvcRestDocumentationWrapper.document(
+            identifier,
+            "",
+            false,
+            *snippets
+        )
+    }
 }

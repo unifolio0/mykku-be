@@ -14,7 +14,6 @@ import org.mockito.Mock
 import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 import org.springframework.http.MediaType
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch
 import org.springframework.restdocs.payload.JsonFieldType
