@@ -96,4 +96,11 @@ class ContestReader(
     fun getContestWinnersByContest(contest: Contest): List<ContestWinner> {
         return contestWinnerRepository.findByContestOrderByWinnerRankAsc(contest)
     }
+
+    fun getContestTagTitlesByTitles(titles: Collection<String>): Set<String> {
+        if (titles.isEmpty()) return emptySet()
+        return contestTagRepository.findAllByTitleIn(titles)
+            .map { it.title }
+            .toSet()
+    }
 }

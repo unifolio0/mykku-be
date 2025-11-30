@@ -19,6 +19,7 @@ import com.example.mykku.like.tool.LikeFeedReader
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.tool.MemberReader
+import com.example.mykku.contest.tool.ContestReader
 import com.example.mykku.scrap.tool.SaveFeedReader
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -62,6 +63,9 @@ class FeedServiceTest : BaseServiceTest() {
 
     @Mock
     private lateinit var imageUploadService: ImageUploadService
+
+    @Mock
+    private lateinit var contestReader: ContestReader
 
     @InjectMocks
     private lateinit var feedService: FeedService
@@ -210,7 +214,8 @@ class FeedServiceTest : BaseServiceTest() {
             memberReader = memberReader,
             likeFeedReader = likeFeedReader,
             saveFeedReader = saveFeedReader,
-            imageUploadService = noOpImageUploadService
+            imageUploadService = noOpImageUploadService,
+            contestReader = contestReader
         )
 
         val imageFile = mock<MultipartFile>()
@@ -524,7 +529,7 @@ class FeedServiceTest : BaseServiceTest() {
         assertFalse(result.isSaved)
         assertEquals(1, result.images.size)
         assertEquals(1, result.tags.size)
-        assertEquals(0, result.tags.count { it.isEvent })
+        assertEquals(0, result.tags.count { it.isContest })
     }
 
     @Test

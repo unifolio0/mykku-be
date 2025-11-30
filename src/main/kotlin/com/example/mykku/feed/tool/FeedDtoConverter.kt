@@ -1,5 +1,6 @@
 package com.example.mykku.feed.tool
 
+import com.example.mykku.contest.tool.ContestReader
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedComment
 import com.example.mykku.feed.domain.FeedImage
@@ -15,7 +16,8 @@ import org.springframework.stereotype.Component
 class FeedDtoConverter(
     private val feedReader: FeedReader,
     private val likeFeedReader: LikeFeedReader,
-    private val saveFeedReader: SaveFeedReader
+    private val saveFeedReader: SaveFeedReader,
+    private val contestReader: ContestReader
 ) {
 
     fun convertToFeedResponse(
@@ -27,9 +29,9 @@ class FeedDtoConverter(
     ): FeedResponse {
         val fetchedData = fetchFeedData(feed, feedImages, feedTags, feedComments)
         val interactions = fetchInteractions(memberId, feed)
-        val eventTagTitles = getEventTagTitles(fetchedData.tags)
+        val contestTagTitles = getContestTagTitles(fetchedData.tags)
 
-        return buildFeedResponse(feed, fetchedData, interactions, eventTagTitles)
+        return buildFeedResponse(feed, fetchedData, interactions, contestTagTitles)
     }
 
     fun convertToFeedResponsesBatch(memberId: String, feeds: List<Feed>): List<FeedResponse> {
@@ -68,22 +70,24 @@ class FeedDtoConverter(
         return InteractionData(isLiked, isSaved)
     }
 
-    private fun getEventTagTitles(feedTags: List<FeedTag>): Set<String> {
-        return emptySet()
+    private fun getContestTagTitles(feedTags: List<FeedTag>): Set<String> {
+        if (feedTags.isEmpty()) return emptySet()
+        val feedTagTitles = feedTags.map { it.title }
+        return contestReader.getContestTagTitlesByTitles(feedTagTitles)
     }
 
     private fun buildFeedResponse(
         feed: Feed,
         feedData: FeedData,
         interactions: InteractionData,
-        eventTagTitles: Set<String>
+        contestTagTitles: Set<String>
     ): FeedResponse {
         return FeedResponse(
             feed,
             AuthorResponse(feed.member),
             interactions.isLiked,
             interactions.isSaved,
-            eventTagTitles,
+            contestTagTitles,
             feedData.images,
             feedData.tags,
             feedData.comments
@@ -93,14 +97,14 @@ class FeedDtoConverter(
     private fun fetchBatchData(memberId: String, feeds: List<Feed>): BatchFeedData {
         val interactions = fetchBatchInteractions(memberId, feeds)
         val feedData = fetchBatchFeedData(feeds)
-        val eventTagsMap = fetchEventTagsMap(feedData.feedTagsMap)
+        val contestTagTitles = fetchContestTagTitles(feedData.feedTagsMap)
 
         return BatchFeedData(
             likedFeedIds = interactions.likedFeedIds,
             savedFeedIds = interactions.savedFeedIds,
             feedImagesMap = feedData.feedImagesMap,
             feedTagsMap = feedData.feedTagsMap,
-            eventTagsMap = eventTagsMap
+            contestTagTitles = contestTagTitles
         )
     }
 
@@ -123,8 +127,9 @@ class FeedDtoConverter(
         )
     }
 
-    private fun fetchEventTagsMap(feedTagsMap: Map<Long, List<FeedTag>>): Map<String, Any> {
-        return emptyMap()
+    private fun fetchContestTagTitles(feedTagsMap: Map<Long, List<FeedTag>>): Set<String> {
+        val allTitles = feedTagsMap.values.flatten().map { it.title }.toSet()
+        return contestReader.getContestTagTitlesByTitles(allTitles)
     }
 
     private fun createFeedResponseFromBatch(
@@ -133,14 +138,13 @@ class FeedDtoConverter(
     ): FeedResponse {
         val feedId = feed.id!!
         val feedData = extractFeedData(feedId, feed, batchData)
-        val eventTagTitles = extractEventTagTitles(feedData.tags, batchData.eventTagsMap)
 
         return FeedResponse(
             feed,
             AuthorResponse(feed.member),
             feedId in batchData.likedFeedIds,
             feedId in batchData.savedFeedIds,
-            eventTagTitles,
+            batchData.contestTagTitles,
             feedData.images,
             feedData.tags,
             feedData.comments
@@ -161,16 +165,6 @@ class FeedDtoConverter(
 
     private fun fetchFirstComment(feed: Feed): List<FeedComment> {
         return feedReader.getFeedCommentsByFeed(feed, PageRequest.of(0, 1)).content
-    }
-
-    private fun extractEventTagTitles(
-        feedTags: List<FeedTag>,
-        eventTagsMap: Map<String, Any>
-    ): Set<String> {
-        return feedTags
-            .mapNotNull { eventTagsMap[it.title] }
-            .map { it.toString() }
-            .toSet()
     }
 
     private data class FeedData(
@@ -199,6 +193,6 @@ class FeedDtoConverter(
         val savedFeedIds: Set<Long>,
         val feedImagesMap: Map<Long, List<FeedImage>>,
         val feedTagsMap: Map<Long, List<FeedTag>>,
-        val eventTagsMap: Map<String, Any>
+        val contestTagTitles: Set<String>
     )
 }

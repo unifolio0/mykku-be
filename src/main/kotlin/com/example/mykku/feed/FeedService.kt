@@ -2,6 +2,7 @@ package com.example.mykku.feed
 
 import com.example.mykku.board.domain.Board
 import com.example.mykku.board.tool.BoardReader
+import com.example.mykku.contest.tool.ContestReader
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedImage
 import com.example.mykku.feed.domain.FeedTag
@@ -30,7 +31,8 @@ class FeedService(
     private val memberReader: MemberReader,
     private val likeFeedReader: LikeFeedReader,
     private val saveFeedReader: SaveFeedReader,
-    private val imageUploadService: ImageUploadService
+    private val imageUploadService: ImageUploadService,
+    private val contestReader: ContestReader
 ) {
     @Transactional
     fun createFeed(request: CreateFeedRequest, member: Member): CreateFeedResponse {
@@ -143,9 +145,9 @@ class FeedService(
         val feed = feedReader.getFeedById(feedId)
         val feedData = fetchFeedDetailData(feed)
         val interactions = fetchUserInteractions(memberId, feed)
-        val eventTagTitles = fetchEventTagTitles(feedData.feedTags)
+        val contestTagTitles = fetchContestTagTitles(feedData.feedTags)
 
-        return buildFeedDetailResponse(feed, feedData, interactions, eventTagTitles)
+        return buildFeedDetailResponse(feed, feedData, interactions, contestTagTitles)
     }
 
     private fun fetchFeedDetailData(feed: Feed): FeedDetailData {
@@ -165,22 +167,24 @@ class FeedService(
         )
     }
 
-    private fun fetchEventTagTitles(feedTags: List<FeedTag>): Set<String> {
-        return emptySet()
+    private fun fetchContestTagTitles(feedTags: List<FeedTag>): Set<String> {
+        if (feedTags.isEmpty()) return emptySet()
+        val feedTagTitles = feedTags.map { it.title }
+        return contestReader.getContestTagTitlesByTitles(feedTagTitles)
     }
 
     private fun buildFeedDetailResponse(
         feed: Feed,
         feedData: FeedDetailData,
         interactions: UserInteractions,
-        eventTagTitles: Set<String>
+        contestTagTitles: Set<String>
     ): FeedDetailResponse {
         return FeedDetailResponse(
             feed = feed,
             author = AuthorResponse(feed.member),
             isLiked = interactions.isLiked,
             isSaved = interactions.isSaved,
-            eventTagTitles = eventTagTitles,
+            contestTagTitles = contestTagTitles,
             feedImages = feedData.feedImages,
             feedTags = feedData.feedTags
         )
