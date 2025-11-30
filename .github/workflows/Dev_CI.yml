@@ -54,11 +54,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build with Gradle
-        run: ./gradlew build -x test -x asciidoctor
+        run: ./gradlew build -x test
 
       - name: Run tests
         run: ./gradlew test --no-daemon
-
-      - name: Generate API documentation
-        if: success()
-        run: ./gradlew asciidoctor
