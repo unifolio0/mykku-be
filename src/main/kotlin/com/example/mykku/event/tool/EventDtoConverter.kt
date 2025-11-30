@@ -19,6 +19,7 @@ class EventDtoConverter {
         return EventListResponse(
             id = event.id!!,
             title = event.title,
+            description = event.description,
             expiredAt = event.expiredAt,
             thumbnailUrl = sortedImages.firstOrNull()?.url,
             isSaved = isSaved
@@ -34,6 +35,7 @@ class EventDtoConverter {
         return EventDetailResponse(
             id = event.id!!,
             title = event.title,
+            description = event.description,
             expiredAt = event.expiredAt,
             images = sortedImages.map { EventImageResponse(url = it.url, orderIndex = it.orderIndex) },
             isSaved = isSaved,

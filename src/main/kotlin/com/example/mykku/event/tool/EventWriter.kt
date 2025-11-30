@@ -19,16 +19,18 @@ class EventWriter(
     @Transactional
     fun createEvent(
         title: String,
+        description: String?,
         expiredAt: LocalDateTime,
         imageRequests: List<EventImageRequest>
     ): Pair<Event, List<EventImage>> {
-        
+
         if (imageRequests.size > Event.IMAGE_MAX_COUNT) {
             throw EventException.eventImageLimitExceeded()
         }
 
         val event = Event(
             title = title,
+            description = description,
             expiredAt = expiredAt
         )
 

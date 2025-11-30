@@ -22,6 +22,7 @@ class ContestWriter(
     @Transactional
     fun createContest(
         title: String,
+        description: String?,
         expiredAt: LocalDateTime,
         imageRequests: List<ContestImageRequest>,
         tagTitles: List<String>
@@ -43,6 +44,7 @@ class ContestWriter(
 
         val contest = Contest(
             title = title,
+            description = description,
             expiredAt = expiredAt
         )
 

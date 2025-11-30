@@ -106,6 +106,7 @@ class EventControllerRestDocsTest : BaseControllerRestDocsTest() {
                 EventListResponse(
                     id = 1L,
                     title = "크리스마스 이벤트",
+                    description = "크리스마스 특별 이벤트입니다.",
                     expiredAt = LocalDateTime.of(2024, 12, 25, 23, 59),
                     thumbnailUrl = "https://example.com/thumbnail1.jpg",
                     isSaved = false
@@ -113,6 +114,7 @@ class EventControllerRestDocsTest : BaseControllerRestDocsTest() {
                 EventListResponse(
                     id = 2L,
                     title = "신년 이벤트",
+                    description = "새해를 맞아 진행하는 이벤트입니다.",
                     expiredAt = LocalDateTime.of(2025, 1, 1, 23, 59),
                     thumbnailUrl = "https://example.com/thumbnail2.jpg",
                     isSaved = true
@@ -159,6 +161,7 @@ class EventControllerRestDocsTest : BaseControllerRestDocsTest() {
                         fieldWithPath("data.events").type(JsonFieldType.ARRAY).description("이벤트 목록"),
                         fieldWithPath("data.events[].id").type(JsonFieldType.NUMBER).description("이벤트 ID"),
                         fieldWithPath("data.events[].title").type(JsonFieldType.STRING).description("이벤트 제목"),
+                        fieldWithPath("data.events[].description").type(JsonFieldType.STRING).description("이벤트 설명").optional(),
                         fieldWithPath("data.events[].expiredAt").type(JsonFieldType.STRING).description("이벤트 종료 일시"),
                         fieldWithPath("data.events[].thumbnailUrl").type(JsonFieldType.STRING).description("썸네일 이미지 URL").optional(),
                         fieldWithPath("data.events[].isSaved").type(JsonFieldType.BOOLEAN).description("저장 여부"),
@@ -180,6 +183,7 @@ class EventControllerRestDocsTest : BaseControllerRestDocsTest() {
         val eventDetailResponse = EventDetailResponse(
             id = eventId,
             title = "크리스마스 이벤트",
+            description = "크리스마스 특별 이벤트입니다.",
             expiredAt = LocalDateTime.of(2024, 12, 25, 23, 59),
             images = listOf(
                 EventImageResponse(url = "https://example.com/event1.jpg", orderIndex = 0),
@@ -210,6 +214,7 @@ class EventControllerRestDocsTest : BaseControllerRestDocsTest() {
                         fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                         fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("이벤트 ID"),
                         fieldWithPath("data.title").type(JsonFieldType.STRING).description("이벤트 제목"),
+                        fieldWithPath("data.description").type(JsonFieldType.STRING).description("이벤트 설명").optional(),
                         fieldWithPath("data.expiredAt").type(JsonFieldType.STRING).description("이벤트 종료 일시"),
                         fieldWithPath("data.images").type(JsonFieldType.ARRAY).description("이벤트 이미지 목록"),
                         fieldWithPath("data.images[].url").type(JsonFieldType.STRING).description("이미지 URL"),

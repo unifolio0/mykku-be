@@ -5,6 +5,7 @@ import java.time.LocalDateTime
 data class ContestDetailResponse(
     val id: Long,
     val title: String,
+    val description: String?,
     val expiredAt: LocalDateTime,
     val images: List<ContestImageResponse>,
     val tags: List<String>,

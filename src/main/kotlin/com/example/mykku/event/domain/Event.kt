@@ -17,6 +17,9 @@ class Event(
     @Column(name = "expired_at")
     var expiredAt: LocalDateTime,
 
+    @Column(name = "description", length = 500)
+    var description: String? = null,
+
     @Column(name = "scrap_count")
     var scrapCount: Int = 0,
 ) : BaseEntity() {

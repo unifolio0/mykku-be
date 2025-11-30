@@ -111,6 +111,7 @@ class DailyMessageControllerRestDocsTest : BaseControllerRestDocsTest() {
                     content = "감사합니다! 새해 복 많이 받으세요!",
                     likeCount = 5,
                     memberName = "사용자1",
+                    memberProfileImage = "https://example.com/profile1.jpg",
                     createdAt = LocalDateTime.of(2024, 1, 1, 10, 30),
                     replies = listOf(
                         ReplyResponse(
@@ -118,6 +119,7 @@ class DailyMessageControllerRestDocsTest : BaseControllerRestDocsTest() {
                             content = "함께 좋은 한 해 만들어요!",
                             likeCount = 2,
                             memberName = "사용자2",
+                            memberProfileImage = "https://example.com/profile2.jpg",
                             createdAt = LocalDateTime.of(2024, 1, 1, 11, 0)
                         )
                     )
@@ -127,6 +129,7 @@ class DailyMessageControllerRestDocsTest : BaseControllerRestDocsTest() {
                     content = "좋은 덕담 감사합니다.",
                     likeCount = 3,
                     memberName = "사용자3",
+                    memberProfileImage = "https://example.com/profile3.jpg",
                     createdAt = LocalDateTime.of(2024, 1, 1, 12, 0),
                     replies = emptyList()
                 )
@@ -161,6 +164,7 @@ class DailyMessageControllerRestDocsTest : BaseControllerRestDocsTest() {
                         fieldWithPath("data.comments[].content").type(JsonFieldType.STRING).description("댓글 내용"),
                         fieldWithPath("data.comments[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                         fieldWithPath("data.comments[].memberName").type(JsonFieldType.STRING).description("작성자 이름"),
+                        fieldWithPath("data.comments[].memberProfileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지"),
                         fieldWithPath("data.comments[].createdAt").type(JsonFieldType.STRING).description("작성 일시"),
                         fieldWithPath("data.comments[].replies").type(JsonFieldType.ARRAY).description("답글 목록"),
                         fieldWithPath("data.comments[].replies[].id").type(JsonFieldType.NUMBER).description("답글 ID")
@@ -171,6 +175,8 @@ class DailyMessageControllerRestDocsTest : BaseControllerRestDocsTest() {
                             .description("좋아요 수").optional(),
                         fieldWithPath("data.comments[].replies[].memberName").type(JsonFieldType.STRING)
                             .description("작성자 이름").optional(),
+                        fieldWithPath("data.comments[].replies[].memberProfileImage").type(JsonFieldType.STRING)
+                            .description("작성자 프로필 이미지").optional(),
                         fieldWithPath("data.comments[].replies[].createdAt").type(JsonFieldType.STRING)
                             .description("작성 일시").optional()
                     )

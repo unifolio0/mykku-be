@@ -26,6 +26,7 @@ class EventService(
     fun createEvent(request: CreateEventRequest): CreateEventResponse {
         val (event, eventImages) = eventWriter.createEvent(
             title = request.title,
+            description = request.description,
             expiredAt = request.expiredAt,
             imageRequests = request.images
         )

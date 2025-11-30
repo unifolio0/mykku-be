@@ -110,6 +110,7 @@ class ContestControllerRestDocsTest : BaseControllerRestDocsTest() {
                 ContestListResponse(
                     id = 1L,
                     title = "겨울 일러스트 콘테스트",
+                    description = "겨울 테마 일러스트 콘테스트입니다.",
                     expiredAt = LocalDateTime.of(2024, 12, 31, 23, 59),
                     thumbnailUrl = "https://example.com/thumbnail1.jpg",
                     tags = listOf("일러스트", "겨울"),
@@ -118,6 +119,7 @@ class ContestControllerRestDocsTest : BaseControllerRestDocsTest() {
                 ContestListResponse(
                     id = 2L,
                     title = "신년 포토 콘테스트",
+                    description = "새해를 맞아 진행하는 포토 콘테스트입니다.",
                     expiredAt = LocalDateTime.of(2025, 1, 15, 23, 59),
                     thumbnailUrl = "https://example.com/thumbnail2.jpg",
                     tags = listOf("사진", "신년"),
@@ -165,6 +167,7 @@ class ContestControllerRestDocsTest : BaseControllerRestDocsTest() {
                         fieldWithPath("data.contests").type(JsonFieldType.ARRAY).description("콘테스트 목록"),
                         fieldWithPath("data.contests[].id").type(JsonFieldType.NUMBER).description("콘테스트 ID"),
                         fieldWithPath("data.contests[].title").type(JsonFieldType.STRING).description("콘테스트 제목"),
+                        fieldWithPath("data.contests[].description").type(JsonFieldType.STRING).description("콘테스트 설명").optional(),
                         fieldWithPath("data.contests[].expiredAt").type(JsonFieldType.STRING).description("콘테스트 종료 일시"),
                         fieldWithPath("data.contests[].thumbnailUrl").type(JsonFieldType.STRING).description("썸네일 이미지 URL").optional(),
                         fieldWithPath("data.contests[].tags").type(JsonFieldType.ARRAY).description("콘테스트 태그 목록"),
@@ -187,6 +190,7 @@ class ContestControllerRestDocsTest : BaseControllerRestDocsTest() {
         val contestDetailResponse = ContestDetailResponse(
             id = contestId,
             title = "겨울 일러스트 콘테스트",
+            description = "겨울 테마 일러스트 콘테스트입니다.",
             expiredAt = LocalDateTime.of(2024, 12, 31, 23, 59),
             images = listOf(
                 ContestImageResponse(url = "https://example.com/contest1.jpg", orderIndex = 0),
@@ -218,6 +222,7 @@ class ContestControllerRestDocsTest : BaseControllerRestDocsTest() {
                         fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                         fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("콘테스트 ID"),
                         fieldWithPath("data.title").type(JsonFieldType.STRING).description("콘테스트 제목"),
+                        fieldWithPath("data.description").type(JsonFieldType.STRING).description("콘테스트 설명").optional(),
                         fieldWithPath("data.expiredAt").type(JsonFieldType.STRING).description("콘테스트 종료 일시"),
                         fieldWithPath("data.images").type(JsonFieldType.ARRAY).description("콘테스트 이미지 목록"),
                         fieldWithPath("data.images[].url").type(JsonFieldType.STRING).description("이미지 URL"),

@@ -21,6 +21,7 @@ class ContestDtoConverter {
         return ContestListResponse(
             id = contest.id!!,
             title = contest.title,
+            description = contest.description,
             expiredAt = contest.expiredAt,
             thumbnailUrl = sortedImages.firstOrNull()?.url,
             tags = tags.map { it.title },
@@ -38,6 +39,7 @@ class ContestDtoConverter {
         return ContestDetailResponse(
             id = contest.id!!,
             title = contest.title,
+            description = contest.description,
             expiredAt = contest.expiredAt,
             images = sortedImages.map { ContestImageResponse(url = it.url, orderIndex = it.orderIndex) },
             tags = tags.map { it.title },

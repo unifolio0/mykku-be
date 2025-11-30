@@ -52,6 +52,7 @@ class DailyMessageCommentControllerRestDocsTest : BaseControllerRestDocsTest() {
             content = "좋은 덕담 감사합니다!",
             likeCount = 0,
             memberName = "홍길동",
+            memberProfileImage = "https://example.com/profile1.jpg",
             createdAt = LocalDateTime.of(2024, 1, 1, 14, 30),
             replies = emptyList()
         )
@@ -90,6 +91,7 @@ class DailyMessageCommentControllerRestDocsTest : BaseControllerRestDocsTest() {
                         fieldWithPath("data.content").type(JsonFieldType.STRING).description("댓글 내용"),
                         fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                         fieldWithPath("data.memberName").type(JsonFieldType.STRING).description("작성자 이름"),
+                        fieldWithPath("data.memberProfileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지"),
                         fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성 일시"),
                         fieldWithPath("data.replies").type(JsonFieldType.ARRAY).description("답글 목록")
                     )
@@ -112,6 +114,7 @@ class DailyMessageCommentControllerRestDocsTest : BaseControllerRestDocsTest() {
             content = "저도 동감합니다!",
             likeCount = 0,
             memberName = "김철수",
+            memberProfileImage = "https://example.com/profile2.jpg",
             createdAt = LocalDateTime.of(2024, 1, 1, 15, 0),
             replies = emptyList()
         )
@@ -149,6 +152,7 @@ class DailyMessageCommentControllerRestDocsTest : BaseControllerRestDocsTest() {
                         fieldWithPath("data.content").type(JsonFieldType.STRING).description("답글 내용"),
                         fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                         fieldWithPath("data.memberName").type(JsonFieldType.STRING).description("작성자 이름"),
+                        fieldWithPath("data.memberProfileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지"),
                         fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성 일시"),
                         fieldWithPath("data.replies").type(JsonFieldType.ARRAY).description("답글 목록 (항상 빈 배열)")
                     )
@@ -169,6 +173,7 @@ class DailyMessageCommentControllerRestDocsTest : BaseControllerRestDocsTest() {
             content = "수정된 댓글 내용입니다!",
             likeCount = 5,
             memberName = "홍길동",
+            memberProfileImage = "https://example.com/profile1.jpg",
             createdAt = LocalDateTime.of(2024, 1, 1, 14, 30),
             replies = emptyList()
         )
@@ -205,6 +210,7 @@ class DailyMessageCommentControllerRestDocsTest : BaseControllerRestDocsTest() {
                         fieldWithPath("data.content").type(JsonFieldType.STRING).description("댓글 내용"),
                         fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                         fieldWithPath("data.memberName").type(JsonFieldType.STRING).description("작성자 이름"),
+                        fieldWithPath("data.memberProfileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지"),
                         fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성 일시"),
                         fieldWithPath("data.replies").type(JsonFieldType.ARRAY).description("답글 목록")
                     )

@@ -26,6 +26,7 @@ class ContestService(
     fun createContest(request: CreateContestRequest): CreateContestResponse {
         val (contest, contestImages, contestTags) = contestWriter.createContest(
             title = request.title,
+            description = request.description,
             expiredAt = request.expiredAt,
             imageRequests = request.images,
             tagTitles = request.tags
