@@ -96,6 +96,10 @@ tasks.build {
     dependsOn("copyOpenApiSpec")
 }
 
+tasks.processResources {
+    dependsOn("copyOpenApiSpec")
+}
+
 tasks.bootJar {
     dependsOn("openapi3")
     from("build/api-spec") {
