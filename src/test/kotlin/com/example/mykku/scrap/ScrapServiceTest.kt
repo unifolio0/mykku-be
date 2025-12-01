@@ -5,9 +5,9 @@ import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.tool.DailyMessageReader
 import com.example.mykku.fannote.domain.FanNote
 import com.example.mykku.fannote.tool.FanNoteReader
-import com.example.mykku.feed.domain.Event
+import com.example.mykku.event.domain.Event
+import com.example.mykku.event.tool.EventReader
 import com.example.mykku.feed.domain.Feed
-import com.example.mykku.feed.tool.EventReader
 import com.example.mykku.feed.tool.FeedReader
 import com.example.mykku.scrap.domain.Folder
 import com.example.mykku.scrap.domain.SaveDailyMessage
@@ -287,7 +287,6 @@ class ScrapServiceTest : BaseServiceTest() {
         val eventId = 1L
         val event = Event(
             id = eventId,
-            isContest = false,
             title = "테스트 이벤트",
             expiredAt = LocalDateTime.now().plusDays(7)
         )
@@ -309,7 +308,6 @@ class ScrapServiceTest : BaseServiceTest() {
         val eventId = 1L
         val event = Event(
             id = eventId,
-            isContest = false,
             title = "테스트 이벤트",
             expiredAt = LocalDateTime.now().plusDays(7)
         )
@@ -330,7 +328,6 @@ class ScrapServiceTest : BaseServiceTest() {
         val member = createTestMember()
         val event = Event(
             id = 1L,
-            isContest = false,
             title = "이벤트",
             expiredAt = LocalDateTime.now().plusDays(7)
         )

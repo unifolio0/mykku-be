@@ -3,9 +3,9 @@ package com.example.mykku.home
 import com.example.mykku.BaseServiceTest
 import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.tool.DailyMessageReader
-import com.example.mykku.feed.dto.EventPreviewResponse
+import com.example.mykku.event.dto.EventPreviewResponse
+import com.example.mykku.event.tool.EventReader
 import com.example.mykku.feed.dto.FeedPreviewResponse
-import com.example.mykku.feed.tool.EventReader
 import com.example.mykku.feed.tool.FeedReader
 import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks

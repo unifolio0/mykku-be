@@ -26,7 +26,7 @@ data class FeedDetailResponse(
         author: AuthorResponse,
         isLiked: Boolean,
         isSaved: Boolean,
-        eventTagTitles: Set<String>,
+        contestTagTitles: Set<String>,
         feedImages: List<FeedImage>,
         feedTags: List<FeedTag>
     ) : this(
@@ -48,7 +48,7 @@ data class FeedDetailResponse(
         tags = feedTags.map {
             TagResponse(
                 title = it.title,
-                isEvent = eventTagTitles.contains(it.title)
+                isContest = contestTagTitles.contains(it.title)
             )
         },
         likeCount = feed.likeCount,

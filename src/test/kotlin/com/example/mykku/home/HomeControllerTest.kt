@@ -4,9 +4,9 @@ import com.example.mykku.BaseControllerTest
 import com.example.mykku.board.domain.Board
 import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.repository.DailyMessageRepository
-import com.example.mykku.feed.domain.Event
+import com.example.mykku.event.domain.Event
+import com.example.mykku.event.repository.EventRepository
 import com.example.mykku.feed.domain.Feed
-import com.example.mykku.feed.repository.EventRepository
 import com.example.mykku.feed.repository.FeedRepository
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
@@ -75,7 +75,6 @@ class HomeControllerTest : BaseControllerTest() {
         eventRepository.save(
             Event(
                 title = "테스트 이벤트",
-                isContest = false,
                 expiredAt = LocalDateTime.now().plusDays(7)
             )
         )

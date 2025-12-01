@@ -77,8 +77,8 @@ class FeedControllerRestDocsTest : BaseControllerRestDocsTest() {
                         )
                     ),
                     tags = listOf(
-                        TagResponse(title = "태그1", isEvent = false),
-                        TagResponse(title = "태그2", isEvent = true)
+                        TagResponse(title = "태그1", isContest = false),
+                        TagResponse(title = "태그2", isContest = true)
                     ),
                     likeCount = 10,
                     isLiked = true,
@@ -103,7 +103,7 @@ class FeedControllerRestDocsTest : BaseControllerRestDocsTest() {
                     content = "두 번째 피드 내용입니다.",
                     images = emptyList(),
                     tags = listOf(
-                        TagResponse(title = "태그3", isEvent = false)
+                        TagResponse(title = "태그3", isContest = false)
                     ),
                     likeCount = 20,
                     isLiked = false,
@@ -177,8 +177,8 @@ class FeedControllerRestDocsTest : BaseControllerRestDocsTest() {
                             .description("이미지 세로 크기 (픽셀)").optional(),
                         fieldWithPath("data.feeds[].tags").type(JsonFieldType.ARRAY).description("피드 태그 목록"),
                         fieldWithPath("data.feeds[].tags[].title").type(JsonFieldType.STRING).description("태그 제목"),
-                        fieldWithPath("data.feeds[].tags[].isEvent").type(JsonFieldType.BOOLEAN)
-                            .description("이벤트 태그 여부"),
+                        fieldWithPath("data.feeds[].tags[].isContest").type(JsonFieldType.BOOLEAN)
+                            .description("콘테스트 태그 여부"),
                         fieldWithPath("data.feeds[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                         fieldWithPath("data.feeds[].commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
                         fieldWithPath("data.feeds[].isLiked").type(JsonFieldType.BOOLEAN).description("현재 사용자의 좋아요 여부"),
@@ -457,7 +457,7 @@ class FeedControllerRestDocsTest : BaseControllerRestDocsTest() {
                         )
                     ),
                     tags = listOf(
-                        TagResponse(title = "자유", isEvent = false)
+                        TagResponse(title = "자유", isContest = false)
                     ),
                     likeCount = 15,
                     isLiked = true,
@@ -530,8 +530,8 @@ class FeedControllerRestDocsTest : BaseControllerRestDocsTest() {
                             .description("이미지 세로 크기 (픽셀)").optional(),
                         fieldWithPath("data.feeds[].tags").type(JsonFieldType.ARRAY).description("피드 태그 목록"),
                         fieldWithPath("data.feeds[].tags[].title").type(JsonFieldType.STRING).description("태그 제목"),
-                        fieldWithPath("data.feeds[].tags[].isEvent").type(JsonFieldType.BOOLEAN)
-                            .description("이벤트 태그 여부"),
+                        fieldWithPath("data.feeds[].tags[].isContest").type(JsonFieldType.BOOLEAN)
+                            .description("콘테스트 태그 여부"),
                         fieldWithPath("data.feeds[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                         fieldWithPath("data.feeds[].commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
                         fieldWithPath("data.feeds[].isLiked").type(JsonFieldType.BOOLEAN).description("현재 사용자의 좋아요 여부"),
@@ -577,8 +577,8 @@ class FeedControllerRestDocsTest : BaseControllerRestDocsTest() {
                 )
             ),
             tags = listOf(
-                TagResponse(title = "일상", isEvent = false),
-                TagResponse(title = "이벤트", isEvent = true)
+                TagResponse(title = "일상", isContest = false),
+                TagResponse(title = "이벤트", isContest = true)
             ),
             likeCount = 25,
             isLiked = true,
@@ -622,7 +622,7 @@ class FeedControllerRestDocsTest : BaseControllerRestDocsTest() {
                         fieldWithPath("data.images[].height").type(JsonFieldType.NUMBER).description("이미지 세로 크기 (픽셀)"),
                         fieldWithPath("data.tags").type(JsonFieldType.ARRAY).description("피드 태그 목록"),
                         fieldWithPath("data.tags[].title").type(JsonFieldType.STRING).description("태그 제목"),
-                        fieldWithPath("data.tags[].isEvent").type(JsonFieldType.BOOLEAN).description("이벤트 태그 여부"),
+                        fieldWithPath("data.tags[].isContest").type(JsonFieldType.BOOLEAN).description("콘테스트 태그 여부"),
                         fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                         fieldWithPath("data.commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
                         fieldWithPath("data.isLiked").type(JsonFieldType.BOOLEAN).description("현재 사용자의 좋아요 여부"),
