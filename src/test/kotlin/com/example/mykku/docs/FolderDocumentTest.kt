@@ -1,6 +1,5 @@
 package com.example.mykku.docs
 
-import com.example.mykku.scrap.FolderService
 import com.example.mykku.scrap.dto.CreateFolderRequest
 import com.example.mykku.scrap.dto.FolderResponse
 import com.example.mykku.scrap.dto.FoldersResponse
@@ -14,13 +13,9 @@ import org.mockito.kotlin.any
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import java.time.LocalDateTime
 
 class FolderDocumentTest : BaseDocumentTest() {
-
-    @MockitoBean
-    private lateinit var folderService: FolderService
 
     @Test
     fun `폴더 생성`() {
@@ -111,7 +106,8 @@ class FolderDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.folders[]").type(JsonFieldType.ARRAY).description("폴더 목록"),
                         fieldWithPath("data.folders[].id").type(JsonFieldType.NUMBER).description("폴더 ID"),
                         fieldWithPath("data.folders[].name").type(JsonFieldType.STRING).description("폴더 이름"),
-                        fieldWithPath("data.folders[].description").type(JsonFieldType.STRING).description("폴더 설명").optional(),
+                        fieldWithPath("data.folders[].description").type(JsonFieldType.STRING).description("폴더 설명")
+                            .optional(),
                         fieldWithPath("data.folders[].createdAt").type(JsonFieldType.STRING).description("생성 시간"),
                         fieldWithPath("data.folders[].updatedAt").type(JsonFieldType.STRING).description("수정 시간")
                     )

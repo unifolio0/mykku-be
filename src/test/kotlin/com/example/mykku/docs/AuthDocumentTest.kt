@@ -16,9 +16,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean
 
 class AuthDocumentTest : BaseDocumentTest() {
 
-    @MockitoBean
-    private lateinit var authService: AuthService
-
     @Test
     fun `모바일 구글 로그인`() {
         val request = MobileLoginRequest(

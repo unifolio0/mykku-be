@@ -1,9 +1,30 @@
 package com.example.mykku.docs
 
+import com.example.mykku.admin.service.AdminRoleService
+import com.example.mykku.auth.AuthService
 import com.example.mykku.auth.tool.JwtTokenProvider
+import com.example.mykku.board.BoardService
+import com.example.mykku.contest.ContestService
+import com.example.mykku.dailymessage.DailyMessageCommentService
+import com.example.mykku.dailymessage.DailyMessageService
+import com.example.mykku.email.EmailAuthService
+import com.example.mykku.event.EventService
+import com.example.mykku.fannote.FanNoteService
+import com.example.mykku.feed.FeedCommentService
+import com.example.mykku.feed.FeedService
+import com.example.mykku.home.HomeService
+import com.example.mykku.like.LikeService
+import com.example.mykku.member.MemberService
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.repository.MemberRepository
+import com.example.mykku.notification.FcmTokenService
+import com.example.mykku.notification.NotificationService
+import com.example.mykku.notification.NotificationSettingService
+import com.example.mykku.preference.PreferenceService
+import com.example.mykku.role.RoleService
+import com.example.mykku.scrap.FolderService
+import com.example.mykku.scrap.ScrapService
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
@@ -35,6 +56,69 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean
 @ExtendWith(RestDocumentationExtension::class, MockitoExtension::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 abstract class BaseDocumentTest {
+
+    @MockitoBean
+    protected lateinit var adminRoleService: AdminRoleService
+
+    @MockitoBean
+    protected lateinit var authService: AuthService
+
+    @MockitoBean
+    protected lateinit var boardService: BoardService
+
+    @MockitoBean
+    protected lateinit var contestService: ContestService
+
+    @MockitoBean
+    protected lateinit var scrapService: ScrapService
+
+    @MockitoBean
+    protected lateinit var roleService: RoleService
+
+    @MockitoBean
+    protected lateinit var preferenceService: PreferenceService
+
+    @MockitoBean
+    protected lateinit var notificationSettingService: NotificationSettingService
+
+    @MockitoBean
+    protected lateinit var notificationService: NotificationService
+
+    @MockitoBean
+    protected lateinit var memberService: MemberService
+
+    @MockitoBean
+    protected lateinit var likeService: LikeService
+
+    @MockitoBean
+    protected lateinit var homeService: HomeService
+
+    @MockitoBean
+    protected lateinit var folderService: FolderService
+
+    @MockitoBean
+    protected lateinit var feedService: FeedService
+
+    @MockitoBean
+    protected lateinit var feedCommentService: FeedCommentService
+
+    @MockitoBean
+    protected lateinit var fcmTokenService: FcmTokenService
+
+    @MockitoBean
+    protected lateinit var fanNoteService: FanNoteService
+
+    @MockitoBean
+    protected lateinit var eventService: EventService
+
+    @MockitoBean
+    protected lateinit var emailAuthService: EmailAuthService
+
+    @MockitoBean
+    protected lateinit var dailyMessageService: DailyMessageService
+
+    @MockitoBean
+    protected lateinit var dailyMessageCommentService: DailyMessageCommentService
 
     companion object {
         const val TEST_MEMBER_ID = "test-member-id"

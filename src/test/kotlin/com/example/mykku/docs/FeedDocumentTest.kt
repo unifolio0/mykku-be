@@ -1,7 +1,5 @@
 package com.example.mykku.docs
 
-import com.example.mykku.feed.FeedCommentService
-import com.example.mykku.feed.FeedService
 import com.example.mykku.feed.dto.*
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.Test
@@ -13,17 +11,9 @@ import org.springframework.data.domain.Pageable
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
-import org.springframework.test.context.bean.override.mockito.MockitoBean
-import java.io.File
 import java.time.LocalDateTime
 
 class FeedDocumentTest : BaseDocumentTest() {
-
-    @MockitoBean
-    private lateinit var feedService: FeedService
-
-    @MockitoBean
-    private lateinit var feedCommentService: FeedCommentService
 
     @Test
     fun `피드 목록 조회`() {
@@ -71,11 +61,13 @@ class FeedDocumentTest : BaseDocumentTest() {
             hasPrevious = false
         )
 
-        `when`(feedService.getFeedsByMemberWithRecommendations(
-            eq(memberId),
-            any(),
-            eq(10L)
-        )).thenReturn(feedsResponse)
+        `when`(
+            feedService.getFeedsByMemberWithRecommendations(
+                eq(memberId),
+                any(),
+                eq(10L)
+            )
+        ).thenReturn(feedsResponse)
 
         val documentFilter = document("feed/list", 200)
             .request(
@@ -358,11 +350,13 @@ class FeedDocumentTest : BaseDocumentTest() {
             hasPrevious = false
         )
 
-        `when`(feedService.getFeedsByBoard(
-            eq(boardId),
-            anyOrNull(),
-            any()
-        )).thenReturn(feedsResponse)
+        `when`(
+            feedService.getFeedsByBoard(
+                eq(boardId),
+                anyOrNull(),
+                any()
+            )
+        ).thenReturn(feedsResponse)
 
         val documentFilter = document("feed/list-by-board", 200)
             .request(
@@ -503,12 +497,15 @@ class FeedDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.comments").type(JsonFieldType.ARRAY).description("댓글 목록"),
                         fieldWithPath("data.comments[].id").type(JsonFieldType.NUMBER).description("댓글 ID"),
                         fieldWithPath("data.comments[].content").type(JsonFieldType.STRING).description("댓글 내용"),
-                        fieldWithPath("data.comments[].author.memberId").type(JsonFieldType.STRING).description("작성자 ID"),
-                        fieldWithPath("data.comments[].author.nickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
+                        fieldWithPath("data.comments[].author.memberId").type(JsonFieldType.STRING)
+                            .description("작성자 ID"),
+                        fieldWithPath("data.comments[].author.nickname").type(JsonFieldType.STRING)
+                            .description("작성자 닉네임"),
                         fieldWithPath("data.comments[].author.profileImage").type(JsonFieldType.STRING)
                             .description("작성자 프로필 이미지"),
                         fieldWithPath("data.comments[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
-                        fieldWithPath("data.comments[].isLiked").type(JsonFieldType.BOOLEAN).description("현재 사용자의 좋아요 여부"),
+                        fieldWithPath("data.comments[].isLiked").type(JsonFieldType.BOOLEAN)
+                            .description("현재 사용자의 좋아요 여부"),
                         fieldWithPath("data.comments[].replies").type(JsonFieldType.ARRAY).description("대댓글 목록"),
                         fieldWithPath("data.comments[].replies[].id").type(JsonFieldType.NUMBER).description("대댓글 ID")
                             .optional(),

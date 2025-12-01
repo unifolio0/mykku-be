@@ -1,6 +1,5 @@
 package com.example.mykku.docs
 
-import com.example.mykku.preference.PreferenceService
 import com.example.mykku.preference.domain.GenreType
 import com.example.mykku.preference.domain.GoodsType
 import com.example.mykku.preference.domain.MoodType
@@ -14,12 +13,8 @@ import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 
 class PreferenceDocumentTest : BaseDocumentTest() {
-
-    @MockitoBean
-    private lateinit var preferenceService: PreferenceService
 
     @Test
     fun `장르 취향 저장`() {

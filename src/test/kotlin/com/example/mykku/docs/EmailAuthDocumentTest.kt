@@ -2,7 +2,6 @@ package com.example.mykku.docs
 
 import com.example.mykku.auth.dto.LoginResponse
 import com.example.mykku.auth.dto.MemberInfo
-import com.example.mykku.email.EmailAuthService
 import com.example.mykku.email.domain.VerificationPurpose
 import com.example.mykku.email.dto.*
 import io.restassured.http.ContentType
@@ -12,12 +11,8 @@ import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 
 class EmailAuthDocumentTest : BaseDocumentTest() {
-
-    @MockitoBean
-    private lateinit var emailAuthService: EmailAuthService
 
     @Test
     fun `인증 코드 발송`() {
@@ -36,7 +31,8 @@ class EmailAuthDocumentTest : BaseDocumentTest() {
                     .description("이메일로 인증 코드를 발송합니다.")
                     .requestBodyField(
                         fieldWithPath("email").type(JsonFieldType.STRING).description("인증 코드를 받을 이메일 주소"),
-                        fieldWithPath("purpose").type(JsonFieldType.STRING).description("인증 목적 (SIGNUP: 회원가입, PASSWORD_RESET: 비밀번호 재설정)")
+                        fieldWithPath("purpose").type(JsonFieldType.STRING)
+                            .description("인증 목적 (SIGNUP: 회원가입, PASSWORD_RESET: 비밀번호 재설정)")
                     )
             )
             .response(
@@ -76,7 +72,8 @@ class EmailAuthDocumentTest : BaseDocumentTest() {
                     .requestBodyField(
                         fieldWithPath("email").type(JsonFieldType.STRING).description("인증할 이메일 주소"),
                         fieldWithPath("code").type(JsonFieldType.STRING).description("발송받은 6자리 인증 코드"),
-                        fieldWithPath("purpose").type(JsonFieldType.STRING).description("인증 목적 (SIGNUP: 회원가입, PASSWORD_RESET: 비밀번호 재설정)")
+                        fieldWithPath("purpose").type(JsonFieldType.STRING)
+                            .description("인증 목적 (SIGNUP: 회원가입, PASSWORD_RESET: 비밀번호 재설정)")
                     )
             )
             .response(
@@ -141,13 +138,16 @@ class EmailAuthDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("JWT 액세스 토큰"),
                         fieldWithPath("data.refreshToken").type(JsonFieldType.STRING).description("JWT 리프레시 토큰"),
                         fieldWithPath("data.tokenType").type(JsonFieldType.STRING).description("토큰 타입"),
-                        fieldWithPath("data.accessTokenExpiresIn").type(JsonFieldType.NUMBER).description("액세스 토큰 만료 시간 (밀리초)"),
-                        fieldWithPath("data.refreshTokenExpiresIn").type(JsonFieldType.NUMBER).description("리프레시 토큰 만료 시간 (밀리초)"),
+                        fieldWithPath("data.accessTokenExpiresIn").type(JsonFieldType.NUMBER)
+                            .description("액세스 토큰 만료 시간 (밀리초)"),
+                        fieldWithPath("data.refreshTokenExpiresIn").type(JsonFieldType.NUMBER)
+                            .description("리프레시 토큰 만료 시간 (밀리초)"),
                         fieldWithPath("data.member").type(JsonFieldType.OBJECT).description("회원 정보"),
                         fieldWithPath("data.member.id").type(JsonFieldType.STRING).description("회원 ID"),
                         fieldWithPath("data.member.email").type(JsonFieldType.STRING).description("회원 이메일"),
                         fieldWithPath("data.member.nickname").type(JsonFieldType.STRING).description("회원 닉네임"),
-                        fieldWithPath("data.member.profileImage").type(JsonFieldType.STRING).description("프로필 이미지 URL").optional(),
+                        fieldWithPath("data.member.profileImage").type(JsonFieldType.STRING).description("프로필 이미지 URL")
+                            .optional(),
                         fieldWithPath("data.isExistingUser").type(JsonFieldType.BOOLEAN).description("기존 가입자 여부")
                     )
             )
@@ -204,13 +204,16 @@ class EmailAuthDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("JWT 액세스 토큰"),
                         fieldWithPath("data.refreshToken").type(JsonFieldType.STRING).description("JWT 리프레시 토큰"),
                         fieldWithPath("data.tokenType").type(JsonFieldType.STRING).description("토큰 타입"),
-                        fieldWithPath("data.accessTokenExpiresIn").type(JsonFieldType.NUMBER).description("액세스 토큰 만료 시간 (밀리초)"),
-                        fieldWithPath("data.refreshTokenExpiresIn").type(JsonFieldType.NUMBER).description("리프레시 토큰 만료 시간 (밀리초)"),
+                        fieldWithPath("data.accessTokenExpiresIn").type(JsonFieldType.NUMBER)
+                            .description("액세스 토큰 만료 시간 (밀리초)"),
+                        fieldWithPath("data.refreshTokenExpiresIn").type(JsonFieldType.NUMBER)
+                            .description("리프레시 토큰 만료 시간 (밀리초)"),
                         fieldWithPath("data.member").type(JsonFieldType.OBJECT).description("회원 정보"),
                         fieldWithPath("data.member.id").type(JsonFieldType.STRING).description("회원 ID"),
                         fieldWithPath("data.member.email").type(JsonFieldType.STRING).description("회원 이메일"),
                         fieldWithPath("data.member.nickname").type(JsonFieldType.STRING).description("회원 닉네임"),
-                        fieldWithPath("data.member.profileImage").type(JsonFieldType.STRING).description("프로필 이미지 URL").optional(),
+                        fieldWithPath("data.member.profileImage").type(JsonFieldType.STRING).description("프로필 이미지 URL")
+                            .optional(),
                         fieldWithPath("data.isExistingUser").type(JsonFieldType.BOOLEAN).description("기존 가입자 여부")
                     )
             )

@@ -17,9 +17,6 @@ import java.time.LocalDateTime
 
 class FcmTokenDocumentTest : BaseDocumentTest() {
 
-    @MockitoBean
-    private lateinit var fcmTokenService: FcmTokenService
-
     @Test
     fun `FCM 토큰 등록`() {
         val request = RegisterFcmTokenRequest(
@@ -45,7 +42,8 @@ class FcmTokenDocumentTest : BaseDocumentTest() {
                     .requestBodyField(
                         fieldWithPath("token").type(JsonFieldType.STRING).description("Firebase Cloud Messaging 토큰"),
                         fieldWithPath("deviceId").type(JsonFieldType.STRING).description("기기 고유 식별자"),
-                        fieldWithPath("deviceType").type(JsonFieldType.STRING).description("기기 타입 (ANDROID, IOS 등)").optional()
+                        fieldWithPath("deviceType").type(JsonFieldType.STRING).description("기기 타입 (ANDROID, IOS 등)")
+                            .optional()
                     )
             )
             .response(

@@ -1,6 +1,5 @@
 package com.example.mykku.docs
 
-import com.example.mykku.member.MemberService
 import com.example.mykku.member.dto.ChangePasswordRequest
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.Test
@@ -9,12 +8,8 @@ import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.whenever
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 
 class MemberDocumentTest : BaseDocumentTest() {
-
-    @MockitoBean
-    private lateinit var memberService: MemberService
 
     @Test
     fun `비밀번호 변경`() {

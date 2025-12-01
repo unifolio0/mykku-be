@@ -1,6 +1,5 @@
 package com.example.mykku.docs
 
-import com.example.mykku.notification.NotificationService
 import com.example.mykku.notification.domain.NotificationType
 import com.example.mykku.notification.dto.NotificationResponse
 import io.restassured.http.ContentType
@@ -12,13 +11,9 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import java.time.LocalDateTime
 
 class NotificationDocumentTest : BaseDocumentTest() {
-
-    @MockitoBean
-    private lateinit var notificationService: NotificationService
 
     @Test
     fun `알림 목록 조회`() {
@@ -69,18 +64,23 @@ class NotificationDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.content[]").type(JsonFieldType.ARRAY).description("알림 목록"),
                         fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("알림 ID"),
                         fieldWithPath("data.content[].type").type(JsonFieldType.STRING).description("알림 타입"),
-                        fieldWithPath("data.content[].senderNickname").type(JsonFieldType.STRING).description("발신자 닉네임").optional(),
-                        fieldWithPath("data.content[].senderProfileImage").type(JsonFieldType.STRING).description("발신자 프로필 이미지").optional(),
+                        fieldWithPath("data.content[].senderNickname").type(JsonFieldType.STRING).description("발신자 닉네임")
+                            .optional(),
+                        fieldWithPath("data.content[].senderProfileImage").type(JsonFieldType.STRING)
+                            .description("발신자 프로필 이미지").optional(),
                         fieldWithPath("data.content[].content").type(JsonFieldType.STRING).description("알림 내용"),
                         fieldWithPath("data.content[].isRead").type(JsonFieldType.BOOLEAN).description("읽음 여부"),
-                        fieldWithPath("data.content[].relatedResourceId").type(JsonFieldType.NUMBER).description("관련 리소스 ID").optional(),
-                        fieldWithPath("data.content[].relatedResourceType").type(JsonFieldType.STRING).description("관련 리소스 타입").optional(),
+                        fieldWithPath("data.content[].relatedResourceId").type(JsonFieldType.NUMBER)
+                            .description("관련 리소스 ID").optional(),
+                        fieldWithPath("data.content[].relatedResourceType").type(JsonFieldType.STRING)
+                            .description("관련 리소스 타입").optional(),
                         fieldWithPath("data.content[].createdAt").type(JsonFieldType.STRING).description("알림 생성 일시"),
                         fieldWithPath("data.pageable").type(JsonFieldType.OBJECT).description("페이징 정보"),
                         fieldWithPath("data.pageable.pageNumber").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
                         fieldWithPath("data.pageable.pageSize").type(JsonFieldType.NUMBER).description("페이지 크기"),
                         fieldWithPath("data.pageable.sort").type(JsonFieldType.OBJECT).description("정렬 정보"),
-                        fieldWithPath("data.pageable.sort.empty").type(JsonFieldType.BOOLEAN).description("정렬 정보 비어있음 여부"),
+                        fieldWithPath("data.pageable.sort.empty").type(JsonFieldType.BOOLEAN)
+                            .description("정렬 정보 비어있음 여부"),
                         fieldWithPath("data.pageable.sort.sorted").type(JsonFieldType.BOOLEAN).description("정렬 여부"),
                         fieldWithPath("data.pageable.sort.unsorted").type(JsonFieldType.BOOLEAN).description("비정렬 여부"),
                         fieldWithPath("data.pageable.offset").type(JsonFieldType.NUMBER).description("오프셋"),

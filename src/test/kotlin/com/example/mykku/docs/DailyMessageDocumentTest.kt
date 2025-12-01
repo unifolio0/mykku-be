@@ -1,7 +1,5 @@
 package com.example.mykku.docs
 
-import com.example.mykku.dailymessage.DailyMessageService
-import com.example.mykku.dailymessage.domain.SortDirection
 import com.example.mykku.dailymessage.dto.CommentResponse
 import com.example.mykku.dailymessage.dto.DailyMessageResponse
 import com.example.mykku.dailymessage.dto.DailyMessageSummaryResponse
@@ -14,14 +12,10 @@ import org.mockito.kotlin.eq
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 class DailyMessageDocumentTest : BaseDocumentTest() {
-
-    @MockitoBean
-    private lateinit var dailyMessageService: DailyMessageService
 
     @Test
     fun `하루 덕담 목록 조회`() {
@@ -136,10 +130,14 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.comments[].createdAt").type(JsonFieldType.STRING).description("작성 일시"),
                         fieldWithPath("data.comments[].replies[]").type(JsonFieldType.ARRAY).description("답글 목록"),
                         fieldWithPath("data.comments[].replies[].id").type(JsonFieldType.NUMBER).description("답글 ID"),
-                        fieldWithPath("data.comments[].replies[].content").type(JsonFieldType.STRING).description("답글 내용"),
-                        fieldWithPath("data.comments[].replies[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
-                        fieldWithPath("data.comments[].replies[].memberName").type(JsonFieldType.STRING).description("작성자 이름"),
-                        fieldWithPath("data.comments[].replies[].createdAt").type(JsonFieldType.STRING).description("작성 일시")
+                        fieldWithPath("data.comments[].replies[].content").type(JsonFieldType.STRING)
+                            .description("답글 내용"),
+                        fieldWithPath("data.comments[].replies[].likeCount").type(JsonFieldType.NUMBER)
+                            .description("좋아요 수"),
+                        fieldWithPath("data.comments[].replies[].memberName").type(JsonFieldType.STRING)
+                            .description("작성자 이름"),
+                        fieldWithPath("data.comments[].replies[].createdAt").type(JsonFieldType.STRING)
+                            .description("작성 일시")
                     )
             )
             .build()

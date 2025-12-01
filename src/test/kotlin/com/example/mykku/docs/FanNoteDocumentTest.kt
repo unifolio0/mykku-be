@@ -1,6 +1,5 @@
 package com.example.mykku.docs
 
-import com.example.mykku.fannote.FanNoteService
 import com.example.mykku.fannote.dto.FanNoteDetailResponse
 import com.example.mykku.fannote.dto.FanNoteListResponse
 import com.example.mykku.fannote.dto.FanNotePageResponse
@@ -16,12 +15,8 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 
 class FanNoteDocumentTest : BaseDocumentTest() {
-
-    @MockitoBean
-    private lateinit var fanNoteService: FanNoteService
 
     @Test
     fun `덕질노트 목록 조회`() {
@@ -66,17 +61,22 @@ class FanNoteDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.content[]").type(JsonFieldType.ARRAY).description("덕질노트 목록"),
                         fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("덕질노트 ID"),
                         fieldWithPath("data.content[].title").type(JsonFieldType.STRING).description("덕질노트 제목"),
-                        fieldWithPath("data.content[].subtitle").type(JsonFieldType.STRING).description("서브 제목").optional(),
-                        fieldWithPath("data.content[].content").type(JsonFieldType.STRING).description("덕질노트 내용").optional(),
-                        fieldWithPath("data.content[].productionDate").type(JsonFieldType.STRING).description("제작 날짜 (yyyy-MM-dd)"),
-                        fieldWithPath("data.content[].coverImageUrl").type(JsonFieldType.STRING).description("표지 이미지 URL").optional(),
+                        fieldWithPath("data.content[].subtitle").type(JsonFieldType.STRING).description("서브 제목")
+                            .optional(),
+                        fieldWithPath("data.content[].content").type(JsonFieldType.STRING).description("덕질노트 내용")
+                            .optional(),
+                        fieldWithPath("data.content[].productionDate").type(JsonFieldType.STRING)
+                            .description("제작 날짜 (yyyy-MM-dd)"),
+                        fieldWithPath("data.content[].coverImageUrl").type(JsonFieldType.STRING)
+                            .description("표지 이미지 URL").optional(),
                         fieldWithPath("data.pageable").type(JsonFieldType.OBJECT).description("페이지 정보"),
                         fieldWithPath("data.pageable.pageNumber").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
                         fieldWithPath("data.pageable.pageSize").type(JsonFieldType.NUMBER).description("페이지 크기"),
                         fieldWithPath("data.pageable.sort").type(JsonFieldType.OBJECT).description("정렬 정보"),
                         fieldWithPath("data.pageable.sort.empty").type(JsonFieldType.BOOLEAN).description("정렬 비어있음 여부"),
                         fieldWithPath("data.pageable.sort.sorted").type(JsonFieldType.BOOLEAN).description("정렬됨 여부"),
-                        fieldWithPath("data.pageable.sort.unsorted").type(JsonFieldType.BOOLEAN).description("정렬되지 않음 여부"),
+                        fieldWithPath("data.pageable.sort.unsorted").type(JsonFieldType.BOOLEAN)
+                            .description("정렬되지 않음 여부"),
                         fieldWithPath("data.pageable.offset").type(JsonFieldType.NUMBER).description("오프셋"),
                         fieldWithPath("data.pageable.paged").type(JsonFieldType.BOOLEAN).description("페이징 여부"),
                         fieldWithPath("data.pageable.unpaged").type(JsonFieldType.BOOLEAN).description("페이징되지 않음 여부"),
@@ -144,8 +144,10 @@ class FanNoteDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.title").type(JsonFieldType.STRING).description("덕질노트 제목"),
                         fieldWithPath("data.subtitle").type(JsonFieldType.STRING).description("서브 제목").optional(),
                         fieldWithPath("data.content").type(JsonFieldType.STRING).description("덕질노트 내용").optional(),
-                        fieldWithPath("data.productionDate").type(JsonFieldType.STRING).description("제작 날짜 (yyyy-MM-dd)"),
-                        fieldWithPath("data.coverImageUrl").type(JsonFieldType.STRING).description("표지 이미지 URL").optional(),
+                        fieldWithPath("data.productionDate").type(JsonFieldType.STRING)
+                            .description("제작 날짜 (yyyy-MM-dd)"),
+                        fieldWithPath("data.coverImageUrl").type(JsonFieldType.STRING).description("표지 이미지 URL")
+                            .optional(),
                         fieldWithPath("data.pages[]").type(JsonFieldType.ARRAY).description("페이지 목록"),
                         fieldWithPath("data.pages[].pageNumber").type(JsonFieldType.NUMBER).description("페이지 번호"),
                         fieldWithPath("data.pages[].imageUrl").type(JsonFieldType.STRING).description("페이지 이미지 URL")

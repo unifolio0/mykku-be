@@ -1,6 +1,5 @@
 package com.example.mykku.docs
 
-import com.example.mykku.notification.NotificationSettingService
 import com.example.mykku.notification.domain.NotificationType
 import com.example.mykku.notification.dto.NotificationSettingResponse
 import com.example.mykku.notification.dto.UpdateNotificationSettingRequest
@@ -10,12 +9,8 @@ import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 
 class NotificationSettingDocumentTest : BaseDocumentTest() {
-
-    @MockitoBean
-    private lateinit var notificationSettingService: NotificationSettingService
 
     @Test
     fun `알림 설정 목록 조회`() {

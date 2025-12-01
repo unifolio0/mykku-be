@@ -5,20 +5,15 @@ import com.example.mykku.contest.dto.ContestWinnersResponse
 import com.example.mykku.dailymessage.dto.DailyMessageSummaryResponse
 import com.example.mykku.event.dto.EventPreviewResponse
 import com.example.mykku.feed.dto.FeedPreviewResponse
-import com.example.mykku.home.HomeService
 import com.example.mykku.home.dto.HomeResponse
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import java.time.LocalDate
 
 class HomeDocumentTest : BaseDocumentTest() {
-
-    @MockitoBean
-    private lateinit var homeService: HomeService
 
     @Test
     fun `홈 데이터 조회`() {
@@ -96,10 +91,14 @@ class HomeDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.contests[].contestTitle").type(JsonFieldType.STRING).description("콘테스트 제목"),
                         fieldWithPath("data.contests[].winners[]").type(JsonFieldType.ARRAY).description("수상자 목록"),
                         fieldWithPath("data.contests[].winners[].id").type(JsonFieldType.NUMBER).description("수상자 ID"),
-                        fieldWithPath("data.contests[].winners[].winnerRank").type(JsonFieldType.NUMBER).description("순위"),
-                        fieldWithPath("data.contests[].winners[].description").type(JsonFieldType.STRING).description("작품 설명"),
-                        fieldWithPath("data.contests[].winners[].acceptanceSpeech").type(JsonFieldType.STRING).description("수상 소감"),
-                        fieldWithPath("data.contests[].winners[].image").type(JsonFieldType.STRING).description("수상작 이미지 URL")
+                        fieldWithPath("data.contests[].winners[].winnerRank").type(JsonFieldType.NUMBER)
+                            .description("순위"),
+                        fieldWithPath("data.contests[].winners[].description").type(JsonFieldType.STRING)
+                            .description("작품 설명"),
+                        fieldWithPath("data.contests[].winners[].acceptanceSpeech").type(JsonFieldType.STRING)
+                            .description("수상 소감"),
+                        fieldWithPath("data.contests[].winners[].image").type(JsonFieldType.STRING)
+                            .description("수상작 이미지 URL")
                     )
             )
             .build()

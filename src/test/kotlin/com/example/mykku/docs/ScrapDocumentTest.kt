@@ -1,13 +1,12 @@
 package com.example.mykku.docs
 
-import com.example.mykku.scrap.ScrapService
 import com.example.mykku.scrap.dto.*
 import com.example.mykku.scrap.exception.ScrapErrorCode
 import com.example.mykku.scrap.exception.ScrapException
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.`when`
 import org.mockito.Mockito.doNothing
+import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.springframework.data.domain.PageImpl
@@ -15,12 +14,8 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 
 class ScrapDocumentTest : BaseDocumentTest() {
-
-    @MockitoBean
-    private lateinit var scrapService: ScrapService
 
     @Test
     fun `피드 저장`() {
@@ -132,7 +127,8 @@ class ScrapDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.pageable.pageNumber").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
                         fieldWithPath("data.pageable.pageSize").type(JsonFieldType.NUMBER).description("페이지 크기"),
                         fieldWithPath("data.pageable.sort").type(JsonFieldType.OBJECT).description("정렬 정보"),
-                        fieldWithPath("data.pageable.sort.empty").type(JsonFieldType.BOOLEAN).description("정렬 정보 비어있음 여부"),
+                        fieldWithPath("data.pageable.sort.empty").type(JsonFieldType.BOOLEAN)
+                            .description("정렬 정보 비어있음 여부"),
                         fieldWithPath("data.pageable.sort.sorted").type(JsonFieldType.BOOLEAN).description("정렬 여부"),
                         fieldWithPath("data.pageable.sort.unsorted").type(JsonFieldType.BOOLEAN).description("비정렬 여부"),
                         fieldWithPath("data.pageable.offset").type(JsonFieldType.NUMBER).description("오프셋"),
@@ -301,12 +297,14 @@ class ScrapDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data").type(JsonFieldType.OBJECT).description("페이지 응답 데이터"),
                         fieldWithPath("data.content[]").type(JsonFieldType.ARRAY).description("저장된 하루덕담 목록"),
                         fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("저장 ID"),
-                        fieldWithPath("data.content[].dailyMessageId").type(JsonFieldType.NUMBER).description("하루덕담 ID"),
+                        fieldWithPath("data.content[].dailyMessageId").type(JsonFieldType.NUMBER)
+                            .description("하루덕담 ID"),
                         fieldWithPath("data.pageable").type(JsonFieldType.OBJECT).description("페이지 정보"),
                         fieldWithPath("data.pageable.pageNumber").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
                         fieldWithPath("data.pageable.pageSize").type(JsonFieldType.NUMBER).description("페이지 크기"),
                         fieldWithPath("data.pageable.sort").type(JsonFieldType.OBJECT).description("정렬 정보"),
-                        fieldWithPath("data.pageable.sort.empty").type(JsonFieldType.BOOLEAN).description("정렬 정보 비어있음 여부"),
+                        fieldWithPath("data.pageable.sort.empty").type(JsonFieldType.BOOLEAN)
+                            .description("정렬 정보 비어있음 여부"),
                         fieldWithPath("data.pageable.sort.sorted").type(JsonFieldType.BOOLEAN).description("정렬 여부"),
                         fieldWithPath("data.pageable.sort.unsorted").type(JsonFieldType.BOOLEAN).description("비정렬 여부"),
                         fieldWithPath("data.pageable.offset").type(JsonFieldType.NUMBER).description("오프셋"),
@@ -441,7 +439,8 @@ class ScrapDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.pageable.pageNumber").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
                         fieldWithPath("data.pageable.pageSize").type(JsonFieldType.NUMBER).description("페이지 크기"),
                         fieldWithPath("data.pageable.sort").type(JsonFieldType.OBJECT).description("정렬 정보"),
-                        fieldWithPath("data.pageable.sort.empty").type(JsonFieldType.BOOLEAN).description("정렬 정보 비어있음 여부"),
+                        fieldWithPath("data.pageable.sort.empty").type(JsonFieldType.BOOLEAN)
+                            .description("정렬 정보 비어있음 여부"),
                         fieldWithPath("data.pageable.sort.sorted").type(JsonFieldType.BOOLEAN).description("정렬 여부"),
                         fieldWithPath("data.pageable.sort.unsorted").type(JsonFieldType.BOOLEAN).description("비정렬 여부"),
                         fieldWithPath("data.pageable.offset").type(JsonFieldType.NUMBER).description("오프셋"),
@@ -576,7 +575,8 @@ class ScrapDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.pageable.pageNumber").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
                         fieldWithPath("data.pageable.pageSize").type(JsonFieldType.NUMBER).description("페이지 크기"),
                         fieldWithPath("data.pageable.sort").type(JsonFieldType.OBJECT).description("정렬 정보"),
-                        fieldWithPath("data.pageable.sort.empty").type(JsonFieldType.BOOLEAN).description("정렬 정보 비어있음 여부"),
+                        fieldWithPath("data.pageable.sort.empty").type(JsonFieldType.BOOLEAN)
+                            .description("정렬 정보 비어있음 여부"),
                         fieldWithPath("data.pageable.sort.sorted").type(JsonFieldType.BOOLEAN).description("정렬 여부"),
                         fieldWithPath("data.pageable.sort.unsorted").type(JsonFieldType.BOOLEAN).description("비정렬 여부"),
                         fieldWithPath("data.pageable.offset").type(JsonFieldType.NUMBER).description("오프셋"),

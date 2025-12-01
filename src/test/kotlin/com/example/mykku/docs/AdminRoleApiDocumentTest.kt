@@ -1,6 +1,5 @@
 package com.example.mykku.docs
 
-import com.example.mykku.admin.service.AdminRoleService
 import com.example.mykku.role.dto.CreateRoleRequest
 import com.example.mykku.role.dto.MemberRoleResponse
 import com.example.mykku.role.dto.RoleResponse
@@ -17,13 +16,9 @@ import org.springframework.restdocs.RestDocumentationContextProvider
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import java.time.LocalDateTime
 
 class AdminRoleApiDocumentTest : BaseDocumentTest() {
-
-    @MockitoBean
-    private lateinit var adminRoleService: AdminRoleService
 
     private lateinit var adminSessionId: String
 
@@ -249,7 +244,8 @@ class AdminRoleApiDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.role").type(JsonFieldType.OBJECT).description("칭호 정보"),
                         fieldWithPath("data.role.id").type(JsonFieldType.NUMBER).description("칭호 ID"),
                         fieldWithPath("data.role.name").type(JsonFieldType.STRING).description("칭호 이름"),
-                        fieldWithPath("data.role.description").type(JsonFieldType.STRING).description("칭호 설명").optional(),
+                        fieldWithPath("data.role.description").type(JsonFieldType.STRING).description("칭호 설명")
+                            .optional(),
                         fieldWithPath("data.earnedAt").type(JsonFieldType.STRING).description("칭호 부여 일시"),
                         fieldWithPath("data.isRepresentative").type(JsonFieldType.BOOLEAN).description("대표 칭호 여부")
                     )

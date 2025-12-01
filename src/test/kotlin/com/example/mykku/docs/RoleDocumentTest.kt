@@ -1,6 +1,5 @@
 package com.example.mykku.docs
 
-import com.example.mykku.role.RoleService
 import com.example.mykku.role.dto.MemberRoleResponse
 import com.example.mykku.role.dto.RoleResponse
 import io.restassured.http.ContentType
@@ -12,13 +11,9 @@ import org.mockito.kotlin.eq
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import java.time.LocalDateTime
 
 class RoleDocumentTest : BaseDocumentTest() {
-
-    @MockitoBean
-    private lateinit var roleService: RoleService
 
     @Test
     fun `내 칭호 목록 조회`() {
@@ -55,7 +50,8 @@ class RoleDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data[].role").type(JsonFieldType.OBJECT).description("칭호 정보"),
                         fieldWithPath("data[].role.id").type(JsonFieldType.NUMBER).description("칭호 ID"),
                         fieldWithPath("data[].role.name").type(JsonFieldType.STRING).description("칭호 이름"),
-                        fieldWithPath("data[].role.description").type(JsonFieldType.STRING).description("칭호 설명").optional(),
+                        fieldWithPath("data[].role.description").type(JsonFieldType.STRING).description("칭호 설명")
+                            .optional(),
                         fieldWithPath("data[].earnedAt").type(JsonFieldType.STRING).description("칭호 획득 일시"),
                         fieldWithPath("data[].isRepresentative").type(JsonFieldType.BOOLEAN).description("대표 칭호 여부")
                     )

@@ -1,22 +1,17 @@
 package com.example.mykku.docs
 
-import com.example.mykku.like.LikeService
 import com.example.mykku.like.dto.*
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.`when`
 import org.mockito.Mockito.doNothing
+import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 
 class LikeDocumentTest : BaseDocumentTest() {
-
-    @MockitoBean
-    private lateinit var likeService: LikeService
 
     @Test
     fun `즐겨찾기한 게시판 목록 조회`() {

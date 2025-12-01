@@ -1,6 +1,5 @@
 package com.example.mykku.docs
 
-import com.example.mykku.dailymessage.DailyMessageCommentService
 import com.example.mykku.dailymessage.dto.CommentResponse
 import com.example.mykku.dailymessage.dto.CreateCommentRequest
 import com.example.mykku.dailymessage.dto.UpdateCommentRequest
@@ -12,13 +11,9 @@ import org.mockito.kotlin.eq
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import java.time.LocalDateTime
 
 class DailyMessageCommentDocumentTest : BaseDocumentTest() {
-
-    @MockitoBean
-    private lateinit var dailyMessageCommentService: DailyMessageCommentService
 
     @Test
     fun `하루 덕담 댓글 생성`() {
@@ -49,7 +44,8 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                     )
                     .requestBodyField(
                         fieldWithPath("content").type(JsonFieldType.STRING).description("댓글 내용"),
-                        fieldWithPath("parentCommentId").type(JsonFieldType.NUMBER).description("부모 댓글 ID (답글인 경우)").optional()
+                        fieldWithPath("parentCommentId").type(JsonFieldType.NUMBER).description("부모 댓글 ID (답글인 경우)")
+                            .optional()
                     )
             )
             .response(

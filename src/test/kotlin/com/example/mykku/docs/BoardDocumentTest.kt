@@ -1,6 +1,5 @@
 package com.example.mykku.docs
 
-import com.example.mykku.board.BoardService
 import com.example.mykku.board.dto.CreateBoardRequest
 import com.example.mykku.board.dto.CreateBoardResponse
 import com.example.mykku.board.dto.UpdateBoardRequest
@@ -15,12 +14,8 @@ import org.mockito.kotlin.eq
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 
 class BoardDocumentTest : BaseDocumentTest() {
-
-    @MockitoBean
-    private lateinit var boardService: BoardService
 
     @Test
     fun `게시판 생성`() {

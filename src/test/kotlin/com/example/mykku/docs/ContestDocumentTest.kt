@@ -1,6 +1,5 @@
 package com.example.mykku.docs
 
-import com.example.mykku.contest.ContestService
 import com.example.mykku.contest.dto.*
 import com.example.mykku.contest.exception.ContestErrorCode
 import com.example.mykku.contest.exception.ContestException
@@ -12,13 +11,9 @@ import org.mockito.kotlin.anyOrNull
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import java.time.LocalDateTime
 
 class ContestDocumentTest : BaseDocumentTest() {
-
-    @MockitoBean
-    private lateinit var contestService: ContestService
 
     @Test
     fun `공모전 생성`() {
@@ -57,7 +52,8 @@ class ContestDocumentTest : BaseDocumentTest() {
                     .requestBodyField(
                         fieldWithPath("title").type(JsonFieldType.STRING).description("공모전 제목"),
                         fieldWithPath("description").type(JsonFieldType.STRING).description("공모전 설명").optional(),
-                        fieldWithPath("expiredAt").type(JsonFieldType.STRING).description("공모전 만료일 (yyyy-MM-dd'T'HH:mm:ss)"),
+                        fieldWithPath("expiredAt").type(JsonFieldType.STRING)
+                            .description("공모전 만료일 (yyyy-MM-dd'T'HH:mm:ss)"),
                         fieldWithPath("images[]").type(JsonFieldType.ARRAY).description("공모전 이미지 목록 (최대 10개)"),
                         fieldWithPath("images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
                         fieldWithPath("images[].orderIndex").type(JsonFieldType.NUMBER).description("이미지 순서"),
@@ -131,7 +127,8 @@ class ContestDocumentTest : BaseDocumentTest() {
                     .description("공모전 목록을 조회합니다. 상태와 정렬 방식으로 필터링할 수 있습니다.")
                     .queryParameter(
                         parameterWithName("status").description("공모전 상태 (ACTIVE, EXPIRED, ALL) 기본값: ACTIVE").optional(),
-                        parameterWithName("sortType").description("정렬 방식 (LATEST, OLDEST, POPULAR) 기본값: LATEST").optional(),
+                        parameterWithName("sortType").description("정렬 방식 (LATEST, OLDEST, POPULAR) 기본값: LATEST")
+                            .optional(),
                         parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
                         parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
                     )
@@ -145,7 +142,8 @@ class ContestDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("공모전 ID"),
                         fieldWithPath("data.content[].title").type(JsonFieldType.STRING).description("공모전 제목"),
                         fieldWithPath("data.content[].expiredAt").type(JsonFieldType.STRING).description("만료일"),
-                        fieldWithPath("data.content[].thumbnailUrl").type(JsonFieldType.STRING).description("썸네일 이미지 URL").optional(),
+                        fieldWithPath("data.content[].thumbnailUrl").type(JsonFieldType.STRING)
+                            .description("썸네일 이미지 URL").optional(),
                         fieldWithPath("data.content[].tags[]").type(JsonFieldType.ARRAY).description("태그 목록"),
                         fieldWithPath("data.content[].isSaved").type(JsonFieldType.BOOLEAN).description("저장 여부"),
                         fieldWithPath("data.page").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
