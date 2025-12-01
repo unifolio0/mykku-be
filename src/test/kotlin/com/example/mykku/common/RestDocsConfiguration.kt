@@ -16,7 +16,7 @@ class RestDocsConfiguration {
             Preprocessors.preprocessRequest(
                 Preprocessors.modifyUris()
                     .scheme("https")
-                    .host("api.mykku.com")
+                    .host("api.dev.mykku.kr")
                     .removePort(),
                 Preprocessors.prettyPrint()
             ),

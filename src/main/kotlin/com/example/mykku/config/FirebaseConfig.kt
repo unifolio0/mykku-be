@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Profile
 import java.io.FileInputStream
 
 @Configuration
-@Profile("!test")
+@Profile("!test & !local")
 class FirebaseConfig(
     @Value("\${firebase.service-account-key-path}")
     private val serviceAccountKeyPath: String

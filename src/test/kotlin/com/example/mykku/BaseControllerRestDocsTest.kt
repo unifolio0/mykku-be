@@ -49,7 +49,7 @@ abstract class BaseControllerRestDocsTest {
             .withRequestDefaults(
                 modifyUris()
                     .scheme("https")
-                    .host("api.mykku.com")
+                    .host("api.dev.mykku.kr")
                     .removePort(),
                 prettyPrint()
             )
