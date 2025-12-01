@@ -126,7 +126,7 @@ tasks.bootJar {
 }
 
 openapi3 {
-    setServer("https://api.mykku.com")
+    setServer("https://api.dev.mykku.kr")
     title = "MyKKU API"
     description = """
 # MyKKU API Documentation
