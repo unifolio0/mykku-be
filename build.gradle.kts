@@ -54,6 +54,7 @@ dependencies {
 
     // RestDocs API Spec
     testImplementation("org.springframework.restdocs:spring-restdocs-restassured")
+    testImplementation("com.epages:restdocs-api-spec:0.18.2")
     testImplementation("com.epages:restdocs-api-spec-restassured:0.18.2")
 }
 
