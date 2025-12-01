@@ -1,48 +1,25 @@
 package com.example.mykku.docs
 
-import com.example.mykku.BaseControllerRestDocsTest
-import com.example.mykku.docs.RestDocsUtils.paginationParams
-import com.example.mykku.fannote.exception.FanNoteException
-import com.example.mykku.fannote.exception.FanNoteErrorCode
-import com.example.mykku.fannote.FanNoteController
-import com.example.mykku.fannote.FanNoteService
 import com.example.mykku.fannote.dto.FanNoteDetailResponse
 import com.example.mykku.fannote.dto.FanNoteListResponse
 import com.example.mykku.fannote.dto.FanNotePageResponse
+import com.example.mykku.fannote.exception.FanNoteErrorCode
+import com.example.mykku.fannote.exception.FanNoteException
+import io.restassured.http.ContentType
 import org.junit.jupiter.api.Test
-import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
-import org.springframework.http.MediaType
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
-import org.springframework.restdocs.payload.PayloadDocumentation.responseFields
-import org.springframework.restdocs.request.RequestDocumentation.*
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import org.springframework.test.web.servlet.setup.MockMvcBuilders
-import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
+import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
 
-class FanNoteControllerRestDocsTest : BaseControllerRestDocsTest() {
-
-    @Mock
-    private lateinit var fanNoteService: FanNoteService
-
-    private lateinit var fanNoteController: FanNoteController
-
-    override fun createMockMvcBuilder(): StandaloneMockMvcBuilder {
-        fanNoteController = FanNoteController(fanNoteService)
-        return MockMvcBuilders.standaloneSetup(fanNoteController)
-    }
+class FanNoteDocumentTest : BaseDocumentTest() {
 
     @Test
-    fun `덕질노트 목록 조회 API 문서화`() {
-        // given
+    fun `덕질노트 목록 조회`() {
         val fanNoteList = listOf(
             FanNoteListResponse(
                 id = 1L,
@@ -65,25 +42,22 @@ class FanNoteControllerRestDocsTest : BaseControllerRestDocsTest() {
 
         `when`(fanNoteService.getFanNoteList(any())).thenReturn(fanNotePage)
 
-        // when & then
-        mockMvc.perform(
-            RestDocumentationRequestBuilders.get("/api/v1/fan-notes")
-                .param("page", "0")
-                .param("size", "20")
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-            .andDo(MockMvcResultHandlers.print())
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("$.message").value("덕질노트 목록 조회 성공"))
-            .andDo(
-                document(
-                    "fan-note-list",
-                    queryParameters(
-                        *paginationParams(pageDefault = 0, sizeDefault = 20).toTypedArray()
-                    ),
-                    responseFields(
+        val documentFilter = document("fan-note/list", 200)
+            .request(
+                request()
+                    .tag(Tag.FAN_NOTE_API)
+                    .summary("덕질노트 목록 조회")
+                    .description("덕질노트 목록을 페이지네이션으로 조회합니다.")
+                    .queryParameter(
+                        parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
+                        parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
+                    )
+            )
+            .response(
+                response()
+                    .responseBodyField(
                         fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
+                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("페이지 응답 데이터"),
                         fieldWithPath("data.content[]").type(JsonFieldType.ARRAY).description("덕질노트 목록"),
                         fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("덕질노트 ID"),
                         fieldWithPath("data.content[].title").type(JsonFieldType.STRING).description("덕질노트 제목"),
@@ -119,13 +93,21 @@ class FanNoteControllerRestDocsTest : BaseControllerRestDocsTest() {
                         fieldWithPath("data.sort.sorted").type(JsonFieldType.BOOLEAN).description("정렬됨 여부"),
                         fieldWithPath("data.sort.unsorted").type(JsonFieldType.BOOLEAN).description("정렬되지 않음 여부")
                     )
-                )
             )
+            .build()
+
+        given(documentFilter)
+            .contentType(ContentType.JSON)
+            .param("page", "0")
+            .param("size", "20")
+            .`when`()
+            .get("/api/v1/fan-notes")
+            .then()
+            .statusCode(200)
     }
 
     @Test
-    fun `덕질노트 상세 조회 API 문서화`() {
-        // given
+    fun `덕질노트 상세 조회`() {
         val fanNoteId = 1L
         val fanNoteDetail = FanNoteDetailResponse(
             id = fanNoteId,
@@ -137,32 +119,27 @@ class FanNoteControllerRestDocsTest : BaseControllerRestDocsTest() {
             pages = listOf(
                 FanNotePageResponse(1, "https://s3.amazonaws.com/mykku/pages/page1.jpg"),
                 FanNotePageResponse(2, "https://s3.amazonaws.com/mykku/pages/page2.jpg"),
-                FanNotePageResponse(3, "https://s3.amazonaws.com/mykku/pages/page3.jpg"),
-                FanNotePageResponse(4, "https://s3.amazonaws.com/mykku/pages/page4.jpg"),
-                FanNotePageResponse(5, "https://s3.amazonaws.com/mykku/pages/page5.jpg")
+                FanNotePageResponse(3, "https://s3.amazonaws.com/mykku/pages/page3.jpg")
             )
         )
 
-        `when`(fanNoteService.getFanNoteDetail(fanNoteId)).thenReturn(fanNoteDetail)
+        `when`(fanNoteService.getFanNoteDetail(eq(fanNoteId))).thenReturn(fanNoteDetail)
 
-        // when & then
-        mockMvc.perform(
-            RestDocumentationRequestBuilders.get("/api/v1/fan-notes/{fanNoteId}", fanNoteId)
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-            .andDo(MockMvcResultHandlers.print())
-            .andExpect(jsonPath("$.message").value("덕질노트 상세 조회 성공"))
-            .andExpect(jsonPath("$.data.id").value(fanNoteId))
-            .andExpect(jsonPath("$.data.pages.length()").value(5))
-            .andDo(
-                document(
-                    "fan-note-detail",
-                    pathParameters(
-                        parameterWithName("fanNoteId").description("덕질노트 ID")
-                    ),
-                    responseFields(
+        val documentFilter = document("fan-note/detail", 200)
+            .request(
+                request()
+                    .tag(Tag.FAN_NOTE_API)
+                    .summary("덕질노트 상세 조회")
+                    .description("덕질노트의 상세 정보를 조회합니다.")
+                    .pathParameter(
+                        parameterWithName("fanNoteId").description("조회할 덕질노트 ID")
+                    )
+            )
+            .response(
+                response()
+                    .responseBodyField(
                         fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
+                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("덕질노트 상세 정보"),
                         fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("덕질노트 ID"),
                         fieldWithPath("data.title").type(JsonFieldType.STRING).description("덕질노트 제목"),
                         fieldWithPath("data.subtitle").type(JsonFieldType.STRING).description("서브 제목").optional(),
@@ -173,38 +150,44 @@ class FanNoteControllerRestDocsTest : BaseControllerRestDocsTest() {
                             .optional(),
                         fieldWithPath("data.pages[]").type(JsonFieldType.ARRAY).description("페이지 목록"),
                         fieldWithPath("data.pages[].pageNumber").type(JsonFieldType.NUMBER).description("페이지 번호"),
-                        fieldWithPath("data.pages[].imageUrl").type(JsonFieldType.STRING)
-                            .description("페이지 이미지 URL (S3)")
+                        fieldWithPath("data.pages[].imageUrl").type(JsonFieldType.STRING).description("페이지 이미지 URL")
                     )
-                )
             )
+            .build()
+
+        given(documentFilter)
+            .contentType(ContentType.JSON)
+            .`when`()
+            .get("/api/v1/fan-notes/{fanNoteId}", fanNoteId)
+            .then()
+            .statusCode(200)
     }
 
     @Test
-    fun `존재하지 않는 덕질노트 조회 시 404 에러 문서화`() {
-        // given
+    fun `존재하지 않는 덕질노트 조회`() {
         val fanNoteId = 999L
-        `when`(fanNoteService.getFanNoteDetail(fanNoteId))
+
+        `when`(fanNoteService.getFanNoteDetail(eq(fanNoteId)))
             .thenThrow(FanNoteException(FanNoteErrorCode.FAN_NOTE_NOT_FOUND))
 
-        // when & then
-        mockMvc.perform(
-            RestDocumentationRequestBuilders.get("/api/v1/fan-notes/{fanNoteId}", fanNoteId)
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-            .andDo(MockMvcResultHandlers.print())
-            .andExpect(status().isNotFound)
-            .andExpect(jsonPath("$.message").value("덕질노트를 찾을 수 없습니다"))
-            .andDo(
-                document(
-                    "fan-note-not-found",
-                    pathParameters(
+        val documentFilter = document("fan-note/detail", "FAN_NOTE_NOT_FOUND")
+            .request(
+                request()
+                    .tag(Tag.FAN_NOTE_API)
+                    .summary("존재하지 않는 덕질노트 조회")
+                    .description("존재하지 않는 덕질노트를 조회할 때 발생하는 에러입니다.")
+                    .pathParameter(
                         parameterWithName("fanNoteId").description("존재하지 않는 덕질노트 ID")
-                    ),
-                    responseFields(
-                        fieldWithPath("message").type(JsonFieldType.STRING).description("에러 메시지")
                     )
-                )
             )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .contentType(ContentType.JSON)
+            .`when`()
+            .get("/api/v1/fan-notes/{fanNoteId}", fanNoteId)
+            .then()
+            .statusCode(404)
     }
 }

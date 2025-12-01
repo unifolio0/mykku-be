@@ -13,6 +13,30 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: mykku_test
+        ports:
+          - 3311:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -38,8 +62,8 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Build with Gradle (skip tests)
-        run: ./gradlew clean bootJar -x test -x asciidoctor --info
+      - name: Build with Gradle
+        run: ./gradlew clean build --info
 
       - name: Change artifact file name
         run: |

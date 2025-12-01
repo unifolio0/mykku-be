@@ -4,7 +4,8 @@ plugins {
     id("org.springframework.boot") version "3.4.5"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.jpa") version "1.9.25"
-    id("org.asciidoctor.jvm.convert") version "3.3.2"
+    id("com.epages.restdocs-api-spec") version "0.18.2"
+    id("org.hidetake.swagger.generator") version "2.18.2"
 }
 
 group = "com.example"
@@ -19,8 +20,6 @@ java {
 repositories {
     mavenCentral()
 }
-
-val asciidoctorExt: Configuration by configurations.creating
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -41,15 +40,22 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.3")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.3")
     runtimeOnly("com.mysql:mysql-connector-j")
+
+    // Swagger UI
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
-    testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
-    testImplementation("io.rest-assured:rest-assured:5.4.0")
-    testImplementation("io.rest-assured:spring-mock-mvc:5.4.0")
+    testImplementation("io.rest-assured:rest-assured:5.5.0")
+    testImplementation("io.rest-assured:spring-mock-mvc:5.5.0")
     testImplementation("com.h2database:h2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    asciidoctorExt("org.springframework.restdocs:spring-restdocs-asciidoctor")
+
+    // RestDocs API Spec
+    testImplementation("org.springframework.restdocs:spring-restdocs-restassured")
+    testImplementation("com.epages:restdocs-api-spec:0.18.2")
+    testImplementation("com.epages:restdocs-api-spec-restassured:0.18.2")
 }
 
 kotlin {
@@ -69,44 +75,60 @@ tasks.withType<Test> {
     outputs.dir("build/generated-snippets")
 }
 
-tasks.asciidoctor {
-    dependsOn(tasks.test)
-    configurations(asciidoctorExt.name)
-    baseDirFollowsSourceFile()
-    inputs.dir("build/generated-snippets")
-    doFirst {
-        file("build/generated-snippets").mkdirs()
-    }
-}
-
-tasks.register("copyDocument", Copy::class) {
-    dependsOn(tasks.asciidoctor)
-    from("build/docs/asciidoc")
-    into("src/main/resources/static/docs")
-}
-
-tasks.register("generateDocs") {
-    group = "documentation"
-    description = "Generate API documentation from tests"
-    dependsOn(tasks.test, tasks.asciidoctor)
-    finalizedBy("copyDocument")
-    doLast {
-        println("API documentation generated at: src/main/resources/static/docs/")
-        println("Don't forget to commit the generated files!")
-    }
-}
-
-tasks.build {
-    dependsOn(tasks.getByName("copyDocument"))
-}
-
 tasks.bootJar {
-    dependsOn(tasks.asciidoctor)
-    from("build/docs/asciidoc") {
+    dependsOn("openapi3")
+    from(layout.buildDirectory.dir("resources/main/static/docs")) {
         into("static/docs")
     }
-
     from("mykku-be-config/templates") {
         into("templates")
+    }
+}
+
+openapi3 {
+    setServer("https://api.dev.mykku.kr")
+    title = "MyKKU API"
+    description = """
+# MyKKU API Documentation
+
+## 공통 응답 구조
+모든 API는 다음과 같은 공통 응답 구조를 가집니다:
+```json
+{
+  "message": "응답 메시지",
+  "data": { /* 응답 데이터 */ }
+}
+```
+
+## HTTP 상태 코드
+| 상태 코드 | 설명 |
+|----------|------|
+| 200 OK | 요청 성공 |
+| 201 Created | 리소스 생성 성공 |
+| 400 Bad Request | 잘못된 요청 |
+| 401 Unauthorized | 인증 실패 |
+| 403 Forbidden | 권한 없음 |
+| 404 Not Found | 리소스를 찾을 수 없음 |
+| 500 Internal Server Error | 서버 오류 |
+    """.trimIndent()
+    version = "1.0.0"
+    format = "yaml"
+    outputDirectory = layout.buildDirectory.dir("resources/main/static/docs").get().asFile.path
+}
+
+tasks.named("generateSwaggerUI") {
+    dependsOn("openapi3")
+
+    doFirst {
+        delete(fileTree("src/main/resources/static/docs/") {
+            exclude(".gitkeep")
+        })
+    }
+
+    doLast {
+        copy {
+            from(layout.buildDirectory.dir("resources/main/static/docs/"))
+            into("src/main/resources/static/docs/")
+        }
     }
 }

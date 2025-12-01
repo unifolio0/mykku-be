@@ -1,43 +1,22 @@
 package com.example.mykku.docs
 
-import com.example.mykku.BaseControllerRestDocsTest
-import com.example.mykku.contest.ContestController
-import com.example.mykku.contest.ContestService
 import com.example.mykku.contest.dto.*
 import com.example.mykku.contest.exception.ContestErrorCode
 import com.example.mykku.contest.exception.ContestException
+import io.restassured.http.ContentType
 import org.junit.jupiter.api.Test
-import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
-import org.springframework.http.MediaType
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
+import org.mockito.kotlin.anyOrNull
 import org.springframework.restdocs.payload.JsonFieldType
-import org.springframework.restdocs.payload.PayloadDocumentation.*
-import org.springframework.restdocs.request.RequestDocumentation.*
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import org.springframework.test.web.servlet.setup.MockMvcBuilders
-import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder
+import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
+import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
 import java.time.LocalDateTime
 
-class ContestControllerRestDocsTest : BaseControllerRestDocsTest() {
-
-    @Mock
-    private lateinit var contestService: ContestService
-
-    private lateinit var contestController: ContestController
-
-    override fun createMockMvcBuilder(): StandaloneMockMvcBuilder {
-        contestController = ContestController(contestService)
-        return MockMvcBuilders.standaloneSetup(contestController)
-    }
+class ContestDocumentTest : BaseDocumentTest() {
 
     @Test
-    fun `공모전 생성 API 문서화`() {
-        // given
+    fun `공모전 생성`() {
         val request = CreateContestRequest(
             title = "신규 공모전",
             description = "공모전 상세 설명입니다.",
@@ -64,28 +43,26 @@ class ContestControllerRestDocsTest : BaseControllerRestDocsTest() {
 
         `when`(contestService.createContest(any())).thenReturn(response)
 
-        // when & then
-        mockMvc.perform(
-            RestDocumentationRequestBuilders.post("/api/v1/contests")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
-        )
-            .andDo(MockMvcResultHandlers.print())
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("$.message").value("공모전이 성공적으로 생성되었습니다."))
-            .andDo(
-                document(
-                    "contest-create",
-                    requestFields(
+        val documentFilter = document("contest/create", 200)
+            .request(
+                request()
+                    .tag(Tag.CONTEST_API)
+                    .summary("공모전 생성")
+                    .description("새로운 공모전을 생성합니다.")
+                    .requestBodyField(
                         fieldWithPath("title").type(JsonFieldType.STRING).description("공모전 제목"),
                         fieldWithPath("description").type(JsonFieldType.STRING).description("공모전 설명").optional(),
-                        fieldWithPath("expiredAt").type(JsonFieldType.STRING).description("공모전 만료일 (yyyy-MM-dd'T'HH:mm:ss)"),
+                        fieldWithPath("expiredAt").type(JsonFieldType.STRING)
+                            .description("공모전 만료일 (yyyy-MM-dd'T'HH:mm:ss)"),
                         fieldWithPath("images[]").type(JsonFieldType.ARRAY).description("공모전 이미지 목록 (최대 10개)"),
                         fieldWithPath("images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
                         fieldWithPath("images[].orderIndex").type(JsonFieldType.NUMBER).description("이미지 순서"),
                         fieldWithPath("tags[]").type(JsonFieldType.ARRAY).description("공모전 태그 목록 (최대 7개)")
-                    ),
-                    responseFields(
+                    )
+            )
+            .response(
+                response()
+                    .responseBodyField(
                         fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                         fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
                         fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("생성된 공모전 ID"),
@@ -98,13 +75,20 @@ class ContestControllerRestDocsTest : BaseControllerRestDocsTest() {
                         fieldWithPath("data.tags[]").type(JsonFieldType.ARRAY).description("공모전 태그 목록"),
                         fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성일시")
                     )
-                )
             )
+            .build()
+
+        given(documentFilter)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .post("/api/v1/contests")
+            .then()
+            .statusCode(200)
     }
 
     @Test
-    fun `공모전 목록 조회 API 문서화`() {
-        // given
+    fun `공모전 목록 조회`() {
         val contestList = listOf(
             ContestListResponse(
                 id = 1L,
@@ -133,37 +117,33 @@ class ContestControllerRestDocsTest : BaseControllerRestDocsTest() {
             isLast = true
         )
 
-        `when`(contestService.getContests(any(), any(), any(), any(), any())).thenReturn(response)
+        `when`(contestService.getContests(any(), any(), any(), any(), anyOrNull())).thenReturn(response)
 
-        // when & then
-        mockMvc.perform(
-            RestDocumentationRequestBuilders.get("/api/v1/contests")
-                .param("status", "ACTIVE")
-                .param("sortType", "LATEST")
-                .param("page", "0")
-                .param("size", "20")
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-            .andDo(MockMvcResultHandlers.print())
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("$.message").value("공모전 목록을 성공적으로 조회했습니다."))
-            .andDo(
-                document(
-                    "contest-list",
-                    queryParameters(
-                        parameterWithName("status").description("공모전 상태 (ACTIVE, EXPIRED, ALL)").optional(),
-                        parameterWithName("sortType").description("정렬 방식 (LATEST, OLDEST, POPULAR)").optional(),
-                        parameterWithName("page").description("페이지 번호 (0부터 시작)").optional(),
-                        parameterWithName("size").description("페이지 크기").optional()
-                    ),
-                    responseFields(
+        val documentFilter = document("contest/list", 200)
+            .request(
+                request()
+                    .tag(Tag.CONTEST_API)
+                    .summary("공모전 목록 조회")
+                    .description("공모전 목록을 조회합니다. 상태와 정렬 방식으로 필터링할 수 있습니다.")
+                    .queryParameter(
+                        parameterWithName("status").description("공모전 상태 (ACTIVE, EXPIRED, ALL) 기본값: ACTIVE").optional(),
+                        parameterWithName("sortType").description("정렬 방식 (LATEST, OLDEST, POPULAR) 기본값: LATEST")
+                            .optional(),
+                        parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
+                        parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
+                    )
+            )
+            .response(
+                response()
+                    .responseBodyField(
                         fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                         fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
                         fieldWithPath("data.content[]").type(JsonFieldType.ARRAY).description("공모전 목록"),
                         fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("공모전 ID"),
                         fieldWithPath("data.content[].title").type(JsonFieldType.STRING).description("공모전 제목"),
                         fieldWithPath("data.content[].expiredAt").type(JsonFieldType.STRING).description("만료일"),
-                        fieldWithPath("data.content[].thumbnailUrl").type(JsonFieldType.STRING).description("썸네일 이미지 URL").optional(),
+                        fieldWithPath("data.content[].thumbnailUrl").type(JsonFieldType.STRING)
+                            .description("썸네일 이미지 URL").optional(),
                         fieldWithPath("data.content[].tags[]").type(JsonFieldType.ARRAY).description("태그 목록"),
                         fieldWithPath("data.content[].isSaved").type(JsonFieldType.BOOLEAN).description("저장 여부"),
                         fieldWithPath("data.page").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
@@ -172,13 +152,22 @@ class ContestControllerRestDocsTest : BaseControllerRestDocsTest() {
                         fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
                         fieldWithPath("data.isLast").type(JsonFieldType.BOOLEAN).description("마지막 페이지 여부")
                     )
-                )
             )
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .param("status", "ACTIVE")
+            .param("sortType", "LATEST")
+            .`when`()
+            .get("/api/v1/contests")
+            .then()
+            .statusCode(200)
     }
 
     @Test
-    fun `공모전 상세 조회 API 문서화`() {
-        // given
+    fun `공모전 상세 조회`() {
         val contestId = 1L
         val response = ContestDetailResponse(
             id = contestId,
@@ -194,23 +183,21 @@ class ContestControllerRestDocsTest : BaseControllerRestDocsTest() {
             createdAt = LocalDateTime.now()
         )
 
-        `when`(contestService.getContestDetail(any(), any())).thenReturn(response)
+        `when`(contestService.getContestDetail(any(), anyOrNull())).thenReturn(response)
 
-        // when & then
-        mockMvc.perform(
-            RestDocumentationRequestBuilders.get("/api/v1/contests/{contestId}", contestId)
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-            .andDo(MockMvcResultHandlers.print())
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("$.message").value("공모전 상세 정보를 성공적으로 조회했습니다."))
-            .andDo(
-                document(
-                    "contest-detail",
-                    pathParameters(
+        val documentFilter = document("contest/detail", 200)
+            .request(
+                request()
+                    .tag(Tag.CONTEST_API)
+                    .summary("공모전 상세 조회")
+                    .description("특정 공모전의 상세 정보를 조회합니다.")
+                    .pathParameter(
                         parameterWithName("contestId").description("공모전 ID")
-                    ),
-                    responseFields(
+                    )
+            )
+            .response(
+                response()
+                    .responseBodyField(
                         fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                         fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
                         fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("공모전 ID"),
@@ -224,35 +211,43 @@ class ContestControllerRestDocsTest : BaseControllerRestDocsTest() {
                         fieldWithPath("data.isSaved").type(JsonFieldType.BOOLEAN).description("저장 여부"),
                         fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성일시")
                     )
-                )
             )
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .`when`()
+            .get("/api/v1/contests/{contestId}", contestId)
+            .then()
+            .statusCode(200)
     }
 
     @Test
-    fun `존재하지 않는 공모전 조회 시 404 에러 문서화`() {
-        // given
+    fun `존재하지 않는 공모전 조회`() {
         val contestId = 999L
-        `when`(contestService.getContestDetail(any(), any()))
+        `when`(contestService.getContestDetail(any(), anyOrNull()))
             .thenThrow(ContestException(ContestErrorCode.CONTEST_NOT_FOUND))
 
-        // when & then
-        mockMvc.perform(
-            RestDocumentationRequestBuilders.get("/api/v1/contests/{contestId}", contestId)
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-            .andDo(MockMvcResultHandlers.print())
-            .andExpect(status().isNotFound)
-            .andExpect(jsonPath("$.message").value("콘테스트를 찾을 수 없습니다"))
-            .andDo(
-                document(
-                    "contest-not-found",
-                    pathParameters(
+        val documentFilter = document("contest/detail", "CONTEST_NOT_FOUND")
+            .request(
+                request()
+                    .tag(Tag.CONTEST_API)
+                    .summary("공모전 상세 조회 - 존재하지 않는 공모전")
+                    .description("존재하지 않는 공모전을 조회할 때 반환되는 에러 응답입니다.")
+                    .pathParameter(
                         parameterWithName("contestId").description("존재하지 않는 공모전 ID")
-                    ),
-                    responseFields(
-                        fieldWithPath("message").type(JsonFieldType.STRING).description("에러 메시지")
                     )
-                )
             )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .`when`()
+            .get("/api/v1/contests/{contestId}", contestId)
+            .then()
+            .statusCode(404)
     }
 }
