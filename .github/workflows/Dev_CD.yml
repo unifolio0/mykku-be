@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "develop"
+      - "refactor/#98"
 
 jobs:
   test:
@@ -39,7 +40,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle (skip tests)
-        run: ./gradlew clean bootJar -x test -x asciidoctor --info
+        run: ./gradlew clean bootJar -x test --info
 
       - name: Change artifact file name
         run: |

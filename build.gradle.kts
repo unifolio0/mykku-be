@@ -4,7 +4,6 @@ plugins {
     id("org.springframework.boot") version "3.4.5"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.jpa") version "1.9.25"
-    id("org.asciidoctor.jvm.convert") version "3.3.2"
     id("com.epages.restdocs-api-spec") version "0.18.2"
     id("org.hidetake.swagger.generator") version "2.18.2"
 }
@@ -21,8 +20,6 @@ java {
 repositories {
     mavenCentral()
 }
-
-val asciidoctorExt: Configuration by configurations.creating
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -50,7 +47,6 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
-    testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
     testImplementation("io.rest-assured:rest-assured:5.5.0")
     testImplementation("io.rest-assured:spring-mock-mvc:5.5.0")
     testImplementation("com.h2database:h2")
@@ -58,10 +54,7 @@ dependencies {
 
     // RestDocs API Spec
     testImplementation("org.springframework.restdocs:spring-restdocs-restassured")
-    testImplementation("com.epages:restdocs-api-spec-mockmvc:0.18.2")
     testImplementation("com.epages:restdocs-api-spec-restassured:0.18.2")
-
-    asciidoctorExt("org.springframework.restdocs:spring-restdocs-asciidoctor")
 }
 
 kotlin {
@@ -81,42 +74,8 @@ tasks.withType<Test> {
     outputs.dir("build/generated-snippets")
 }
 
-tasks.asciidoctor {
-    dependsOn(tasks.test)
-    configurations(asciidoctorExt.name)
-    baseDirFollowsSourceFile()
-    inputs.dir("build/generated-snippets")
-    doFirst {
-        file("build/generated-snippets").mkdirs()
-    }
-}
-
-tasks.register("copyDocument", Copy::class) {
-    dependsOn(tasks.asciidoctor)
-    from("build/docs/asciidoc")
-    into("src/main/resources/static/docs")
-}
-
-tasks.register("generateDocs") {
-    group = "documentation"
-    description = "Generate API documentation from tests"
-    dependsOn(tasks.test, tasks.asciidoctor)
-    finalizedBy("copyDocument")
-    doLast {
-        println("API documentation generated at: src/main/resources/static/docs/")
-        println("Don't forget to commit the generated files!")
-    }
-}
-
-tasks.build {
-    dependsOn(tasks.getByName("copyDocument"))
-}
-
 tasks.bootJar {
-    dependsOn(tasks.asciidoctor, "openapi3")
-    from("build/docs/asciidoc") {
-        into("static/docs")
-    }
+    dependsOn("openapi3")
     from(layout.buildDirectory.dir("resources/main/static/docs")) {
         into("static/docs")
     }
