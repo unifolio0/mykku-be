@@ -1,8 +1,8 @@
 package com.example.mykku.scrap.repository
 
 import com.example.mykku.BaseRepositoryTest
-import com.example.mykku.feed.domain.Event
-import com.example.mykku.feed.repository.EventRepository
+import com.example.mykku.event.domain.Event
+import com.example.mykku.event.repository.EventRepository
 import com.example.mykku.scrap.domain.SaveEvent
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
@@ -32,7 +32,6 @@ class SaveEventRepositoryTest : BaseRepositoryTest() {
         val event = eventRepository.save(
             Event(
                 title = "테스트 이벤트",
-                isContest = true,
                 expiredAt = LocalDateTime.now().plusDays(7)
             )
         )
@@ -61,7 +60,7 @@ class SaveEventRepositoryTest : BaseRepositoryTest() {
         // given
         val member = createAndSaveMember()
         val event = eventRepository.save(
-            Event(title = "이벤트", isContest = false, expiredAt = LocalDateTime.now().plusDays(1))
+            Event(title = "이벤트", expiredAt = LocalDateTime.now().plusDays(1))
         )
 
         saveEventRepository.save(SaveEvent(member = member, event = event))
@@ -83,7 +82,6 @@ class SaveEventRepositoryTest : BaseRepositoryTest() {
             val event = eventRepository.save(
                 Event(
                     title = "이벤트$i",
-                    isContest = i % 2 == 0,
                     expiredAt = LocalDateTime.now().plusDays(i.toLong())
                 )
             )
@@ -107,7 +105,7 @@ class SaveEventRepositoryTest : BaseRepositoryTest() {
         // given
         val member = createAndSaveMember()
         val event = eventRepository.save(
-            Event(title = "삭제할 이벤트", isContest = false, expiredAt = LocalDateTime.now().plusDays(1))
+            Event(title = "삭제할 이벤트", expiredAt = LocalDateTime.now().plusDays(1))
         )
 
         saveEventRepository.save(SaveEvent(member = member, event = event))
@@ -128,13 +126,13 @@ class SaveEventRepositoryTest : BaseRepositoryTest() {
     fun `회원과 여러 이벤트로 저장된 이벤트 목록을 조회한다`() {
         val member = createAndSaveMember()
         val event1 = eventRepository.save(
-            Event(title = "이벤트1", isContest = false, expiredAt = LocalDateTime.now().plusDays(1))
+            Event(title = "이벤트1", expiredAt = LocalDateTime.now().plusDays(1))
         )
         val event2 = eventRepository.save(
-            Event(title = "이벤트2", isContest = false, expiredAt = LocalDateTime.now().plusDays(2))
+            Event(title = "이벤트2", expiredAt = LocalDateTime.now().plusDays(2))
         )
         val event3 = eventRepository.save(
-            Event(title = "이벤트3", isContest = false, expiredAt = LocalDateTime.now().plusDays(3))
+            Event(title = "이벤트3", expiredAt = LocalDateTime.now().plusDays(3))
         )
 
         saveEventRepository.save(SaveEvent(member = member, event = event1))

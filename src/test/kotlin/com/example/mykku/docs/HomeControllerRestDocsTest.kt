@@ -2,9 +2,9 @@ package com.example.mykku.docs
 
 import com.example.mykku.BaseControllerRestDocsTest
 import com.example.mykku.dailymessage.dto.DailyMessageSummaryResponse
-import com.example.mykku.feed.dto.ContestWinnerResponse
-import com.example.mykku.feed.dto.ContestWinnersResponse
-import com.example.mykku.feed.dto.EventPreviewResponse
+import com.example.mykku.contest.dto.ContestWinnerResponse
+import com.example.mykku.contest.dto.ContestWinnersResponse
+import com.example.mykku.event.dto.EventPreviewResponse
 import com.example.mykku.feed.dto.FeedPreviewResponse
 import com.example.mykku.home.HomeController
 import com.example.mykku.home.HomeService
@@ -91,22 +91,29 @@ class HomeControllerRestDocsTest : BaseControllerRestDocsTest() {
             ),
             contests = listOf(
                 ContestWinnersResponse(
-                    title = "12월 사진 콘테스트",
+                    contestId = 1L,
+                    contestTitle = "12월 사진 콘테스트",
                     winners = listOf(
                         ContestWinnerResponse(
                             id = 1L,
-                            image = "https://example.com/contest-winner1.jpg",
-                            rank = 1
+                            winnerRank = 1,
+                            description = "우수 작품 1등",
+                            acceptanceSpeech = "감사합니다",
+                            image = "https://example.com/contest-winner1.jpg"
                         ),
                         ContestWinnerResponse(
                             id = 2L,
-                            image = "https://example.com/contest-winner2.jpg",
-                            rank = 2
+                            winnerRank = 2,
+                            description = "우수 작품 2등",
+                            acceptanceSpeech = "영광입니다",
+                            image = "https://example.com/contest-winner2.jpg"
                         ),
                         ContestWinnerResponse(
                             id = 3L,
-                            image = "https://example.com/contest-winner3.jpg",
-                            rank = 3
+                            winnerRank = 3,
+                            description = "우수 작품 3등",
+                            acceptanceSpeech = "행복합니다",
+                            image = "https://example.com/contest-winner3.jpg"
                         )
                     )
                 )
@@ -146,12 +153,15 @@ class HomeControllerRestDocsTest : BaseControllerRestDocsTest() {
                         fieldWithPath("data.feeds[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                         fieldWithPath("data.feeds[].commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
                         fieldWithPath("data.contests").type(JsonFieldType.ARRAY).description("콘테스트 목록"),
-                        fieldWithPath("data.contests[].title").type(JsonFieldType.STRING).description("콘테스트 제목"),
+                        fieldWithPath("data.contests[].contestId").type(JsonFieldType.NUMBER).description("콘테스트 ID"),
+                        fieldWithPath("data.contests[].contestTitle").type(JsonFieldType.STRING).description("콘테스트 제목"),
                         fieldWithPath("data.contests[].winners").type(JsonFieldType.ARRAY).description("콘테스트 수상자 목록"),
                         fieldWithPath("data.contests[].winners[].id").type(JsonFieldType.NUMBER).description("수상자 ID"),
+                        fieldWithPath("data.contests[].winners[].winnerRank").type(JsonFieldType.NUMBER).description("순위"),
+                        fieldWithPath("data.contests[].winners[].description").type(JsonFieldType.STRING).description("작품 설명"),
+                        fieldWithPath("data.contests[].winners[].acceptanceSpeech").type(JsonFieldType.STRING).description("수상 소감"),
                         fieldWithPath("data.contests[].winners[].image").type(JsonFieldType.STRING)
-                            .description("수상작 이미지 URL"),
-                        fieldWithPath("data.contests[].winners[].rank").type(JsonFieldType.NUMBER).description("순위")
+                            .description("수상작 이미지 URL")
                     )
                 )
             )

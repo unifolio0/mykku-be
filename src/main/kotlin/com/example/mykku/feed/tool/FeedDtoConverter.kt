@@ -27,9 +27,9 @@ class FeedDtoConverter(
     ): FeedResponse {
         val fetchedData = fetchFeedData(feed, feedImages, feedTags, feedComments)
         val interactions = fetchInteractions(memberId, feed)
-        val eventTagTitles = getEventTagTitles(fetchedData.tags)
+        val contestTagTitles = getContestTagTitles(fetchedData.tags)
 
-        return buildFeedResponse(feed, fetchedData, interactions, eventTagTitles)
+        return buildFeedResponse(feed, fetchedData, interactions, contestTagTitles)
     }
 
     fun convertToFeedResponsesBatch(memberId: String, feeds: List<Feed>): List<FeedResponse> {
@@ -68,24 +68,24 @@ class FeedDtoConverter(
         return InteractionData(isLiked, isSaved)
     }
 
-    private fun getEventTagTitles(feedTags: List<FeedTag>): Set<String> {
+    private fun getContestTagTitles(feedTags: List<FeedTag>): Set<String> {
         val tagTitles = feedTags.map { it.title }
-        val eventTags = feedReader.getEventTagsByTitles(tagTitles)
-        return eventTags.map { it.title }.toSet()
+        val contestTags = feedReader.getContestTagsByTitles(tagTitles)
+        return contestTags.map { it.title }.toSet()
     }
 
     private fun buildFeedResponse(
         feed: Feed,
         feedData: FeedData,
         interactions: InteractionData,
-        eventTagTitles: Set<String>
+        contestTagTitles: Set<String>
     ): FeedResponse {
         return FeedResponse(
             feed,
             AuthorResponse(feed.member),
             interactions.isLiked,
             interactions.isSaved,
-            eventTagTitles,
+            contestTagTitles,
             feedData.images,
             feedData.tags,
             feedData.comments
@@ -95,14 +95,14 @@ class FeedDtoConverter(
     private fun fetchBatchData(memberId: String, feeds: List<Feed>): BatchFeedData {
         val interactions = fetchBatchInteractions(memberId, feeds)
         val feedData = fetchBatchFeedData(feeds)
-        val eventTagsMap = fetchEventTagsMap(feedData.feedTagsMap)
+        val contestTagsMap = fetchContestTagsMap(feedData.feedTagsMap)
 
         return BatchFeedData(
             likedFeedIds = interactions.likedFeedIds,
             savedFeedIds = interactions.savedFeedIds,
             feedImagesMap = feedData.feedImagesMap,
             feedTagsMap = feedData.feedTagsMap,
-            eventTagsMap = eventTagsMap
+            contestTagsMap = contestTagsMap
         )
     }
 
@@ -125,9 +125,9 @@ class FeedDtoConverter(
         )
     }
 
-    private fun fetchEventTagsMap(feedTagsMap: Map<Long, List<FeedTag>>): Map<String, Any> {
+    private fun fetchContestTagsMap(feedTagsMap: Map<Long, List<FeedTag>>): Map<String, Any> {
         val allFeedTags = feedTagsMap.values.flatten()
-        return feedReader.getEventTagsByFeedTags(allFeedTags)
+        return feedReader.getContestTagsByFeedTags(allFeedTags)
     }
 
     private fun createFeedResponseFromBatch(
@@ -136,14 +136,14 @@ class FeedDtoConverter(
     ): FeedResponse {
         val feedId = feed.id!!
         val feedData = extractFeedData(feedId, feed, batchData)
-        val eventTagTitles = extractEventTagTitles(feedData.tags, batchData.eventTagsMap)
+        val contestTagTitles = extractContestTagTitles(feedData.tags, batchData.contestTagsMap)
 
         return FeedResponse(
             feed,
             AuthorResponse(feed.member),
             feedId in batchData.likedFeedIds,
             feedId in batchData.savedFeedIds,
-            eventTagTitles,
+            contestTagTitles,
             feedData.images,
             feedData.tags,
             feedData.comments
@@ -166,12 +166,12 @@ class FeedDtoConverter(
         return feedReader.getFeedCommentsByFeed(feed, PageRequest.of(0, 1)).content
     }
 
-    private fun extractEventTagTitles(
+    private fun extractContestTagTitles(
         feedTags: List<FeedTag>,
-        eventTagsMap: Map<String, Any>
+        contestTagsMap: Map<String, Any>
     ): Set<String> {
         return feedTags
-            .mapNotNull { eventTagsMap[it.title] }
+            .mapNotNull { contestTagsMap[it.title] }
             .map { it.toString() }
             .toSet()
     }
@@ -202,6 +202,6 @@ class FeedDtoConverter(
         val savedFeedIds: Set<Long>,
         val feedImagesMap: Map<Long, List<FeedImage>>,
         val feedTagsMap: Map<Long, List<FeedTag>>,
-        val eventTagsMap: Map<String, Any>
+        val contestTagsMap: Map<String, Any>
     )
 }

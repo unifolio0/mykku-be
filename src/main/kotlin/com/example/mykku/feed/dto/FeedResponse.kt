@@ -22,11 +22,11 @@ data class FeedResponse(
     val comment: CommentPreviewResponse,
 ) {
     constructor(
-        feed: Feed, 
-        author: AuthorResponse, 
-        isLiked: Boolean, 
-        isSaved: Boolean, 
-        eventTagTitles: Set<String>,
+        feed: Feed,
+        author: AuthorResponse,
+        isLiked: Boolean,
+        isSaved: Boolean,
+        contestTagTitles: Set<String>,
         feedImages: List<FeedImage> = emptyList(),
         feedTags: List<FeedTag> = emptyList(),
         feedComments: List<FeedComment> = emptyList()
@@ -44,10 +44,10 @@ data class FeedResponse(
                 height = it.height
             )
         },
-        tags = feedTags.map { 
+        tags = feedTags.map {
             TagResponse(
                 title = it.title,
-                isEvent = eventTagTitles.contains(it.title)
+                isContest = contestTagTitles.contains(it.title)
             )
         },
         likeCount = feed.likeCount,

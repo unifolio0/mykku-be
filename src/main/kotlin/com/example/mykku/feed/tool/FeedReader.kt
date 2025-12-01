@@ -1,14 +1,14 @@
 package com.example.mykku.feed.tool
 
 import com.example.mykku.board.domain.Board
+import com.example.mykku.contest.domain.ContestTag
+import com.example.mykku.contest.repository.ContestTagRepository
 import com.example.mykku.feed.exception.FeedException
-import com.example.mykku.feed.domain.EventTag
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedComment
 import com.example.mykku.feed.domain.FeedImage
 import com.example.mykku.feed.domain.FeedTag
 import com.example.mykku.feed.dto.FeedPreviewResponse
-import com.example.mykku.feed.repository.EventTagRepository
 import com.example.mykku.feed.repository.FeedCommentRepository
 import com.example.mykku.feed.repository.FeedImageRepository
 import com.example.mykku.feed.repository.FeedRepository
@@ -24,7 +24,7 @@ class FeedReader(
     private val feedImageRepository: FeedImageRepository,
     private val feedTagRepository: FeedTagRepository,
     private val feedCommentRepository: FeedCommentRepository,
-    private val eventTagRepository: EventTagRepository
+    private val contestTagRepository: ContestTagRepository
 ) {
     fun getFeedPreviews(): List<FeedPreviewResponse> {
         return feedRepository.findAll()
@@ -65,8 +65,8 @@ class FeedReader(
         return feedCommentRepository.findByFeedAndParentCommentIsNull(feed, pageable)
     }
     
-    fun getEventTagsByTitles(titles: List<String>): List<EventTag> {
-        return eventTagRepository.findAllByTitleIn(titles)
+    fun getContestTagsByTitles(titles: List<String>): List<ContestTag> {
+        return contestTagRepository.findAllByTitleIn(titles)
     }
 
     fun getFeedImagesByFeeds(feeds: List<Feed>): Map<Long, List<FeedImage>> {
@@ -87,9 +87,9 @@ class FeedReader(
         return result
     }
     
-    fun getEventTagsByFeedTags(feedTags: List<FeedTag>): Map<String, EventTag> {
+    fun getContestTagsByFeedTags(feedTags: List<FeedTag>): Map<String, ContestTag> {
         val titles = feedTags.map { it.title }.distinct()
-        val eventTags = eventTagRepository.findAllByTitleIn(titles)
-        return eventTags.associateBy { it.title }
+        val contestTags = contestTagRepository.findAllByTitleIn(titles)
+        return contestTags.associateBy { it.title }
     }
 }

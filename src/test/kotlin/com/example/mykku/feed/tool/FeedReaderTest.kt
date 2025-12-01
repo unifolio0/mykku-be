@@ -4,7 +4,7 @@ import com.example.mykku.BaseToolTest
 import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.feed.exception.FeedErrorCode
 import com.example.mykku.feed.domain.Feed
-import com.example.mykku.feed.repository.EventTagRepository
+import com.example.mykku.contest.repository.ContestTagRepository
 import com.example.mykku.feed.repository.FeedCommentRepository
 import com.example.mykku.feed.repository.FeedImageRepository
 import com.example.mykku.feed.repository.FeedRepository
@@ -35,7 +35,7 @@ class FeedReaderTest : BaseToolTest() {
     private lateinit var feedCommentRepository: FeedCommentRepository
 
     @Mock
-    private lateinit var eventTagRepository: EventTagRepository
+    private lateinit var contestTagRepository: ContestTagRepository
 
     @InjectMocks
     private lateinit var feedReader: FeedReader

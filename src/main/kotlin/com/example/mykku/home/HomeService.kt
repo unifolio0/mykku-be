@@ -2,7 +2,7 @@ package com.example.mykku.home
 
 import com.example.mykku.dailymessage.dto.DailyMessageSummaryResponse
 import com.example.mykku.dailymessage.tool.DailyMessageReader
-import com.example.mykku.feed.tool.EventReader
+import com.example.mykku.event.tool.EventReader
 import com.example.mykku.feed.tool.FeedReader
 import com.example.mykku.home.dto.HomeResponse
 import org.springframework.stereotype.Service

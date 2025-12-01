@@ -2,7 +2,7 @@ package com.example.mykku.scrap
 
 import com.example.mykku.dailymessage.tool.DailyMessageReader
 import com.example.mykku.fannote.tool.FanNoteReader
-import com.example.mykku.feed.tool.EventReader
+import com.example.mykku.event.tool.EventReader
 import com.example.mykku.feed.tool.FeedReader
 import com.example.mykku.member.domain.Member
 import com.example.mykku.scrap.dto.*

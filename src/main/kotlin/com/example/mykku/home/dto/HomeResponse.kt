@@ -1,8 +1,8 @@
 package com.example.mykku.home.dto
 
+import com.example.mykku.contest.dto.ContestWinnersResponse
 import com.example.mykku.dailymessage.dto.DailyMessageSummaryResponse
-import com.example.mykku.feed.dto.ContestWinnersResponse
-import com.example.mykku.feed.dto.EventPreviewResponse
+import com.example.mykku.event.dto.EventPreviewResponse
 import com.example.mykku.feed.dto.FeedPreviewResponse
 
 data class HomeResponse(

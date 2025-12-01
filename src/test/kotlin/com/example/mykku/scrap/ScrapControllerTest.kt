@@ -5,9 +5,9 @@ import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.repository.DailyMessageRepository
 import com.example.mykku.fannote.domain.FanNote
 import com.example.mykku.fannote.repository.FanNoteRepository
-import com.example.mykku.feed.domain.Event
+import com.example.mykku.event.domain.Event
+import com.example.mykku.event.repository.EventRepository
 import com.example.mykku.feed.domain.Feed
-import com.example.mykku.feed.repository.EventRepository
 import com.example.mykku.feed.repository.FeedRepository
 import com.example.mykku.scrap.domain.Folder
 import com.example.mykku.scrap.dto.SaveFeedRequest
@@ -262,7 +262,6 @@ class ScrapControllerTest : BaseControllerTest() {
         // 이벤트 생성
         val event = eventRepository.save(
             Event(
-                isContest = false,
                 title = "테스트 이벤트",
                 expiredAt = LocalDateTime.now().plusDays(7)
             )
