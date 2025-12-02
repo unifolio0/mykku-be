@@ -6,6 +6,8 @@ import com.example.mykku.auth.dto.MemberInfo
 import com.example.mykku.auth.dto.MobileLoginRequest
 import com.example.mykku.auth.dto.RefreshTokenRequest
 import com.example.mykku.auth.dto.RefreshTokenResponse
+import com.example.mykku.auth.exception.AuthErrorCode
+import com.example.mykku.auth.exception.AuthException
 import com.example.mykku.member.domain.SocialProvider
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.Test
@@ -90,6 +92,120 @@ class AuthDocumentTest : BaseDocumentTest() {
     }
 
     @Test
+    fun `모바일 소셜 로그인 - 유효하지 않은 토큰`() {
+        val request = MobileLoginRequest(
+            provider = SocialProvider.GOOGLE,
+            accessToken = "invalid_access_token"
+        )
+
+        `when`(authService.handleMobileLogin(request))
+            .thenThrow(AuthException(AuthErrorCode.OAUTH_INVALID_TOKEN))
+
+        val documentFilter = document("auth/mobile-login", "OAUTH_INVALID_TOKEN")
+            .request(
+                request()
+                    .tag(Tag.AUTH_API)
+                    .summary("모바일 소셜 로그인 - 유효하지 않은 토큰")
+                    .description("OAuth 제공자로부터 받은 토큰이 유효하지 않을 때 발생하는 에러입니다.")
+                    .requestBodyField(
+                        fieldWithPath("provider").type(JsonFieldType.STRING)
+                            .description("OAuth 제공자"),
+                        fieldWithPath("accessToken").type(JsonFieldType.STRING)
+                            .description("OAuth 제공자에서 받은 액세스 토큰"),
+                        fieldWithPath("idToken").type(JsonFieldType.STRING)
+                            .description("Apple 로그인 시 필요한 ID 토큰")
+                            .optional()
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .post("/api/v1/auth/mobile/login")
+            .then()
+            .statusCode(401)
+    }
+
+    @Test
+    fun `모바일 소셜 로그인 - 사용자 정보 가져오기 실패`() {
+        val request = MobileLoginRequest(
+            provider = SocialProvider.GOOGLE,
+            accessToken = "google_access_token_example"
+        )
+
+        `when`(authService.handleMobileLogin(request))
+            .thenThrow(AuthException(AuthErrorCode.OAUTH_USER_INFO_FAILED))
+
+        val documentFilter = document("auth/mobile-login", "OAUTH_USER_INFO_FAILED")
+            .request(
+                request()
+                    .tag(Tag.AUTH_API)
+                    .summary("모바일 소셜 로그인 - 사용자 정보 가져오기 실패")
+                    .description("OAuth 제공자로부터 사용자 정보를 가져오는데 실패했을 때 발생하는 에러입니다.")
+                    .requestBodyField(
+                        fieldWithPath("provider").type(JsonFieldType.STRING)
+                            .description("OAuth 제공자"),
+                        fieldWithPath("accessToken").type(JsonFieldType.STRING)
+                            .description("OAuth 제공자에서 받은 액세스 토큰"),
+                        fieldWithPath("idToken").type(JsonFieldType.STRING)
+                            .description("Apple 로그인 시 필요한 ID 토큰")
+                            .optional()
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .post("/api/v1/auth/mobile/login")
+            .then()
+            .statusCode(400)
+    }
+
+    @Test
+    fun `모바일 소셜 로그인 - 외부 서비스 오류`() {
+        val request = MobileLoginRequest(
+            provider = SocialProvider.GOOGLE,
+            accessToken = "google_access_token_example"
+        )
+
+        `when`(authService.handleMobileLogin(request))
+            .thenThrow(AuthException(AuthErrorCode.OAUTH_EXTERNAL_SERVICE_ERROR))
+
+        val documentFilter = document("auth/mobile-login", "OAUTH_EXTERNAL_SERVICE_ERROR")
+            .request(
+                request()
+                    .tag(Tag.AUTH_API)
+                    .summary("모바일 소셜 로그인 - 외부 서비스 오류")
+                    .description("OAuth 제공자의 외부 서비스에서 오류가 발생했을 때 나타나는 에러입니다.")
+                    .requestBodyField(
+                        fieldWithPath("provider").type(JsonFieldType.STRING)
+                            .description("OAuth 제공자"),
+                        fieldWithPath("accessToken").type(JsonFieldType.STRING)
+                            .description("OAuth 제공자에서 받은 액세스 토큰"),
+                        fieldWithPath("idToken").type(JsonFieldType.STRING)
+                            .description("Apple 로그인 시 필요한 ID 토큰")
+                            .optional()
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .post("/api/v1/auth/mobile/login")
+            .then()
+            .statusCode(503)
+    }
+
+    @Test
     fun `토큰 갱신`() {
         val request = RefreshTokenRequest(
             refreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.refresh.token.example"
@@ -135,5 +251,37 @@ class AuthDocumentTest : BaseDocumentTest() {
             .post("/api/v1/auth/refresh")
             .then()
             .statusCode(200)
+    }
+
+    @Test
+    fun `토큰 갱신 - 유효하지 않은 리프레시 토큰`() {
+        val request = RefreshTokenRequest(
+            refreshToken = "invalid_refresh_token"
+        )
+
+        `when`(authService.refreshAccessToken(request))
+            .thenThrow(AuthException(AuthErrorCode.INVALID_TOKEN))
+
+        val documentFilter = document("auth/refresh", "INVALID_TOKEN")
+            .request(
+                request()
+                    .tag(Tag.AUTH_API)
+                    .summary("토큰 갱신 - 유효하지 않은 리프레시 토큰")
+                    .description("유효하지 않거나 만료된 리프레시 토큰으로 갱신을 시도할 때 발생하는 에러입니다.")
+                    .requestBodyField(
+                        fieldWithPath("refreshToken").type(JsonFieldType.STRING)
+                            .description("리프레시 토큰")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .post("/api/v1/auth/refresh")
+            .then()
+            .statusCode(401)
     }
 }

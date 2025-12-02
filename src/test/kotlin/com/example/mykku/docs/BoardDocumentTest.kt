@@ -65,6 +65,74 @@ class BoardDocumentTest : BaseDocumentTest() {
     }
 
     @Test
+    fun `게시판 생성 - 중복 제목 에러`() {
+        val request = CreateBoardRequest(
+            title = "자유게시판",
+            logo = "https://example.com/board-logo.png"
+        )
+
+        `when`(boardService.createBoard(any(), any()))
+            .thenThrow(BoardException(BoardErrorCode.BOARD_DUPLICATE_TITLE))
+
+        val documentFilter = document("board/create", "BOARD_DUPLICATE_TITLE")
+            .request(
+                request()
+                    .tag(Tag.BOARD_API)
+                    .summary("게시판 생성 - 중복 제목 에러")
+                    .description("이미 존재하는 게시판 제목으로 생성 시도 시 발생하는 에러입니다.")
+                    .requestBodyField(
+                        fieldWithPath("title").type(JsonFieldType.STRING).description("게시판 제목"),
+                        fieldWithPath("logo").type(JsonFieldType.STRING).description("게시판 로고 URL")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .post("/api/v1/board")
+            .then()
+            .statusCode(400)
+    }
+
+    @Test
+    fun `게시판 생성 - 제목 길이 초과 에러`() {
+        val request = CreateBoardRequest(
+            title = "a".repeat(51),
+            logo = "https://example.com/board-logo.png"
+        )
+
+        `when`(boardService.createBoard(any(), any()))
+            .thenThrow(BoardException(BoardErrorCode.BOARD_TITLE_TOO_LONG))
+
+        val documentFilter = document("board/create", "BOARD_TITLE_TOO_LONG")
+            .request(
+                request()
+                    .tag(Tag.BOARD_API)
+                    .summary("게시판 생성 - 제목 길이 초과 에러")
+                    .description("게시판 제목이 최대 길이를 초과했을 때 발생하는 에러입니다.")
+                    .requestBodyField(
+                        fieldWithPath("title").type(JsonFieldType.STRING).description("게시판 제목"),
+                        fieldWithPath("logo").type(JsonFieldType.STRING).description("게시판 로고 URL")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .post("/api/v1/board")
+            .then()
+            .statusCode(400)
+    }
+
+    @Test
     fun `게시판 수정`() {
         val boardId = 1L
         val request = UpdateBoardRequest(
@@ -113,40 +181,6 @@ class BoardDocumentTest : BaseDocumentTest() {
             .put("/api/v1/board/{id}", boardId)
             .then()
             .statusCode(200)
-    }
-
-    @Test
-    fun `게시판 생성 - 중복 제목 에러`() {
-        val request = CreateBoardRequest(
-            title = "자유게시판",
-            logo = "https://example.com/board-logo.png"
-        )
-
-        `when`(boardService.createBoard(any(), any()))
-            .thenThrow(BoardException(BoardErrorCode.BOARD_DUPLICATE_TITLE))
-
-        val documentFilter = document("board/create", "BOARD_DUPLICATE_TITLE")
-            .request(
-                request()
-                    .tag(Tag.BOARD_API)
-                    .summary("게시판 생성 - 중복 제목 에러")
-                    .description("이미 존재하는 게시판 제목으로 생성 시도 시 발생하는 에러입니다.")
-                    .requestBodyField(
-                        fieldWithPath("title").type(JsonFieldType.STRING).description("게시판 제목"),
-                        fieldWithPath("logo").type(JsonFieldType.STRING).description("게시판 로고 URL")
-                    )
-            )
-            .response(RestDocumentationResponse.ERROR_RESPONSE)
-            .build()
-
-        given(documentFilter)
-            .headers(AUTH_HEADER)
-            .contentType(ContentType.JSON)
-            .body(objectMapper.writeValueAsString(request))
-            .`when`()
-            .post("/api/v1/board")
-            .then()
-            .statusCode(400)
     }
 
     @Test

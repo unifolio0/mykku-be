@@ -4,6 +4,8 @@ import com.example.mykku.dailymessage.dto.CommentResponse
 import com.example.mykku.dailymessage.dto.DailyMessageResponse
 import com.example.mykku.dailymessage.dto.DailyMessageSummaryResponse
 import com.example.mykku.dailymessage.dto.ReplyResponse
+import com.example.mykku.dailymessage.exception.DailyMessageErrorCode
+import com.example.mykku.dailymessage.exception.DailyMessageException
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -153,5 +155,33 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
             .get("/api/v1/daily-message/{id}", dailyMessageId)
             .then()
             .statusCode(200)
+    }
+
+    @Test
+    fun `하루 덕담 상세 조회 - 존재하지 않는 덕담`() {
+        val dailyMessageId = 999L
+
+        `when`(dailyMessageService.getDailyMessage(eq(dailyMessageId)))
+            .thenThrow(DailyMessageException(DailyMessageErrorCode.DAILY_MESSAGE_NOT_FOUND))
+
+        val documentFilter = document("daily-message/detail", "DAILY_MESSAGE_NOT_FOUND")
+            .request(
+                request()
+                    .tag(Tag.DAILY_MESSAGE_API)
+                    .summary("하루 덕담 상세 조회 - 존재하지 않는 덕담")
+                    .description("존재하지 않는 하루 덕담을 조회할 때 발생하는 에러입니다.")
+                    .pathParameter(
+                        parameterWithName("id").description("존재하지 않는 하루 덕담 ID")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .contentType(ContentType.JSON)
+            .`when`()
+            .get("/api/v1/daily-message/{id}", dailyMessageId)
+            .then()
+            .statusCode(404)
     }
 }

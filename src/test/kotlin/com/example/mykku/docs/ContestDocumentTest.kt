@@ -93,6 +93,189 @@ class ContestDocumentTest : BaseDocumentTest() {
     }
 
     @Test
+    fun `공모전 생성 - 이미지 개수 초과`() {
+        val images = (0..10).map { i ->
+            ContestImageRequest(url = "https://example.com/image$i.jpg", orderIndex = i)
+        }
+        val request = CreateContestRequest(
+            title = "신규 공모전",
+            description = "공모전 상세 설명입니다.",
+            startedAt = LocalDateTime.now(),
+            expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
+            images = images,
+            tags = listOf("디자인")
+        )
+
+        `when`(contestService.createContest(any()))
+            .thenThrow(ContestException(ContestErrorCode.CONTEST_IMAGE_LIMIT_EXCEEDED))
+
+        val documentFilter = document("contest/create", "CONTEST_IMAGE_LIMIT_EXCEEDED")
+            .request(
+                request()
+                    .tag(Tag.CONTEST_API)
+                    .summary("공모전 생성 - 이미지 개수 초과")
+                    .description("공모전 이미지가 최대 개수(10개)를 초과했을 때 발생하는 에러입니다.")
+                    .requestBodyField(
+                        fieldWithPath("title").type(JsonFieldType.STRING).description("공모전 제목"),
+                        fieldWithPath("description").type(JsonFieldType.STRING).description("공모전 설명").optional(),
+                        fieldWithPath("expiredAt").type(JsonFieldType.STRING)
+                            .description("공모전 만료일 (yyyy-MM-dd'T'HH:mm:ss)"),
+                        fieldWithPath("startedAt").type(JsonFieldType.STRING)
+                            .description("공모전 시작일 (yyyy-MM-dd'T'HH:mm:ss)"),
+                        fieldWithPath("images[]").type(JsonFieldType.ARRAY).description("공모전 이미지 목록 (최대 10개)"),
+                        fieldWithPath("images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
+                        fieldWithPath("images[].orderIndex").type(JsonFieldType.NUMBER).description("이미지 순서"),
+                        fieldWithPath("tags[]").type(JsonFieldType.ARRAY).description("공모전 태그 목록 (최대 7개)")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .post("/api/v1/contests")
+            .then()
+            .statusCode(400)
+    }
+
+    @Test
+    fun `공모전 생성 - 태그 개수 초과`() {
+        val request = CreateContestRequest(
+            title = "신규 공모전",
+            description = "공모전 상세 설명입니다.",
+            startedAt = LocalDateTime.now(),
+            expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
+            images = listOf(ContestImageRequest(url = "https://example.com/image1.jpg", orderIndex = 0)),
+            tags = listOf("태그1", "태그2", "태그3", "태그4", "태그5", "태그6", "태그7", "태그8")
+        )
+
+        `when`(contestService.createContest(any()))
+            .thenThrow(ContestException(ContestErrorCode.CONTEST_TAG_LIMIT_EXCEEDED))
+
+        val documentFilter = document("contest/create", "CONTEST_TAG_LIMIT_EXCEEDED")
+            .request(
+                request()
+                    .tag(Tag.CONTEST_API)
+                    .summary("공모전 생성 - 태그 개수 초과")
+                    .description("공모전 태그가 최대 개수(7개)를 초과했을 때 발생하는 에러입니다.")
+                    .requestBodyField(
+                        fieldWithPath("title").type(JsonFieldType.STRING).description("공모전 제목"),
+                        fieldWithPath("description").type(JsonFieldType.STRING).description("공모전 설명").optional(),
+                        fieldWithPath("expiredAt").type(JsonFieldType.STRING)
+                            .description("공모전 만료일 (yyyy-MM-dd'T'HH:mm:ss)"),
+                        fieldWithPath("startedAt").type(JsonFieldType.STRING)
+                            .description("공모전 시작일 (yyyy-MM-dd'T'HH:mm:ss)"),
+                        fieldWithPath("images[]").type(JsonFieldType.ARRAY).description("공모전 이미지 목록 (최대 10개)"),
+                        fieldWithPath("images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
+                        fieldWithPath("images[].orderIndex").type(JsonFieldType.NUMBER).description("이미지 순서"),
+                        fieldWithPath("tags[]").type(JsonFieldType.ARRAY).description("공모전 태그 목록 (최대 7개)")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .post("/api/v1/contests")
+            .then()
+            .statusCode(400)
+    }
+
+    @Test
+    fun `공모전 생성 - 태그 길이 초과`() {
+        val request = CreateContestRequest(
+            title = "신규 공모전",
+            description = "공모전 상세 설명입니다.",
+            startedAt = LocalDateTime.now(),
+            expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
+            images = listOf(ContestImageRequest(url = "https://example.com/image1.jpg", orderIndex = 0)),
+            tags = listOf("가".repeat(21))
+        )
+
+        `when`(contestService.createContest(any()))
+            .thenThrow(ContestException(ContestErrorCode.TAG_TITLE_TOO_LONG))
+
+        val documentFilter = document("contest/create", "TAG_TITLE_TOO_LONG")
+            .request(
+                request()
+                    .tag(Tag.CONTEST_API)
+                    .summary("공모전 생성 - 태그 길이 초과")
+                    .description("태그가 최대 길이(20자)를 초과했을 때 발생하는 에러입니다.")
+                    .requestBodyField(
+                        fieldWithPath("title").type(JsonFieldType.STRING).description("공모전 제목"),
+                        fieldWithPath("description").type(JsonFieldType.STRING).description("공모전 설명").optional(),
+                        fieldWithPath("expiredAt").type(JsonFieldType.STRING)
+                            .description("공모전 만료일 (yyyy-MM-dd'T'HH:mm:ss)"),
+                        fieldWithPath("startedAt").type(JsonFieldType.STRING)
+                            .description("공모전 시작일 (yyyy-MM-dd'T'HH:mm:ss)"),
+                        fieldWithPath("images[]").type(JsonFieldType.ARRAY).description("공모전 이미지 목록 (최대 10개)"),
+                        fieldWithPath("images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
+                        fieldWithPath("images[].orderIndex").type(JsonFieldType.NUMBER).description("이미지 순서"),
+                        fieldWithPath("tags[]").type(JsonFieldType.ARRAY).description("공모전 태그 목록 (최대 7개)")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .post("/api/v1/contests")
+            .then()
+            .statusCode(400)
+    }
+
+    @Test
+    fun `공모전 생성 - 태그 형식 오류`() {
+        val request = CreateContestRequest(
+            title = "신규 공모전",
+            description = "공모전 상세 설명입니다.",
+            startedAt = LocalDateTime.now(),
+            expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
+            images = listOf(ContestImageRequest(url = "https://example.com/image1.jpg", orderIndex = 0)),
+            tags = listOf("태그!@#")
+        )
+
+        `when`(contestService.createContest(any()))
+            .thenThrow(ContestException(ContestErrorCode.TAG_INVALID_FORMAT))
+
+        val documentFilter = document("contest/create", "TAG_INVALID_FORMAT")
+            .request(
+                request()
+                    .tag(Tag.CONTEST_API)
+                    .summary("공모전 생성 - 태그 형식 오류")
+                    .description("태그에 허용되지 않는 문자(특수문자 등)가 포함되었을 때 발생하는 에러입니다.")
+                    .requestBodyField(
+                        fieldWithPath("title").type(JsonFieldType.STRING).description("공모전 제목"),
+                        fieldWithPath("description").type(JsonFieldType.STRING).description("공모전 설명").optional(),
+                        fieldWithPath("expiredAt").type(JsonFieldType.STRING)
+                            .description("공모전 만료일 (yyyy-MM-dd'T'HH:mm:ss)"),
+                        fieldWithPath("startedAt").type(JsonFieldType.STRING)
+                            .description("공모전 시작일 (yyyy-MM-dd'T'HH:mm:ss)"),
+                        fieldWithPath("images[]").type(JsonFieldType.ARRAY).description("공모전 이미지 목록 (최대 10개)"),
+                        fieldWithPath("images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
+                        fieldWithPath("images[].orderIndex").type(JsonFieldType.NUMBER).description("이미지 순서"),
+                        fieldWithPath("tags[]").type(JsonFieldType.ARRAY).description("공모전 태그 목록 (최대 7개)")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .post("/api/v1/contests")
+            .then()
+            .statusCode(400)
+    }
+
+    @Test
     fun `공모전 목록 조회`() {
         val contestList = listOf(
             ContestListResponse(

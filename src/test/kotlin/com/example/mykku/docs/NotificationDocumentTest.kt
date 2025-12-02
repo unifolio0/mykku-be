@@ -2,10 +2,15 @@ package com.example.mykku.docs
 
 import com.example.mykku.notification.domain.NotificationType
 import com.example.mykku.notification.dto.NotificationResponse
+import com.example.mykku.notification.exception.NotificationErrorCode
+import com.example.mykku.notification.exception.NotificationException
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito.doNothing
+import org.mockito.Mockito.doThrow
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.restdocs.payload.JsonFieldType
@@ -329,5 +334,63 @@ class NotificationDocumentTest : BaseDocumentTest() {
             .delete("/api/v1/notifications/{notificationId}", notificationId)
             .then()
             .statusCode(200)
+    }
+
+    @Test
+    fun `알림 삭제 - 알림을 찾을 수 없음`() {
+        val notificationId = 999L
+
+        doThrow(NotificationException(NotificationErrorCode.NOTIFICATION_NOT_FOUND))
+            .`when`(notificationService).deleteNotification(any(), any())
+
+        val documentFilter = document("notification/delete", "NOTIFICATION_NOT_FOUND")
+            .request(
+                request()
+                    .tag(Tag.NOTIFICATION_API)
+                    .summary("알림 삭제 - 알림을 찾을 수 없음")
+                    .description("존재하지 않는 알림을 삭제하려 할 때 발생하는 에러입니다.")
+                    .pathParameter(
+                        parameterWithName("notificationId").description("삭제할 알림 ID")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .`when`()
+            .delete("/api/v1/notifications/{notificationId}", notificationId)
+            .then()
+            .statusCode(404)
+    }
+
+    @Test
+    fun `알림 삭제 - 권한 없음`() {
+        val notificationId = 1L
+
+        doThrow(NotificationException(NotificationErrorCode.NOTIFICATION_NOT_AUTHORIZED))
+            .`when`(notificationService).deleteNotification(any(), any())
+
+        val documentFilter = document("notification/delete", "NOTIFICATION_NOT_AUTHORIZED")
+            .request(
+                request()
+                    .tag(Tag.NOTIFICATION_API)
+                    .summary("알림 삭제 - 권한 없음")
+                    .description("해당 알림을 삭제할 권한이 없을 때 발생하는 에러입니다.")
+                    .pathParameter(
+                        parameterWithName("notificationId").description("삭제할 알림 ID")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .`when`()
+            .delete("/api/v1/notifications/{notificationId}", notificationId)
+            .then()
+            .statusCode(403)
     }
 }

@@ -89,6 +89,52 @@ class EventDocumentTest : BaseDocumentTest() {
     }
 
     @Test
+    fun `이벤트 생성 - 이미지 개수 초과`() {
+        val images = (0..10).map { i ->
+            EventImageRequest(url = "https://example.com/image$i.jpg", orderIndex = i)
+        }
+        val request = CreateEventRequest(
+            title = "신규 이벤트",
+            description = "이벤트 상세 설명입니다.",
+            startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
+            expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
+            images = images
+        )
+
+        `when`(eventService.createEvent(any()))
+            .thenThrow(EventException(EventErrorCode.EVENT_IMAGE_LIMIT_EXCEEDED))
+
+        val documentFilter = document("event/create", "EVENT_IMAGE_LIMIT_EXCEEDED")
+            .request(
+                request()
+                    .tag(Tag.EVENT_API)
+                    .summary("이벤트 생성 - 이미지 개수 초과")
+                    .description("이벤트 이미지가 최대 개수(10개)를 초과했을 때 발생하는 에러입니다.")
+                    .requestBodyField(
+                        fieldWithPath("title").type(JsonFieldType.STRING).description("이벤트 제목"),
+                        fieldWithPath("description").type(JsonFieldType.STRING).description("이벤트 설명").optional(),
+                        fieldWithPath("expiredAt").type(JsonFieldType.STRING)
+                            .description("이벤트 만료일 (yyyy-MM-dd'T'HH:mm:ss)"),
+                        fieldWithPath("startedAt").type(JsonFieldType.STRING)
+                            .description("이벤트 시작일 (yyyy-MM-dd'T'HH:mm:ss)"),
+                        fieldWithPath("images[]").type(JsonFieldType.ARRAY).description("이벤트 이미지 목록 (최대 10개)"),
+                        fieldWithPath("images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
+                        fieldWithPath("images[].orderIndex").type(JsonFieldType.NUMBER).description("이미지 순서")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .post("/api/v1/events")
+            .then()
+            .statusCode(400)
+    }
+
+    @Test
     fun `이벤트 목록 조회`() {
         val eventList = listOf(
             EventListResponse(

@@ -2,9 +2,12 @@ package com.example.mykku.docs
 
 import com.example.mykku.role.dto.MemberRoleResponse
 import com.example.mykku.role.dto.RoleResponse
+import com.example.mykku.role.exception.RoleErrorCode
+import com.example.mykku.role.exception.RoleException
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.doNothing
+import org.mockito.Mockito.doThrow
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
@@ -99,5 +102,34 @@ class RoleDocumentTest : BaseDocumentTest() {
             .patch("/api/v1/roles/{memberRoleId}/representative", memberRoleId)
             .then()
             .statusCode(200)
+    }
+
+    @Test
+    fun `대표 칭호 변경 - 보유하지 않은 칭호`() {
+        val memberRoleId = 999L
+
+        doThrow(RoleException(RoleErrorCode.MEMBER_ROLE_NOT_FOUND))
+            .`when`(roleService).changeRepresentativeRole(any(), eq(memberRoleId))
+
+        val documentFilter = document("role/change-representative", "MEMBER_ROLE_NOT_FOUND")
+            .request(
+                request()
+                    .tag(Tag.ROLE_API)
+                    .summary("대표 칭호 변경 - 보유하지 않은 칭호")
+                    .description("보유하지 않은 칭호를 대표로 설정하려 할 때 발생하는 에러입니다.")
+                    .pathParameter(
+                        parameterWithName("memberRoleId").description("대표로 설정할 보유 칭호 ID")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .`when`()
+            .patch("/api/v1/roles/{memberRoleId}/representative", memberRoleId)
+            .then()
+            .statusCode(404)
     }
 }

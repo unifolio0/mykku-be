@@ -1,6 +1,8 @@
 package com.example.mykku.docs
 
 import com.example.mykku.feed.dto.*
+import com.example.mykku.feed.exception.FeedErrorCode
+import com.example.mykku.feed.exception.FeedException
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -220,6 +222,161 @@ class FeedDocumentTest : BaseDocumentTest() {
     }
 
     @Test
+    fun `피드 작성 - 내용 길이 초과 에러`() {
+        `when`(feedService.createFeed(any(), any()))
+            .thenThrow(FeedException(FeedErrorCode.FEED_CONTENT_TOO_LONG))
+
+        val requestJson = """{
+            "title": "피드 제목",
+            "content": "${"a".repeat(5001)}",
+            "boardId": 1,
+            "tags": ["태그"]
+        }"""
+
+        val documentFilter = document("feed/create", "FEED_CONTENT_TOO_LONG")
+            .request(
+                request()
+                    .tag(Tag.FEED_API)
+                    .summary("피드 작성 - 내용 길이 초과 에러")
+                    .description("피드 내용이 최대 길이를 초과했을 때 발생하는 에러입니다.")
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .multiPart("request", requestJson, "application/json")
+            .`when`()
+            .post("/api/v1/feeds")
+            .then()
+            .statusCode(400)
+    }
+
+    @Test
+    fun `피드 작성 - 이미지 개수 초과 에러`() {
+        `when`(feedService.createFeed(any(), any()))
+            .thenThrow(FeedException(FeedErrorCode.FEED_IMAGE_LIMIT_EXCEEDED))
+
+        val requestJson = """{
+            "title": "피드 제목",
+            "content": "피드 내용",
+            "boardId": 1,
+            "tags": []
+        }"""
+
+        val documentFilter = document("feed/create", "FEED_IMAGE_LIMIT_EXCEEDED")
+            .request(
+                request()
+                    .tag(Tag.FEED_API)
+                    .summary("피드 작성 - 이미지 개수 초과 에러")
+                    .description("피드 이미지가 최대 개수를 초과했을 때 발생하는 에러입니다.")
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .multiPart("request", requestJson, "application/json")
+            .`when`()
+            .post("/api/v1/feeds")
+            .then()
+            .statusCode(400)
+    }
+
+    @Test
+    fun `피드 작성 - 태그 개수 초과 에러`() {
+        `when`(feedService.createFeed(any(), any()))
+            .thenThrow(FeedException(FeedErrorCode.FEED_TAG_LIMIT_EXCEEDED))
+
+        val requestJson = """{
+            "title": "피드 제목",
+            "content": "피드 내용",
+            "boardId": 1,
+            "tags": ["태그1", "태그2", "태그3", "태그4", "태그5", "태그6", "태그7", "태그8", "태그9", "태그10", "태그11"]
+        }"""
+
+        val documentFilter = document("feed/create", "FEED_TAG_LIMIT_EXCEEDED")
+            .request(
+                request()
+                    .tag(Tag.FEED_API)
+                    .summary("피드 작성 - 태그 개수 초과 에러")
+                    .description("피드 태그가 최대 개수를 초과했을 때 발생하는 에러입니다.")
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .multiPart("request", requestJson, "application/json")
+            .`when`()
+            .post("/api/v1/feeds")
+            .then()
+            .statusCode(400)
+    }
+
+    @Test
+    fun `피드 작성 - 태그 길이 초과 에러`() {
+        `when`(feedService.createFeed(any(), any()))
+            .thenThrow(FeedException(FeedErrorCode.TAG_TITLE_TOO_LONG))
+
+        val requestJson = """{
+            "title": "피드 제목",
+            "content": "피드 내용",
+            "boardId": 1,
+            "tags": ["${"가".repeat(31)}"]
+        }"""
+
+        val documentFilter = document("feed/create", "TAG_TITLE_TOO_LONG")
+            .request(
+                request()
+                    .tag(Tag.FEED_API)
+                    .summary("피드 작성 - 태그 길이 초과 에러")
+                    .description("태그가 최대 길이를 초과했을 때 발생하는 에러입니다.")
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .multiPart("request", requestJson, "application/json")
+            .`when`()
+            .post("/api/v1/feeds")
+            .then()
+            .statusCode(400)
+    }
+
+    @Test
+    fun `피드 작성 - 태그 형식 오류`() {
+        `when`(feedService.createFeed(any(), any()))
+            .thenThrow(FeedException(FeedErrorCode.TAG_INVALID_FORMAT))
+
+        val requestJson = """{
+            "title": "피드 제목",
+            "content": "피드 내용",
+            "boardId": 1,
+            "tags": ["태그@#$"]
+        }"""
+
+        val documentFilter = document("feed/create", "TAG_INVALID_FORMAT")
+            .request(
+                request()
+                    .tag(Tag.FEED_API)
+                    .summary("피드 작성 - 태그 형식 오류")
+                    .description("태그에 허용되지 않은 문자가 포함되었을 때 발생하는 에러입니다.")
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .multiPart("request", requestJson, "application/json")
+            .`when`()
+            .post("/api/v1/feeds")
+            .then()
+            .statusCode(400)
+    }
+
+    @Test
     fun `피드 상세 조회`() {
         val feedId = 1L
         val feedDetailResponse = FeedDetailResponse(
@@ -303,6 +460,34 @@ class FeedDocumentTest : BaseDocumentTest() {
             .get("/api/v1/feeds/{feedId}", feedId)
             .then()
             .statusCode(200)
+    }
+
+    @Test
+    fun `피드 상세 조회 - 피드를 찾을 수 없음`() {
+        val feedId = 999L
+
+        `when`(feedService.getFeedDetail(eq(feedId), anyOrNull()))
+            .thenThrow(FeedException(FeedErrorCode.FEED_NOT_FOUND))
+
+        val documentFilter = document("feed/detail", "FEED_NOT_FOUND")
+            .request(
+                request()
+                    .tag(Tag.FEED_API)
+                    .summary("피드 상세 조회 - 피드를 찾을 수 없음")
+                    .description("존재하지 않는 피드를 조회하려 할 때 발생하는 에러입니다.")
+                    .pathParameter(
+                        parameterWithName("feedId").description("조회할 피드의 ID")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .contentType(ContentType.JSON)
+            .`when`()
+            .get("/api/v1/feeds/{feedId}", feedId)
+            .then()
+            .statusCode(404)
     }
 
     @Test
@@ -543,5 +728,33 @@ class FeedDocumentTest : BaseDocumentTest() {
             .get("/api/v1/feeds/{feedId}/comments", feedId)
             .then()
             .statusCode(200)
+    }
+
+    @Test
+    fun `피드 댓글 목록 조회 - 피드를 찾을 수 없음`() {
+        val feedId = 999L
+
+        `when`(feedCommentService.getComments(eq(feedId), anyOrNull(), any<Pageable>()))
+            .thenThrow(FeedException(FeedErrorCode.FEED_NOT_FOUND))
+
+        val documentFilter = document("feed/comments", "FEED_NOT_FOUND")
+            .request(
+                request()
+                    .tag(Tag.FEED_API)
+                    .summary("피드 댓글 목록 조회 - 피드를 찾을 수 없음")
+                    .description("존재하지 않는 피드의 댓글을 조회하려 할 때 발생하는 에러입니다.")
+                    .pathParameter(
+                        parameterWithName("feedId").description("피드 ID")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .contentType(ContentType.JSON)
+            .`when`()
+            .get("/api/v1/feeds/{feedId}/comments", feedId)
+            .then()
+            .statusCode(404)
     }
 }
