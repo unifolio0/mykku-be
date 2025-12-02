@@ -60,6 +60,7 @@ class DailyMessageService(
                         content = reply.content,
                         likeCount = reply.likeCount,
                         memberName = reply.member.nickname,
+                        profileImage = reply.member.profileImage,
                         createdAt = reply.createdAt
                     )
                 }
@@ -79,6 +80,7 @@ class DailyMessageService(
                     content = comment.content,
                     likeCount = comment.likeCount,
                     memberName = comment.member.nickname,
+                    profileImage = comment.member.profileImage,
                     createdAt = comment.createdAt,
                     replies = repliesByParentId[comment.id] ?: emptyList()
                 )
