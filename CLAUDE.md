@@ -353,16 +353,16 @@ src/main/kotlin/com/example/mykku/
 
 새로운 기능을 추가할 때는 **반드시** 다음 5가지 계층의 테스트를 모두 작성해야 합니다:
 
-### 1. RestDocsTest
-- **위치**: `src/test/kotlin/com/example/mykku/docs/[Domain]ControllerRestDocsTest.kt`
-- **상속**: `BaseControllerRestDocsTest`를 상속
-- **목적**: API 문서 자동 생성
+### 1. DocsTest
+- **위치**: `src/test/kotlin/com/example/mykku/docs/[Domain]DocumentTest.kt`
+- **상속**: `BaseDocumentTest`를 상속
+- **목적**: API 문서 자동 생성 (Swagger + RestDocs 통합)
 - **필수 요소**:
-  - `@Mock` Service 주입
-  - `@InjectMocks` Controller 주입
-  - MockMvcBuilders.standaloneSetup() 사용
-  - document() 메서드로 API 문서화
-  - 요청/응답 필드 상세 설명
+  - `@MockitoBean`으로 Service Mock
+  - RestAssured 기반 테스트
+  - `document()` 메서드로 API 문서화
+  - `Tag` enum으로 API 분류
+  - `request()`, `response()` DSL로 필드 설명
 
 ### 2. ControllerTest
 - **위치**: `src/test/kotlin/com/example/mykku/[domain]/[Domain]ControllerTest.kt`
@@ -400,30 +400,12 @@ src/main/kotlin/com/example/mykku/
   - 실제 JPA 쿼리 동작 검증
   - 커스텀 쿼리 메서드 테스트
 
-### API 문서화 (RestDocs)
-
-RestDocsTest 작성 후 반드시:
-1. `src/docs/asciidoc/index.adoc` 파일에 API 섹션 추가
-2. operation 스니펫 참조 추가
-3. 다음 형식 준수:
-```asciidoc
-[[domain-api]]
-== 도메인 API
-
-=== API 이름
-
-API 설명
-
-operation::operation-name[snippets='http-request,request-fields,http-response,response-fields']
-```
-
 ### 테스트 작성 체크리스트
-- [ ] RestDocsTest 작성 및 API 문서 생성
+- [ ] DocsTest 작성 및 API 문서 생성
 - [ ] ControllerTest로 엔드포인트 검증
 - [ ] ServiceTest로 비즈니스 로직 검증
 - [ ] ToolTest로 데이터 접근 로직 검증
 - [ ] RepositoryTest로 실제 쿼리 동작 확인
-- [ ] index.adoc에 API 문서 섹션 추가
 
 ## Clean Code Rules
 
