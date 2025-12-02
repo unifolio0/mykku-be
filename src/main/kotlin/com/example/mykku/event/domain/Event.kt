@@ -21,6 +21,10 @@ class Event(
 
     @Column(name = "scrap_count")
     var scrapCount: Int = 0,
+
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    var status: EventStatusType = EventStatusType.ACTIVE,
 ) : BaseEntity() {
     companion object {
         const val IMAGE_MAX_COUNT = 10

@@ -2,6 +2,9 @@ package com.example.mykku.feed
 
 import com.example.mykku.board.domain.Board
 import com.example.mykku.board.tool.BoardReader
+import com.example.mykku.contest.exception.ContestException
+import com.example.mykku.contest.tool.ContestParticipationWriter
+import com.example.mykku.contest.tool.ContestReader
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedImage
 import com.example.mykku.feed.domain.FeedTag
@@ -30,7 +33,9 @@ class FeedService(
     private val memberReader: MemberReader,
     private val likeFeedReader: LikeFeedReader,
     private val saveFeedReader: SaveFeedReader,
-    private val imageUploadService: ImageUploadService
+    private val imageUploadService: ImageUploadService,
+    private val contestReader: ContestReader,
+    private val contestParticipationWriter: ContestParticipationWriter
 ) {
     @Transactional
     fun createFeed(request: CreateFeedRequest, member: Member): CreateFeedResponse {
@@ -46,7 +51,32 @@ class FeedService(
             tagTitles = request.tags
         )
 
+        recordContestParticipationIfApplicable(member, feedTags, feed)
+
         return buildCreateFeedResponse(feed, feedImages, feedTags, board, member)
+    }
+
+    private fun recordContestParticipationIfApplicable(
+        member: Member,
+        feedTags: List<FeedTag>,
+        feed: Feed
+    ) {
+        if (feedTags.isEmpty()) return
+
+        val feedTagTitles = feedTags.map { it.title }.toSet()
+        val activeContestsWithTags = contestReader.getActiveContestsWithAllTags()
+
+        activeContestsWithTags
+            .filter { (_, requiredTags) ->
+                requiredTags.isNotEmpty() && feedTagTitles.containsAll(requiredTags)
+            }
+            .forEach { (contest, _) ->
+                try {
+                    contestParticipationWriter.participateViaFeed(member, contest, feed)
+                } catch (e: ContestException) {
+                    // 이미 같은 feed로 참여한 경우 무시
+                }
+            }
     }
 
     private fun uploadImages(images: List<MultipartFile>): List<ImageUploadResult> {

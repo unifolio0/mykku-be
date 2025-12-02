@@ -43,6 +43,8 @@ class EventReader(
         return when (status) {
             EventStatusType.ACTIVE -> getActiveEventsBySortType(sortType, currentTime, pageable)
             EventStatusType.EXPIRED -> eventRepository.findByExpiredAtLessThanEqualOrderByCreatedAtDesc(currentTime, pageable)
+            EventStatusType.WINNER_SELECTING,
+            EventStatusType.WINNER_SELECTED -> eventRepository.findByExpiredAtLessThanEqualOrderByCreatedAtDesc(currentTime, pageable)
             EventStatusType.ALL -> eventRepository.findAllByOrderByCreatedAtDesc(pageable)
         }
     }

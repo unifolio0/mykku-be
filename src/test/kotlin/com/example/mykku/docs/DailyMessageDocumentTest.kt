@@ -42,9 +42,9 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
                 request()
                     .tag(Tag.DAILY_MESSAGE_API)
                     .summary("하루 덕담 목록 조회")
-                    .description("특정 날짜의 하루 덕담 목록을 조회합니다.")
+                    .description("특정 날짜 이전의 하루 덕담 목록을 조회합니다.")
                     .queryParameter(
-                        parameterWithName("date").description("조회할 날짜 (YYYY-MM-DD 형식)"),
+                        parameterWithName("date").description("기준 날짜 (YYYY-MM-DD 형식)"),
                         parameterWithName("limit").description("조회할 개수 (기본값: 10)").optional(),
                         parameterWithName("sort").description("정렬 방향 (ASC/DESC, 기본값: DESC)").optional()
                     )
