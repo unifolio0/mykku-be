@@ -3,6 +3,9 @@ package com.example.mykku.feed
 import com.example.mykku.BaseServiceTest
 import com.example.mykku.board.domain.Board
 import com.example.mykku.board.tool.BoardReader
+import com.example.mykku.contest.tool.ContestParticipationReader
+import com.example.mykku.contest.tool.ContestParticipationWriter
+import com.example.mykku.contest.tool.ContestReader
 import com.example.mykku.image.exception.ImageErrorCode
 import com.example.mykku.image.exception.ImageException
 import com.example.mykku.feed.domain.Feed
@@ -64,10 +67,13 @@ class FeedServiceTest : BaseServiceTest() {
     private lateinit var imageUploadService: ImageUploadService
 
     @Mock
-    private lateinit var contestReader: com.example.mykku.contest.tool.ContestReader
+    private lateinit var contestReader: ContestReader
 
     @Mock
-    private lateinit var contestParticipationWriter: com.example.mykku.contest.tool.ContestParticipationWriter
+    private lateinit var contestParticipationWriter: ContestParticipationWriter
+
+    @Mock
+    private lateinit var contestParticipationReader: ContestParticipationReader
 
     @InjectMocks
     private lateinit var feedService: FeedService
@@ -218,7 +224,8 @@ class FeedServiceTest : BaseServiceTest() {
             saveFeedReader = saveFeedReader,
             imageUploadService = noOpImageUploadService,
             contestReader = contestReader,
-            contestParticipationWriter = contestParticipationWriter
+            contestParticipationWriter = contestParticipationWriter,
+            contestParticipationReader = contestParticipationReader
         )
 
         val imageFile = mock<MultipartFile>()

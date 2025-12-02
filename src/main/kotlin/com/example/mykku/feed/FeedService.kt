@@ -2,7 +2,7 @@ package com.example.mykku.feed
 
 import com.example.mykku.board.domain.Board
 import com.example.mykku.board.tool.BoardReader
-import com.example.mykku.contest.exception.ContestException
+import com.example.mykku.contest.tool.ContestParticipationReader
 import com.example.mykku.contest.tool.ContestParticipationWriter
 import com.example.mykku.contest.tool.ContestReader
 import com.example.mykku.feed.domain.Feed
@@ -35,7 +35,8 @@ class FeedService(
     private val saveFeedReader: SaveFeedReader,
     private val imageUploadService: ImageUploadService,
     private val contestReader: ContestReader,
-    private val contestParticipationWriter: ContestParticipationWriter
+    private val contestParticipationWriter: ContestParticipationWriter,
+    private val contestParticipationReader: ContestParticipationReader
 ) {
     @Transactional
     fun createFeed(request: CreateFeedRequest, member: Member): CreateFeedResponse {
@@ -71,10 +72,8 @@ class FeedService(
                 requiredTags.isNotEmpty() && feedTagTitles.containsAll(requiredTags)
             }
             .forEach { (contest, _) ->
-                try {
+                if (!contestParticipationReader.existsByMemberAndContestAndFeed(member, contest, feed)) {
                     contestParticipationWriter.participateViaFeed(member, contest, feed)
-                } catch (e: ContestException) {
-                    // 이미 같은 feed로 참여한 경우 무시
                 }
             }
     }

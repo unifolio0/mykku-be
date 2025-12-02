@@ -22,7 +22,8 @@ CREATE TABLE contest_participation (
     updated_at DATETIME(6) NOT NULL,
     CONSTRAINT fk_contest_participation_member FOREIGN KEY (member_id) REFERENCES member(id) ON DELETE CASCADE,
     CONSTRAINT fk_contest_participation_contest FOREIGN KEY (contest_id) REFERENCES contest(id) ON DELETE CASCADE,
-    CONSTRAINT fk_contest_participation_feed FOREIGN KEY (feed_id) REFERENCES feed(id) ON DELETE CASCADE
+    CONSTRAINT fk_contest_participation_feed FOREIGN KEY (feed_id) REFERENCES feed(id) ON DELETE CASCADE,
+    CONSTRAINT uk_contest_participation_member_contest_feed UNIQUE (member_id, contest_id, feed_id)
 );
 
 -- 3. Event 테이블에 status, started_at 컬럼 추가

@@ -11,6 +11,7 @@ import com.example.mykku.event.tool.EventReader
 import com.example.mykku.event.tool.EventWriter
 import com.example.mykku.member.domain.Member
 import com.example.mykku.scrap.tool.SaveEventReader
+import org.springframework.data.domain.PageImpl
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -93,10 +94,7 @@ class EventService(
         val eventPage = eventParticipationReader.getParticipatedEvents(member, pageable)
 
         val eventListResponses = convertToEventListResponses(eventPage.content, member)
-        val responseMap = eventListResponses.associateBy { it.id }
-        val responsePage = eventPage.map { event ->
-            responseMap[event.id]!!
-        }
+        val responsePage = PageImpl(eventListResponses, eventPage.pageable, eventPage.totalElements)
 
         return PagedEventsResponse.from(responsePage)
     }

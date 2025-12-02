@@ -84,8 +84,7 @@ class ContestReader(
     }
 
     fun getActiveContestsWithAllTags(): List<Pair<Contest, Set<String>>> {
-        val activeContests = contestRepository.findByExpiredAtAfter(LocalDateTime.now())
-            .filter { it.status == ContestStatusType.ACTIVE }
+        val activeContests = contestRepository.findByStatusAndExpiredAtAfter(ContestStatusType.ACTIVE, LocalDateTime.now())
 
         if (activeContests.isEmpty()) return emptyList()
 

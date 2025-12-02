@@ -11,6 +11,7 @@ import com.example.mykku.contest.tool.ContestReader
 import com.example.mykku.contest.tool.ContestWriter
 import com.example.mykku.member.domain.Member
 import com.example.mykku.scrap.tool.SaveContestReader
+import org.springframework.data.domain.PageImpl
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -98,10 +99,7 @@ class ContestService(
         val contestPage = contestParticipationReader.getParticipatedContests(member, pageable)
 
         val contestListResponses = convertToContestListResponses(contestPage.content, member)
-        val responseMap = contestListResponses.associateBy { it.id }
-        val responsePage = contestPage.map { contest ->
-            responseMap[contest.id]!!
-        }
+        val responsePage = PageImpl(contestListResponses, contestPage.pageable, contestPage.totalElements)
 
         return PagedContestsResponse.from(responsePage)
     }
