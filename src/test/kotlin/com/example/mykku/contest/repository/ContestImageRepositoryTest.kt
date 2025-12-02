@@ -23,7 +23,7 @@ class ContestImageRepositoryTest : BaseRepositoryTest() {
     fun `콘테스트 이미지를 저장하고 조회한다`() {
         // given
         val contest = contestRepository.save(
-            Contest(title = "테스트 콘테스트", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "테스트 콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
         val image = ContestImage(url = "https://example.com/image.jpg", orderIndex = 0, contest = contest)
 
@@ -43,13 +43,13 @@ class ContestImageRepositoryTest : BaseRepositoryTest() {
     fun `여러 콘테스트의 이미지를 한번에 조회한다`() {
         // given
         val contest1 = contestRepository.save(
-            Contest(title = "콘테스트1", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "콘테스트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
         val contest2 = contestRepository.save(
-            Contest(title = "콘테스트2", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "콘테스트2", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
         val contest3 = contestRepository.save(
-            Contest(title = "콘테스트3", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "콘테스트3", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
 
         contestImageRepository.saveAll(listOf(
@@ -72,10 +72,10 @@ class ContestImageRepositoryTest : BaseRepositoryTest() {
     fun `특정 콘테스트만 조회하면 해당 콘테스트 이미지만 반환한다`() {
         // given
         val contest1 = contestRepository.save(
-            Contest(title = "콘테스트1", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "콘테스트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
         val contest2 = contestRepository.save(
-            Contest(title = "콘테스트2", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "콘테스트2", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
 
         contestImageRepository.saveAll(listOf(
@@ -96,7 +96,7 @@ class ContestImageRepositoryTest : BaseRepositoryTest() {
     fun `빈 콘테스트 목록으로 조회하면 빈 결과를 반환한다`() {
         // given
         val contest = contestRepository.save(
-            Contest(title = "콘테스트1", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "콘테스트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
         contestImageRepository.save(ContestImage(url = "url1", orderIndex = 0, contest = contest))
 
@@ -112,7 +112,7 @@ class ContestImageRepositoryTest : BaseRepositoryTest() {
     fun `이미지가 없는 콘테스트를 조회하면 빈 결과를 반환한다`() {
         // given
         val contest = contestRepository.save(
-            Contest(title = "이미지 없는 콘테스트", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "이미지 없는 콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
 
         // when
@@ -127,7 +127,7 @@ class ContestImageRepositoryTest : BaseRepositoryTest() {
     fun `여러 이미지를 한번에 저장한다`() {
         // given
         val contest = contestRepository.save(
-            Contest(title = "테스트 콘테스트", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "테스트 콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
         val images = (0..4).map { i ->
             ContestImage(url = "url$i", orderIndex = i, contest = contest)

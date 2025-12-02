@@ -12,6 +12,7 @@ import com.example.mykku.contest.dto.ContestImageResponse
 import com.example.mykku.contest.dto.ContestListResponse
 import com.example.mykku.contest.dto.CreateContestRequest
 import com.example.mykku.contest.tool.ContestDtoConverter
+import com.example.mykku.contest.tool.ContestParticipationReader
 import com.example.mykku.contest.tool.ContestReader
 import com.example.mykku.contest.tool.ContestWriter
 import com.example.mykku.scrap.tool.SaveContestReader
@@ -38,6 +39,9 @@ class ContestServiceTest : BaseServiceTest() {
     private lateinit var contestReader: ContestReader
 
     @Mock
+    private lateinit var contestParticipationReader: ContestParticipationReader
+
+    @Mock
     private lateinit var saveContestReader: SaveContestReader
 
     @Mock
@@ -53,6 +57,7 @@ class ContestServiceTest : BaseServiceTest() {
         val request = CreateContestRequest(
             title = "테스트 콘테스트",
             description = "콘테스트 설명",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7),
             images = listOf(
                 ContestImageRequest(url = "url1", orderIndex = 0),
@@ -61,7 +66,7 @@ class ContestServiceTest : BaseServiceTest() {
             tags = listOf("디자인", "개발")
         )
 
-        val contest = Contest(id = 1L, title = request.title, description = request.description, expiredAt = request.expiredAt)
+        val contest = Contest(id = 1L, title = request.title, description = request.description, startedAt = LocalDateTime.now(), expiredAt = request.expiredAt)
         initializeBaseEntityFields(contest, LocalDateTime.now())
 
         val images = listOf(
@@ -74,7 +79,7 @@ class ContestServiceTest : BaseServiceTest() {
             ContestTag(id = 2L, title = "개발", contest = contest)
         )
 
-        whenever(contestWriter.createContest(any(), anyOrNull(), any(), any(), any())).thenReturn(Triple(contest, images, tags))
+        whenever(contestWriter.createContest(any(), anyOrNull(), any(), any(), any(), any())).thenReturn(Triple(contest, images, tags))
 
         // when
         val result = contestService.createContest(request)
@@ -93,13 +98,14 @@ class ContestServiceTest : BaseServiceTest() {
         // given
         val request = CreateContestRequest(
             title = "테스트 콘테스트",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7)
         )
 
-        val contest = Contest(id = 1L, title = request.title, expiredAt = request.expiredAt)
+        val contest = Contest(id = 1L, title = request.title, startedAt = LocalDateTime.now(), expiredAt = request.expiredAt)
         initializeBaseEntityFields(contest, LocalDateTime.now())
 
-        whenever(contestWriter.createContest(any(), anyOrNull(), any(), any(), any())).thenReturn(Triple(contest, emptyList(), emptyList()))
+        whenever(contestWriter.createContest(any(), anyOrNull(), any(), any(), any(), any())).thenReturn(Triple(contest, emptyList(), emptyList()))
 
         // when
         val result = contestService.createContest(request)
@@ -115,8 +121,8 @@ class ContestServiceTest : BaseServiceTest() {
     fun `콘테스트 목록을 조회한다`() {
         // given
         val member = createTestMember()
-        val contest1 = Contest(id = 1L, title = "콘테스트1", expiredAt = LocalDateTime.now().plusDays(7))
-        val contest2 = Contest(id = 2L, title = "콘테스트2", expiredAt = LocalDateTime.now().plusDays(7))
+        val contest1 = Contest(id = 1L, title = "콘테스트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
+        val contest2 = Contest(id = 2L, title = "콘테스트2", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         val contests = listOf(contest1, contest2)
         val pageable = PageRequest.of(0, 20)
         val page = PageImpl(contests, pageable, contests.size.toLong())
@@ -127,8 +133,8 @@ class ContestServiceTest : BaseServiceTest() {
         val tag1 = ContestTag(id = 1L, title = "디자인", contest = contest1)
         val tagsByContestId = mapOf(1L to listOf(tag1), 2L to emptyList<ContestTag>())
 
-        val response1 = ContestListResponse(id = 1L, title = "콘테스트1", expiredAt = contest1.expiredAt, thumbnailUrl = "url1", tags = listOf("디자인"), isSaved = true)
-        val response2 = ContestListResponse(id = 2L, title = "콘테스트2", expiredAt = contest2.expiredAt, thumbnailUrl = null, tags = emptyList(), isSaved = false)
+        val response1 = ContestListResponse(id = 1L, title = "콘테스트1", startedAt = LocalDateTime.now(), expiredAt = contest1.expiredAt, status = ContestStatusType.ACTIVE, thumbnailUrl = "url1", tags = listOf("디자인"), isSaved = true)
+        val response2 = ContestListResponse(id = 2L, title = "콘테스트2", startedAt = LocalDateTime.now(), expiredAt = contest2.expiredAt, status = ContestStatusType.ACTIVE, thumbnailUrl = null, tags = emptyList(), isSaved = false)
 
         whenever(contestReader.getContestsWithPagination(any(), any(), any(), any())).thenReturn(page)
         whenever(contestReader.getContestImages(contests)).thenReturn(imagesByContestId)
@@ -150,7 +156,7 @@ class ContestServiceTest : BaseServiceTest() {
     fun `콘테스트 상세를 조회한다`() {
         // given
         val member = createTestMember()
-        val contest = Contest(id = 1L, title = "테스트 콘테스트", description = "설명", expiredAt = LocalDateTime.now().plusDays(7))
+        val contest = Contest(id = 1L, title = "테스트 콘테스트", description = "설명", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         initializeBaseEntityFields(contest, LocalDateTime.now())
 
         val images = listOf(
@@ -167,7 +173,9 @@ class ContestServiceTest : BaseServiceTest() {
             id = 1L,
             title = "테스트 콘테스트",
             description = "설명",
+            startedAt = LocalDateTime.now(),
             expiredAt = contest.expiredAt,
+            status = ContestStatusType.ACTIVE,
             images = listOf(ContestImageResponse(url = "url1", orderIndex = 0)),
             tags = listOf("디자인"),
             isSaved = true,
@@ -194,7 +202,7 @@ class ContestServiceTest : BaseServiceTest() {
     fun `저장하지 않은 콘테스트 상세를 조회한다`() {
         // given
         val member = createTestMember()
-        val contest = Contest(id = 1L, title = "테스트 콘테스트", expiredAt = LocalDateTime.now().plusDays(7))
+        val contest = Contest(id = 1L, title = "테스트 콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         initializeBaseEntityFields(contest, LocalDateTime.now())
 
         val imagesByContestId = mapOf(1L to emptyList<ContestImage>())
@@ -204,7 +212,9 @@ class ContestServiceTest : BaseServiceTest() {
             id = 1L,
             title = "테스트 콘테스트",
             description = null,
+            startedAt = LocalDateTime.now(),
             expiredAt = contest.expiredAt,
+            status = ContestStatusType.ACTIVE,
             images = emptyList(),
             tags = emptyList(),
             isSaved = false,

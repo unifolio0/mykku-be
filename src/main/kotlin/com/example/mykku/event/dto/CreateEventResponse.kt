@@ -6,6 +6,7 @@ data class CreateEventResponse(
     val id: Long,
     val title: String,
     val description: String?,
+    val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
     val images: List<EventImageResponse>,
     val createdAt: LocalDateTime

@@ -20,6 +20,7 @@ class EventDocumentTest : BaseDocumentTest() {
         val request = CreateEventRequest(
             title = "신규 이벤트",
             description = "이벤트 상세 설명입니다.",
+            startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
             expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
             images = listOf(
                 EventImageRequest(url = "https://example.com/image1.jpg", orderIndex = 0),
@@ -31,6 +32,7 @@ class EventDocumentTest : BaseDocumentTest() {
             id = 1L,
             title = "신규 이벤트",
             description = "이벤트 상세 설명입니다.",
+            startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
             expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
             images = listOf(
                 EventImageResponse(url = "https://example.com/image1.jpg", orderIndex = 0),
@@ -52,6 +54,8 @@ class EventDocumentTest : BaseDocumentTest() {
                         fieldWithPath("description").type(JsonFieldType.STRING).description("이벤트 설명").optional(),
                         fieldWithPath("expiredAt").type(JsonFieldType.STRING)
                             .description("이벤트 만료일 (yyyy-MM-dd'T'HH:mm:ss)"),
+                        fieldWithPath("startedAt").type(JsonFieldType.STRING)
+                            .description("이벤트 시작일 (yyyy-MM-dd'T'HH:mm:ss)"),
                         fieldWithPath("images[]").type(JsonFieldType.ARRAY).description("이벤트 이미지 목록 (최대 10개)"),
                         fieldWithPath("images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
                         fieldWithPath("images[].orderIndex").type(JsonFieldType.NUMBER).description("이미지 순서")
@@ -66,6 +70,7 @@ class EventDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.title").type(JsonFieldType.STRING).description("이벤트 제목"),
                         fieldWithPath("data.description").type(JsonFieldType.STRING).description("이벤트 설명").optional(),
                         fieldWithPath("data.expiredAt").type(JsonFieldType.STRING).description("이벤트 만료일"),
+                        fieldWithPath("data.startedAt").type(JsonFieldType.STRING).description("이벤트 시작일"),
                         fieldWithPath("data.images[]").type(JsonFieldType.ARRAY).description("이벤트 이미지 목록"),
                         fieldWithPath("data.images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
                         fieldWithPath("data.images[].orderIndex").type(JsonFieldType.NUMBER).description("이미지 순서"),
@@ -89,14 +94,18 @@ class EventDocumentTest : BaseDocumentTest() {
             EventListResponse(
                 id = 1L,
                 title = "첫 번째 이벤트",
+                startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                 expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
+                status = com.example.mykku.event.domain.EventStatusType.ACTIVE,
                 thumbnailUrl = "https://example.com/thumbnail1.jpg",
                 isSaved = true
             ),
             EventListResponse(
                 id = 2L,
                 title = "두 번째 이벤트",
+                startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                 expiredAt = LocalDateTime.of(2025, 11, 30, 23, 59, 59),
+                status = com.example.mykku.event.domain.EventStatusType.ACTIVE,
                 thumbnailUrl = "https://example.com/thumbnail2.jpg",
                 isSaved = false
             )
@@ -139,6 +148,8 @@ class EventDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.content[].thumbnailUrl").type(JsonFieldType.STRING)
                             .description("썸네일 이미지 URL").optional(),
                         fieldWithPath("data.content[].isSaved").type(JsonFieldType.BOOLEAN).description("저장 여부"),
+                        fieldWithPath("data.content[].status").type(JsonFieldType.STRING).description("이벤트 상태"),
+                        fieldWithPath("data.content[].startedAt").type(JsonFieldType.STRING).description("시작일"),
                         fieldWithPath("data.page").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
                         fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
                         fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 요소 수"),
@@ -166,7 +177,9 @@ class EventDocumentTest : BaseDocumentTest() {
             id = eventId,
             title = "이벤트 제목",
             description = "이벤트 상세 설명입니다.",
+            startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
             expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
+            status = com.example.mykku.event.domain.EventStatusType.ACTIVE,
             images = listOf(
                 EventImageResponse(url = "https://example.com/image1.jpg", orderIndex = 0),
                 EventImageResponse(url = "https://example.com/image2.jpg", orderIndex = 1)
@@ -200,7 +213,9 @@ class EventDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
                         fieldWithPath("data.images[].orderIndex").type(JsonFieldType.NUMBER).description("이미지 순서"),
                         fieldWithPath("data.isSaved").type(JsonFieldType.BOOLEAN).description("저장 여부"),
-                        fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성일시")
+                        fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성일시"),
+                        fieldWithPath("data.startedAt").type(JsonFieldType.STRING).description("시작일"),
+                        fieldWithPath("data.status").type(JsonFieldType.STRING).description("이벤트 상태")
                     )
             )
             .build()

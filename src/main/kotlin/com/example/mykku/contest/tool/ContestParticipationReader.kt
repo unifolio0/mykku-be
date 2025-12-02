@@ -34,4 +34,8 @@ class ContestParticipationReader(
             .mapNotNull { it.contest.id }
             .toSet()
     }
+
+    fun getParticipatedContests(member: Member, pageable: Pageable): Page<Contest> {
+        return contestParticipationRepository.findContestsByMember(member, pageable)
+    }
 }

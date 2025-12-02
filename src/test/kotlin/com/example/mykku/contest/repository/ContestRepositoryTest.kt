@@ -22,6 +22,7 @@ class ContestRepositoryTest : BaseRepositoryTest() {
         val contest = Contest(
             title = "테스트 콘테스트",
             description = "콘테스트 설명",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7)
         )
 
@@ -41,10 +42,12 @@ class ContestRepositoryTest : BaseRepositoryTest() {
         // given
         val activeContest = Contest(
             title = "진행중 콘테스트",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7)
         )
         val expiredContest = Contest(
             title = "만료된 콘테스트",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().minusDays(1)
         )
         contestRepository.saveAll(listOf(activeContest, expiredContest))
@@ -61,9 +64,9 @@ class ContestRepositoryTest : BaseRepositoryTest() {
     @DisplayName("ACTIVE 상태 콘테스트를 최신순으로 페이지네이션 조회한다")
     fun `ACTIVE 상태 콘테스트를 최신순으로 페이지네이션 조회한다`() {
         // given
-        val contest1 = Contest(title = "콘테스트1", expiredAt = LocalDateTime.now().plusDays(7))
-        val contest2 = Contest(title = "콘테스트2", expiredAt = LocalDateTime.now().plusDays(7))
-        val expiredContest = Contest(title = "만료 콘테스트", expiredAt = LocalDateTime.now().minusDays(1))
+        val contest1 = Contest(title = "콘테스트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
+        val contest2 = Contest(title = "콘테스트2", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
+        val expiredContest = Contest(title = "만료 콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().minusDays(1))
         contestRepository.saveAll(listOf(contest1, contest2, expiredContest))
         val pageable = PageRequest.of(0, 10)
 
@@ -79,8 +82,8 @@ class ContestRepositoryTest : BaseRepositoryTest() {
     @DisplayName("ACTIVE 상태 콘테스트를 오래된순으로 페이지네이션 조회한다")
     fun `ACTIVE 상태 콘테스트를 오래된순으로 페이지네이션 조회한다`() {
         // given
-        val contest1 = Contest(title = "콘테스트1", expiredAt = LocalDateTime.now().plusDays(7))
-        val contest2 = Contest(title = "콘테스트2", expiredAt = LocalDateTime.now().plusDays(7))
+        val contest1 = Contest(title = "콘테스트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
+        val contest2 = Contest(title = "콘테스트2", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         contestRepository.saveAll(listOf(contest1, contest2))
         val pageable = PageRequest.of(0, 10)
 
@@ -95,8 +98,8 @@ class ContestRepositoryTest : BaseRepositoryTest() {
     @DisplayName("ACTIVE 상태 콘테스트를 인기순으로 페이지네이션 조회한다")
     fun `ACTIVE 상태 콘테스트를 인기순으로 페이지네이션 조회한다`() {
         // given
-        val popularContest = Contest(title = "인기 콘테스트", expiredAt = LocalDateTime.now().plusDays(7), scrapCount = 100)
-        val normalContest = Contest(title = "일반 콘테스트", expiredAt = LocalDateTime.now().plusDays(7), scrapCount = 10)
+        val popularContest = Contest(title = "인기 콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7), scrapCount = 100)
+        val normalContest = Contest(title = "일반 콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7), scrapCount = 10)
         contestRepository.saveAll(listOf(normalContest, popularContest))
         val pageable = PageRequest.of(0, 10)
 
@@ -113,8 +116,8 @@ class ContestRepositoryTest : BaseRepositoryTest() {
     @DisplayName("EXPIRED 상태 콘테스트를 페이지네이션 조회한다")
     fun `EXPIRED 상태 콘테스트를 페이지네이션 조회한다`() {
         // given
-        val activeContest = Contest(title = "진행중 콘테스트", expiredAt = LocalDateTime.now().plusDays(7))
-        val expiredContest = Contest(title = "만료 콘테스트", expiredAt = LocalDateTime.now().minusDays(1))
+        val activeContest = Contest(title = "진행중 콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
+        val expiredContest = Contest(title = "만료 콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().minusDays(1))
         contestRepository.saveAll(listOf(activeContest, expiredContest))
         val pageable = PageRequest.of(0, 10)
 
@@ -130,8 +133,8 @@ class ContestRepositoryTest : BaseRepositoryTest() {
     @DisplayName("모든 콘테스트를 페이지네이션 조회한다")
     fun `모든 콘테스트를 페이지네이션 조회한다`() {
         // given
-        val activeContest = Contest(title = "진행중 콘테스트", expiredAt = LocalDateTime.now().plusDays(7))
-        val expiredContest = Contest(title = "만료 콘테스트", expiredAt = LocalDateTime.now().minusDays(1))
+        val activeContest = Contest(title = "진행중 콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
+        val expiredContest = Contest(title = "만료 콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().minusDays(1))
         contestRepository.saveAll(listOf(activeContest, expiredContest))
         val pageable = PageRequest.of(0, 10)
 
@@ -147,7 +150,7 @@ class ContestRepositoryTest : BaseRepositoryTest() {
     fun `페이지네이션이 정상 동작한다`() {
         // given
         (1..25).forEach { i ->
-            contestRepository.save(Contest(title = "콘테스트$i", expiredAt = LocalDateTime.now().plusDays(7)))
+            contestRepository.save(Contest(title = "콘테스트$i", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7)))
         }
         val pageable = PageRequest.of(0, 10)
 

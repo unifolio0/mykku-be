@@ -27,7 +27,7 @@ class EventImageRepositoryTest : BaseRepositoryTest() {
     fun `이벤트 이미지를 저장하고 조회한다`() {
         // given
         val event = eventRepository.save(
-            Event(title = "테스트 이벤트", expiredAt = LocalDateTime.now().plusDays(7))
+            Event(title = "테스트 이벤트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
 
         val eventImage = EventImage(
@@ -54,13 +54,13 @@ class EventImageRepositoryTest : BaseRepositoryTest() {
     fun `여러 이벤트의 이미지를 조회한다`() {
         // given
         val event1 = eventRepository.save(
-            Event(title = "이벤트1", expiredAt = LocalDateTime.now().plusDays(7))
+            Event(title = "이벤트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
         val event2 = eventRepository.save(
-            Event(title = "이벤트2", expiredAt = LocalDateTime.now().plusDays(7))
+            Event(title = "이벤트2", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
         val event3 = eventRepository.save(
-            Event(title = "이벤트3", expiredAt = LocalDateTime.now().plusDays(7))
+            Event(title = "이벤트3", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
 
         eventImageRepository.save(EventImage(url = "url1", orderIndex = 0, event = event1))
@@ -91,7 +91,7 @@ class EventImageRepositoryTest : BaseRepositoryTest() {
     fun `이벤트에 여러 이미지가 있을 때 모든 이미지를 조회한다`() {
         // given
         val event = eventRepository.save(
-            Event(title = "이벤트", expiredAt = LocalDateTime.now().plusDays(7))
+            Event(title = "이벤트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
 
         for (i in 0 until 5) {

@@ -20,6 +20,7 @@ class ContestDocumentTest : BaseDocumentTest() {
         val request = CreateContestRequest(
             title = "신규 공모전",
             description = "공모전 상세 설명입니다.",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
             images = listOf(
                 ContestImageRequest(url = "https://example.com/image1.jpg", orderIndex = 0),
@@ -32,6 +33,7 @@ class ContestDocumentTest : BaseDocumentTest() {
             id = 1L,
             title = "신규 공모전",
             description = "공모전 상세 설명입니다.",
+            startedAt = LocalDateTime.of(2024, 6, 1, 0, 0, 0),
             expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
             images = listOf(
                 ContestImageResponse(url = "https://example.com/image1.jpg", orderIndex = 0),
@@ -54,6 +56,8 @@ class ContestDocumentTest : BaseDocumentTest() {
                         fieldWithPath("description").type(JsonFieldType.STRING).description("공모전 설명").optional(),
                         fieldWithPath("expiredAt").type(JsonFieldType.STRING)
                             .description("공모전 만료일 (yyyy-MM-dd'T'HH:mm:ss)"),
+                        fieldWithPath("startedAt").type(JsonFieldType.STRING)
+                            .description("공모전 시작일 (yyyy-MM-dd'T'HH:mm:ss)"),
                         fieldWithPath("images[]").type(JsonFieldType.ARRAY).description("공모전 이미지 목록 (최대 10개)"),
                         fieldWithPath("images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
                         fieldWithPath("images[].orderIndex").type(JsonFieldType.NUMBER).description("이미지 순서"),
@@ -73,7 +77,8 @@ class ContestDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
                         fieldWithPath("data.images[].orderIndex").type(JsonFieldType.NUMBER).description("이미지 순서"),
                         fieldWithPath("data.tags[]").type(JsonFieldType.ARRAY).description("공모전 태그 목록"),
-                        fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성일시")
+                        fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성일시"),
+                        fieldWithPath("data.startedAt").type(JsonFieldType.STRING).description("시작일시")
                     )
             )
             .build()
@@ -93,7 +98,9 @@ class ContestDocumentTest : BaseDocumentTest() {
             ContestListResponse(
                 id = 1L,
                 title = "첫 번째 공모전",
+                startedAt = LocalDateTime.now(),
                 expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
+                status = com.example.mykku.contest.domain.ContestStatusType.ACTIVE,
                 thumbnailUrl = "https://example.com/thumbnail1.jpg",
                 tags = listOf("디자인", "개발"),
                 isSaved = true
@@ -101,7 +108,9 @@ class ContestDocumentTest : BaseDocumentTest() {
             ContestListResponse(
                 id = 2L,
                 title = "두 번째 공모전",
+                startedAt = LocalDateTime.now(),
                 expiredAt = LocalDateTime.of(2025, 11, 30, 23, 59, 59),
+                status = com.example.mykku.contest.domain.ContestStatusType.ACTIVE,
                 thumbnailUrl = "https://example.com/thumbnail2.jpg",
                 tags = listOf("기획"),
                 isSaved = false
@@ -142,6 +151,8 @@ class ContestDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("공모전 ID"),
                         fieldWithPath("data.content[].title").type(JsonFieldType.STRING).description("공모전 제목"),
                         fieldWithPath("data.content[].expiredAt").type(JsonFieldType.STRING).description("만료일"),
+                        fieldWithPath("data.content[].status").type(JsonFieldType.STRING).description("공모전 상태"),
+                        fieldWithPath("data.content[].startedAt").type(JsonFieldType.STRING).description("시작일"),
                         fieldWithPath("data.content[].thumbnailUrl").type(JsonFieldType.STRING)
                             .description("썸네일 이미지 URL").optional(),
                         fieldWithPath("data.content[].tags[]").type(JsonFieldType.ARRAY).description("태그 목록"),
@@ -173,7 +184,9 @@ class ContestDocumentTest : BaseDocumentTest() {
             id = contestId,
             title = "공모전 제목",
             description = "공모전 상세 설명입니다.",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
+            status = com.example.mykku.contest.domain.ContestStatusType.ACTIVE,
             images = listOf(
                 ContestImageResponse(url = "https://example.com/image1.jpg", orderIndex = 0),
                 ContestImageResponse(url = "https://example.com/image2.jpg", orderIndex = 1)
@@ -209,7 +222,9 @@ class ContestDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.images[].orderIndex").type(JsonFieldType.NUMBER).description("이미지 순서"),
                         fieldWithPath("data.tags[]").type(JsonFieldType.ARRAY).description("태그 목록"),
                         fieldWithPath("data.isSaved").type(JsonFieldType.BOOLEAN).description("저장 여부"),
-                        fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성일시")
+                        fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성일시"),
+                        fieldWithPath("data.startedAt").type(JsonFieldType.STRING).description("시작일시"),
+                        fieldWithPath("data.status").type(JsonFieldType.STRING).description("공모전 상태")
                     )
             )
             .build()

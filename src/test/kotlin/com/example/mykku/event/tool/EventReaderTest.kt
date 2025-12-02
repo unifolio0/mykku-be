@@ -41,6 +41,7 @@ class EventReaderTest : BaseToolTest() {
         val event = Event(
             id = 1L,
             title = "테스트 이벤트",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7)
         )
 
@@ -71,8 +72,8 @@ class EventReaderTest : BaseToolTest() {
     @DisplayName("진행중인 이벤트 미리보기를 조회한다")
     fun `진행중인 이벤트 미리보기를 조회한다`() {
         // given
-        val event1 = Event(id = 1L, title = "이벤트1", expiredAt = LocalDateTime.now().plusDays(7))
-        val event2 = Event(id = 2L, title = "이벤트2", expiredAt = LocalDateTime.now().plusDays(7))
+        val event1 = Event(id = 1L, title = "이벤트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
+        val event2 = Event(id = 2L, title = "이벤트2", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         val events = listOf(event1, event2)
 
         val image1 = EventImage(id = 1L, url = "url1", orderIndex = 0, event = event1)
@@ -93,7 +94,7 @@ class EventReaderTest : BaseToolTest() {
     fun `ACTIVE 상태와 LATEST 정렬로 이벤트를 페이지네이션 조회한다`() {
         // given
         val events = listOf(
-            Event(id = 1L, title = "이벤트1", expiredAt = LocalDateTime.now().plusDays(7))
+            Event(id = 1L, title = "이벤트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
         val pageable = PageRequest.of(0, 10)
         val page = PageImpl(events, pageable, events.size.toLong())
@@ -117,7 +118,7 @@ class EventReaderTest : BaseToolTest() {
     fun `ACTIVE 상태와 OLDEST 정렬로 이벤트를 조회한다`() {
         // given
         val events = listOf(
-            Event(id = 1L, title = "이벤트1", expiredAt = LocalDateTime.now().plusDays(7))
+            Event(id = 1L, title = "이벤트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
         val pageable = PageRequest.of(0, 10)
         val page = PageImpl(events, pageable, events.size.toLong())
@@ -141,7 +142,7 @@ class EventReaderTest : BaseToolTest() {
     fun `ACTIVE 상태와 POPULAR 정렬로 이벤트를 조회한다`() {
         // given
         val events = listOf(
-            Event(id = 1L, title = "이벤트1", expiredAt = LocalDateTime.now().plusDays(7), scrapCount = 100)
+            Event(id = 1L, title = "이벤트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7), scrapCount = 100)
         )
         val pageable = PageRequest.of(0, 10)
         val page = PageImpl(events, pageable, events.size.toLong())
@@ -165,7 +166,7 @@ class EventReaderTest : BaseToolTest() {
     fun `EXPIRED 상태로 이벤트를 조회한다`() {
         // given
         val events = listOf(
-            Event(id = 1L, title = "만료 이벤트", expiredAt = LocalDateTime.now().minusDays(1))
+            Event(id = 1L, title = "만료 이벤트", startedAt = LocalDateTime.now().minusDays(2), expiredAt = LocalDateTime.now().minusDays(1))
         )
         val pageable = PageRequest.of(0, 10)
         val page = PageImpl(events, pageable, events.size.toLong())
@@ -189,8 +190,8 @@ class EventReaderTest : BaseToolTest() {
     fun `ALL 상태로 모든 이벤트를 조회한다`() {
         // given
         val events = listOf(
-            Event(id = 1L, title = "이벤트1", expiredAt = LocalDateTime.now().plusDays(7)),
-            Event(id = 2L, title = "이벤트2", expiredAt = LocalDateTime.now().minusDays(1))
+            Event(id = 1L, title = "이벤트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7)),
+            Event(id = 2L, title = "이벤트2", startedAt = LocalDateTime.now().minusDays(2), expiredAt = LocalDateTime.now().minusDays(1))
         )
         val pageable = PageRequest.of(0, 10)
         val page = PageImpl(events, pageable, events.size.toLong())
@@ -213,8 +214,8 @@ class EventReaderTest : BaseToolTest() {
     @DisplayName("이벤트 이미지를 조회한다")
     fun `이벤트 이미지를 조회한다`() {
         // given
-        val event1 = Event(id = 1L, title = "이벤트1", expiredAt = LocalDateTime.now().plusDays(7))
-        val event2 = Event(id = 2L, title = "이벤트2", expiredAt = LocalDateTime.now().plusDays(7))
+        val event1 = Event(id = 1L, title = "이벤트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
+        val event2 = Event(id = 2L, title = "이벤트2", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         val events = listOf(event1, event2)
 
         val images = listOf(
@@ -238,7 +239,7 @@ class EventReaderTest : BaseToolTest() {
     @DisplayName("관계와 함께 이벤트를 조회한다")
     fun `관계와 함께 이벤트를 조회한다`() {
         // given
-        val event = Event(id = 1L, title = "테스트 이벤트", expiredAt = LocalDateTime.now().plusDays(7))
+        val event = Event(id = 1L, title = "테스트 이벤트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
 
         whenever(eventRepository.findById(1L)).thenReturn(Optional.of(event))
 

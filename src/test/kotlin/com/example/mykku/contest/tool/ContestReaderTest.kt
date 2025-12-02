@@ -46,6 +46,7 @@ class ContestReaderTest : BaseToolTest() {
         val contest = Contest(
             id = 1L,
             title = "테스트 콘테스트",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7)
         )
 
@@ -77,7 +78,7 @@ class ContestReaderTest : BaseToolTest() {
     fun `ACTIVE 상태와 LATEST 정렬로 콘테스트를 페이지네이션 조회한다`() {
         // given
         val contests = listOf(
-            Contest(id = 1L, title = "콘테스트1", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(id = 1L, title = "콘테스트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
         val pageable = PageRequest.of(0, 10)
         val page = PageImpl(contests, pageable, contests.size.toLong())
@@ -101,7 +102,7 @@ class ContestReaderTest : BaseToolTest() {
     fun `ACTIVE 상태와 OLDEST 정렬로 콘테스트를 조회한다`() {
         // given
         val contests = listOf(
-            Contest(id = 1L, title = "콘테스트1", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(id = 1L, title = "콘테스트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
         val pageable = PageRequest.of(0, 10)
         val page = PageImpl(contests, pageable, contests.size.toLong())
@@ -125,7 +126,7 @@ class ContestReaderTest : BaseToolTest() {
     fun `ACTIVE 상태와 POPULAR 정렬로 콘테스트를 조회한다`() {
         // given
         val contests = listOf(
-            Contest(id = 1L, title = "콘테스트1", expiredAt = LocalDateTime.now().plusDays(7), scrapCount = 100)
+            Contest(id = 1L, title = "콘테스트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7), scrapCount = 100)
         )
         val pageable = PageRequest.of(0, 10)
         val page = PageImpl(contests, pageable, contests.size.toLong())
@@ -149,7 +150,7 @@ class ContestReaderTest : BaseToolTest() {
     fun `EXPIRED 상태로 콘테스트를 조회한다`() {
         // given
         val contests = listOf(
-            Contest(id = 1L, title = "만료 콘테스트", expiredAt = LocalDateTime.now().minusDays(1))
+            Contest(id = 1L, title = "만료 콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().minusDays(1))
         )
         val pageable = PageRequest.of(0, 10)
         val page = PageImpl(contests, pageable, contests.size.toLong())
@@ -173,8 +174,8 @@ class ContestReaderTest : BaseToolTest() {
     fun `ALL 상태로 모든 콘테스트를 조회한다`() {
         // given
         val contests = listOf(
-            Contest(id = 1L, title = "콘테스트1", expiredAt = LocalDateTime.now().plusDays(7)),
-            Contest(id = 2L, title = "콘테스트2", expiredAt = LocalDateTime.now().minusDays(1))
+            Contest(id = 1L, title = "콘테스트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7)),
+            Contest(id = 2L, title = "콘테스트2", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().minusDays(1))
         )
         val pageable = PageRequest.of(0, 10)
         val page = PageImpl(contests, pageable, contests.size.toLong())
@@ -197,8 +198,8 @@ class ContestReaderTest : BaseToolTest() {
     @DisplayName("콘테스트 이미지를 조회한다")
     fun `콘테스트 이미지를 조회한다`() {
         // given
-        val contest1 = Contest(id = 1L, title = "콘테스트1", expiredAt = LocalDateTime.now().plusDays(7))
-        val contest2 = Contest(id = 2L, title = "콘테스트2", expiredAt = LocalDateTime.now().plusDays(7))
+        val contest1 = Contest(id = 1L, title = "콘테스트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
+        val contest2 = Contest(id = 2L, title = "콘테스트2", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         val contests = listOf(contest1, contest2)
 
         val images = listOf(
@@ -222,8 +223,8 @@ class ContestReaderTest : BaseToolTest() {
     @DisplayName("콘테스트 태그를 조회한다")
     fun `콘테스트 태그를 조회한다`() {
         // given
-        val contest1 = Contest(id = 1L, title = "콘테스트1", expiredAt = LocalDateTime.now().plusDays(7))
-        val contest2 = Contest(id = 2L, title = "콘테스트2", expiredAt = LocalDateTime.now().plusDays(7))
+        val contest1 = Contest(id = 1L, title = "콘테스트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
+        val contest2 = Contest(id = 2L, title = "콘테스트2", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         val contests = listOf(contest1, contest2)
 
         val tags = listOf(
@@ -247,7 +248,7 @@ class ContestReaderTest : BaseToolTest() {
     @DisplayName("태그 제목 목록으로 태그를 조회한다")
     fun `태그 제목 목록으로 태그를 조회한다`() {
         // given
-        val contest = Contest(id = 1L, title = "콘테스트", expiredAt = LocalDateTime.now().plusDays(7))
+        val contest = Contest(id = 1L, title = "콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         val tags = listOf(
             ContestTag(id = 1L, title = "디자인", contest = contest),
             ContestTag(id = 2L, title = "개발", contest = contest)
@@ -267,7 +268,7 @@ class ContestReaderTest : BaseToolTest() {
     @DisplayName("관계와 함께 콘테스트를 조회한다")
     fun `관계와 함께 콘테스트를 조회한다`() {
         // given
-        val contest = Contest(id = 1L, title = "테스트 콘테스트", expiredAt = LocalDateTime.now().plusDays(7))
+        val contest = Contest(id = 1L, title = "테스트 콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
 
         whenever(contestRepository.findById(1L)).thenReturn(Optional.of(contest))
 

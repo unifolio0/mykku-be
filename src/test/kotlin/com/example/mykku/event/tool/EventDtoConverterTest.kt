@@ -21,6 +21,7 @@ class EventDtoConverterTest : BaseToolTest() {
             id = 1L,
             title = "테스트 이벤트",
             description = "설명",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7)
         )
         val images = listOf(
@@ -45,6 +46,7 @@ class EventDtoConverterTest : BaseToolTest() {
         val event = Event(
             id = 1L,
             title = "테스트 이벤트",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7)
         )
 
@@ -63,6 +65,7 @@ class EventDtoConverterTest : BaseToolTest() {
         val event = Event(
             id = 1L,
             title = "테스트 이벤트",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7)
         )
         val images = listOf(
@@ -86,6 +89,7 @@ class EventDtoConverterTest : BaseToolTest() {
             id = 1L,
             title = "테스트 이벤트",
             description = "이벤트 설명",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7)
         )
         initializeBaseEntityFields(event, LocalDateTime.now())
@@ -115,6 +119,7 @@ class EventDtoConverterTest : BaseToolTest() {
         val event = Event(
             id = 1L,
             title = "테스트 이벤트",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7)
         )
         initializeBaseEntityFields(event, LocalDateTime.now())
@@ -142,6 +147,7 @@ class EventDtoConverterTest : BaseToolTest() {
         val event = Event(
             id = 1L,
             title = "테스트 이벤트",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7)
         )
         initializeBaseEntityFields(event, LocalDateTime.now())

@@ -27,6 +27,7 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
             content = "좋은 덕담 감사합니다!",
             likeCount = 0,
             memberName = "홍길동",
+            profileImage = "https://example.com/profile.jpg",
             createdAt = LocalDateTime.now(),
             replies = emptyList()
         )
@@ -58,6 +59,7 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                         fieldWithPath("data.memberName").type(JsonFieldType.STRING).description("작성자 이름"),
                         fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성 일시"),
+                        fieldWithPath("data.profileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지 URL"),
                         fieldWithPath("data.replies[]").type(JsonFieldType.ARRAY).description("답글 목록")
                     )
             )
@@ -85,6 +87,7 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
             content = "저도 동감합니다!",
             likeCount = 0,
             memberName = "김철수",
+            profileImage = "https://example.com/profile2.jpg",
             createdAt = LocalDateTime.now(),
             replies = emptyList()
         )
@@ -115,7 +118,8 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                         fieldWithPath("data.memberName").type(JsonFieldType.STRING).description("작성자 이름"),
                         fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성 일시"),
-                        fieldWithPath("data.replies[]").type(JsonFieldType.ARRAY).description("답글 목록 (항상 빈 배열)")
+                        fieldWithPath("data.replies[]").type(JsonFieldType.ARRAY).description("답글 목록 (항상 빈 배열)"),
+                        fieldWithPath("data.profileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지 URL")
                     )
             )
             .build()
@@ -139,6 +143,7 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
             content = "수정된 댓글 내용입니다!",
             likeCount = 5,
             memberName = "홍길동",
+            profileImage = "https://example.com/profile.jpg",
             createdAt = LocalDateTime.now(),
             replies = emptyList()
         )
@@ -168,6 +173,7 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                         fieldWithPath("data.memberName").type(JsonFieldType.STRING).description("작성자 이름"),
                         fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성 일시"),
+                        fieldWithPath("data.profileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지 URL"),
                         fieldWithPath("data.replies[]").type(JsonFieldType.ARRAY).description("답글 목록")
                     )
             )

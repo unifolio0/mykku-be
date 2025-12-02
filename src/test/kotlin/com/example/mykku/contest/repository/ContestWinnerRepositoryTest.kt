@@ -23,7 +23,7 @@ class ContestWinnerRepositoryTest : BaseRepositoryTest() {
     fun `콘테스트 수상자를 저장하고 조회한다`() {
         // given
         val contest = contestRepository.save(
-            Contest(title = "테스트 콘테스트", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "테스트 콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
         val winner = ContestWinner(
             winnerRank = 1,
@@ -51,7 +51,7 @@ class ContestWinnerRepositoryTest : BaseRepositoryTest() {
     fun `특정 콘테스트의 수상자를 조회한다`() {
         // given
         val contest = contestRepository.save(
-            Contest(title = "테스트 콘테스트", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "테스트 콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
         contestWinnerRepository.saveAll(listOf(
             ContestWinner(winnerRank = 1, description = "대상", acceptanceSpeech = "감사", image = "img1", contest = contest),
@@ -72,13 +72,13 @@ class ContestWinnerRepositoryTest : BaseRepositoryTest() {
     fun `여러 콘테스트의 수상자를 한번에 조회한다`() {
         // given
         val contest1 = contestRepository.save(
-            Contest(title = "콘테스트1", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "콘테스트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
         val contest2 = contestRepository.save(
-            Contest(title = "콘테스트2", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "콘테스트2", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
         val contest3 = contestRepository.save(
-            Contest(title = "콘테스트3", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "콘테스트3", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
 
         contestWinnerRepository.saveAll(listOf(
@@ -101,7 +101,7 @@ class ContestWinnerRepositoryTest : BaseRepositoryTest() {
     fun `수상자가 없는 콘테스트를 조회하면 빈 결과를 반환한다`() {
         // given
         val contest = contestRepository.save(
-            Contest(title = "수상자 없는 콘테스트", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "수상자 없는 콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
 
         // when
@@ -116,7 +116,7 @@ class ContestWinnerRepositoryTest : BaseRepositoryTest() {
     fun `빈 콘테스트 목록으로 조회하면 빈 결과를 반환한다`() {
         // given
         val contest = contestRepository.save(
-            Contest(title = "콘테스트", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
         contestWinnerRepository.save(
             ContestWinner(winnerRank = 1, description = "대상", acceptanceSpeech = "감사", image = "img", contest = contest)
@@ -134,10 +134,10 @@ class ContestWinnerRepositoryTest : BaseRepositoryTest() {
     fun `특정 콘테스트만 조회하면 해당 콘테스트 수상자만 반환한다`() {
         // given
         val contest1 = contestRepository.save(
-            Contest(title = "콘테스트1", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "콘테스트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
         val contest2 = contestRepository.save(
-            Contest(title = "콘테스트2", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "콘테스트2", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
 
         contestWinnerRepository.saveAll(listOf(
@@ -158,7 +158,7 @@ class ContestWinnerRepositoryTest : BaseRepositoryTest() {
     fun `여러 수상자를 한번에 저장한다`() {
         // given
         val contest = contestRepository.save(
-            Contest(title = "테스트 콘테스트", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "테스트 콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
         val winners = (1..5).map { rank ->
             ContestWinner(

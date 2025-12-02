@@ -19,10 +19,10 @@ spring:
     username: root
     password: root
   jpa:
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
         dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: validate

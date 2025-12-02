@@ -21,7 +21,9 @@ class ContestDtoConverter {
         return ContestListResponse(
             id = contest.id!!,
             title = contest.title,
+            startedAt = contest.startedAt,
             expiredAt = contest.expiredAt,
+            status = contest.status,
             thumbnailUrl = sortedImages.firstOrNull()?.url,
             tags = tags.map { it.title },
             isSaved = isSaved
@@ -39,7 +41,9 @@ class ContestDtoConverter {
             id = contest.id!!,
             title = contest.title,
             description = contest.description,
+            startedAt = contest.startedAt,
             expiredAt = contest.expiredAt,
+            status = contest.status,
             images = sortedImages.map { ContestImageResponse(url = it.url, orderIndex = it.orderIndex) },
             tags = tags.map { it.title },
             isSaved = isSaved,

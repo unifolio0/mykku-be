@@ -63,6 +63,12 @@ class FeedServiceTest : BaseServiceTest() {
     @Mock
     private lateinit var imageUploadService: ImageUploadService
 
+    @Mock
+    private lateinit var contestReader: com.example.mykku.contest.tool.ContestReader
+
+    @Mock
+    private lateinit var contestParticipationWriter: com.example.mykku.contest.tool.ContestParticipationWriter
+
     @InjectMocks
     private lateinit var feedService: FeedService
 
@@ -201,7 +207,7 @@ class FeedServiceTest : BaseServiceTest() {
         val noOpImageUploadService = mock<ImageUploadService>()
         whenever(noOpImageUploadService.uploadImages(any()))
             .thenThrow(ImageException(ImageErrorCode.IMAGE_UPLOAD_SERVICE_UNAVAILABLE))
-        
+
         val feedServiceWithoutImageUpload = FeedService(
             feedReader = feedReader,
             feedWriter = feedWriter,
@@ -210,7 +216,9 @@ class FeedServiceTest : BaseServiceTest() {
             memberReader = memberReader,
             likeFeedReader = likeFeedReader,
             saveFeedReader = saveFeedReader,
-            imageUploadService = noOpImageUploadService
+            imageUploadService = noOpImageUploadService,
+            contestReader = contestReader,
+            contestParticipationWriter = contestParticipationWriter
         )
 
         val imageFile = mock<MultipartFile>()

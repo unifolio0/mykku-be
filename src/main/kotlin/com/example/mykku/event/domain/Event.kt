@@ -16,6 +16,9 @@ class Event(
     @Column(name = "description", columnDefinition = "TEXT")
     var description: String? = null,
 
+    @Column(name = "started_at")
+    var startedAt: LocalDateTime,
+
     @Column(name = "expired_at")
     var expiredAt: LocalDateTime,
 

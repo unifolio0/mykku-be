@@ -26,6 +26,7 @@ class EventRepositoryTest : BaseRepositoryTest() {
         val event = Event(
             title = "테스트 이벤트",
             description = "이벤트 설명",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7)
         )
 
@@ -47,10 +48,10 @@ class EventRepositoryTest : BaseRepositoryTest() {
     fun `만료되지 않은 이벤트 목록을 조회한다`() {
         // given
         val activeEvent = eventRepository.save(
-            Event(title = "활성 이벤트", expiredAt = LocalDateTime.now().plusDays(7))
+            Event(title = "활성 이벤트", startedAt = LocalDateTime.now().minusDays(1), expiredAt = LocalDateTime.now().plusDays(7))
         )
         val expiredEvent = eventRepository.save(
-            Event(title = "만료 이벤트", expiredAt = LocalDateTime.now().minusDays(1))
+            Event(title = "만료 이벤트", startedAt = LocalDateTime.now().minusDays(2), expiredAt = LocalDateTime.now().minusDays(1))
         )
         testEntityManager.flush()
         testEntityManager.clear()
@@ -71,6 +72,7 @@ class EventRepositoryTest : BaseRepositoryTest() {
             eventRepository.save(
                 Event(
                     title = "이벤트$i",
+                    startedAt = LocalDateTime.now().minusDays(1),
                     expiredAt = LocalDateTime.now().plusDays(i.toLong())
                 )
             )
@@ -96,6 +98,7 @@ class EventRepositoryTest : BaseRepositoryTest() {
             eventRepository.save(
                 Event(
                     title = "이벤트$i",
+                    startedAt = LocalDateTime.now().minusDays(1),
                     expiredAt = LocalDateTime.now().plusDays(i.toLong())
                 )
             )
@@ -116,13 +119,13 @@ class EventRepositoryTest : BaseRepositoryTest() {
     fun `인기순으로 활성 이벤트를 조회한다`() {
         // given
         val event1 = eventRepository.save(
-            Event(title = "이벤트1", expiredAt = LocalDateTime.now().plusDays(7), scrapCount = 10)
+            Event(title = "이벤트1", startedAt = LocalDateTime.now().minusDays(1), expiredAt = LocalDateTime.now().plusDays(7), scrapCount = 10)
         )
         val event2 = eventRepository.save(
-            Event(title = "이벤트2", expiredAt = LocalDateTime.now().plusDays(7), scrapCount = 50)
+            Event(title = "이벤트2", startedAt = LocalDateTime.now().minusDays(1), expiredAt = LocalDateTime.now().plusDays(7), scrapCount = 50)
         )
         val event3 = eventRepository.save(
-            Event(title = "이벤트3", expiredAt = LocalDateTime.now().plusDays(7), scrapCount = 30)
+            Event(title = "이벤트3", startedAt = LocalDateTime.now().minusDays(1), expiredAt = LocalDateTime.now().plusDays(7), scrapCount = 30)
         )
         testEntityManager.flush()
         testEntityManager.clear()
@@ -143,13 +146,13 @@ class EventRepositoryTest : BaseRepositoryTest() {
     fun `만료된 이벤트를 페이지네이션으로 조회한다`() {
         // given
         eventRepository.save(
-            Event(title = "활성 이벤트", expiredAt = LocalDateTime.now().plusDays(7))
+            Event(title = "활성 이벤트", startedAt = LocalDateTime.now().minusDays(1), expiredAt = LocalDateTime.now().plusDays(7))
         )
         eventRepository.save(
-            Event(title = "만료 이벤트1", expiredAt = LocalDateTime.now().minusDays(1))
+            Event(title = "만료 이벤트1", startedAt = LocalDateTime.now().minusDays(2), expiredAt = LocalDateTime.now().minusDays(1))
         )
         eventRepository.save(
-            Event(title = "만료 이벤트2", expiredAt = LocalDateTime.now().minusDays(2))
+            Event(title = "만료 이벤트2", startedAt = LocalDateTime.now().minusDays(3), expiredAt = LocalDateTime.now().minusDays(2))
         )
         testEntityManager.flush()
         testEntityManager.clear()
@@ -170,6 +173,7 @@ class EventRepositoryTest : BaseRepositoryTest() {
             eventRepository.save(
                 Event(
                     title = "이벤트$i",
+                    startedAt = LocalDateTime.now().minusDays(2),
                     expiredAt = if (i <= 2) LocalDateTime.now().minusDays(1) else LocalDateTime.now().plusDays(i.toLong())
                 )
             )

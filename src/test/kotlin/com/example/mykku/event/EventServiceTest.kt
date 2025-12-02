@@ -11,6 +11,7 @@ import com.example.mykku.event.dto.EventListResponse
 import com.example.mykku.event.dto.EventDetailResponse
 import com.example.mykku.event.dto.EventImageResponse
 import com.example.mykku.event.tool.EventDtoConverter
+import com.example.mykku.event.tool.EventParticipationReader
 import com.example.mykku.event.tool.EventReader
 import com.example.mykku.event.tool.EventWriter
 import com.example.mykku.scrap.tool.SaveEventReader
@@ -37,6 +38,9 @@ class EventServiceTest : BaseServiceTest() {
     private lateinit var eventReader: EventReader
 
     @Mock
+    private lateinit var eventParticipationReader: EventParticipationReader
+
+    @Mock
     private lateinit var saveEventReader: SaveEventReader
 
     @Mock
@@ -52,6 +56,7 @@ class EventServiceTest : BaseServiceTest() {
         val request = CreateEventRequest(
             title = "테스트 이벤트",
             description = "이벤트 설명",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7),
             images = listOf(
                 EventImageRequest(url = "url1", orderIndex = 0),
@@ -59,7 +64,7 @@ class EventServiceTest : BaseServiceTest() {
             )
         )
 
-        val event = Event(id = 1L, title = request.title, description = request.description, expiredAt = request.expiredAt)
+        val event = Event(id = 1L, title = request.title, description = request.description, startedAt = LocalDateTime.now(), expiredAt = request.expiredAt)
         initializeBaseEntityFields(event, LocalDateTime.now())
 
         val images = listOf(
@@ -67,7 +72,7 @@ class EventServiceTest : BaseServiceTest() {
             EventImage(id = 2L, url = "url2", orderIndex = 1, event = event)
         )
 
-        whenever(eventWriter.createEvent(any(), anyOrNull(), any(), any())).thenReturn(Pair(event, images))
+        whenever(eventWriter.createEvent(any(), anyOrNull(), any(), any(), any())).thenReturn(Pair(event, images))
 
         // when
         val result = eventService.createEvent(request)
@@ -85,13 +90,14 @@ class EventServiceTest : BaseServiceTest() {
         // given
         val request = CreateEventRequest(
             title = "테스트 이벤트",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7)
         )
 
-        val event = Event(id = 1L, title = request.title, expiredAt = request.expiredAt)
+        val event = Event(id = 1L, title = request.title, startedAt = LocalDateTime.now(), expiredAt = request.expiredAt)
         initializeBaseEntityFields(event, LocalDateTime.now())
 
-        whenever(eventWriter.createEvent(any(), anyOrNull(), any(), any())).thenReturn(Pair(event, emptyList()))
+        whenever(eventWriter.createEvent(any(), anyOrNull(), any(), any(), any())).thenReturn(Pair(event, emptyList()))
 
         // when
         val result = eventService.createEvent(request)
@@ -106,8 +112,8 @@ class EventServiceTest : BaseServiceTest() {
     fun `이벤트 목록을 조회한다`() {
         // given
         val member = createTestMember()
-        val event1 = Event(id = 1L, title = "이벤트1", expiredAt = LocalDateTime.now().plusDays(7))
-        val event2 = Event(id = 2L, title = "이벤트2", expiredAt = LocalDateTime.now().plusDays(7))
+        val event1 = Event(id = 1L, title = "이벤트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
+        val event2 = Event(id = 2L, title = "이벤트2", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         val events = listOf(event1, event2)
         val pageable = PageRequest.of(0, 20)
         val page = PageImpl(events, pageable, events.size.toLong())
@@ -115,8 +121,8 @@ class EventServiceTest : BaseServiceTest() {
         val image1 = EventImage(id = 1L, url = "url1", orderIndex = 0, event = event1)
         val imagesByEventId = mapOf(1L to listOf(image1), 2L to emptyList())
 
-        val response1 = EventListResponse(id = 1L, title = "이벤트1", expiredAt = event1.expiredAt, thumbnailUrl = "url1", isSaved = true)
-        val response2 = EventListResponse(id = 2L, title = "이벤트2", expiredAt = event2.expiredAt, thumbnailUrl = null, isSaved = false)
+        val response1 = EventListResponse(id = 1L, title = "이벤트1", startedAt = event1.startedAt, expiredAt = event1.expiredAt, status = event1.status, thumbnailUrl = "url1", isSaved = true)
+        val response2 = EventListResponse(id = 2L, title = "이벤트2", startedAt = event2.startedAt, expiredAt = event2.expiredAt, status = event2.status, thumbnailUrl = null, isSaved = false)
 
         whenever(eventReader.getEventsWithPagination(any(), any(), any(), any())).thenReturn(page)
         whenever(eventReader.getEventImages(events)).thenReturn(imagesByEventId)
@@ -137,7 +143,7 @@ class EventServiceTest : BaseServiceTest() {
     fun `이벤트 상세를 조회한다`() {
         // given
         val member = createTestMember()
-        val event = Event(id = 1L, title = "테스트 이벤트", description = "설명", expiredAt = LocalDateTime.now().plusDays(7))
+        val event = Event(id = 1L, title = "테스트 이벤트", description = "설명", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         initializeBaseEntityFields(event, LocalDateTime.now())
 
         val images = listOf(
@@ -149,7 +155,9 @@ class EventServiceTest : BaseServiceTest() {
             id = 1L,
             title = "테스트 이벤트",
             description = "설명",
+            startedAt = event.startedAt,
             expiredAt = event.expiredAt,
+            status = event.status,
             images = listOf(EventImageResponse(url = "url1", orderIndex = 0)),
             isSaved = true,
             createdAt = event.createdAt
@@ -174,7 +182,7 @@ class EventServiceTest : BaseServiceTest() {
     fun `저장하지 않은 이벤트 상세를 조회한다`() {
         // given
         val member = createTestMember()
-        val event = Event(id = 1L, title = "테스트 이벤트", expiredAt = LocalDateTime.now().plusDays(7))
+        val event = Event(id = 1L, title = "테스트 이벤트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         initializeBaseEntityFields(event, LocalDateTime.now())
 
         val imagesByEventId = mapOf(1L to emptyList<EventImage>())
@@ -183,7 +191,9 @@ class EventServiceTest : BaseServiceTest() {
             id = 1L,
             title = "테스트 이벤트",
             description = null,
+            startedAt = event.startedAt,
             expiredAt = event.expiredAt,
+            status = event.status,
             images = emptyList(),
             isSaved = false,
             createdAt = event.createdAt

@@ -87,6 +87,7 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
                     content = "감사합니다!",
                     likeCount = 5,
                     memberName = "사용자1",
+                    profileImage = "https://example.com/profile1.jpg",
                     createdAt = LocalDateTime.now(),
                     replies = listOf(
                         ReplyResponse(
@@ -94,6 +95,7 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
                             content = "함께해요!",
                             likeCount = 2,
                             memberName = "사용자2",
+                            profileImage = "https://example.com/profile2.jpg",
                             createdAt = LocalDateTime.now()
                         )
                     )
@@ -128,6 +130,7 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.comments[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                         fieldWithPath("data.comments[].memberName").type(JsonFieldType.STRING).description("작성자 이름"),
                         fieldWithPath("data.comments[].createdAt").type(JsonFieldType.STRING).description("작성 일시"),
+                        fieldWithPath("data.comments[].profileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지 URL"),
                         fieldWithPath("data.comments[].replies[]").type(JsonFieldType.ARRAY).description("답글 목록"),
                         fieldWithPath("data.comments[].replies[].id").type(JsonFieldType.NUMBER).description("답글 ID"),
                         fieldWithPath("data.comments[].replies[].content").type(JsonFieldType.STRING)
@@ -136,6 +139,8 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
                             .description("좋아요 수"),
                         fieldWithPath("data.comments[].replies[].memberName").type(JsonFieldType.STRING)
                             .description("작성자 이름"),
+                        fieldWithPath("data.comments[].replies[].profileImage").type(JsonFieldType.STRING)
+                            .description("작성자 프로필 이미지 URL"),
                         fieldWithPath("data.comments[].replies[].createdAt").type(JsonFieldType.STRING)
                             .description("작성 일시")
                     )

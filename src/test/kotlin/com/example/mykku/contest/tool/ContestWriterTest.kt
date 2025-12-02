@@ -48,7 +48,7 @@ class ContestWriterTest : BaseToolTest() {
         )
         val tagTitles = listOf("디자인", "개발")
 
-        val savedContest = Contest(id = 1L, title = title, description = description, expiredAt = expiredAt)
+        val savedContest = Contest(id = 1L, title = title, description = description, startedAt = LocalDateTime.now(), expiredAt = expiredAt)
         val savedImages = imageRequests.mapIndexed { index, req ->
             ContestImage(id = (index + 1).toLong(), url = req.url, orderIndex = req.orderIndex, contest = savedContest)
         }
@@ -61,7 +61,7 @@ class ContestWriterTest : BaseToolTest() {
         whenever(contestTagRepository.saveAll(any<List<ContestTag>>())).thenReturn(savedTags)
 
         // when
-        val (contest, images, tags) = contestWriter.createContest(title, description, expiredAt, imageRequests, tagTitles)
+        val (contest, images, tags) = contestWriter.createContest(title, description, LocalDateTime.now(), expiredAt, imageRequests, tagTitles)
 
         // then
         assertThat(contest.id).isEqualTo(1L)
@@ -78,14 +78,14 @@ class ContestWriterTest : BaseToolTest() {
         val title = "테스트 콘테스트"
         val expiredAt = LocalDateTime.now().plusDays(7)
 
-        val savedContest = Contest(id = 1L, title = title, expiredAt = expiredAt)
+        val savedContest = Contest(id = 1L, title = title, startedAt = LocalDateTime.now(), expiredAt = expiredAt)
 
         whenever(contestRepository.save(any<Contest>())).thenReturn(savedContest)
         whenever(contestImageRepository.saveAll(any<List<ContestImage>>())).thenReturn(emptyList())
         whenever(contestTagRepository.saveAll(any<List<ContestTag>>())).thenReturn(emptyList())
 
         // when
-        val (contest, images, tags) = contestWriter.createContest(title, null, expiredAt, emptyList(), emptyList())
+        val (contest, images, tags) = contestWriter.createContest(title, null, LocalDateTime.now(), expiredAt, emptyList(), emptyList())
 
         // then
         assertThat(contest.id).isEqualTo(1L)
@@ -103,7 +103,7 @@ class ContestWriterTest : BaseToolTest() {
 
         // when & then
         val exception = assertThrows<ContestException> {
-            contestWriter.createContest(title, null, expiredAt, imageRequests, emptyList())
+            contestWriter.createContest(title, null, LocalDateTime.now(), expiredAt, imageRequests, emptyList())
         }
         assertThat(exception.errorCode).isEqualTo(ContestErrorCode.CONTEST_IMAGE_LIMIT_EXCEEDED)
     }
@@ -116,7 +116,7 @@ class ContestWriterTest : BaseToolTest() {
         val expiredAt = LocalDateTime.now().plusDays(7)
         val imageRequests = (0..9).map { ContestImageRequest(url = "url$it", orderIndex = it) }
 
-        val savedContest = Contest(id = 1L, title = title, expiredAt = expiredAt)
+        val savedContest = Contest(id = 1L, title = title, startedAt = LocalDateTime.now(), expiredAt = expiredAt)
         val savedImages = imageRequests.mapIndexed { index, req ->
             ContestImage(id = (index + 1).toLong(), url = req.url, orderIndex = req.orderIndex, contest = savedContest)
         }
@@ -126,7 +126,7 @@ class ContestWriterTest : BaseToolTest() {
         whenever(contestTagRepository.saveAll(any<List<ContestTag>>())).thenReturn(emptyList())
 
         // when
-        val (contest, images, tags) = contestWriter.createContest(title, null, expiredAt, imageRequests, emptyList())
+        val (contest, images, tags) = contestWriter.createContest(title, null, LocalDateTime.now(), expiredAt, imageRequests, emptyList())
 
         // then
         assertThat(contest.id).isEqualTo(1L)
@@ -143,7 +143,7 @@ class ContestWriterTest : BaseToolTest() {
 
         // when & then
         val exception = assertThrows<ContestException> {
-            contestWriter.createContest(title, null, expiredAt, emptyList(), tagTitles)
+            contestWriter.createContest(title, null, LocalDateTime.now(), expiredAt, emptyList(), tagTitles)
         }
         assertThat(exception.errorCode).isEqualTo(ContestErrorCode.CONTEST_TAG_LIMIT_EXCEEDED)
     }
@@ -156,7 +156,7 @@ class ContestWriterTest : BaseToolTest() {
         val expiredAt = LocalDateTime.now().plusDays(7)
         val tagTitles = (1..7).map { "태그$it" }
 
-        val savedContest = Contest(id = 1L, title = title, expiredAt = expiredAt)
+        val savedContest = Contest(id = 1L, title = title, startedAt = LocalDateTime.now(), expiredAt = expiredAt)
         val savedTags = tagTitles.mapIndexed { index, tag ->
             ContestTag(id = (index + 1).toLong(), title = tag, contest = savedContest)
         }
@@ -166,7 +166,7 @@ class ContestWriterTest : BaseToolTest() {
         whenever(contestTagRepository.saveAll(any<List<ContestTag>>())).thenReturn(savedTags)
 
         // when
-        val (contest, images, tags) = contestWriter.createContest(title, null, expiredAt, emptyList(), tagTitles)
+        val (contest, images, tags) = contestWriter.createContest(title, null, LocalDateTime.now(), expiredAt, emptyList(), tagTitles)
 
         // then
         assertThat(contest.id).isEqualTo(1L)
@@ -181,7 +181,7 @@ class ContestWriterTest : BaseToolTest() {
         val expiredAt = LocalDateTime.now().plusDays(7)
         val tagTitles = listOf("디자인", "디자인", "개발", "개발", "기획")
 
-        val savedContest = Contest(id = 1L, title = title, expiredAt = expiredAt)
+        val savedContest = Contest(id = 1L, title = title, startedAt = LocalDateTime.now(), expiredAt = expiredAt)
         val uniqueTags = listOf("디자인", "개발", "기획")
         val savedTags = uniqueTags.mapIndexed { index, tag ->
             ContestTag(id = (index + 1).toLong(), title = tag, contest = savedContest)
@@ -192,7 +192,7 @@ class ContestWriterTest : BaseToolTest() {
         whenever(contestTagRepository.saveAll(any<List<ContestTag>>())).thenReturn(savedTags)
 
         // when
-        val (contest, images, tags) = contestWriter.createContest(title, null, expiredAt, emptyList(), tagTitles)
+        val (contest, images, tags) = contestWriter.createContest(title, null, LocalDateTime.now(), expiredAt, emptyList(), tagTitles)
 
         // then
         assertThat(tags).hasSize(3)
@@ -207,7 +207,7 @@ class ContestWriterTest : BaseToolTest() {
         val expiredAt = LocalDateTime.now().plusDays(7)
         val tagTitles = listOf("디자인", "", "  ", "개발")
 
-        val savedContest = Contest(id = 1L, title = title, expiredAt = expiredAt)
+        val savedContest = Contest(id = 1L, title = title, startedAt = LocalDateTime.now(), expiredAt = expiredAt)
         val validTags = listOf("디자인", "개발")
         val savedTags = validTags.mapIndexed { index, tag ->
             ContestTag(id = (index + 1).toLong(), title = tag, contest = savedContest)
@@ -218,7 +218,7 @@ class ContestWriterTest : BaseToolTest() {
         whenever(contestTagRepository.saveAll(any<List<ContestTag>>())).thenReturn(savedTags)
 
         // when
-        val (contest, images, tags) = contestWriter.createContest(title, null, expiredAt, emptyList(), tagTitles)
+        val (contest, images, tags) = contestWriter.createContest(title, null, LocalDateTime.now(), expiredAt, emptyList(), tagTitles)
 
         // then
         assertThat(tags).hasSize(2)

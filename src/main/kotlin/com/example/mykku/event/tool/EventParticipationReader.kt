@@ -29,4 +29,8 @@ class EventParticipationReader(
             .mapNotNull { it.event.id }
             .toSet()
     }
+
+    fun getParticipatedEvents(member: Member, pageable: Pageable): Page<Event> {
+        return eventParticipationRepository.findEventsByMember(member, pageable)
+    }
 }
