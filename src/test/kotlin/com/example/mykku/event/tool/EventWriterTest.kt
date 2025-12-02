@@ -42,7 +42,7 @@ class EventWriterTest : BaseToolTest() {
             EventImageRequest(url = "url2", orderIndex = 1)
         )
 
-        val savedEvent = Event(id = 1L, title = title, description = description, expiredAt = expiredAt)
+        val savedEvent = Event(id = 1L, title = title, description = description, startedAt = LocalDateTime.now(), expiredAt = expiredAt)
         val savedImages = imageRequests.mapIndexed { index, req ->
             EventImage(id = (index + 1).toLong(), url = req.url, orderIndex = req.orderIndex, event = savedEvent)
         }
@@ -51,7 +51,7 @@ class EventWriterTest : BaseToolTest() {
         whenever(eventImageRepository.saveAll(any<List<EventImage>>())).thenReturn(savedImages)
 
         // when
-        val (event, images) = eventWriter.createEvent(title, description, expiredAt, imageRequests)
+        val (event, images) = eventWriter.createEvent(title, description, LocalDateTime.now(), expiredAt, imageRequests)
 
         // then
         assertThat(event.id).isEqualTo(1L)
@@ -67,13 +67,13 @@ class EventWriterTest : BaseToolTest() {
         val title = "테스트 이벤트"
         val expiredAt = LocalDateTime.now().plusDays(7)
 
-        val savedEvent = Event(id = 1L, title = title, expiredAt = expiredAt)
+        val savedEvent = Event(id = 1L, title = title, startedAt = LocalDateTime.now(), expiredAt = expiredAt)
 
         whenever(eventRepository.save(any<Event>())).thenReturn(savedEvent)
         whenever(eventImageRepository.saveAll(any<List<EventImage>>())).thenReturn(emptyList())
 
         // when
-        val (event, images) = eventWriter.createEvent(title, null, expiredAt, emptyList())
+        val (event, images) = eventWriter.createEvent(title, null, LocalDateTime.now(), expiredAt, emptyList())
 
         // then
         assertThat(event.id).isEqualTo(1L)
@@ -90,7 +90,7 @@ class EventWriterTest : BaseToolTest() {
 
         // when & then
         val exception = assertThrows<EventException> {
-            eventWriter.createEvent(title, null, expiredAt, imageRequests)
+            eventWriter.createEvent(title, null, LocalDateTime.now(), expiredAt, imageRequests)
         }
         assertThat(exception.errorCode).isEqualTo(EventErrorCode.EVENT_IMAGE_LIMIT_EXCEEDED)
     }
@@ -103,7 +103,7 @@ class EventWriterTest : BaseToolTest() {
         val expiredAt = LocalDateTime.now().plusDays(7)
         val imageRequests = (0..9).map { EventImageRequest(url = "url$it", orderIndex = it) }
 
-        val savedEvent = Event(id = 1L, title = title, expiredAt = expiredAt)
+        val savedEvent = Event(id = 1L, title = title, startedAt = LocalDateTime.now(), expiredAt = expiredAt)
         val savedImages = imageRequests.mapIndexed { index, req ->
             EventImage(id = (index + 1).toLong(), url = req.url, orderIndex = req.orderIndex, event = savedEvent)
         }
@@ -112,7 +112,7 @@ class EventWriterTest : BaseToolTest() {
         whenever(eventImageRepository.saveAll(any<List<EventImage>>())).thenReturn(savedImages)
 
         // when
-        val (event, images) = eventWriter.createEvent(title, null, expiredAt, imageRequests)
+        val (event, images) = eventWriter.createEvent(title, null, LocalDateTime.now(), expiredAt, imageRequests)
 
         // then
         assertThat(event.id).isEqualTo(1L)

@@ -15,6 +15,7 @@ data class CommentResponse(
     val content: String,
     val likeCount: Int,
     val memberName: String,
+    val profileImage: String,
     val createdAt: LocalDateTime,
     val replies: List<ReplyResponse>
 )
@@ -24,5 +25,6 @@ data class ReplyResponse(
     val content: String,
     val likeCount: Int,
     val memberName: String,
+    val profileImage: String,
     val createdAt: LocalDateTime
 )

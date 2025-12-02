@@ -23,6 +23,7 @@ class ContestWriter(
     fun createContest(
         title: String,
         description: String?,
+        startedAt: LocalDateTime,
         expiredAt: LocalDateTime,
         imageRequests: List<ContestImageRequest>,
         tagTitles: List<String>
@@ -45,6 +46,7 @@ class ContestWriter(
         val contest = Contest(
             title = title,
             description = description,
+            startedAt = startedAt,
             expiredAt = expiredAt
         )
 

@@ -4,6 +4,8 @@ import com.example.mykku.dailymessage.dto.CommentResponse
 import com.example.mykku.dailymessage.dto.DailyMessageResponse
 import com.example.mykku.dailymessage.dto.DailyMessageSummaryResponse
 import com.example.mykku.dailymessage.dto.ReplyResponse
+import com.example.mykku.dailymessage.exception.DailyMessageErrorCode
+import com.example.mykku.dailymessage.exception.DailyMessageException
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -42,9 +44,9 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
                 request()
                     .tag(Tag.DAILY_MESSAGE_API)
                     .summary("하루 덕담 목록 조회")
-                    .description("특정 날짜의 하루 덕담 목록을 조회합니다.")
+                    .description("특정 날짜 이전의 하루 덕담 목록을 조회합니다.")
                     .queryParameter(
-                        parameterWithName("date").description("조회할 날짜 (YYYY-MM-DD 형식)"),
+                        parameterWithName("date").description("기준 날짜 (YYYY-MM-DD 형식)"),
                         parameterWithName("limit").description("조회할 개수 (기본값: 10)").optional(),
                         parameterWithName("sort").description("정렬 방향 (ASC/DESC, 기본값: DESC)").optional()
                     )
@@ -87,6 +89,7 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
                     content = "감사합니다!",
                     likeCount = 5,
                     memberName = "사용자1",
+                    profileImage = "https://example.com/profile1.jpg",
                     createdAt = LocalDateTime.now(),
                     replies = listOf(
                         ReplyResponse(
@@ -94,6 +97,7 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
                             content = "함께해요!",
                             likeCount = 2,
                             memberName = "사용자2",
+                            profileImage = "https://example.com/profile2.jpg",
                             createdAt = LocalDateTime.now()
                         )
                     )
@@ -128,6 +132,7 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.comments[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                         fieldWithPath("data.comments[].memberName").type(JsonFieldType.STRING).description("작성자 이름"),
                         fieldWithPath("data.comments[].createdAt").type(JsonFieldType.STRING).description("작성 일시"),
+                        fieldWithPath("data.comments[].profileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지 URL"),
                         fieldWithPath("data.comments[].replies[]").type(JsonFieldType.ARRAY).description("답글 목록"),
                         fieldWithPath("data.comments[].replies[].id").type(JsonFieldType.NUMBER).description("답글 ID"),
                         fieldWithPath("data.comments[].replies[].content").type(JsonFieldType.STRING)
@@ -136,6 +141,8 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
                             .description("좋아요 수"),
                         fieldWithPath("data.comments[].replies[].memberName").type(JsonFieldType.STRING)
                             .description("작성자 이름"),
+                        fieldWithPath("data.comments[].replies[].profileImage").type(JsonFieldType.STRING)
+                            .description("작성자 프로필 이미지 URL"),
                         fieldWithPath("data.comments[].replies[].createdAt").type(JsonFieldType.STRING)
                             .description("작성 일시")
                     )
@@ -148,5 +155,33 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
             .get("/api/v1/daily-message/{id}", dailyMessageId)
             .then()
             .statusCode(200)
+    }
+
+    @Test
+    fun `하루 덕담 상세 조회 - 존재하지 않는 덕담`() {
+        val dailyMessageId = 999L
+
+        `when`(dailyMessageService.getDailyMessage(eq(dailyMessageId)))
+            .thenThrow(DailyMessageException(DailyMessageErrorCode.DAILY_MESSAGE_NOT_FOUND))
+
+        val documentFilter = document("daily-message/detail", "DAILY_MESSAGE_NOT_FOUND")
+            .request(
+                request()
+                    .tag(Tag.DAILY_MESSAGE_API)
+                    .summary("하루 덕담 상세 조회 - 존재하지 않는 덕담")
+                    .description("존재하지 않는 하루 덕담을 조회할 때 발생하는 에러입니다.")
+                    .pathParameter(
+                        parameterWithName("id").description("존재하지 않는 하루 덕담 ID")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .contentType(ContentType.JSON)
+            .`when`()
+            .get("/api/v1/daily-message/{id}", dailyMessageId)
+            .then()
+            .statusCode(404)
     }
 }

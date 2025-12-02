@@ -3,6 +3,8 @@ package com.example.mykku.docs
 import com.example.mykku.dailymessage.dto.CommentResponse
 import com.example.mykku.dailymessage.dto.CreateCommentRequest
 import com.example.mykku.dailymessage.dto.UpdateCommentRequest
+import com.example.mykku.dailymessage.exception.DailyMessageErrorCode
+import com.example.mykku.dailymessage.exception.DailyMessageException
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -27,6 +29,7 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
             content = "좋은 덕담 감사합니다!",
             likeCount = 0,
             memberName = "홍길동",
+            profileImage = "https://example.com/profile.jpg",
             createdAt = LocalDateTime.now(),
             replies = emptyList()
         )
@@ -58,6 +61,7 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                         fieldWithPath("data.memberName").type(JsonFieldType.STRING).description("작성자 이름"),
                         fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성 일시"),
+                        fieldWithPath("data.profileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지 URL"),
                         fieldWithPath("data.replies[]").type(JsonFieldType.ARRAY).description("답글 목록")
                     )
             )
@@ -74,6 +78,45 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
     }
 
     @Test
+    fun `하루 덕담 댓글 생성 - 내용 길이 초과`() {
+        val dailyMessageId = 1L
+        val request = CreateCommentRequest(
+            content = "a".repeat(501),
+            parentCommentId = null
+        )
+
+        `when`(dailyMessageCommentService.createComment(eq(dailyMessageId), any(), any()))
+            .thenThrow(DailyMessageException(DailyMessageErrorCode.DAILY_MESSAGE_COMMENT_CONTENT_TOO_LONG))
+
+        val documentFilter = document("daily-message-comment/create", "DAILY_MESSAGE_COMMENT_CONTENT_TOO_LONG")
+            .request(
+                request()
+                    .tag(Tag.DAILY_MESSAGE_COMMENT_API)
+                    .summary("하루 덕담 댓글 생성 - 내용 길이 초과")
+                    .description("댓글 내용이 최대 길이를 초과했을 때 발생하는 에러입니다.")
+                    .pathParameter(
+                        parameterWithName("dailyMessageId").description("댓글을 작성할 하루 덕담 ID")
+                    )
+                    .requestBodyField(
+                        fieldWithPath("content").type(JsonFieldType.STRING).description("댓글 내용"),
+                        fieldWithPath("parentCommentId").type(JsonFieldType.NUMBER).description("부모 댓글 ID (답글인 경우)")
+                            .optional()
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .post("/api/v1/daily-messages/{dailyMessageId}/comment", dailyMessageId)
+            .then()
+            .statusCode(400)
+    }
+
+    @Test
     fun `하루 덕담 답글 생성`() {
         val dailyMessageId = 1L
         val request = CreateCommentRequest(
@@ -85,6 +128,7 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
             content = "저도 동감합니다!",
             likeCount = 0,
             memberName = "김철수",
+            profileImage = "https://example.com/profile2.jpg",
             createdAt = LocalDateTime.now(),
             replies = emptyList()
         )
@@ -115,7 +159,8 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                         fieldWithPath("data.memberName").type(JsonFieldType.STRING).description("작성자 이름"),
                         fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성 일시"),
-                        fieldWithPath("data.replies[]").type(JsonFieldType.ARRAY).description("답글 목록 (항상 빈 배열)")
+                        fieldWithPath("data.replies[]").type(JsonFieldType.ARRAY).description("답글 목록 (항상 빈 배열)"),
+                        fieldWithPath("data.profileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지 URL")
                     )
             )
             .build()
@@ -139,6 +184,7 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
             content = "수정된 댓글 내용입니다!",
             likeCount = 5,
             memberName = "홍길동",
+            profileImage = "https://example.com/profile.jpg",
             createdAt = LocalDateTime.now(),
             replies = emptyList()
         )
@@ -168,6 +214,7 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                         fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                         fieldWithPath("data.memberName").type(JsonFieldType.STRING).description("작성자 이름"),
                         fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성 일시"),
+                        fieldWithPath("data.profileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지 URL"),
                         fieldWithPath("data.replies[]").type(JsonFieldType.ARRAY).description("답글 목록")
                     )
             )
@@ -181,5 +228,73 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
             .put("/api/v1/daily-messages/comments/{commentId}", commentId)
             .then()
             .statusCode(200)
+    }
+
+    @Test
+    fun `하루 덕담 댓글 수정 - 댓글을 찾을 수 없음`() {
+        val commentId = 999L
+        val request = UpdateCommentRequest(content = "수정된 댓글 내용입니다!")
+
+        `when`(dailyMessageCommentService.updateComment(eq(commentId), any(), any()))
+            .thenThrow(DailyMessageException(DailyMessageErrorCode.DAILY_MESSAGE_COMMENT_NOT_FOUND))
+
+        val documentFilter = document("daily-message-comment/update", "DAILY_MESSAGE_COMMENT_NOT_FOUND")
+            .request(
+                request()
+                    .tag(Tag.DAILY_MESSAGE_COMMENT_API)
+                    .summary("하루 덕담 댓글 수정 - 댓글을 찾을 수 없음")
+                    .description("존재하지 않는 댓글을 수정하려 할 때 발생하는 에러입니다.")
+                    .pathParameter(
+                        parameterWithName("commentId").description("수정할 댓글 ID")
+                    )
+                    .requestBodyField(
+                        fieldWithPath("content").type(JsonFieldType.STRING).description("수정할 댓글 내용")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .put("/api/v1/daily-messages/comments/{commentId}", commentId)
+            .then()
+            .statusCode(404)
+    }
+
+    @Test
+    fun `하루 덕담 댓글 수정 - 권한 없음`() {
+        val commentId = 1L
+        val request = UpdateCommentRequest(content = "수정된 댓글 내용입니다!")
+
+        `when`(dailyMessageCommentService.updateComment(eq(commentId), any(), any()))
+            .thenThrow(DailyMessageException(DailyMessageErrorCode.COMMENT_FORBIDDEN_ACCESS))
+
+        val documentFilter = document("daily-message-comment/update", "COMMENT_FORBIDDEN_ACCESS")
+            .request(
+                request()
+                    .tag(Tag.DAILY_MESSAGE_COMMENT_API)
+                    .summary("하루 덕담 댓글 수정 - 권한 없음")
+                    .description("해당 댓글을 수정할 권한이 없을 때 발생하는 에러입니다.")
+                    .pathParameter(
+                        parameterWithName("commentId").description("수정할 댓글 ID")
+                    )
+                    .requestBodyField(
+                        fieldWithPath("content").type(JsonFieldType.STRING).description("수정할 댓글 내용")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .put("/api/v1/daily-messages/comments/{commentId}", commentId)
+            .then()
+            .statusCode(403)
     }
 }

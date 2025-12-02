@@ -41,9 +41,10 @@ class DailyMessageCommentService(
         return CommentResponse(
             id = comment.id!!,
             content = comment.content,
-            memberName = comment.member.nickname,
-            createdAt = comment.createdAt,
             likeCount = comment.likeCount,
+            memberName = comment.member.nickname,
+            profileImage = comment.member.profileImage,
+            createdAt = comment.createdAt,
             replies = emptyList(),
         )
     }
@@ -68,9 +69,10 @@ class DailyMessageCommentService(
         return CommentResponse(
             id = updatedComment.id!!,
             content = updatedComment.content,
-            memberName = updatedComment.member.nickname,
-            createdAt = updatedComment.createdAt,
             likeCount = updatedComment.likeCount,
+            memberName = updatedComment.member.nickname,
+            profileImage = updatedComment.member.profileImage,
+            createdAt = updatedComment.createdAt,
             replies = emptyList(),
         )
     }

@@ -46,6 +46,8 @@ class ContestReader(
         return when (status) {
             ContestStatusType.ACTIVE -> getActiveContestsBySortType(sortType, currentTime, pageable)
             ContestStatusType.EXPIRED -> contestRepository.findByExpiredAtLessThanEqualOrderByCreatedAtDesc(currentTime, pageable)
+            ContestStatusType.WINNER_SELECTING,
+            ContestStatusType.WINNER_SELECTED -> contestRepository.findByExpiredAtLessThanEqualOrderByCreatedAtDesc(currentTime, pageable)
             ContestStatusType.ALL -> contestRepository.findAllByOrderByCreatedAtDesc(pageable)
         }
     }
@@ -79,5 +81,19 @@ class ContestReader(
 
     fun getContestTagsByTitles(titles: List<String>): List<ContestTag> {
         return contestTagRepository.findAllByTitleIn(titles)
+    }
+
+    fun getActiveContestsWithAllTags(): List<Pair<Contest, Set<String>>> {
+        val activeContests = contestRepository.findByStatusAndExpiredAtAfter(ContestStatusType.ACTIVE, LocalDateTime.now())
+
+        if (activeContests.isEmpty()) return emptyList()
+
+        val contestTags = contestTagRepository.findByContestIn(activeContests)
+        val tagsByContest = contestTags.groupBy { it.contest.id!! }
+
+        return activeContests.map { contest ->
+            val tags = tagsByContest[contest.id]?.map { it.title }?.toSet() ?: emptySet()
+            contest to tags
+        }
     }
 }

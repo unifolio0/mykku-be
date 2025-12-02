@@ -75,6 +75,7 @@ class HomeControllerTest : BaseControllerTest() {
         eventRepository.save(
             Event(
                 title = "테스트 이벤트",
+                startedAt = LocalDateTime.now(),
                 expiredAt = LocalDateTime.now().plusDays(7)
             )
         )

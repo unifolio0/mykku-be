@@ -5,6 +5,7 @@ import java.time.LocalDateTime
 data class CreateEventRequest(
     val title: String,
     val description: String? = null,
+    val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
     val images: List<EventImageRequest> = emptyList()
 )

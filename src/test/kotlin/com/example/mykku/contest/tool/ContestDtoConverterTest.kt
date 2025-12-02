@@ -22,6 +22,7 @@ class ContestDtoConverterTest : BaseToolTest() {
             id = 1L,
             title = "테스트 콘테스트",
             description = "설명",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7)
         )
         val images = listOf(
@@ -51,6 +52,7 @@ class ContestDtoConverterTest : BaseToolTest() {
         val contest = Contest(
             id = 1L,
             title = "테스트 콘테스트",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7)
         )
 
@@ -70,6 +72,7 @@ class ContestDtoConverterTest : BaseToolTest() {
         val contest = Contest(
             id = 1L,
             title = "테스트 콘테스트",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7)
         )
         val images = listOf(
@@ -93,6 +96,7 @@ class ContestDtoConverterTest : BaseToolTest() {
             id = 1L,
             title = "테스트 콘테스트",
             description = "콘테스트 설명",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7)
         )
         initializeBaseEntityFields(contest, LocalDateTime.now())
@@ -127,6 +131,7 @@ class ContestDtoConverterTest : BaseToolTest() {
         val contest = Contest(
             id = 1L,
             title = "테스트 콘테스트",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7)
         )
         initializeBaseEntityFields(contest, LocalDateTime.now())
@@ -154,6 +159,7 @@ class ContestDtoConverterTest : BaseToolTest() {
         val contest = Contest(
             id = 1L,
             title = "테스트 콘테스트",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7)
         )
         initializeBaseEntityFields(contest, LocalDateTime.now())
@@ -174,6 +180,7 @@ class ContestDtoConverterTest : BaseToolTest() {
         val contest = Contest(
             id = 1L,
             title = "테스트 콘테스트",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7)
         )
         val images = listOf(
@@ -197,6 +204,7 @@ class ContestDtoConverterTest : BaseToolTest() {
             id = 1L,
             title = "테스트 콘테스트",
             description = "설명",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7)
         )
         initializeBaseEntityFields(contest, LocalDateTime.now())

@@ -20,6 +20,7 @@ class EventWriter(
     fun createEvent(
         title: String,
         description: String?,
+        startedAt: LocalDateTime,
         expiredAt: LocalDateTime,
         imageRequests: List<EventImageRequest>
     ): Pair<Event, List<EventImage>> {
@@ -31,6 +32,7 @@ class EventWriter(
         val event = Event(
             title = title,
             description = description,
+            startedAt = startedAt,
             expiredAt = expiredAt
         )
 

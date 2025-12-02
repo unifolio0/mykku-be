@@ -57,6 +57,40 @@ class ScrapDocumentTest : BaseDocumentTest() {
     }
 
     @Test
+    fun `피드 저장 - 이미 저장된 경우`() {
+        val feedId = 1L
+        val request = SaveFeedRequest(folderId = 1L)
+
+        `when`(scrapService.saveFeed(any(), any(), any()))
+            .thenThrow(ScrapException(ScrapErrorCode.SAVE_FEED_ALREADY_EXISTS))
+
+        val documentFilter = document("scrap/feed-save", "SAVE_FEED_ALREADY_EXISTS")
+            .request(
+                request()
+                    .tag(Tag.SCRAP_API)
+                    .summary("피드 저장 - 이미 저장된 경우")
+                    .description("이미 저장된 피드를 다시 저장하려고 할 때 발생하는 에러입니다.")
+                    .pathParameter(
+                        parameterWithName("feedId").description("저장할 피드 ID")
+                    )
+                    .requestBodyField(
+                        fieldWithPath("folderId").type(JsonFieldType.NUMBER).description("저장할 폴더 ID")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .post("/api/v1/scraps/feeds/{feedId}", feedId)
+            .then()
+            .statusCode(400)
+    }
+
+    @Test
     fun `피드 저장 취소`() {
         val feedId = 1L
 
@@ -88,6 +122,35 @@ class ScrapDocumentTest : BaseDocumentTest() {
             .delete("/api/v1/scraps/feeds/{feedId}", feedId)
             .then()
             .statusCode(200)
+    }
+
+    @Test
+    fun `피드 저장 취소 - 저장된 피드를 찾을 수 없음`() {
+        val feedId = 999L
+
+        `when`(scrapService.unsaveFeed(eq(feedId), any()))
+            .thenThrow(ScrapException(ScrapErrorCode.SAVE_FEED_NOT_FOUND))
+
+        val documentFilter = document("scrap/feed-unsave", "SAVE_FEED_NOT_FOUND")
+            .request(
+                request()
+                    .tag(Tag.SCRAP_API)
+                    .summary("피드 저장 취소 - 저장된 피드를 찾을 수 없음")
+                    .description("저장되지 않은 피드를 취소하려 할 때 발생하는 에러입니다.")
+                    .pathParameter(
+                        parameterWithName("feedId").description("저장 취소할 피드 ID")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .`when`()
+            .delete("/api/v1/scraps/feeds/{feedId}", feedId)
+            .then()
+            .statusCode(404)
     }
 
     @Test
@@ -235,6 +298,35 @@ class ScrapDocumentTest : BaseDocumentTest() {
     }
 
     @Test
+    fun `하루덕담 저장 - 이미 저장된 경우`() {
+        val dailyMessageId = 1L
+
+        `when`(scrapService.saveDailyMessage(eq(dailyMessageId), any()))
+            .thenThrow(ScrapException(ScrapErrorCode.SAVE_DAILY_MESSAGE_ALREADY_EXISTS))
+
+        val documentFilter = document("scrap/daily-message-save", "SAVE_DAILY_MESSAGE_ALREADY_EXISTS")
+            .request(
+                request()
+                    .tag(Tag.SCRAP_API)
+                    .summary("하루덕담 저장 - 이미 저장된 경우")
+                    .description("이미 저장된 하루덕담을 다시 저장하려고 할 때 발생하는 에러입니다.")
+                    .pathParameter(
+                        parameterWithName("dailyMessageId").description("저장할 하루덕담 ID")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .`when`()
+            .post("/api/v1/scraps/daily-messages/{dailyMessageId}", dailyMessageId)
+            .then()
+            .statusCode(400)
+    }
+
+    @Test
     fun `하루덕담 저장 취소`() {
         val dailyMessageId = 1L
 
@@ -266,6 +358,35 @@ class ScrapDocumentTest : BaseDocumentTest() {
             .delete("/api/v1/scraps/daily-messages/{dailyMessageId}", dailyMessageId)
             .then()
             .statusCode(200)
+    }
+
+    @Test
+    fun `하루덕담 저장 취소 - 저장된 하루덕담을 찾을 수 없음`() {
+        val dailyMessageId = 999L
+
+        `when`(scrapService.unsaveDailyMessage(eq(dailyMessageId), any()))
+            .thenThrow(ScrapException(ScrapErrorCode.SAVE_DAILY_MESSAGE_NOT_FOUND))
+
+        val documentFilter = document("scrap/daily-message-unsave", "SAVE_DAILY_MESSAGE_NOT_FOUND")
+            .request(
+                request()
+                    .tag(Tag.SCRAP_API)
+                    .summary("하루덕담 저장 취소 - 저장된 하루덕담을 찾을 수 없음")
+                    .description("저장되지 않은 하루덕담을 취소하려 할 때 발생하는 에러입니다.")
+                    .pathParameter(
+                        parameterWithName("dailyMessageId").description("저장 취소할 하루덕담 ID")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .`when`()
+            .delete("/api/v1/scraps/daily-messages/{dailyMessageId}", dailyMessageId)
+            .then()
+            .statusCode(404)
     }
 
     @Test
@@ -372,6 +493,35 @@ class ScrapDocumentTest : BaseDocumentTest() {
     }
 
     @Test
+    fun `이벤트 저장 - 이미 저장된 경우`() {
+        val eventId = 1L
+
+        `when`(scrapService.saveEvent(eq(eventId), any()))
+            .thenThrow(ScrapException(ScrapErrorCode.SAVE_EVENT_ALREADY_EXISTS))
+
+        val documentFilter = document("scrap/event-save", "SAVE_EVENT_ALREADY_EXISTS")
+            .request(
+                request()
+                    .tag(Tag.SCRAP_API)
+                    .summary("이벤트 저장 - 이미 저장된 경우")
+                    .description("이미 저장된 이벤트를 다시 저장하려고 할 때 발생하는 에러입니다.")
+                    .pathParameter(
+                        parameterWithName("eventId").description("저장할 이벤트 ID")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .`when`()
+            .post("/api/v1/scraps/events/{eventId}", eventId)
+            .then()
+            .statusCode(400)
+    }
+
+    @Test
     fun `이벤트 저장 취소`() {
         val eventId = 1L
 
@@ -403,6 +553,35 @@ class ScrapDocumentTest : BaseDocumentTest() {
             .delete("/api/v1/scraps/events/{eventId}", eventId)
             .then()
             .statusCode(200)
+    }
+
+    @Test
+    fun `이벤트 저장 취소 - 저장된 이벤트를 찾을 수 없음`() {
+        val eventId = 999L
+
+        `when`(scrapService.unsaveEvent(eq(eventId), any()))
+            .thenThrow(ScrapException(ScrapErrorCode.SAVE_EVENT_NOT_FOUND))
+
+        val documentFilter = document("scrap/event-unsave", "SAVE_EVENT_NOT_FOUND")
+            .request(
+                request()
+                    .tag(Tag.SCRAP_API)
+                    .summary("이벤트 저장 취소 - 저장된 이벤트를 찾을 수 없음")
+                    .description("저장되지 않은 이벤트를 취소하려 할 때 발생하는 에러입니다.")
+                    .pathParameter(
+                        parameterWithName("eventId").description("저장 취소할 이벤트 ID")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .`when`()
+            .delete("/api/v1/scraps/events/{eventId}", eventId)
+            .then()
+            .statusCode(404)
     }
 
     @Test
@@ -508,6 +687,35 @@ class ScrapDocumentTest : BaseDocumentTest() {
     }
 
     @Test
+    fun `덕질노트 저장 - 이미 저장된 경우`() {
+        val fanNoteId = 1L
+
+        `when`(scrapService.saveFanNote(eq(fanNoteId), any()))
+            .thenThrow(ScrapException(ScrapErrorCode.SAVE_FAN_NOTE_ALREADY_EXISTS))
+
+        val documentFilter = document("scrap/fan-note-save", "SAVE_FAN_NOTE_ALREADY_EXISTS")
+            .request(
+                request()
+                    .tag(Tag.SCRAP_API)
+                    .summary("덕질노트 저장 - 이미 저장된 경우")
+                    .description("이미 저장된 덕질노트를 다시 저장하려고 할 때 발생하는 에러입니다.")
+                    .pathParameter(
+                        parameterWithName("fanNoteId").description("저장할 덕질노트 ID")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .`when`()
+            .post("/api/v1/scraps/fan-notes/{fanNoteId}", fanNoteId)
+            .then()
+            .statusCode(400)
+    }
+
+    @Test
     fun `덕질노트 저장 취소`() {
         val fanNoteId = 1L
 
@@ -539,6 +747,35 @@ class ScrapDocumentTest : BaseDocumentTest() {
             .delete("/api/v1/scraps/fan-notes/{fanNoteId}", fanNoteId)
             .then()
             .statusCode(200)
+    }
+
+    @Test
+    fun `덕질노트 저장 취소 - 저장된 덕질노트를 찾을 수 없음`() {
+        val fanNoteId = 999L
+
+        `when`(scrapService.unsaveFanNote(eq(fanNoteId), any()))
+            .thenThrow(ScrapException(ScrapErrorCode.SAVE_FAN_NOTE_NOT_FOUND))
+
+        val documentFilter = document("scrap/fan-note-unsave", "SAVE_FAN_NOTE_NOT_FOUND")
+            .request(
+                request()
+                    .tag(Tag.SCRAP_API)
+                    .summary("덕질노트 저장 취소 - 저장된 덕질노트를 찾을 수 없음")
+                    .description("저장되지 않은 덕질노트를 취소하려 할 때 발생하는 에러입니다.")
+                    .pathParameter(
+                        parameterWithName("fanNoteId").description("저장 취소할 덕질노트 ID")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .`when`()
+            .delete("/api/v1/scraps/fan-notes/{fanNoteId}", fanNoteId)
+            .then()
+            .statusCode(404)
     }
 
     @Test
@@ -607,39 +844,5 @@ class ScrapDocumentTest : BaseDocumentTest() {
             .get("/api/v1/scraps/fan-notes")
             .then()
             .statusCode(200)
-    }
-
-    @Test
-    fun `피드 저장 - 이미 저장된 경우`() {
-        val feedId = 1L
-        val request = SaveFeedRequest(folderId = 1L)
-
-        `when`(scrapService.saveFeed(any(), any(), any()))
-            .thenThrow(ScrapException(ScrapErrorCode.SAVE_FEED_ALREADY_EXISTS))
-
-        val documentFilter = document("scrap/feed-save", "SAVE_FEED_ALREADY_EXISTS")
-            .request(
-                request()
-                    .tag(Tag.SCRAP_API)
-                    .summary("피드 저장 - 이미 저장된 경우")
-                    .description("이미 저장된 피드를 다시 저장하려고 할 때 발생하는 에러입니다.")
-                    .pathParameter(
-                        parameterWithName("feedId").description("저장할 피드 ID")
-                    )
-                    .requestBodyField(
-                        fieldWithPath("folderId").type(JsonFieldType.NUMBER).description("저장할 폴더 ID")
-                    )
-            )
-            .response(RestDocumentationResponse.ERROR_RESPONSE)
-            .build()
-
-        given(documentFilter)
-            .headers(AUTH_HEADER)
-            .contentType(ContentType.JSON)
-            .body(objectMapper.writeValueAsString(request))
-            .`when`()
-            .post("/api/v1/scraps/feeds/{feedId}", feedId)
-            .then()
-            .statusCode(400)
     }
 }

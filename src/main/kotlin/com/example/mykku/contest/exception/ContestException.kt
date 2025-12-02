@@ -22,5 +22,7 @@ class ContestException(
         fun invalidContestStatus(): ContestException = ContestException(ContestErrorCode.INVALID_CONTEST_STATUS)
 
         fun contestWinnerNotFound(): ContestException = ContestException(ContestErrorCode.CONTEST_WINNER_NOT_FOUND)
+
+        fun alreadyParticipatedWithFeed(): ContestException = ContestException(ContestErrorCode.ALREADY_PARTICIPATED_WITH_FEED)
     }
 }

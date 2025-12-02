@@ -23,7 +23,7 @@ class ContestTagRepositoryTest : BaseRepositoryTest() {
     fun `콘테스트 태그를 저장하고 조회한다`() {
         // given
         val contest = contestRepository.save(
-            Contest(title = "테스트 콘테스트", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "테스트 콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
         val tag = ContestTag(title = "태그1", contest = contest)
 
@@ -42,10 +42,10 @@ class ContestTagRepositoryTest : BaseRepositoryTest() {
     fun `여러 콘테스트의 태그를 한번에 조회한다`() {
         // given
         val contest1 = contestRepository.save(
-            Contest(title = "콘테스트1", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "콘테스트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
         val contest2 = contestRepository.save(
-            Contest(title = "콘테스트2", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "콘테스트2", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
 
         contestTagRepository.saveAll(listOf(
@@ -68,7 +68,7 @@ class ContestTagRepositoryTest : BaseRepositoryTest() {
     fun `태그 제목으로 조회한다`() {
         // given
         val contest = contestRepository.save(
-            Contest(title = "콘테스트", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
         contestTagRepository.saveAll(listOf(
             ContestTag(title = "디자인", contest = contest),
@@ -89,7 +89,7 @@ class ContestTagRepositoryTest : BaseRepositoryTest() {
     fun `존재하지 않는 태그 제목으로 조회하면 빈 결과를 반환한다`() {
         // given
         val contest = contestRepository.save(
-            Contest(title = "콘테스트", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
         contestTagRepository.save(ContestTag(title = "디자인", contest = contest))
 
@@ -105,7 +105,7 @@ class ContestTagRepositoryTest : BaseRepositoryTest() {
     fun `빈 콘테스트 목록으로 조회하면 빈 결과를 반환한다`() {
         // given
         val contest = contestRepository.save(
-            Contest(title = "콘테스트", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
         contestTagRepository.save(ContestTag(title = "태그", contest = contest))
 
@@ -121,7 +121,7 @@ class ContestTagRepositoryTest : BaseRepositoryTest() {
     fun `태그가 없는 콘테스트를 조회하면 빈 결과를 반환한다`() {
         // given
         val contest = contestRepository.save(
-            Contest(title = "태그 없는 콘테스트", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "태그 없는 콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
 
         // when
@@ -136,7 +136,7 @@ class ContestTagRepositoryTest : BaseRepositoryTest() {
     fun `영문과 숫자를 포함한 태그를 저장한다`() {
         // given
         val contest = contestRepository.save(
-            Contest(title = "콘테스트", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
 
         // when
@@ -156,7 +156,7 @@ class ContestTagRepositoryTest : BaseRepositoryTest() {
     fun `여러 태그를 한번에 저장한다`() {
         // given
         val contest = contestRepository.save(
-            Contest(title = "테스트 콘테스트", expiredAt = LocalDateTime.now().plusDays(7))
+            Contest(title = "테스트 콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
         )
         val tags = listOf("디자인", "개발", "기획", "마케팅", "영업").map { title ->
             ContestTag(title = title, contest = contest)

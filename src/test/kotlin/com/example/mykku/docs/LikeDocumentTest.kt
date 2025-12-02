@@ -1,6 +1,8 @@
 package com.example.mykku.docs
 
 import com.example.mykku.like.dto.*
+import com.example.mykku.like.exception.LikeErrorCode
+import com.example.mykku.like.exception.LikeException
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.doNothing
@@ -90,6 +92,36 @@ class LikeDocumentTest : BaseDocumentTest() {
     }
 
     @Test
+    fun `게시판 즐겨찾기 - 이미 즐겨찾기한 경우`() {
+        val request = LikeBoardRequest(boardId = 1L)
+
+        `when`(likeService.likeBoard(any(), any()))
+            .thenThrow(LikeException(LikeErrorCode.LIKE_BOARD_ALREADY_LIKED))
+
+        val documentFilter = document("like/board-create", "LIKE_BOARD_ALREADY_LIKED")
+            .request(
+                request()
+                    .tag(Tag.LIKE_API)
+                    .summary("게시판 즐겨찾기 - 이미 즐겨찾기한 경우")
+                    .description("이미 즐겨찾기한 게시판을 다시 즐겨찾기하려 할 때 발생하는 에러입니다.")
+                    .requestBodyField(
+                        fieldWithPath("boardId").type(JsonFieldType.NUMBER).description("즐겨찾기할 게시판 ID")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .post("/api/v1/board/like")
+            .then()
+            .statusCode(400)
+    }
+
+    @Test
     fun `게시판 즐겨찾기 취소`() {
         val boardId = 1L
 
@@ -121,6 +153,35 @@ class LikeDocumentTest : BaseDocumentTest() {
             .delete("/api/v1/board/unlike/{boardId}", boardId)
             .then()
             .statusCode(200)
+    }
+
+    @Test
+    fun `게시판 즐겨찾기 취소 - 즐겨찾기한 게시판을 찾을 수 없음`() {
+        val boardId = 999L
+
+        `when`(likeService.unlikeBoard(any(), eq(boardId)))
+            .thenThrow(LikeException(LikeErrorCode.LIKE_BOARD_NOT_FOUND))
+
+        val documentFilter = document("like/board-delete", "LIKE_BOARD_NOT_FOUND")
+            .request(
+                request()
+                    .tag(Tag.LIKE_API)
+                    .summary("게시판 즐겨찾기 취소 - 즐겨찾기한 게시판을 찾을 수 없음")
+                    .description("즐겨찾기하지 않은 게시판을 취소하려 할 때 발생하는 에러입니다.")
+                    .pathParameter(
+                        parameterWithName("boardId").description("즐겨찾기 취소할 게시판 ID")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .`when`()
+            .delete("/api/v1/board/unlike/{boardId}", boardId)
+            .then()
+            .statusCode(404)
     }
 
     @Test
@@ -163,6 +224,36 @@ class LikeDocumentTest : BaseDocumentTest() {
     }
 
     @Test
+    fun `피드 좋아요 - 이미 좋아요한 경우`() {
+        val request = LikeFeedRequest(feedId = 10L)
+
+        `when`(likeService.likeFeed(any(), any()))
+            .thenThrow(LikeException(LikeErrorCode.LIKE_FEED_ALREADY_LIKED))
+
+        val documentFilter = document("like/feed-create", "LIKE_FEED_ALREADY_LIKED")
+            .request(
+                request()
+                    .tag(Tag.LIKE_API)
+                    .summary("피드 좋아요 - 이미 좋아요한 경우")
+                    .description("이미 좋아요한 피드에 다시 좋아요하려 할 때 발생하는 에러입니다.")
+                    .requestBodyField(
+                        fieldWithPath("feedId").type(JsonFieldType.NUMBER).description("좋아요할 피드 ID")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .post("/api/v1/feed/like")
+            .then()
+            .statusCode(400)
+    }
+
+    @Test
     fun `피드 좋아요 취소`() {
         val feedId = 10L
 
@@ -194,6 +285,35 @@ class LikeDocumentTest : BaseDocumentTest() {
             .delete("/api/v1/feed/unlike/{feedId}", feedId)
             .then()
             .statusCode(200)
+    }
+
+    @Test
+    fun `피드 좋아요 취소 - 좋아요한 피드를 찾을 수 없음`() {
+        val feedId = 999L
+
+        `when`(likeService.unlikeFeed(any(), eq(feedId)))
+            .thenThrow(LikeException(LikeErrorCode.LIKE_FEED_NOT_FOUND))
+
+        val documentFilter = document("like/feed-delete", "LIKE_FEED_NOT_FOUND")
+            .request(
+                request()
+                    .tag(Tag.LIKE_API)
+                    .summary("피드 좋아요 취소 - 좋아요한 피드를 찾을 수 없음")
+                    .description("좋아요하지 않은 피드를 취소하려 할 때 발생하는 에러입니다.")
+                    .pathParameter(
+                        parameterWithName("feedId").description("좋아요 취소할 피드 ID")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .`when`()
+            .delete("/api/v1/feed/unlike/{feedId}", feedId)
+            .then()
+            .statusCode(404)
     }
 
     @Test
@@ -236,6 +356,36 @@ class LikeDocumentTest : BaseDocumentTest() {
     }
 
     @Test
+    fun `댓글 좋아요 - 이미 좋아요한 경우`() {
+        val request = LikeFeedCommentRequest(feedCommentId = 20L)
+
+        `when`(likeService.likeFeedComment(any(), any()))
+            .thenThrow(LikeException(LikeErrorCode.LIKE_FEED_COMMENT_ALREADY_LIKED))
+
+        val documentFilter = document("like/comment-create", "LIKE_FEED_COMMENT_ALREADY_LIKED")
+            .request(
+                request()
+                    .tag(Tag.LIKE_API)
+                    .summary("댓글 좋아요 - 이미 좋아요한 경우")
+                    .description("이미 좋아요한 댓글에 다시 좋아요하려 할 때 발생하는 에러입니다.")
+                    .requestBodyField(
+                        fieldWithPath("feedCommentId").type(JsonFieldType.NUMBER).description("좋아요할 댓글 ID")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .post("/api/v1/comment/like")
+            .then()
+            .statusCode(400)
+    }
+
+    @Test
     fun `댓글 좋아요 취소`() {
         val feedCommentId = 20L
 
@@ -267,5 +417,166 @@ class LikeDocumentTest : BaseDocumentTest() {
             .delete("/api/v1/comment/unlike/{feedCommentId}", feedCommentId)
             .then()
             .statusCode(200)
+    }
+
+    @Test
+    fun `댓글 좋아요 취소 - 좋아요한 댓글을 찾을 수 없음`() {
+        val feedCommentId = 999L
+
+        `when`(likeService.unlikeFeedComment(any(), eq(feedCommentId)))
+            .thenThrow(LikeException(LikeErrorCode.LIKE_FEED_COMMENT_NOT_FOUND))
+
+        val documentFilter = document("like/comment-delete", "LIKE_FEED_COMMENT_NOT_FOUND")
+            .request(
+                request()
+                    .tag(Tag.LIKE_API)
+                    .summary("댓글 좋아요 취소 - 좋아요한 댓글을 찾을 수 없음")
+                    .description("좋아요하지 않은 댓글을 취소하려 할 때 발생하는 에러입니다.")
+                    .pathParameter(
+                        parameterWithName("feedCommentId").description("좋아요 취소할 댓글 ID")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .`when`()
+            .delete("/api/v1/comment/unlike/{feedCommentId}", feedCommentId)
+            .then()
+            .statusCode(404)
+    }
+
+    @Test
+    fun `하루 덕담 댓글 좋아요`() {
+        val request = LikeDailyMessageCommentRequest(dailyMessageCommentId = 30L)
+        val response = LikeDailyMessageCommentResponse(id = 1L, memberId = "member123", dailyMessageCommentId = 30L)
+
+        `when`(likeService.likeDailyMessageComment(any(), any())).thenReturn(response)
+
+        val documentFilter = document("like/daily-message-comment-create", 200)
+            .request(
+                request()
+                    .tag(Tag.LIKE_API)
+                    .summary("하루 덕담 댓글 좋아요")
+                    .description("하루 덕담 댓글에 좋아요를 누릅니다.")
+                    .requestBodyField(
+                        fieldWithPath("dailyMessageCommentId").type(JsonFieldType.NUMBER).description("좋아요할 하루 덕담 댓글 ID")
+                    )
+            )
+            .response(
+                response()
+                    .responseBodyField(
+                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("좋아요 정보"),
+                        fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("좋아요 ID"),
+                        fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("회원 ID"),
+                        fieldWithPath("data.dailyMessageCommentId").type(JsonFieldType.NUMBER).description("하루 덕담 댓글 ID")
+                    )
+            )
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .post("/api/v1/daily-message-comment/like")
+            .then()
+            .statusCode(200)
+    }
+
+    @Test
+    fun `하루 덕담 댓글 좋아요 - 이미 좋아요한 경우`() {
+        val request = LikeDailyMessageCommentRequest(dailyMessageCommentId = 30L)
+
+        `when`(likeService.likeDailyMessageComment(any(), any()))
+            .thenThrow(LikeException(LikeErrorCode.LIKE_DAILY_MESSAGE_COMMENT_ALREADY_LIKED))
+
+        val documentFilter = document("like/daily-message-comment-create", "LIKE_DAILY_MESSAGE_COMMENT_ALREADY_LIKED")
+            .request(
+                request()
+                    .tag(Tag.LIKE_API)
+                    .summary("하루 덕담 댓글 좋아요 - 이미 좋아요한 경우")
+                    .description("이미 좋아요한 하루 덕담 댓글에 다시 좋아요하려 할 때 발생하는 에러입니다.")
+                    .requestBodyField(
+                        fieldWithPath("dailyMessageCommentId").type(JsonFieldType.NUMBER).description("좋아요할 하루 덕담 댓글 ID")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .post("/api/v1/daily-message-comment/like")
+            .then()
+            .statusCode(400)
+    }
+
+    @Test
+    fun `하루 덕담 댓글 좋아요 취소`() {
+        val dailyMessageCommentId = 30L
+
+        doNothing().`when`(likeService).unlikeDailyMessageComment(any(), eq(dailyMessageCommentId))
+
+        val documentFilter = document("like/daily-message-comment-delete", 200)
+            .request(
+                request()
+                    .tag(Tag.LIKE_API)
+                    .summary("하루 덕담 댓글 좋아요 취소")
+                    .description("하루 덕담 댓글 좋아요를 취소합니다.")
+                    .pathParameter(
+                        parameterWithName("dailyMessageCommentId").description("좋아요 취소할 하루 덕담 댓글 ID")
+                    )
+            )
+            .response(
+                response()
+                    .responseBodyField(
+                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional()
+                    )
+            )
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .`when`()
+            .delete("/api/v1/daily-message-comment/unlike/{dailyMessageCommentId}", dailyMessageCommentId)
+            .then()
+            .statusCode(200)
+    }
+
+    @Test
+    fun `하루 덕담 댓글 좋아요 취소 - 좋아요한 하루 덕담 댓글을 찾을 수 없음`() {
+        val dailyMessageCommentId = 999L
+
+        `when`(likeService.unlikeDailyMessageComment(any(), eq(dailyMessageCommentId)))
+            .thenThrow(LikeException(LikeErrorCode.LIKE_DAILY_MESSAGE_COMMENT_NOT_FOUND))
+
+        val documentFilter = document("like/daily-message-comment-delete", "LIKE_DAILY_MESSAGE_COMMENT_NOT_FOUND")
+            .request(
+                request()
+                    .tag(Tag.LIKE_API)
+                    .summary("하루 덕담 댓글 좋아요 취소 - 좋아요한 하루 덕담 댓글을 찾을 수 없음")
+                    .description("좋아요하지 않은 하루 덕담 댓글을 취소하려 할 때 발생하는 에러입니다.")
+                    .pathParameter(
+                        parameterWithName("dailyMessageCommentId").description("좋아요 취소할 하루 덕담 댓글 ID")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .`when`()
+            .delete("/api/v1/daily-message-comment/unlike/{dailyMessageCommentId}", dailyMessageCommentId)
+            .then()
+            .statusCode(404)
     }
 }

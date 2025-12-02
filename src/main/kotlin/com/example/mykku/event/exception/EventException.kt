@@ -11,5 +11,7 @@ class EventException(
     companion object {
         fun eventNotFound(): EventException = EventException(EventErrorCode.EVENT_NOT_FOUND)
         fun eventImageLimitExceeded(): EventException = EventException(EventErrorCode.EVENT_IMAGE_LIMIT_EXCEEDED)
+        fun alreadyParticipated(): EventException = EventException(EventErrorCode.ALREADY_PARTICIPATED)
+        fun eventNotActive(): EventException = EventException(EventErrorCode.EVENT_NOT_ACTIVE)
     }
 }

@@ -288,6 +288,7 @@ class ScrapServiceTest : BaseServiceTest() {
         val event = Event(
             id = eventId,
             title = "테스트 이벤트",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7)
         )
 
@@ -309,6 +310,7 @@ class ScrapServiceTest : BaseServiceTest() {
         val event = Event(
             id = eventId,
             title = "테스트 이벤트",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7)
         )
 
@@ -329,6 +331,7 @@ class ScrapServiceTest : BaseServiceTest() {
         val event = Event(
             id = 1L,
             title = "이벤트",
+            startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7)
         )
         val saveEvents = listOf(

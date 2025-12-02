@@ -4,9 +4,12 @@ import com.example.mykku.auth.dto.LoginResponse
 import com.example.mykku.auth.dto.MemberInfo
 import com.example.mykku.email.domain.VerificationPurpose
 import com.example.mykku.email.dto.*
+import com.example.mykku.email.exception.EmailAuthErrorCode
+import com.example.mykku.email.exception.EmailAuthException
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.doNothing
+import org.mockito.Mockito.doThrow
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.springframework.restdocs.payload.JsonFieldType
@@ -54,6 +57,39 @@ class EmailAuthDocumentTest : BaseDocumentTest() {
     }
 
     @Test
+    fun `인증 코드 발송 - 너무 많은 요청`() {
+        val request = SendVerificationCodeRequest(
+            email = "user@example.com",
+            purpose = VerificationPurpose.SIGNUP
+        )
+
+        doThrow(EmailAuthException(EmailAuthErrorCode.TOO_MANY_REQUESTS))
+            .`when`(emailAuthService).sendVerificationCode(any(), any())
+
+        val documentFilter = document("email-auth/send-code", "TOO_MANY_REQUESTS")
+            .request(
+                request()
+                    .tag(Tag.EMAIL_AUTH_API)
+                    .summary("인증 코드 발송 - 너무 많은 요청")
+                    .description("인증 코드 발송 요청이 너무 많을 때 발생하는 에러입니다.")
+                    .requestBodyField(
+                        fieldWithPath("email").type(JsonFieldType.STRING).description("인증 코드를 받을 이메일 주소"),
+                        fieldWithPath("purpose").type(JsonFieldType.STRING).description("인증 목적")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .post("/api/v1/email-auth/send-code")
+            .then()
+            .statusCode(429)
+    }
+
+    @Test
     fun `인증 코드 검증`() {
         val request = VerifyCodeRequest(
             email = "user@example.com",
@@ -92,6 +128,76 @@ class EmailAuthDocumentTest : BaseDocumentTest() {
             .post("/api/v1/email-auth/verify-code")
             .then()
             .statusCode(200)
+    }
+
+    @Test
+    fun `인증 코드 검증 - 유효하지 않은 코드`() {
+        val request = VerifyCodeRequest(
+            email = "user@example.com",
+            code = "000000",
+            purpose = VerificationPurpose.SIGNUP
+        )
+
+        doThrow(EmailAuthException(EmailAuthErrorCode.INVALID_VERIFICATION_CODE))
+            .`when`(emailAuthService).verifyCode(any(), any(), any())
+
+        val documentFilter = document("email-auth/verify-code", "INVALID_VERIFICATION_CODE")
+            .request(
+                request()
+                    .tag(Tag.EMAIL_AUTH_API)
+                    .summary("인증 코드 검증 - 유효하지 않은 코드")
+                    .description("입력한 인증 코드가 유효하지 않을 때 발생하는 에러입니다.")
+                    .requestBodyField(
+                        fieldWithPath("email").type(JsonFieldType.STRING).description("인증할 이메일 주소"),
+                        fieldWithPath("code").type(JsonFieldType.STRING).description("인증 코드"),
+                        fieldWithPath("purpose").type(JsonFieldType.STRING).description("인증 목적")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .post("/api/v1/email-auth/verify-code")
+            .then()
+            .statusCode(400)
+    }
+
+    @Test
+    fun `인증 코드 검증 - 만료된 코드`() {
+        val request = VerifyCodeRequest(
+            email = "user@example.com",
+            code = "123456",
+            purpose = VerificationPurpose.SIGNUP
+        )
+
+        doThrow(EmailAuthException(EmailAuthErrorCode.VERIFICATION_CODE_EXPIRED))
+            .`when`(emailAuthService).verifyCode(any(), any(), any())
+
+        val documentFilter = document("email-auth/verify-code", "VERIFICATION_CODE_EXPIRED")
+            .request(
+                request()
+                    .tag(Tag.EMAIL_AUTH_API)
+                    .summary("인증 코드 검증 - 만료된 코드")
+                    .description("인증 코드가 만료되었을 때 발생하는 에러입니다.")
+                    .requestBodyField(
+                        fieldWithPath("email").type(JsonFieldType.STRING).description("인증할 이메일 주소"),
+                        fieldWithPath("code").type(JsonFieldType.STRING).description("인증 코드"),
+                        fieldWithPath("purpose").type(JsonFieldType.STRING).description("인증 목적")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .post("/api/v1/email-auth/verify-code")
+            .then()
+            .statusCode(400)
     }
 
     @Test
@@ -163,6 +269,41 @@ class EmailAuthDocumentTest : BaseDocumentTest() {
     }
 
     @Test
+    fun `이메일 회원가입 - 이미 존재하는 이메일`() {
+        val request = SignupRequest(
+            email = "existing@example.com",
+            password = "password123!",
+            nickname = "기존유저"
+        )
+
+        `when`(emailAuthService.signup(any(), any(), any()))
+            .thenThrow(EmailAuthException(EmailAuthErrorCode.EMAIL_ALREADY_EXISTS))
+
+        val documentFilter = document("email-auth/signup", "EMAIL_ALREADY_EXISTS")
+            .request(
+                request()
+                    .tag(Tag.EMAIL_AUTH_API)
+                    .summary("이메일 회원가입 - 이미 존재하는 이메일")
+                    .description("이미 사용 중인 이메일로 가입하려 할 때 발생하는 에러입니다.")
+                    .requestBodyField(
+                        fieldWithPath("email").type(JsonFieldType.STRING).description("가입할 이메일 주소"),
+                        fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호"),
+                        fieldWithPath("nickname").type(JsonFieldType.STRING).description("닉네임")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .post("/api/v1/email-auth/signup")
+            .then()
+            .statusCode(409)
+    }
+
+    @Test
     fun `이메일 로그인`() {
         val request = EmailLoginRequest(
             email = "user@example.com",
@@ -226,6 +367,39 @@ class EmailAuthDocumentTest : BaseDocumentTest() {
             .post("/api/v1/email-auth/login")
             .then()
             .statusCode(200)
+    }
+
+    @Test
+    fun `이메일 로그인 - 잘못된 이메일 또는 비밀번호`() {
+        val request = EmailLoginRequest(
+            email = "wrong@example.com",
+            password = "wrongPassword123!"
+        )
+
+        `when`(emailAuthService.login(any(), any()))
+            .thenThrow(EmailAuthException(EmailAuthErrorCode.INVALID_EMAIL_OR_PASSWORD))
+
+        val documentFilter = document("email-auth/login", "INVALID_EMAIL_OR_PASSWORD")
+            .request(
+                request()
+                    .tag(Tag.EMAIL_AUTH_API)
+                    .summary("이메일 로그인 - 잘못된 이메일 또는 비밀번호")
+                    .description("이메일 또는 비밀번호가 올바르지 않을 때 발생하는 에러입니다.")
+                    .requestBodyField(
+                        fieldWithPath("email").type(JsonFieldType.STRING).description("이메일 주소"),
+                        fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .post("/api/v1/email-auth/login")
+            .then()
+            .statusCode(401)
     }
 
     @Test

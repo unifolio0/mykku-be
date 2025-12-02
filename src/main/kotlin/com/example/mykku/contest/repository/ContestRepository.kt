@@ -1,6 +1,7 @@
 package com.example.mykku.contest.repository
 
 import com.example.mykku.contest.domain.Contest
+import com.example.mykku.contest.domain.ContestStatusType
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
@@ -11,6 +12,8 @@ import java.time.LocalDateTime
 @Repository
 interface ContestRepository : JpaRepository<Contest, Long> {
     fun findByExpiredAtAfter(dateTime: LocalDateTime): List<Contest>
+
+    fun findByStatusAndExpiredAtAfter(status: ContestStatusType, dateTime: LocalDateTime): List<Contest>
 
     fun findByExpiredAtAfterOrderByCreatedAtDesc(dateTime: LocalDateTime, pageable: Pageable): Page<Contest>
 

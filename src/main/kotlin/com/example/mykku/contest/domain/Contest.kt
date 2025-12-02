@@ -1,7 +1,13 @@
 package com.example.mykku.contest.domain
 
 import com.example.mykku.common.domain.BaseEntity
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
 import java.time.LocalDateTime
 
 @Entity
@@ -16,11 +22,18 @@ class Contest(
     @Column(name = "description", columnDefinition = "TEXT")
     var description: String? = null,
 
+    @Column(name = "started_at")
+    var startedAt: LocalDateTime,
+
     @Column(name = "expired_at")
     var expiredAt: LocalDateTime,
 
     @Column(name = "scrap_count")
     var scrapCount: Int = 0,
+
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    var status: ContestStatusType = ContestStatusType.ACTIVE,
 ) : BaseEntity() {
     companion object {
         const val IMAGE_MAX_COUNT = 10

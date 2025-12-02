@@ -6,10 +6,12 @@ import com.example.mykku.event.domain.EventSortType
 import com.example.mykku.event.domain.EventStatusType
 import com.example.mykku.event.dto.*
 import com.example.mykku.event.tool.EventDtoConverter
+import com.example.mykku.event.tool.EventParticipationReader
 import com.example.mykku.event.tool.EventReader
 import com.example.mykku.event.tool.EventWriter
 import com.example.mykku.member.domain.Member
 import com.example.mykku.scrap.tool.SaveEventReader
+import org.springframework.data.domain.PageImpl
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -18,6 +20,7 @@ import java.time.LocalDateTime
 class EventService(
     private val eventWriter: EventWriter,
     private val eventReader: EventReader,
+    private val eventParticipationReader: EventParticipationReader,
     private val saveEventReader: SaveEventReader,
     private val eventDtoConverter: EventDtoConverter
 ) {
@@ -27,6 +30,7 @@ class EventService(
         val (event, eventImages) = eventWriter.createEvent(
             title = request.title,
             description = request.description,
+            startedAt = request.startedAt,
             expiredAt = request.expiredAt,
             imageRequests = request.images
         )
@@ -35,6 +39,7 @@ class EventService(
             id = event.id!!,
             title = event.title,
             description = event.description,
+            startedAt = event.startedAt,
             expiredAt = event.expiredAt,
             images = eventImages
                 .sortedBy { it.orderIndex }
@@ -81,5 +86,16 @@ class EventService(
         val isSaved = saveEventReader.isSaved(member, event)
 
         return eventDtoConverter.toEventDetailResponse(event, images, isSaved)
+    }
+
+    @Transactional(readOnly = true)
+    fun getMyParticipatedEvents(member: Member, page: Int, size: Int): PagedEventsResponse {
+        val pageable = PageableValidator.validateAndCreate(page, size)
+        val eventPage = eventParticipationReader.getParticipatedEvents(member, pageable)
+
+        val eventListResponses = convertToEventListResponses(eventPage.content, member)
+        val responsePage = PageImpl(eventListResponses, eventPage.pageable, eventPage.totalElements)
+
+        return PagedEventsResponse.from(responsePage)
     }
 }

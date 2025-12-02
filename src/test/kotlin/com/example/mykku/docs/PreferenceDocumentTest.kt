@@ -6,9 +6,12 @@ import com.example.mykku.preference.domain.MoodType
 import com.example.mykku.preference.dto.UpdateGenrePreferenceRequest
 import com.example.mykku.preference.dto.UpdateGoodsPreferenceRequest
 import com.example.mykku.preference.dto.UpdateMoodPreferenceRequest
+import com.example.mykku.preference.exception.PreferenceErrorCode
+import com.example.mykku.preference.exception.PreferenceException
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.doNothing
+import org.mockito.Mockito.doThrow
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.springframework.restdocs.payload.JsonFieldType
@@ -52,6 +55,39 @@ class PreferenceDocumentTest : BaseDocumentTest() {
             .post("/api/v1/preferences/genre")
             .then()
             .statusCode(200)
+    }
+
+    @Test
+    fun `장르 취향 저장 - 빈 목록`() {
+        val request = UpdateGenrePreferenceRequest(
+            genreTypes = emptyList()
+        )
+
+        doThrow(PreferenceException(PreferenceErrorCode.EMPTY_PREFERENCE_LIST))
+            .`when`(preferenceService).updateGenrePreferences(any(), any())
+
+        val documentFilter = document("preference/genre-update", "EMPTY_PREFERENCE_LIST")
+            .request(
+                request()
+                    .tag(Tag.PREFERENCE_API)
+                    .summary("장르 취향 저장 - 빈 목록")
+                    .description("취향 목록이 비어있을 때 발생하는 에러입니다.")
+                    .requestBodyField(
+                        fieldWithPath("genreTypes").type(JsonFieldType.ARRAY)
+                            .description("장르 취향 목록")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .post("/api/v1/preferences/genre")
+            .then()
+            .statusCode(400)
     }
 
     @Test
