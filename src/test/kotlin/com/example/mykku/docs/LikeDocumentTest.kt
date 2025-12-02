@@ -268,4 +268,77 @@ class LikeDocumentTest : BaseDocumentTest() {
             .then()
             .statusCode(200)
     }
+
+    @Test
+    fun `하루 덕담 댓글 좋아요`() {
+        val request = LikeDailyMessageCommentRequest(dailyMessageCommentId = 30L)
+        val response = LikeDailyMessageCommentResponse(id = 1L, memberId = "member123", dailyMessageCommentId = 30L)
+
+        `when`(likeService.likeDailyMessageComment(any(), any())).thenReturn(response)
+
+        val documentFilter = document("like/daily-message-comment-create", 200)
+            .request(
+                request()
+                    .tag(Tag.LIKE_API)
+                    .summary("하루 덕담 댓글 좋아요")
+                    .description("하루 덕담 댓글에 좋아요를 누릅니다.")
+                    .requestBodyField(
+                        fieldWithPath("dailyMessageCommentId").type(JsonFieldType.NUMBER).description("좋아요할 하루 덕담 댓글 ID")
+                    )
+            )
+            .response(
+                response()
+                    .responseBodyField(
+                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("좋아요 정보"),
+                        fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("좋아요 ID"),
+                        fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("회원 ID"),
+                        fieldWithPath("data.dailyMessageCommentId").type(JsonFieldType.NUMBER).description("하루 덕담 댓글 ID")
+                    )
+            )
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(request))
+            .`when`()
+            .post("/api/v1/daily-message-comment/like")
+            .then()
+            .statusCode(200)
+    }
+
+    @Test
+    fun `하루 덕담 댓글 좋아요 취소`() {
+        val dailyMessageCommentId = 30L
+
+        doNothing().`when`(likeService).unlikeDailyMessageComment(any(), eq(dailyMessageCommentId))
+
+        val documentFilter = document("like/daily-message-comment-delete", 200)
+            .request(
+                request()
+                    .tag(Tag.LIKE_API)
+                    .summary("하루 덕담 댓글 좋아요 취소")
+                    .description("하루 덕담 댓글 좋아요를 취소합니다.")
+                    .pathParameter(
+                        parameterWithName("dailyMessageCommentId").description("좋아요 취소할 하루 덕담 댓글 ID")
+                    )
+            )
+            .response(
+                response()
+                    .responseBodyField(
+                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional()
+                    )
+            )
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .contentType(ContentType.JSON)
+            .`when`()
+            .delete("/api/v1/daily-message-comment/unlike/{dailyMessageCommentId}", dailyMessageCommentId)
+            .then()
+            .statusCode(200)
+    }
 }
