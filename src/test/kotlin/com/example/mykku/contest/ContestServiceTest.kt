@@ -233,4 +233,39 @@ class ContestServiceTest : BaseServiceTest() {
         // then
         assertThat(result.isSaved).isFalse()
     }
+
+    @Test
+    @DisplayName("내가 참여한 콘테스트 목록을 조회한다")
+    fun `내가 참여한 콘테스트 목록을 조회한다`() {
+        // given
+        val member = createTestMember()
+        val contest1 = Contest(id = 1L, title = "콘테스트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
+        val contest2 = Contest(id = 2L, title = "콘테스트2", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
+        val contests = listOf(contest1, contest2)
+        val pageable = PageRequest.of(0, 20)
+        val page = PageImpl(contests, pageable, contests.size.toLong())
+
+        val image1 = ContestImage(id = 1L, url = "url1", orderIndex = 0, contest = contest1)
+        val imagesByContestId = mapOf(1L to listOf(image1), 2L to emptyList<ContestImage>())
+
+        val tag1 = ContestTag(id = 1L, title = "디자인", contest = contest1)
+        val tagsByContestId = mapOf(1L to listOf(tag1), 2L to emptyList<ContestTag>())
+
+        val response1 = ContestListResponse(id = 1L, title = "콘테스트1", startedAt = LocalDateTime.now(), expiredAt = contest1.expiredAt, status = ContestStatusType.ACTIVE, thumbnailUrl = "url1", tags = listOf("디자인"), isSaved = true)
+        val response2 = ContestListResponse(id = 2L, title = "콘테스트2", startedAt = LocalDateTime.now(), expiredAt = contest2.expiredAt, status = ContestStatusType.ACTIVE, thumbnailUrl = null, tags = emptyList(), isSaved = false)
+
+        whenever(contestParticipationReader.getParticipatedContests(eq(member), any())).thenReturn(page)
+        whenever(contestReader.getContestImages(contests)).thenReturn(imagesByContestId)
+        whenever(contestReader.getContestTags(contests)).thenReturn(tagsByContestId)
+        whenever(saveContestReader.getSavedContestIds(eq(member), any())).thenReturn(setOf(1L))
+        whenever(contestDtoConverter.toContestListResponse(eq(contest1), any(), any(), eq(true))).thenReturn(response1)
+        whenever(contestDtoConverter.toContestListResponse(eq(contest2), any(), any(), eq(false))).thenReturn(response2)
+
+        // when
+        val result = contestService.getMyParticipatedContests(member, 0, 20)
+
+        // then
+        assertThat(result.content).hasSize(2)
+        assertThat(result.totalElements).isEqualTo(2)
+    }
 }

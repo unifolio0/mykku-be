@@ -210,4 +210,35 @@ class EventServiceTest : BaseServiceTest() {
         // then
         assertThat(result.isSaved).isFalse()
     }
+
+    @Test
+    @DisplayName("내가 참여한 이벤트 목록을 조회한다")
+    fun `내가 참여한 이벤트 목록을 조회한다`() {
+        // given
+        val member = createTestMember()
+        val event1 = Event(id = 1L, title = "이벤트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
+        val event2 = Event(id = 2L, title = "이벤트2", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
+        val events = listOf(event1, event2)
+        val pageable = PageRequest.of(0, 20)
+        val page = PageImpl(events, pageable, events.size.toLong())
+
+        val image1 = EventImage(id = 1L, url = "url1", orderIndex = 0, event = event1)
+        val imagesByEventId = mapOf(1L to listOf(image1), 2L to emptyList<EventImage>())
+
+        val response1 = EventListResponse(id = 1L, title = "이벤트1", startedAt = event1.startedAt, expiredAt = event1.expiredAt, status = event1.status, thumbnailUrl = "url1", isSaved = true)
+        val response2 = EventListResponse(id = 2L, title = "이벤트2", startedAt = event2.startedAt, expiredAt = event2.expiredAt, status = event2.status, thumbnailUrl = null, isSaved = false)
+
+        whenever(eventParticipationReader.getParticipatedEvents(eq(member), any())).thenReturn(page)
+        whenever(eventReader.getEventImages(events)).thenReturn(imagesByEventId)
+        whenever(saveEventReader.getSavedEventIds(eq(member), any())).thenReturn(setOf(1L))
+        whenever(eventDtoConverter.toEventListResponse(eq(event1), any(), eq(true))).thenReturn(response1)
+        whenever(eventDtoConverter.toEventListResponse(eq(event2), any(), eq(false))).thenReturn(response2)
+
+        // when
+        val result = eventService.getMyParticipatedEvents(member, 0, 20)
+
+        // then
+        assertThat(result.content).hasSize(2)
+        assertThat(result.totalElements).isEqualTo(2)
+    }
 }
