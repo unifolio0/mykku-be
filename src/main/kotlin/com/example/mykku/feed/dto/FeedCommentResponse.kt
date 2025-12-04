@@ -38,3 +38,11 @@ data class FeedCommentsResponse(
     val pageSize: Int,
     val hasNext: Boolean
 )
+
+data class SingleFeedCommentResponse(
+    val id: Long,
+    val content: String,
+    val author: CommentAuthorResponse,
+    val likeCount: Int,
+    val createdAt: LocalDateTime
+)

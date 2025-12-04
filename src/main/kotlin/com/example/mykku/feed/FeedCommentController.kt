@@ -1,26 +1,27 @@
-package com.example.mykku.dailymessage
+package com.example.mykku.feed
 
 import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
-import com.example.mykku.dailymessage.dto.CommentResponse
-import com.example.mykku.dailymessage.dto.CreateCommentRequest
-import com.example.mykku.dailymessage.dto.UpdateCommentRequest
+import com.example.mykku.feed.dto.CreateFeedCommentRequest
+import com.example.mykku.feed.dto.SingleFeedCommentResponse
+import com.example.mykku.feed.dto.UpdateFeedCommentRequest
 import com.example.mykku.member.domain.Member
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-class DailyMessageCommentController(
-    private val dailyMessageCommentService: DailyMessageCommentService,
+@RequestMapping("/api/v1")
+class FeedCommentController(
+    private val feedCommentService: FeedCommentService,
 ) {
-    @PostMapping("/api/v1/daily-messages/{dailyMessageId}/comment")
+    @PostMapping("/feeds/{feedId}/comments")
     fun createComment(
-        @PathVariable dailyMessageId: Long,
-        @RequestBody request: CreateCommentRequest,
+        @PathVariable feedId: Long,
+        @RequestBody request: CreateFeedCommentRequest,
         @CurrentMember member: Member
-    ): ResponseEntity<ApiResponse<CommentResponse>> {
-        val comment = dailyMessageCommentService.createComment(
-            dailyMessageId = dailyMessageId,
+    ): ResponseEntity<ApiResponse<SingleFeedCommentResponse>> {
+        val comment = feedCommentService.createComment(
+            feedId = feedId,
             memberId = member.id,
             request = request,
         )
@@ -33,13 +34,13 @@ class DailyMessageCommentController(
         )
     }
 
-    @PutMapping("/api/v1/daily-messages/comments/{commentId}")
+    @PutMapping("/feeds/comments/{commentId}")
     fun updateComment(
         @PathVariable commentId: Long,
-        @RequestBody request: UpdateCommentRequest,
+        @RequestBody request: UpdateFeedCommentRequest,
         @CurrentMember member: Member
-    ): ResponseEntity<ApiResponse<CommentResponse>> {
-        val comment = dailyMessageCommentService.updateComment(
+    ): ResponseEntity<ApiResponse<SingleFeedCommentResponse>> {
+        val comment = feedCommentService.updateComment(
             commentId = commentId,
             memberId = member.id,
             request = request,
@@ -53,12 +54,12 @@ class DailyMessageCommentController(
         )
     }
 
-    @DeleteMapping("/api/v1/daily-messages/comments/{commentId}")
+    @DeleteMapping("/feeds/comments/{commentId}")
     fun deleteComment(
         @PathVariable commentId: Long,
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
-        dailyMessageCommentService.deleteComment(
+        feedCommentService.deleteComment(
             commentId = commentId,
             memberId = member.id,
         )

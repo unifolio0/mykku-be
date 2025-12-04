@@ -33,4 +33,8 @@ class DailyMessageCommentWriter(
         comment.updateContent(newContent)
         return dailyMessageCommentRepository.save(comment)
     }
+
+    fun deleteComment(comment: DailyMessageComment) {
+        dailyMessageCommentRepository.delete(comment)
+    }
 }
