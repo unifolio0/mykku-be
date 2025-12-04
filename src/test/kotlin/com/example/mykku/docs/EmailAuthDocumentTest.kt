@@ -7,6 +7,8 @@ import com.example.mykku.email.dto.*
 import com.example.mykku.email.exception.EmailAuthErrorCode
 import com.example.mykku.email.exception.EmailAuthException
 import io.restassured.http.ContentType
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.doNothing
 import org.mockito.Mockito.doThrow
@@ -17,462 +19,450 @@ import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 
 class EmailAuthDocumentTest : BaseDocumentTest() {
 
-    @Test
-    fun `인증 코드 발송`() {
-        val request = SendVerificationCodeRequest(
-            email = "user@example.com",
-            purpose = VerificationPurpose.SIGNUP
+    @Nested
+    @DisplayName("인증 코드 발송")
+    inner class SendVerificationCode {
+
+        private val apiConfig = ApiRequestConfig(
+            tag = Tag.EMAIL_AUTH_API,
+            summary = "인증 코드 발송",
+            description = "이메일로 인증 코드를 발송합니다.",
+            requestBodyFields = listOf(
+                fieldWithPath("email").type(JsonFieldType.STRING).description("인증 코드를 받을 이메일 주소"),
+                fieldWithPath("purpose").type(JsonFieldType.STRING)
+                    .description("인증 목적 (SIGNUP: 회원가입, PASSWORD_RESET: 비밀번호 재설정)")
+            )
         )
 
-        doNothing().`when`(emailAuthService).sendVerificationCode(any(), any())
-
-        val documentFilter = document("email-auth/send-code", 200)
-            .request(
-                request()
-                    .tag(Tag.EMAIL_AUTH_API)
-                    .summary("인증 코드 발송")
-                    .description("이메일로 인증 코드를 발송합니다.")
-                    .requestBodyField(
-                        fieldWithPath("email").type(JsonFieldType.STRING).description("인증 코드를 받을 이메일 주소"),
-                        fieldWithPath("purpose").type(JsonFieldType.STRING)
-                            .description("인증 목적 (SIGNUP: 회원가입, PASSWORD_RESET: 비밀번호 재설정)")
-                    )
+        @Test
+        fun `성공`() {
+            val request = SendVerificationCodeRequest(
+                email = "user@example.com",
+                purpose = VerificationPurpose.SIGNUP
             )
-            .response(
-                response()
-                    .responseBodyField(
-                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional()
-                    )
-            )
-            .build()
 
-        given(documentFilter)
-            .contentType(ContentType.JSON)
-            .body(objectMapper.writeValueAsString(request))
-            .`when`()
-            .post("/api/v1/email-auth/send-code")
-            .then()
-            .statusCode(200)
+            doNothing().`when`(emailAuthService).sendVerificationCode(any(), any())
+
+            val documentFilter = document("email-auth/send-code", 200)
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional()
+                        )
+                )
+                .build()
+
+            given(documentFilter)
+                .contentType(ContentType.JSON)
+                .body(objectMapper.writeValueAsString(request))
+                .`when`()
+                .post("/api/v1/email-auth/send-code")
+                .then()
+                .statusCode(200)
+        }
+
+        @Test
+        fun `너무 많은 요청`() {
+            val request = SendVerificationCodeRequest(
+                email = "user@example.com",
+                purpose = VerificationPurpose.SIGNUP
+            )
+
+            doThrow(EmailAuthException(EmailAuthErrorCode.TOO_MANY_REQUESTS))
+                .`when`(emailAuthService).sendVerificationCode(any(), any())
+
+            val documentFilter = document("email-auth/send-code", "TOO_MANY_REQUESTS")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .contentType(ContentType.JSON)
+                .body(objectMapper.writeValueAsString(request))
+                .`when`()
+                .post("/api/v1/email-auth/send-code")
+                .then()
+                .statusCode(429)
+        }
     }
 
-    @Test
-    fun `인증 코드 발송 - 너무 많은 요청`() {
-        val request = SendVerificationCodeRequest(
-            email = "user@example.com",
-            purpose = VerificationPurpose.SIGNUP
+    @Nested
+    @DisplayName("인증 코드 검증")
+    inner class VerifyCode {
+
+        private val apiConfig = ApiRequestConfig(
+            tag = Tag.EMAIL_AUTH_API,
+            summary = "인증 코드 검증",
+            description = "발송된 인증 코드를 검증합니다.",
+            requestBodyFields = listOf(
+                fieldWithPath("email").type(JsonFieldType.STRING).description("인증할 이메일 주소"),
+                fieldWithPath("code").type(JsonFieldType.STRING).description("발송받은 6자리 인증 코드"),
+                fieldWithPath("purpose").type(JsonFieldType.STRING)
+                    .description("인증 목적 (SIGNUP: 회원가입, PASSWORD_RESET: 비밀번호 재설정)")
+            )
         )
 
-        doThrow(EmailAuthException(EmailAuthErrorCode.TOO_MANY_REQUESTS))
-            .`when`(emailAuthService).sendVerificationCode(any(), any())
-
-        val documentFilter = document("email-auth/send-code", "TOO_MANY_REQUESTS")
-            .request(
-                request()
-                    .tag(Tag.EMAIL_AUTH_API)
-                    .summary("인증 코드 발송 - 너무 많은 요청")
-                    .description("인증 코드 발송 요청이 너무 많을 때 발생하는 에러입니다.")
-                    .requestBodyField(
-                        fieldWithPath("email").type(JsonFieldType.STRING).description("인증 코드를 받을 이메일 주소"),
-                        fieldWithPath("purpose").type(JsonFieldType.STRING).description("인증 목적")
-                    )
+        @Test
+        fun `성공`() {
+            val request = VerifyCodeRequest(
+                email = "user@example.com",
+                code = "123456",
+                purpose = VerificationPurpose.SIGNUP
             )
-            .response(RestDocumentationResponse.ERROR_RESPONSE)
-            .build()
 
-        given(documentFilter)
-            .contentType(ContentType.JSON)
-            .body(objectMapper.writeValueAsString(request))
-            .`when`()
-            .post("/api/v1/email-auth/send-code")
-            .then()
-            .statusCode(429)
+            doNothing().`when`(emailAuthService).verifyCode(any(), any(), any())
+
+            val documentFilter = document("email-auth/verify-code", 200)
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional()
+                        )
+                )
+                .build()
+
+            given(documentFilter)
+                .contentType(ContentType.JSON)
+                .body(objectMapper.writeValueAsString(request))
+                .`when`()
+                .post("/api/v1/email-auth/verify-code")
+                .then()
+                .statusCode(200)
+        }
+
+        @Test
+        fun `유효하지 않은 코드`() {
+            val request = VerifyCodeRequest(
+                email = "user@example.com",
+                code = "000000",
+                purpose = VerificationPurpose.SIGNUP
+            )
+
+            doThrow(EmailAuthException(EmailAuthErrorCode.INVALID_VERIFICATION_CODE))
+                .`when`(emailAuthService).verifyCode(any(), any(), any())
+
+            val documentFilter = document("email-auth/verify-code", "INVALID_VERIFICATION_CODE")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .contentType(ContentType.JSON)
+                .body(objectMapper.writeValueAsString(request))
+                .`when`()
+                .post("/api/v1/email-auth/verify-code")
+                .then()
+                .statusCode(400)
+        }
+
+        @Test
+        fun `만료된 코드`() {
+            val request = VerifyCodeRequest(
+                email = "user@example.com",
+                code = "123456",
+                purpose = VerificationPurpose.SIGNUP
+            )
+
+            doThrow(EmailAuthException(EmailAuthErrorCode.VERIFICATION_CODE_EXPIRED))
+                .`when`(emailAuthService).verifyCode(any(), any(), any())
+
+            val documentFilter = document("email-auth/verify-code", "VERIFICATION_CODE_EXPIRED")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .contentType(ContentType.JSON)
+                .body(objectMapper.writeValueAsString(request))
+                .`when`()
+                .post("/api/v1/email-auth/verify-code")
+                .then()
+                .statusCode(400)
+        }
     }
 
-    @Test
-    fun `인증 코드 검증`() {
-        val request = VerifyCodeRequest(
-            email = "user@example.com",
-            code = "123456",
-            purpose = VerificationPurpose.SIGNUP
+    @Nested
+    @DisplayName("이메일 회원가입")
+    inner class Signup {
+
+        private val apiConfig = ApiRequestConfig(
+            tag = Tag.EMAIL_AUTH_API,
+            summary = "이메일 회원가입",
+            description = "이메일로 회원가입합니다.",
+            requestBodyFields = listOf(
+                fieldWithPath("email").type(JsonFieldType.STRING).description("가입할 이메일 주소"),
+                fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호 (최소 8자, 영문/숫자/특수문자 포함)"),
+                fieldWithPath("nickname").type(JsonFieldType.STRING).description("닉네임 (최대 10자)")
+            )
         )
 
-        doNothing().`when`(emailAuthService).verifyCode(any(), any(), any())
-
-        val documentFilter = document("email-auth/verify-code", 200)
-            .request(
-                request()
-                    .tag(Tag.EMAIL_AUTH_API)
-                    .summary("인증 코드 검증")
-                    .description("발송된 인증 코드를 검증합니다.")
-                    .requestBodyField(
-                        fieldWithPath("email").type(JsonFieldType.STRING).description("인증할 이메일 주소"),
-                        fieldWithPath("code").type(JsonFieldType.STRING).description("발송받은 6자리 인증 코드"),
-                        fieldWithPath("purpose").type(JsonFieldType.STRING)
-                            .description("인증 목적 (SIGNUP: 회원가입, PASSWORD_RESET: 비밀번호 재설정)")
-                    )
+        @Test
+        fun `성공`() {
+            val request = SignupRequest(
+                email = "newuser@example.com",
+                password = "password123!",
+                nickname = "신규유저"
             )
-            .response(
-                response()
-                    .responseBodyField(
-                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional()
-                    )
-            )
-            .build()
 
-        given(documentFilter)
-            .contentType(ContentType.JSON)
-            .body(objectMapper.writeValueAsString(request))
-            .`when`()
-            .post("/api/v1/email-auth/verify-code")
-            .then()
-            .statusCode(200)
+            val loginResponse = LoginResponse(
+                accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                refreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.refresh...",
+                accessTokenExpiresIn = 86400000,
+                refreshTokenExpiresIn = 1209600000,
+                member = MemberInfo(
+                    id = "newUserId",
+                    email = request.email,
+                    nickname = request.nickname,
+                    profileImage = ""
+                ),
+                isExistingUser = false
+            )
+
+            `when`(emailAuthService.signup(any(), any(), any())).thenReturn(loginResponse)
+
+            val documentFilter = document("email-auth/signup", 200)
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("로그인 응답 데이터"),
+                            fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("JWT 액세스 토큰"),
+                            fieldWithPath("data.refreshToken").type(JsonFieldType.STRING).description("JWT 리프레시 토큰"),
+                            fieldWithPath("data.tokenType").type(JsonFieldType.STRING).description("토큰 타입"),
+                            fieldWithPath("data.accessTokenExpiresIn").type(JsonFieldType.NUMBER)
+                                .description("액세스 토큰 만료 시간 (밀리초)"),
+                            fieldWithPath("data.refreshTokenExpiresIn").type(JsonFieldType.NUMBER)
+                                .description("리프레시 토큰 만료 시간 (밀리초)"),
+                            fieldWithPath("data.member").type(JsonFieldType.OBJECT).description("회원 정보"),
+                            fieldWithPath("data.member.id").type(JsonFieldType.STRING).description("회원 ID"),
+                            fieldWithPath("data.member.email").type(JsonFieldType.STRING).description("회원 이메일"),
+                            fieldWithPath("data.member.nickname").type(JsonFieldType.STRING).description("회원 닉네임"),
+                            fieldWithPath("data.member.profileImage").type(JsonFieldType.STRING).description("프로필 이미지 URL")
+                                .optional(),
+                            fieldWithPath("data.isExistingUser").type(JsonFieldType.BOOLEAN).description("기존 가입자 여부")
+                        )
+                )
+                .build()
+
+            given(documentFilter)
+                .contentType(ContentType.JSON)
+                .body(objectMapper.writeValueAsString(request))
+                .`when`()
+                .post("/api/v1/email-auth/signup")
+                .then()
+                .statusCode(200)
+        }
+
+        @Test
+        fun `이미 존재하는 이메일`() {
+            val request = SignupRequest(
+                email = "existing@example.com",
+                password = "password123!",
+                nickname = "기존유저"
+            )
+
+            `when`(emailAuthService.signup(any(), any(), any()))
+                .thenThrow(EmailAuthException(EmailAuthErrorCode.EMAIL_ALREADY_EXISTS))
+
+            val documentFilter = document("email-auth/signup", "EMAIL_ALREADY_EXISTS")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .contentType(ContentType.JSON)
+                .body(objectMapper.writeValueAsString(request))
+                .`when`()
+                .post("/api/v1/email-auth/signup")
+                .then()
+                .statusCode(409)
+        }
     }
 
-    @Test
-    fun `인증 코드 검증 - 유효하지 않은 코드`() {
-        val request = VerifyCodeRequest(
-            email = "user@example.com",
-            code = "000000",
-            purpose = VerificationPurpose.SIGNUP
+    @Nested
+    @DisplayName("이메일 로그인")
+    inner class Login {
+
+        private val apiConfig = ApiRequestConfig(
+            tag = Tag.EMAIL_AUTH_API,
+            summary = "이메일 로그인",
+            description = "이메일로 로그인합니다.",
+            requestBodyFields = listOf(
+                fieldWithPath("email").type(JsonFieldType.STRING).description("이메일 주소"),
+                fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
+            )
         )
 
-        doThrow(EmailAuthException(EmailAuthErrorCode.INVALID_VERIFICATION_CODE))
-            .`when`(emailAuthService).verifyCode(any(), any(), any())
-
-        val documentFilter = document("email-auth/verify-code", "INVALID_VERIFICATION_CODE")
-            .request(
-                request()
-                    .tag(Tag.EMAIL_AUTH_API)
-                    .summary("인증 코드 검증 - 유효하지 않은 코드")
-                    .description("입력한 인증 코드가 유효하지 않을 때 발생하는 에러입니다.")
-                    .requestBodyField(
-                        fieldWithPath("email").type(JsonFieldType.STRING).description("인증할 이메일 주소"),
-                        fieldWithPath("code").type(JsonFieldType.STRING).description("인증 코드"),
-                        fieldWithPath("purpose").type(JsonFieldType.STRING).description("인증 목적")
-                    )
+        @Test
+        fun `성공`() {
+            val request = EmailLoginRequest(
+                email = "user@example.com",
+                password = "password123!"
             )
-            .response(RestDocumentationResponse.ERROR_RESPONSE)
-            .build()
 
-        given(documentFilter)
-            .contentType(ContentType.JSON)
-            .body(objectMapper.writeValueAsString(request))
-            .`when`()
-            .post("/api/v1/email-auth/verify-code")
-            .then()
-            .statusCode(400)
+            val loginResponse = LoginResponse(
+                accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                refreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.refresh...",
+                accessTokenExpiresIn = 86400000,
+                refreshTokenExpiresIn = 1209600000,
+                member = MemberInfo(
+                    id = "userId",
+                    email = request.email,
+                    nickname = "테스트유저",
+                    profileImage = ""
+                ),
+                isExistingUser = true
+            )
+
+            `when`(emailAuthService.login(any(), any())).thenReturn(loginResponse)
+
+            val documentFilter = document("email-auth/login", 200)
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("로그인 응답 데이터"),
+                            fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("JWT 액세스 토큰"),
+                            fieldWithPath("data.refreshToken").type(JsonFieldType.STRING).description("JWT 리프레시 토큰"),
+                            fieldWithPath("data.tokenType").type(JsonFieldType.STRING).description("토큰 타입"),
+                            fieldWithPath("data.accessTokenExpiresIn").type(JsonFieldType.NUMBER)
+                                .description("액세스 토큰 만료 시간 (밀리초)"),
+                            fieldWithPath("data.refreshTokenExpiresIn").type(JsonFieldType.NUMBER)
+                                .description("리프레시 토큰 만료 시간 (밀리초)"),
+                            fieldWithPath("data.member").type(JsonFieldType.OBJECT).description("회원 정보"),
+                            fieldWithPath("data.member.id").type(JsonFieldType.STRING).description("회원 ID"),
+                            fieldWithPath("data.member.email").type(JsonFieldType.STRING).description("회원 이메일"),
+                            fieldWithPath("data.member.nickname").type(JsonFieldType.STRING).description("회원 닉네임"),
+                            fieldWithPath("data.member.profileImage").type(JsonFieldType.STRING).description("프로필 이미지 URL")
+                                .optional(),
+                            fieldWithPath("data.isExistingUser").type(JsonFieldType.BOOLEAN).description("기존 가입자 여부")
+                        )
+                )
+                .build()
+
+            given(documentFilter)
+                .contentType(ContentType.JSON)
+                .body(objectMapper.writeValueAsString(request))
+                .`when`()
+                .post("/api/v1/email-auth/login")
+                .then()
+                .statusCode(200)
+        }
+
+        @Test
+        fun `잘못된 이메일 또는 비밀번호`() {
+            val request = EmailLoginRequest(
+                email = "wrong@example.com",
+                password = "wrongPassword123!"
+            )
+
+            `when`(emailAuthService.login(any(), any()))
+                .thenThrow(EmailAuthException(EmailAuthErrorCode.INVALID_EMAIL_OR_PASSWORD))
+
+            val documentFilter = document("email-auth/login", "INVALID_EMAIL_OR_PASSWORD")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .contentType(ContentType.JSON)
+                .body(objectMapper.writeValueAsString(request))
+                .`when`()
+                .post("/api/v1/email-auth/login")
+                .then()
+                .statusCode(401)
+        }
     }
 
-    @Test
-    fun `인증 코드 검증 - 만료된 코드`() {
-        val request = VerifyCodeRequest(
-            email = "user@example.com",
-            code = "123456",
-            purpose = VerificationPurpose.SIGNUP
+    @Nested
+    @DisplayName("비밀번호 재설정")
+    inner class ResetPassword {
+
+        private val apiConfig = ApiRequestConfig(
+            tag = Tag.EMAIL_AUTH_API,
+            summary = "비밀번호 재설정",
+            description = "인증 코드를 통해 비밀번호를 재설정합니다.",
+            requestBodyFields = listOf(
+                fieldWithPath("email").type(JsonFieldType.STRING).description("비밀번호를 재설정할 이메일 주소"),
+                fieldWithPath("code").type(JsonFieldType.STRING).description("발송받은 6자리 인증 코드"),
+                fieldWithPath("newPassword").type(JsonFieldType.STRING).description("새로운 비밀번호 (최소 8자)")
+            )
         )
 
-        doThrow(EmailAuthException(EmailAuthErrorCode.VERIFICATION_CODE_EXPIRED))
-            .`when`(emailAuthService).verifyCode(any(), any(), any())
-
-        val documentFilter = document("email-auth/verify-code", "VERIFICATION_CODE_EXPIRED")
-            .request(
-                request()
-                    .tag(Tag.EMAIL_AUTH_API)
-                    .summary("인증 코드 검증 - 만료된 코드")
-                    .description("인증 코드가 만료되었을 때 발생하는 에러입니다.")
-                    .requestBodyField(
-                        fieldWithPath("email").type(JsonFieldType.STRING).description("인증할 이메일 주소"),
-                        fieldWithPath("code").type(JsonFieldType.STRING).description("인증 코드"),
-                        fieldWithPath("purpose").type(JsonFieldType.STRING).description("인증 목적")
-                    )
+        @Test
+        fun `성공`() {
+            val request = ResetPasswordRequest(
+                email = "user@example.com",
+                code = "123456",
+                newPassword = "newPassword123!"
             )
-            .response(RestDocumentationResponse.ERROR_RESPONSE)
-            .build()
 
-        given(documentFilter)
-            .contentType(ContentType.JSON)
-            .body(objectMapper.writeValueAsString(request))
-            .`when`()
-            .post("/api/v1/email-auth/verify-code")
-            .then()
-            .statusCode(400)
+            doNothing().`when`(emailAuthService).resetPassword(any(), any(), any())
+
+            val documentFilter = document("email-auth/reset-password", 200)
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional()
+                        )
+                )
+                .build()
+
+            given(documentFilter)
+                .contentType(ContentType.JSON)
+                .body(objectMapper.writeValueAsString(request))
+                .`when`()
+                .post("/api/v1/email-auth/reset-password")
+                .then()
+                .statusCode(200)
+        }
     }
 
-    @Test
-    fun `이메일 회원가입`() {
-        val request = SignupRequest(
-            email = "newuser@example.com",
-            password = "password123!",
-            nickname = "신규유저"
+    @Nested
+    @DisplayName("임시 비밀번호 발송")
+    inner class SendTemporaryPassword {
+
+        private val apiConfig = ApiRequestConfig(
+            tag = Tag.EMAIL_AUTH_API,
+            summary = "임시 비밀번호 발송",
+            description = "임시 비밀번호를 이메일로 발송합니다.",
+            requestBodyFields = listOf(
+                fieldWithPath("email").type(JsonFieldType.STRING).description("임시 비밀번호를 받을 이메일 주소")
+            )
         )
 
-        val loginResponse = LoginResponse(
-            accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-            refreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.refresh...",
-            accessTokenExpiresIn = 86400000,
-            refreshTokenExpiresIn = 1209600000,
-            member = MemberInfo(
-                id = "newUserId",
-                email = request.email,
-                nickname = request.nickname,
-                profileImage = ""
-            ),
-            isExistingUser = false
-        )
+        @Test
+        fun `성공`() {
+            val request = SendTemporaryPasswordRequest(email = "user@example.com")
 
-        `when`(emailAuthService.signup(any(), any(), any())).thenReturn(loginResponse)
+            doNothing().`when`(emailAuthService).sendTemporaryPassword(any())
 
-        val documentFilter = document("email-auth/signup", 200)
-            .request(
-                request()
-                    .tag(Tag.EMAIL_AUTH_API)
-                    .summary("이메일 회원가입")
-                    .description("이메일로 회원가입합니다.")
-                    .requestBodyField(
-                        fieldWithPath("email").type(JsonFieldType.STRING).description("가입할 이메일 주소"),
-                        fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호 (최소 8자, 영문/숫자/특수문자 포함)"),
-                        fieldWithPath("nickname").type(JsonFieldType.STRING).description("닉네임 (최대 10자)")
-                    )
-            )
-            .response(
-                response()
-                    .responseBodyField(
-                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("로그인 응답 데이터"),
-                        fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("JWT 액세스 토큰"),
-                        fieldWithPath("data.refreshToken").type(JsonFieldType.STRING).description("JWT 리프레시 토큰"),
-                        fieldWithPath("data.tokenType").type(JsonFieldType.STRING).description("토큰 타입"),
-                        fieldWithPath("data.accessTokenExpiresIn").type(JsonFieldType.NUMBER)
-                            .description("액세스 토큰 만료 시간 (밀리초)"),
-                        fieldWithPath("data.refreshTokenExpiresIn").type(JsonFieldType.NUMBER)
-                            .description("리프레시 토큰 만료 시간 (밀리초)"),
-                        fieldWithPath("data.member").type(JsonFieldType.OBJECT).description("회원 정보"),
-                        fieldWithPath("data.member.id").type(JsonFieldType.STRING).description("회원 ID"),
-                        fieldWithPath("data.member.email").type(JsonFieldType.STRING).description("회원 이메일"),
-                        fieldWithPath("data.member.nickname").type(JsonFieldType.STRING).description("회원 닉네임"),
-                        fieldWithPath("data.member.profileImage").type(JsonFieldType.STRING).description("프로필 이미지 URL")
-                            .optional(),
-                        fieldWithPath("data.isExistingUser").type(JsonFieldType.BOOLEAN).description("기존 가입자 여부")
-                    )
-            )
-            .build()
+            val documentFilter = document("email-auth/send-temporary-password", 200)
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional()
+                        )
+                )
+                .build()
 
-        given(documentFilter)
-            .contentType(ContentType.JSON)
-            .body(objectMapper.writeValueAsString(request))
-            .`when`()
-            .post("/api/v1/email-auth/signup")
-            .then()
-            .statusCode(200)
-    }
-
-    @Test
-    fun `이메일 회원가입 - 이미 존재하는 이메일`() {
-        val request = SignupRequest(
-            email = "existing@example.com",
-            password = "password123!",
-            nickname = "기존유저"
-        )
-
-        `when`(emailAuthService.signup(any(), any(), any()))
-            .thenThrow(EmailAuthException(EmailAuthErrorCode.EMAIL_ALREADY_EXISTS))
-
-        val documentFilter = document("email-auth/signup", "EMAIL_ALREADY_EXISTS")
-            .request(
-                request()
-                    .tag(Tag.EMAIL_AUTH_API)
-                    .summary("이메일 회원가입 - 이미 존재하는 이메일")
-                    .description("이미 사용 중인 이메일로 가입하려 할 때 발생하는 에러입니다.")
-                    .requestBodyField(
-                        fieldWithPath("email").type(JsonFieldType.STRING).description("가입할 이메일 주소"),
-                        fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호"),
-                        fieldWithPath("nickname").type(JsonFieldType.STRING).description("닉네임")
-                    )
-            )
-            .response(RestDocumentationResponse.ERROR_RESPONSE)
-            .build()
-
-        given(documentFilter)
-            .contentType(ContentType.JSON)
-            .body(objectMapper.writeValueAsString(request))
-            .`when`()
-            .post("/api/v1/email-auth/signup")
-            .then()
-            .statusCode(409)
-    }
-
-    @Test
-    fun `이메일 로그인`() {
-        val request = EmailLoginRequest(
-            email = "user@example.com",
-            password = "password123!"
-        )
-
-        val loginResponse = LoginResponse(
-            accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-            refreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.refresh...",
-            accessTokenExpiresIn = 86400000,
-            refreshTokenExpiresIn = 1209600000,
-            member = MemberInfo(
-                id = "userId",
-                email = request.email,
-                nickname = "테스트유저",
-                profileImage = ""
-            ),
-            isExistingUser = true
-        )
-
-        `when`(emailAuthService.login(any(), any())).thenReturn(loginResponse)
-
-        val documentFilter = document("email-auth/login", 200)
-            .request(
-                request()
-                    .tag(Tag.EMAIL_AUTH_API)
-                    .summary("이메일 로그인")
-                    .description("이메일로 로그인합니다.")
-                    .requestBodyField(
-                        fieldWithPath("email").type(JsonFieldType.STRING).description("이메일 주소"),
-                        fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
-                    )
-            )
-            .response(
-                response()
-                    .responseBodyField(
-                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("로그인 응답 데이터"),
-                        fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("JWT 액세스 토큰"),
-                        fieldWithPath("data.refreshToken").type(JsonFieldType.STRING).description("JWT 리프레시 토큰"),
-                        fieldWithPath("data.tokenType").type(JsonFieldType.STRING).description("토큰 타입"),
-                        fieldWithPath("data.accessTokenExpiresIn").type(JsonFieldType.NUMBER)
-                            .description("액세스 토큰 만료 시간 (밀리초)"),
-                        fieldWithPath("data.refreshTokenExpiresIn").type(JsonFieldType.NUMBER)
-                            .description("리프레시 토큰 만료 시간 (밀리초)"),
-                        fieldWithPath("data.member").type(JsonFieldType.OBJECT).description("회원 정보"),
-                        fieldWithPath("data.member.id").type(JsonFieldType.STRING).description("회원 ID"),
-                        fieldWithPath("data.member.email").type(JsonFieldType.STRING).description("회원 이메일"),
-                        fieldWithPath("data.member.nickname").type(JsonFieldType.STRING).description("회원 닉네임"),
-                        fieldWithPath("data.member.profileImage").type(JsonFieldType.STRING).description("프로필 이미지 URL")
-                            .optional(),
-                        fieldWithPath("data.isExistingUser").type(JsonFieldType.BOOLEAN).description("기존 가입자 여부")
-                    )
-            )
-            .build()
-
-        given(documentFilter)
-            .contentType(ContentType.JSON)
-            .body(objectMapper.writeValueAsString(request))
-            .`when`()
-            .post("/api/v1/email-auth/login")
-            .then()
-            .statusCode(200)
-    }
-
-    @Test
-    fun `이메일 로그인 - 잘못된 이메일 또는 비밀번호`() {
-        val request = EmailLoginRequest(
-            email = "wrong@example.com",
-            password = "wrongPassword123!"
-        )
-
-        `when`(emailAuthService.login(any(), any()))
-            .thenThrow(EmailAuthException(EmailAuthErrorCode.INVALID_EMAIL_OR_PASSWORD))
-
-        val documentFilter = document("email-auth/login", "INVALID_EMAIL_OR_PASSWORD")
-            .request(
-                request()
-                    .tag(Tag.EMAIL_AUTH_API)
-                    .summary("이메일 로그인 - 잘못된 이메일 또는 비밀번호")
-                    .description("이메일 또는 비밀번호가 올바르지 않을 때 발생하는 에러입니다.")
-                    .requestBodyField(
-                        fieldWithPath("email").type(JsonFieldType.STRING).description("이메일 주소"),
-                        fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
-                    )
-            )
-            .response(RestDocumentationResponse.ERROR_RESPONSE)
-            .build()
-
-        given(documentFilter)
-            .contentType(ContentType.JSON)
-            .body(objectMapper.writeValueAsString(request))
-            .`when`()
-            .post("/api/v1/email-auth/login")
-            .then()
-            .statusCode(401)
-    }
-
-    @Test
-    fun `비밀번호 재설정`() {
-        val request = ResetPasswordRequest(
-            email = "user@example.com",
-            code = "123456",
-            newPassword = "newPassword123!"
-        )
-
-        doNothing().`when`(emailAuthService).resetPassword(any(), any(), any())
-
-        val documentFilter = document("email-auth/reset-password", 200)
-            .request(
-                request()
-                    .tag(Tag.EMAIL_AUTH_API)
-                    .summary("비밀번호 재설정")
-                    .description("인증 코드를 통해 비밀번호를 재설정합니다.")
-                    .requestBodyField(
-                        fieldWithPath("email").type(JsonFieldType.STRING).description("비밀번호를 재설정할 이메일 주소"),
-                        fieldWithPath("code").type(JsonFieldType.STRING).description("발송받은 6자리 인증 코드"),
-                        fieldWithPath("newPassword").type(JsonFieldType.STRING).description("새로운 비밀번호 (최소 8자)")
-                    )
-            )
-            .response(
-                response()
-                    .responseBodyField(
-                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional()
-                    )
-            )
-            .build()
-
-        given(documentFilter)
-            .contentType(ContentType.JSON)
-            .body(objectMapper.writeValueAsString(request))
-            .`when`()
-            .post("/api/v1/email-auth/reset-password")
-            .then()
-            .statusCode(200)
-    }
-
-    @Test
-    fun `임시 비밀번호 발송`() {
-        val request = SendTemporaryPasswordRequest(email = "user@example.com")
-
-        doNothing().`when`(emailAuthService).sendTemporaryPassword(any())
-
-        val documentFilter = document("email-auth/send-temporary-password", 200)
-            .request(
-                request()
-                    .tag(Tag.EMAIL_AUTH_API)
-                    .summary("임시 비밀번호 발송")
-                    .description("임시 비밀번호를 이메일로 발송합니다.")
-                    .requestBodyField(
-                        fieldWithPath("email").type(JsonFieldType.STRING).description("임시 비밀번호를 받을 이메일 주소")
-                    )
-            )
-            .response(
-                response()
-                    .responseBodyField(
-                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional()
-                    )
-            )
-            .build()
-
-        given(documentFilter)
-            .contentType(ContentType.JSON)
-            .body(objectMapper.writeValueAsString(request))
-            .`when`()
-            .post("/api/v1/email-auth/send-temporary-password")
-            .then()
-            .statusCode(200)
+            given(documentFilter)
+                .contentType(ContentType.JSON)
+                .body(objectMapper.writeValueAsString(request))
+                .`when`()
+                .post("/api/v1/email-auth/send-temporary-password")
+                .then()
+                .statusCode(200)
+        }
     }
 }

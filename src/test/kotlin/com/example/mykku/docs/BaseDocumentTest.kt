@@ -195,6 +195,28 @@ abstract class BaseDocumentTest {
 
     protected fun response(): RestDocumentationResponse = RestDocumentationResponse()
 
+    protected fun RestDocumentationRequest.applyConfig(config: ApiRequestConfig): RestDocumentationRequest {
+        tag(config.tag)
+        summary(config.summary)
+        description(config.description)
+        if (config.pathParameters.isNotEmpty()) {
+            pathParameter(*config.pathParameters.toTypedArray())
+        }
+        if (config.queryParameters.isNotEmpty()) {
+            queryParameter(*config.queryParameters.toTypedArray())
+        }
+        if (config.requestBodyFields.isNotEmpty()) {
+            requestBodyField(*config.requestBodyFields.toTypedArray())
+        }
+        if (config.requestParts.isNotEmpty()) {
+            requestPart(*config.requestParts.toTypedArray())
+        }
+        if (config.headerDescriptors.isNotEmpty()) {
+            requestHeader(*config.headerDescriptors.toTypedArray())
+        }
+        return this
+    }
+
     protected fun document(identifierPrefix: String, status: Int): RestDocumentationFilterBuilder =
         RestDocumentationFilterBuilder(identifierPrefix, status.toString())
 

@@ -9,6 +9,8 @@ import com.example.mykku.preference.dto.UpdateMoodPreferenceRequest
 import com.example.mykku.preference.exception.PreferenceErrorCode
 import com.example.mykku.preference.exception.PreferenceException
 import io.restassured.http.ContentType
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.doNothing
 import org.mockito.Mockito.doThrow
@@ -19,249 +21,276 @@ import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 
 class PreferenceDocumentTest : BaseDocumentTest() {
 
-    @Test
-    fun `장르 취향 저장`() {
-        val request = UpdateGenrePreferenceRequest(
-            genreTypes = listOf(GenreType.KPOP, GenreType.BAND_ROCK, GenreType.GAME_ESPORTS)
+    @Nested
+    @DisplayName("장르 취향 저장")
+    inner class UpdateGenrePreference {
+
+        private val apiConfig = ApiRequestConfig(
+            tag = Tag.PREFERENCE_API,
+            summary = "장르 취향 저장",
+            description = "장르 취향을 저장합니다.",
+            requestBodyFields = listOf(
+                fieldWithPath("genreTypes").type(JsonFieldType.ARRAY)
+                    .description("장르 취향 목록 (${GenreType.entries.joinToString { it.name }})")
+            )
         )
 
-        doNothing().`when`(preferenceService).updateGenrePreferences(any(), any())
-
-        val documentFilter = document("preference/genre-update", 200)
-            .request(
-                request()
-                    .tag(Tag.PREFERENCE_API)
-                    .summary("장르 취향 저장")
-                    .description("장르 취향을 저장합니다.")
-                    .requestBodyField(
-                        fieldWithPath("genreTypes").type(JsonFieldType.ARRAY)
-                            .description("장르 취향 목록 (${GenreType.entries.joinToString { it.name }})")
-                    )
+        @Test
+        fun `성공`() {
+            val request = UpdateGenrePreferenceRequest(
+                genreTypes = listOf(GenreType.KPOP, GenreType.BAND_ROCK, GenreType.GAME_ESPORTS)
             )
-            .response(
-                response()
-                    .responseBodyField(
-                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional()
-                    )
-            )
-            .build()
 
-        given(documentFilter)
-            .headers(AUTH_HEADER)
-            .contentType(ContentType.JSON)
-            .body(objectMapper.writeValueAsString(request))
-            .`when`()
-            .post("/api/v1/preferences/genre")
-            .then()
-            .statusCode(200)
+            doNothing().`when`(preferenceService).updateGenrePreferences(any(), any())
+
+            val documentFilter = document("preference/genre-update", 200)
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional()
+                        )
+                )
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .body(objectMapper.writeValueAsString(request))
+                .`when`()
+                .post("/api/v1/preferences/genre")
+                .then()
+                .statusCode(200)
+        }
+
+        @Test
+        fun `빈 목록`() {
+            val request = UpdateGenrePreferenceRequest(
+                genreTypes = emptyList()
+            )
+
+            doThrow(PreferenceException(PreferenceErrorCode.EMPTY_PREFERENCE_LIST))
+                .`when`(preferenceService).updateGenrePreferences(any(), any())
+
+            val documentFilter = document("preference/genre-update", "EMPTY_PREFERENCE_LIST")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .body(objectMapper.writeValueAsString(request))
+                .`when`()
+                .post("/api/v1/preferences/genre")
+                .then()
+                .statusCode(400)
+        }
     }
 
-    @Test
-    fun `장르 취향 저장 - 빈 목록`() {
-        val request = UpdateGenrePreferenceRequest(
-            genreTypes = emptyList()
+    @Nested
+    @DisplayName("장르 취향 조회")
+    inner class GetGenrePreference {
+
+        private val apiConfig = ApiRequestConfig(
+            tag = Tag.PREFERENCE_API,
+            summary = "장르 취향 조회",
+            description = "장르 취향을 조회합니다."
         )
 
-        doThrow(PreferenceException(PreferenceErrorCode.EMPTY_PREFERENCE_LIST))
-            .`when`(preferenceService).updateGenrePreferences(any(), any())
+        @Test
+        fun `성공`() {
+            val genreTypes = listOf(GenreType.KPOP, GenreType.BAND_ROCK)
 
-        val documentFilter = document("preference/genre-update", "EMPTY_PREFERENCE_LIST")
-            .request(
-                request()
-                    .tag(Tag.PREFERENCE_API)
-                    .summary("장르 취향 저장 - 빈 목록")
-                    .description("취향 목록이 비어있을 때 발생하는 에러입니다.")
-                    .requestBodyField(
-                        fieldWithPath("genreTypes").type(JsonFieldType.ARRAY)
-                            .description("장르 취향 목록")
-                    )
-            )
-            .response(RestDocumentationResponse.ERROR_RESPONSE)
-            .build()
+            `when`(preferenceService.getGenrePreferences(any())).thenReturn(genreTypes)
 
-        given(documentFilter)
-            .headers(AUTH_HEADER)
-            .contentType(ContentType.JSON)
-            .body(objectMapper.writeValueAsString(request))
-            .`when`()
-            .post("/api/v1/preferences/genre")
-            .then()
-            .statusCode(400)
+            val documentFilter = document("preference/genre-get", 200)
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
+                            fieldWithPath("data.genreTypes").type(JsonFieldType.ARRAY)
+                                .description("장르 취향 목록 (${GenreType.entries.joinToString { it.name }})")
+                        )
+                )
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .get("/api/v1/preferences/genre")
+                .then()
+                .statusCode(200)
+        }
     }
 
-    @Test
-    fun `장르 취향 조회`() {
-        val genreTypes = listOf(GenreType.KPOP, GenreType.BAND_ROCK)
+    @Nested
+    @DisplayName("굿즈 취향 저장")
+    inner class UpdateGoodsPreference {
 
-        `when`(preferenceService.getGenrePreferences(any())).thenReturn(genreTypes)
-
-        val documentFilter = document("preference/genre-get", 200)
-            .request(
-                request()
-                    .tag(Tag.PREFERENCE_API)
-                    .summary("장르 취향 조회")
-                    .description("장르 취향을 조회합니다.")
+        private val apiConfig = ApiRequestConfig(
+            tag = Tag.PREFERENCE_API,
+            summary = "굿즈 취향 저장",
+            description = "굿즈 취향을 저장합니다.",
+            requestBodyFields = listOf(
+                fieldWithPath("goodsTypes").type(JsonFieldType.ARRAY)
+                    .description("굿즈 취향 목록 (${GoodsType.entries.joinToString { it.name }})")
             )
-            .response(
-                response()
-                    .responseBodyField(
-                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
-                        fieldWithPath("data.genreTypes").type(JsonFieldType.ARRAY)
-                            .description("장르 취향 목록 (${GenreType.entries.joinToString { it.name }})")
-                    )
-            )
-            .build()
-
-        given(documentFilter)
-            .headers(AUTH_HEADER)
-            .contentType(ContentType.JSON)
-            .`when`()
-            .get("/api/v1/preferences/genre")
-            .then()
-            .statusCode(200)
-    }
-
-    @Test
-    fun `굿즈 취향 저장`() {
-        val request = UpdateGoodsPreferenceRequest(
-            goodsTypes = listOf(GoodsType.ITABAG, GoodsType.PHOTOCARD_HOLDER)
         )
 
-        doNothing().`when`(preferenceService).updateGoodsPreferences(any(), any())
-
-        val documentFilter = document("preference/goods-update", 200)
-            .request(
-                request()
-                    .tag(Tag.PREFERENCE_API)
-                    .summary("굿즈 취향 저장")
-                    .description("굿즈 취향을 저장합니다.")
-                    .requestBodyField(
-                        fieldWithPath("goodsTypes").type(JsonFieldType.ARRAY)
-                            .description("굿즈 취향 목록 (${GoodsType.entries.joinToString { it.name }})")
-                    )
+        @Test
+        fun `성공`() {
+            val request = UpdateGoodsPreferenceRequest(
+                goodsTypes = listOf(GoodsType.ITABAG, GoodsType.PHOTOCARD_HOLDER)
             )
-            .response(
-                response()
-                    .responseBodyField(
-                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional()
-                    )
-            )
-            .build()
 
-        given(documentFilter)
-            .headers(AUTH_HEADER)
-            .contentType(ContentType.JSON)
-            .body(objectMapper.writeValueAsString(request))
-            .`when`()
-            .post("/api/v1/preferences/goods")
-            .then()
-            .statusCode(200)
+            doNothing().`when`(preferenceService).updateGoodsPreferences(any(), any())
+
+            val documentFilter = document("preference/goods-update", 200)
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional()
+                        )
+                )
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .body(objectMapper.writeValueAsString(request))
+                .`when`()
+                .post("/api/v1/preferences/goods")
+                .then()
+                .statusCode(200)
+        }
     }
 
-    @Test
-    fun `굿즈 취향 조회`() {
-        val goodsTypes = listOf(GoodsType.PHOTOCARD_HOLDER, GoodsType.UCHIWA)
+    @Nested
+    @DisplayName("굿즈 취향 조회")
+    inner class GetGoodsPreference {
 
-        `when`(preferenceService.getGoodsPreferences(any())).thenReturn(goodsTypes)
-
-        val documentFilter = document("preference/goods-get", 200)
-            .request(
-                request()
-                    .tag(Tag.PREFERENCE_API)
-                    .summary("굿즈 취향 조회")
-                    .description("굿즈 취향을 조회합니다.")
-            )
-            .response(
-                response()
-                    .responseBodyField(
-                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
-                        fieldWithPath("data.goodsTypes").type(JsonFieldType.ARRAY)
-                            .description("굿즈 취향 목록 (${GoodsType.entries.joinToString { it.name }})")
-                    )
-            )
-            .build()
-
-        given(documentFilter)
-            .headers(AUTH_HEADER)
-            .contentType(ContentType.JSON)
-            .`when`()
-            .get("/api/v1/preferences/goods")
-            .then()
-            .statusCode(200)
-    }
-
-    @Test
-    fun `분위기 취향 저장`() {
-        val request = UpdateMoodPreferenceRequest(
-            moodTypes = listOf(MoodType.COZY, MoodType.FRESH)
+        private val apiConfig = ApiRequestConfig(
+            tag = Tag.PREFERENCE_API,
+            summary = "굿즈 취향 조회",
+            description = "굿즈 취향을 조회합니다."
         )
 
-        doNothing().`when`(preferenceService).updateMoodPreferences(any(), any())
+        @Test
+        fun `성공`() {
+            val goodsTypes = listOf(GoodsType.PHOTOCARD_HOLDER, GoodsType.UCHIWA)
 
-        val documentFilter = document("preference/mood-update", 200)
-            .request(
-                request()
-                    .tag(Tag.PREFERENCE_API)
-                    .summary("분위기 취향 저장")
-                    .description("분위기 취향을 저장합니다.")
-                    .requestBodyField(
-                        fieldWithPath("moodTypes").type(JsonFieldType.ARRAY)
-                            .description("분위기 취향 목록 (${MoodType.entries.joinToString { it.name }})")
-                    )
-            )
-            .response(
-                response()
-                    .responseBodyField(
-                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional()
-                    )
-            )
-            .build()
+            `when`(preferenceService.getGoodsPreferences(any())).thenReturn(goodsTypes)
 
-        given(documentFilter)
-            .headers(AUTH_HEADER)
-            .contentType(ContentType.JSON)
-            .body(objectMapper.writeValueAsString(request))
-            .`when`()
-            .post("/api/v1/preferences/mood")
-            .then()
-            .statusCode(200)
+            val documentFilter = document("preference/goods-get", 200)
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
+                            fieldWithPath("data.goodsTypes").type(JsonFieldType.ARRAY)
+                                .description("굿즈 취향 목록 (${GoodsType.entries.joinToString { it.name }})")
+                        )
+                )
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .get("/api/v1/preferences/goods")
+                .then()
+                .statusCode(200)
+        }
     }
 
-    @Test
-    fun `분위기 취향 조회`() {
-        val moodTypes = listOf(MoodType.KITSCH, MoodType.Y2K)
+    @Nested
+    @DisplayName("분위기 취향 저장")
+    inner class UpdateMoodPreference {
 
-        `when`(preferenceService.getMoodPreferences(any())).thenReturn(moodTypes)
-
-        val documentFilter = document("preference/mood-get", 200)
-            .request(
-                request()
-                    .tag(Tag.PREFERENCE_API)
-                    .summary("분위기 취향 조회")
-                    .description("분위기 취향을 조회합니다.")
+        private val apiConfig = ApiRequestConfig(
+            tag = Tag.PREFERENCE_API,
+            summary = "분위기 취향 저장",
+            description = "분위기 취향을 저장합니다.",
+            requestBodyFields = listOf(
+                fieldWithPath("moodTypes").type(JsonFieldType.ARRAY)
+                    .description("분위기 취향 목록 (${MoodType.entries.joinToString { it.name }})")
             )
-            .response(
-                response()
-                    .responseBodyField(
-                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
-                        fieldWithPath("data.moodTypes").type(JsonFieldType.ARRAY)
-                            .description("분위기 취향 목록 (${MoodType.entries.joinToString { it.name }})")
-                    )
-            )
-            .build()
+        )
 
-        given(documentFilter)
-            .headers(AUTH_HEADER)
-            .contentType(ContentType.JSON)
-            .`when`()
-            .get("/api/v1/preferences/mood")
-            .then()
-            .statusCode(200)
+        @Test
+        fun `성공`() {
+            val request = UpdateMoodPreferenceRequest(
+                moodTypes = listOf(MoodType.COZY, MoodType.FRESH)
+            )
+
+            doNothing().`when`(preferenceService).updateMoodPreferences(any(), any())
+
+            val documentFilter = document("preference/mood-update", 200)
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional()
+                        )
+                )
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .body(objectMapper.writeValueAsString(request))
+                .`when`()
+                .post("/api/v1/preferences/mood")
+                .then()
+                .statusCode(200)
+        }
+    }
+
+    @Nested
+    @DisplayName("분위기 취향 조회")
+    inner class GetMoodPreference {
+
+        private val apiConfig = ApiRequestConfig(
+            tag = Tag.PREFERENCE_API,
+            summary = "분위기 취향 조회",
+            description = "분위기 취향을 조회합니다."
+        )
+
+        @Test
+        fun `성공`() {
+            val moodTypes = listOf(MoodType.KITSCH, MoodType.Y2K)
+
+            `when`(preferenceService.getMoodPreferences(any())).thenReturn(moodTypes)
+
+            val documentFilter = document("preference/mood-get", 200)
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
+                            fieldWithPath("data.moodTypes").type(JsonFieldType.ARRAY)
+                                .description("분위기 취향 목록 (${MoodType.entries.joinToString { it.name }})")
+                        )
+                )
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .get("/api/v1/preferences/mood")
+                .then()
+                .statusCode(200)
+        }
     }
 }
