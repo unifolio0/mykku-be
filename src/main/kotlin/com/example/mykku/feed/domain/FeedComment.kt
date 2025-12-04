@@ -38,4 +38,11 @@ class FeedComment(
             throw FeedException.feedCommentContentTooLong()
         }
     }
+
+    fun updateContent(newContent: String) {
+        if (newContent.length > CONTENT_MAX_LENGTH) {
+            throw FeedException.feedCommentContentTooLong()
+        }
+        this.content = newContent
+    }
 }

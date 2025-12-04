@@ -1,10 +1,11 @@
 package com.example.mykku.docs
 
-import com.example.mykku.dailymessage.dto.CommentResponse
-import com.example.mykku.dailymessage.dto.CreateCommentRequest
-import com.example.mykku.dailymessage.dto.UpdateCommentRequest
-import com.example.mykku.dailymessage.exception.DailyMessageErrorCode
-import com.example.mykku.dailymessage.exception.DailyMessageException
+import com.example.mykku.feed.dto.CommentAuthorResponse
+import com.example.mykku.feed.dto.CreateFeedCommentRequest
+import com.example.mykku.feed.dto.SingleFeedCommentResponse
+import com.example.mykku.feed.dto.UpdateFeedCommentRequest
+import com.example.mykku.feed.exception.FeedErrorCode
+import com.example.mykku.feed.exception.FeedException
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -17,18 +18,18 @@ import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
 import java.time.LocalDateTime
 
-class DailyMessageCommentDocumentTest : BaseDocumentTest() {
+class FeedCommentDocumentTest : BaseDocumentTest() {
 
     @Nested
-    @DisplayName("하루 덕담 댓글 생성")
+    @DisplayName("피드 댓글 생성")
     inner class CreateComment {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.DAILY_MESSAGE_COMMENT_API,
-            summary = "하루 덕담 댓글 생성",
-            description = "하루 덕담에 댓글을 작성합니다.",
+            tag = Tag.FEED_COMMENT_API,
+            summary = "피드 댓글 생성",
+            description = "피드에 댓글을 작성합니다.",
             pathParameters = listOf(
-                parameterWithName("dailyMessageId").description("댓글을 작성할 하루 덕담 ID")
+                parameterWithName("feedId").description("댓글을 작성할 피드 ID")
             ),
             requestBodyFields = listOf(
                 fieldWithPath("content").type(JsonFieldType.STRING).description("댓글 내용"),
@@ -39,24 +40,26 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
 
         @Test
         fun `성공`() {
-            val dailyMessageId = 1L
-            val request = CreateCommentRequest(
-                content = "좋은 덕담 감사합니다!",
+            val feedId = 1L
+            val request = CreateFeedCommentRequest(
+                content = "좋은 피드네요!",
                 parentCommentId = null
             )
-            val response = CommentResponse(
+            val response = SingleFeedCommentResponse(
                 id = 1L,
-                content = "좋은 덕담 감사합니다!",
+                content = "좋은 피드네요!",
+                author = CommentAuthorResponse(
+                    memberId = TEST_MEMBER_ID,
+                    nickname = "testuser",
+                    profileImage = "https://example.com/profile.jpg"
+                ),
                 likeCount = 0,
-                memberName = "홍길동",
-                profileImage = "https://example.com/profile.jpg",
-                createdAt = LocalDateTime.now(),
-                replies = emptyList()
+                createdAt = LocalDateTime.now()
             )
 
-            `when`(dailyMessageCommentService.createComment(eq(dailyMessageId), any(), any())).thenReturn(response)
+            `when`(feedCommentService.createComment(eq(feedId), any(), any())).thenReturn(response)
 
-            val documentFilter = document("daily-message-comment/create", 200)
+            val documentFilter = document("feed-comment/create", 200)
                 .request(request().applyConfig(apiConfig))
                 .response(
                     response()
@@ -65,11 +68,12 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("생성된 댓글 정보"),
                             fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("댓글 ID"),
                             fieldWithPath("data.content").type(JsonFieldType.STRING).description("댓글 내용"),
+                            fieldWithPath("data.author").type(JsonFieldType.OBJECT).description("작성자 정보"),
+                            fieldWithPath("data.author.memberId").type(JsonFieldType.STRING).description("작성자 회원 ID"),
+                            fieldWithPath("data.author.nickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
+                            fieldWithPath("data.author.profileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지 URL"),
                             fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
-                            fieldWithPath("data.memberName").type(JsonFieldType.STRING).description("작성자 이름"),
-                            fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성 일시"),
-                            fieldWithPath("data.profileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지 URL"),
-                            fieldWithPath("data.replies[]").type(JsonFieldType.ARRAY).description("답글 목록")
+                            fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성 일시")
                         )
                 )
                 .build()
@@ -79,23 +83,23 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                 .contentType(ContentType.JSON)
                 .body(objectMapper.writeValueAsString(request))
                 .`when`()
-                .post("/api/v1/daily-messages/{dailyMessageId}/comment", dailyMessageId)
+                .post("/api/v1/feeds/{feedId}/comments", feedId)
                 .then()
                 .statusCode(200)
         }
 
         @Test
-        fun `내용 길이 초과`() {
-            val dailyMessageId = 1L
-            val request = CreateCommentRequest(
-                content = "a".repeat(501),
+        fun `피드를 찾을 수 없음`() {
+            val feedId = 999L
+            val request = CreateFeedCommentRequest(
+                content = "댓글 내용",
                 parentCommentId = null
             )
 
-            `when`(dailyMessageCommentService.createComment(eq(dailyMessageId), any(), any()))
-                .thenThrow(DailyMessageException(DailyMessageErrorCode.DAILY_MESSAGE_COMMENT_CONTENT_TOO_LONG))
+            `when`(feedCommentService.createComment(eq(feedId), any(), any()))
+                .thenThrow(FeedException(FeedErrorCode.FEED_NOT_FOUND))
 
-            val documentFilter = document("daily-message-comment/create", "DAILY_MESSAGE_COMMENT_CONTENT_TOO_LONG")
+            val documentFilter = document("feed-comment/create", "FEED_NOT_FOUND")
                 .request(request().applyConfig(apiConfig))
                 .response(RestDocumentationResponse.ERROR_RESPONSE)
                 .build()
@@ -105,22 +109,22 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                 .contentType(ContentType.JSON)
                 .body(objectMapper.writeValueAsString(request))
                 .`when`()
-                .post("/api/v1/daily-messages/{dailyMessageId}/comment", dailyMessageId)
+                .post("/api/v1/feeds/{feedId}/comments", feedId)
                 .then()
-                .statusCode(400)
+                .statusCode(404)
         }
     }
 
     @Nested
-    @DisplayName("하루 덕담 답글 생성")
+    @DisplayName("피드 답글 생성")
     inner class CreateReply {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.DAILY_MESSAGE_COMMENT_API,
-            summary = "하루 덕담 답글 생성",
-            description = "하루 덕담 댓글에 답글을 작성합니다.",
+            tag = Tag.FEED_COMMENT_API,
+            summary = "피드 답글 생성",
+            description = "피드 댓글에 답글을 작성합니다.",
             pathParameters = listOf(
-                parameterWithName("dailyMessageId").description("댓글을 작성할 하루 덕담 ID")
+                parameterWithName("feedId").description("댓글을 작성할 피드 ID")
             ),
             requestBodyFields = listOf(
                 fieldWithPath("content").type(JsonFieldType.STRING).description("답글 내용"),
@@ -130,24 +134,26 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
 
         @Test
         fun `성공`() {
-            val dailyMessageId = 1L
-            val request = CreateCommentRequest(
+            val feedId = 1L
+            val request = CreateFeedCommentRequest(
                 content = "저도 동감합니다!",
                 parentCommentId = 10L
             )
-            val response = CommentResponse(
+            val response = SingleFeedCommentResponse(
                 id = 2L,
                 content = "저도 동감합니다!",
+                author = CommentAuthorResponse(
+                    memberId = TEST_MEMBER_ID,
+                    nickname = "testuser",
+                    profileImage = "https://example.com/profile.jpg"
+                ),
                 likeCount = 0,
-                memberName = "김철수",
-                profileImage = "https://example.com/profile2.jpg",
-                createdAt = LocalDateTime.now(),
-                replies = emptyList()
+                createdAt = LocalDateTime.now()
             )
 
-            `when`(dailyMessageCommentService.createComment(eq(dailyMessageId), any(), any())).thenReturn(response)
+            `when`(feedCommentService.createComment(eq(feedId), any(), any())).thenReturn(response)
 
-            val documentFilter = document("daily-message-comment/reply-create", 200)
+            val documentFilter = document("feed-comment/reply-create", 200)
                 .request(request().applyConfig(apiConfig))
                 .response(
                     response()
@@ -156,11 +162,12 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("생성된 답글 정보"),
                             fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("답글 ID"),
                             fieldWithPath("data.content").type(JsonFieldType.STRING).description("답글 내용"),
+                            fieldWithPath("data.author").type(JsonFieldType.OBJECT).description("작성자 정보"),
+                            fieldWithPath("data.author.memberId").type(JsonFieldType.STRING).description("작성자 회원 ID"),
+                            fieldWithPath("data.author.nickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
+                            fieldWithPath("data.author.profileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지 URL"),
                             fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
-                            fieldWithPath("data.memberName").type(JsonFieldType.STRING).description("작성자 이름"),
-                            fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성 일시"),
-                            fieldWithPath("data.replies[]").type(JsonFieldType.ARRAY).description("답글 목록 (항상 빈 배열)"),
-                            fieldWithPath("data.profileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지 URL")
+                            fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성 일시")
                         )
                 )
                 .build()
@@ -170,20 +177,20 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                 .contentType(ContentType.JSON)
                 .body(objectMapper.writeValueAsString(request))
                 .`when`()
-                .post("/api/v1/daily-messages/{dailyMessageId}/comment", dailyMessageId)
+                .post("/api/v1/feeds/{feedId}/comments", feedId)
                 .then()
                 .statusCode(200)
         }
     }
 
     @Nested
-    @DisplayName("하루 덕담 댓글 수정")
+    @DisplayName("피드 댓글 수정")
     inner class UpdateComment {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.DAILY_MESSAGE_COMMENT_API,
-            summary = "하루 덕담 댓글 수정",
-            description = "하루 덕담 댓글을 수정합니다.",
+            tag = Tag.FEED_COMMENT_API,
+            summary = "피드 댓글 수정",
+            description = "피드 댓글을 수정합니다.",
             pathParameters = listOf(
                 parameterWithName("commentId").description("수정할 댓글 ID")
             ),
@@ -195,20 +202,22 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
         @Test
         fun `성공`() {
             val commentId = 1L
-            val request = UpdateCommentRequest(content = "수정된 댓글 내용입니다!")
-            val response = CommentResponse(
+            val request = UpdateFeedCommentRequest(content = "수정된 댓글 내용입니다!")
+            val response = SingleFeedCommentResponse(
                 id = commentId,
                 content = "수정된 댓글 내용입니다!",
+                author = CommentAuthorResponse(
+                    memberId = TEST_MEMBER_ID,
+                    nickname = "testuser",
+                    profileImage = "https://example.com/profile.jpg"
+                ),
                 likeCount = 5,
-                memberName = "홍길동",
-                profileImage = "https://example.com/profile.jpg",
-                createdAt = LocalDateTime.now(),
-                replies = emptyList()
+                createdAt = LocalDateTime.now()
             )
 
-            `when`(dailyMessageCommentService.updateComment(eq(commentId), any(), any())).thenReturn(response)
+            `when`(feedCommentService.updateComment(eq(commentId), any(), any())).thenReturn(response)
 
-            val documentFilter = document("daily-message-comment/update", 200)
+            val documentFilter = document("feed-comment/update", 200)
                 .request(request().applyConfig(apiConfig))
                 .response(
                     response()
@@ -217,11 +226,12 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("수정된 댓글 정보"),
                             fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("댓글 ID"),
                             fieldWithPath("data.content").type(JsonFieldType.STRING).description("댓글 내용"),
+                            fieldWithPath("data.author").type(JsonFieldType.OBJECT).description("작성자 정보"),
+                            fieldWithPath("data.author.memberId").type(JsonFieldType.STRING).description("작성자 회원 ID"),
+                            fieldWithPath("data.author.nickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
+                            fieldWithPath("data.author.profileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지 URL"),
                             fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
-                            fieldWithPath("data.memberName").type(JsonFieldType.STRING).description("작성자 이름"),
-                            fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성 일시"),
-                            fieldWithPath("data.profileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지 URL"),
-                            fieldWithPath("data.replies[]").type(JsonFieldType.ARRAY).description("답글 목록")
+                            fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성 일시")
                         )
                 )
                 .build()
@@ -231,7 +241,7 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                 .contentType(ContentType.JSON)
                 .body(objectMapper.writeValueAsString(request))
                 .`when`()
-                .put("/api/v1/daily-messages/comments/{commentId}", commentId)
+                .put("/api/v1/feeds/comments/{commentId}", commentId)
                 .then()
                 .statusCode(200)
         }
@@ -239,12 +249,12 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
         @Test
         fun `댓글을 찾을 수 없음`() {
             val commentId = 999L
-            val request = UpdateCommentRequest(content = "수정된 댓글 내용입니다!")
+            val request = UpdateFeedCommentRequest(content = "수정된 댓글 내용입니다!")
 
-            `when`(dailyMessageCommentService.updateComment(eq(commentId), any(), any()))
-                .thenThrow(DailyMessageException(DailyMessageErrorCode.DAILY_MESSAGE_COMMENT_NOT_FOUND))
+            `when`(feedCommentService.updateComment(eq(commentId), any(), any()))
+                .thenThrow(FeedException(FeedErrorCode.FEED_COMMENT_NOT_FOUND))
 
-            val documentFilter = document("daily-message-comment/update", "DAILY_MESSAGE_COMMENT_NOT_FOUND")
+            val documentFilter = document("feed-comment/update", "FEED_COMMENT_NOT_FOUND")
                 .request(request().applyConfig(apiConfig))
                 .response(RestDocumentationResponse.ERROR_RESPONSE)
                 .build()
@@ -254,7 +264,7 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                 .contentType(ContentType.JSON)
                 .body(objectMapper.writeValueAsString(request))
                 .`when`()
-                .put("/api/v1/daily-messages/comments/{commentId}", commentId)
+                .put("/api/v1/feeds/comments/{commentId}", commentId)
                 .then()
                 .statusCode(404)
         }
@@ -262,12 +272,12 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
         @Test
         fun `권한 없음`() {
             val commentId = 1L
-            val request = UpdateCommentRequest(content = "수정된 댓글 내용입니다!")
+            val request = UpdateFeedCommentRequest(content = "수정된 댓글 내용입니다!")
 
-            `when`(dailyMessageCommentService.updateComment(eq(commentId), any(), any()))
-                .thenThrow(DailyMessageException(DailyMessageErrorCode.COMMENT_FORBIDDEN_ACCESS))
+            `when`(feedCommentService.updateComment(eq(commentId), any(), any()))
+                .thenThrow(FeedException(FeedErrorCode.FEED_COMMENT_FORBIDDEN_ACCESS))
 
-            val documentFilter = document("daily-message-comment/update", "COMMENT_FORBIDDEN_ACCESS")
+            val documentFilter = document("feed-comment/update", "FEED_COMMENT_FORBIDDEN_ACCESS")
                 .request(request().applyConfig(apiConfig))
                 .response(RestDocumentationResponse.ERROR_RESPONSE)
                 .build()
@@ -277,20 +287,20 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                 .contentType(ContentType.JSON)
                 .body(objectMapper.writeValueAsString(request))
                 .`when`()
-                .put("/api/v1/daily-messages/comments/{commentId}", commentId)
+                .put("/api/v1/feeds/comments/{commentId}", commentId)
                 .then()
                 .statusCode(403)
         }
     }
 
     @Nested
-    @DisplayName("하루 덕담 댓글 삭제")
+    @DisplayName("피드 댓글 삭제")
     inner class DeleteComment {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.DAILY_MESSAGE_COMMENT_API,
-            summary = "하루 덕담 댓글 삭제",
-            description = "하루 덕담 댓글을 삭제합니다.",
+            tag = Tag.FEED_COMMENT_API,
+            summary = "피드 댓글 삭제",
+            description = "피드 댓글을 삭제합니다.",
             pathParameters = listOf(
                 parameterWithName("commentId").description("삭제할 댓글 ID")
             )
@@ -300,7 +310,7 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
         fun `성공`() {
             val commentId = 1L
 
-            val documentFilter = document("daily-message-comment/delete", 200)
+            val documentFilter = document("feed-comment/delete", 200)
                 .request(request().applyConfig(apiConfig))
                 .response(
                     response()
@@ -314,7 +324,7 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
             given(documentFilter)
                 .headers(AUTH_HEADER)
                 .`when`()
-                .delete("/api/v1/daily-messages/comments/{commentId}", commentId)
+                .delete("/api/v1/feeds/comments/{commentId}", commentId)
                 .then()
                 .statusCode(200)
         }
@@ -323,10 +333,10 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
         fun `댓글을 찾을 수 없음`() {
             val commentId = 999L
 
-            `when`(dailyMessageCommentService.deleteComment(eq(commentId), any()))
-                .thenThrow(DailyMessageException(DailyMessageErrorCode.DAILY_MESSAGE_COMMENT_NOT_FOUND))
+            `when`(feedCommentService.deleteComment(eq(commentId), any()))
+                .thenThrow(FeedException(FeedErrorCode.FEED_COMMENT_NOT_FOUND))
 
-            val documentFilter = document("daily-message-comment/delete", "DAILY_MESSAGE_COMMENT_NOT_FOUND")
+            val documentFilter = document("feed-comment/delete", "FEED_COMMENT_NOT_FOUND")
                 .request(request().applyConfig(apiConfig))
                 .response(RestDocumentationResponse.ERROR_RESPONSE)
                 .build()
@@ -334,7 +344,7 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
             given(documentFilter)
                 .headers(AUTH_HEADER)
                 .`when`()
-                .delete("/api/v1/daily-messages/comments/{commentId}", commentId)
+                .delete("/api/v1/feeds/comments/{commentId}", commentId)
                 .then()
                 .statusCode(404)
         }
@@ -343,10 +353,10 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
         fun `권한 없음`() {
             val commentId = 1L
 
-            `when`(dailyMessageCommentService.deleteComment(eq(commentId), any()))
-                .thenThrow(DailyMessageException(DailyMessageErrorCode.COMMENT_FORBIDDEN_ACCESS))
+            `when`(feedCommentService.deleteComment(eq(commentId), any()))
+                .thenThrow(FeedException(FeedErrorCode.FEED_COMMENT_FORBIDDEN_ACCESS))
 
-            val documentFilter = document("daily-message-comment/delete", "COMMENT_FORBIDDEN_ACCESS")
+            val documentFilter = document("feed-comment/delete", "FEED_COMMENT_FORBIDDEN_ACCESS")
                 .request(request().applyConfig(apiConfig))
                 .response(RestDocumentationResponse.ERROR_RESPONSE)
                 .build()
@@ -354,7 +364,7 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
             given(documentFilter)
                 .headers(AUTH_HEADER)
                 .`when`()
-                .delete("/api/v1/daily-messages/comments/{commentId}", commentId)
+                .delete("/api/v1/feeds/comments/{commentId}", commentId)
                 .then()
                 .statusCode(403)
         }

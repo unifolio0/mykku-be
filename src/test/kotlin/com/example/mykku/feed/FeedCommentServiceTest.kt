@@ -4,13 +4,22 @@ import com.example.mykku.BaseServiceTest
 import com.example.mykku.board.domain.Board
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedComment
+import com.example.mykku.feed.dto.CreateFeedCommentRequest
+import com.example.mykku.feed.dto.UpdateFeedCommentRequest
+import com.example.mykku.feed.exception.FeedException
+import com.example.mykku.feed.exception.FeedErrorCode
 import com.example.mykku.feed.tool.FeedCommentReader
+import com.example.mykku.feed.tool.FeedCommentWriter
 import com.example.mykku.feed.tool.FeedReader
 import com.example.mykku.like.tool.LikeFeedCommentReader
 import com.example.mykku.member.domain.Member
+import com.example.mykku.member.tool.MemberReader
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.mockito.InjectMocks
 import org.mockito.Mock
+import org.mockito.kotlin.any
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
@@ -26,7 +35,13 @@ class FeedCommentServiceTest : BaseServiceTest() {
     private lateinit var feedCommentReader: FeedCommentReader
 
     @Mock
+    private lateinit var feedCommentWriter: FeedCommentWriter
+
+    @Mock
     private lateinit var likeFeedCommentReader: LikeFeedCommentReader
+
+    @Mock
+    private lateinit var memberReader: MemberReader
 
     @InjectMocks
     private lateinit var feedCommentService: FeedCommentService
@@ -154,5 +169,157 @@ class FeedCommentServiceTest : BaseServiceTest() {
         // then
         assertEquals(1, result.comments.size)
         assertEquals(false, result.comments[0].isLiked)
+    }
+
+    @Test
+    fun `createComment - 댓글을 생성한다`() {
+        // given
+        val request = CreateFeedCommentRequest(content = "새 댓글", parentCommentId = null)
+        val savedComment = createTestFeedComment(
+            id = 10L,
+            content = "새 댓글",
+            feed = feed,
+            member = member,
+            parentComment = null
+        )
+
+        whenever(feedReader.getFeedById(1L)).thenReturn(feed)
+        whenever(memberReader.getMemberById("member1")).thenReturn(member)
+        whenever(feedCommentWriter.createComment("새 댓글", feed, member, null)).thenReturn(savedComment)
+
+        // when
+        val result = feedCommentService.createComment(1L, "member1", request)
+
+        // then
+        assertEquals(10L, result.id)
+        assertEquals("새 댓글", result.content)
+        assertEquals("member1", result.author.memberId)
+        assertEquals("testUser", result.author.nickname)
+        verify(feedCommentWriter).createComment("새 댓글", feed, member, null)
+    }
+
+    @Test
+    fun `createComment - 답글을 생성한다`() {
+        // given
+        val parentComment = createTestFeedComment(
+            id = 1L,
+            content = "부모 댓글",
+            feed = feed,
+            member = member,
+            parentComment = null
+        )
+        val request = CreateFeedCommentRequest(content = "답글", parentCommentId = 1L)
+        val savedReply = createTestFeedComment(
+            id = 11L,
+            content = "답글",
+            feed = feed,
+            member = member,
+            parentComment = parentComment
+        )
+
+        whenever(feedReader.getFeedById(1L)).thenReturn(feed)
+        whenever(memberReader.getMemberById("member1")).thenReturn(member)
+        whenever(feedCommentReader.getFeedCommentById(1L)).thenReturn(parentComment)
+        whenever(feedCommentWriter.createComment("답글", feed, member, parentComment)).thenReturn(savedReply)
+
+        // when
+        val result = feedCommentService.createComment(1L, "member1", request)
+
+        // then
+        assertEquals(11L, result.id)
+        assertEquals("답글", result.content)
+        verify(feedCommentWriter).createComment("답글", feed, member, parentComment)
+    }
+
+    @Test
+    fun `updateComment - 댓글을 수정한다`() {
+        // given
+        val comment = createTestFeedComment(
+            id = 1L,
+            content = "원본 댓글",
+            feed = feed,
+            member = member,
+            parentComment = null
+        )
+        val request = UpdateFeedCommentRequest(content = "수정된 댓글")
+        val updatedComment = createTestFeedComment(
+            id = 1L,
+            content = "수정된 댓글",
+            feed = feed,
+            member = member,
+            parentComment = null
+        )
+
+        whenever(feedCommentReader.getFeedCommentById(1L)).thenReturn(comment)
+        whenever(feedCommentWriter.updateComment(comment, "수정된 댓글")).thenReturn(updatedComment)
+
+        // when
+        val result = feedCommentService.updateComment(1L, "member1", request)
+
+        // then
+        assertEquals(1L, result.id)
+        assertEquals("수정된 댓글", result.content)
+        verify(feedCommentWriter).updateComment(comment, "수정된 댓글")
+    }
+
+    @Test
+    fun `updateComment - 권한이 없으면 예외를 발생시킨다`() {
+        // given
+        val comment = createTestFeedComment(
+            id = 1L,
+            content = "원본 댓글",
+            feed = feed,
+            member = member,
+            parentComment = null
+        )
+        val request = UpdateFeedCommentRequest(content = "수정된 댓글")
+
+        whenever(feedCommentReader.getFeedCommentById(1L)).thenReturn(comment)
+
+        // when & then
+        val exception = assertThrows<FeedException> {
+            feedCommentService.updateComment(1L, "otherMember", request)
+        }
+        assertEquals(FeedErrorCode.FEED_COMMENT_FORBIDDEN_ACCESS, exception.errorCode)
+    }
+
+    @Test
+    fun `deleteComment - 댓글을 삭제한다`() {
+        // given
+        val comment = createTestFeedComment(
+            id = 1L,
+            content = "삭제할 댓글",
+            feed = feed,
+            member = member,
+            parentComment = null
+        )
+
+        whenever(feedCommentReader.getFeedCommentById(1L)).thenReturn(comment)
+
+        // when
+        feedCommentService.deleteComment(1L, "member1")
+
+        // then
+        verify(feedCommentWriter).deleteComment(comment)
+    }
+
+    @Test
+    fun `deleteComment - 권한이 없으면 예외를 발생시킨다`() {
+        // given
+        val comment = createTestFeedComment(
+            id = 1L,
+            content = "삭제할 댓글",
+            feed = feed,
+            member = member,
+            parentComment = null
+        )
+
+        whenever(feedCommentReader.getFeedCommentById(1L)).thenReturn(comment)
+
+        // when & then
+        val exception = assertThrows<FeedException> {
+            feedCommentService.deleteComment(1L, "otherMember")
+        }
+        assertEquals(FeedErrorCode.FEED_COMMENT_FORBIDDEN_ACCESS, exception.errorCode)
     }
 }

@@ -181,7 +181,7 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
         val member = createTestMember()
         val otherMember = createTestMember(id = "member2", nickname = "otherUser")
         val dailyMessage = createTestDailyMessage()
-        
+
         val request = UpdateCommentRequest(content = "수정된 댓글")
         val comment = createTestComment(
             content = "원본 댓글",
@@ -194,6 +194,47 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
         // when & then
         val exception = assertThrows<DailyMessageException> {
             dailyMessageCommentService.updateComment(1L, member.id, request)
+        }
+        assertEquals(DailyMessageErrorCode.COMMENT_FORBIDDEN_ACCESS, exception.errorCode)
+    }
+
+    @Test
+    fun `deleteComment - 댓글을 정상적으로 삭제한다`() {
+        // given
+        val member = createTestMember()
+        val dailyMessage = createTestDailyMessage()
+        val comment = createTestComment(
+            content = "삭제할 댓글",
+            member = member,
+            dailyMessage = dailyMessage
+        )
+
+        whenever(dailyMessageCommentReader.getComment(1L)).thenReturn(comment)
+
+        // when
+        dailyMessageCommentService.deleteComment(1L, member.id)
+
+        // then
+        org.mockito.kotlin.verify(dailyMessageCommentWriter).deleteComment(comment)
+    }
+
+    @Test
+    fun `deleteComment - 작성자가 아닌 사용자가 삭제를 시도하면 예외가 발생한다`() {
+        // given
+        val member = createTestMember()
+        val otherMember = createTestMember(id = "member2", nickname = "otherUser")
+        val dailyMessage = createTestDailyMessage()
+        val comment = createTestComment(
+            content = "삭제할 댓글",
+            member = otherMember,
+            dailyMessage = dailyMessage
+        )
+
+        whenever(dailyMessageCommentReader.getComment(1L)).thenReturn(comment)
+
+        // when & then
+        val exception = assertThrows<DailyMessageException> {
+            dailyMessageCommentService.deleteComment(1L, member.id)
         }
         assertEquals(DailyMessageErrorCode.COMMENT_FORBIDDEN_ACCESS, exception.errorCode)
     }

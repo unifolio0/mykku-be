@@ -76,4 +76,15 @@ class DailyMessageCommentService(
             replies = emptyList(),
         )
     }
+
+    @Transactional
+    fun deleteComment(commentId: Long, memberId: String) {
+        val comment = dailyMessageCommentReader.getComment(commentId)
+
+        if (comment.member.id != memberId) {
+            throw DailyMessageException.commentForbiddenAccess()
+        }
+
+        dailyMessageCommentWriter.deleteComment(comment)
+    }
 }

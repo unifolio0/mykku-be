@@ -119,4 +119,21 @@ class DailyMessageCommentWriterTest : BaseToolTest() {
         assertSame(updatedComment, result)
         verify(dailyMessageCommentRepository).save(comment)
     }
+
+    @Test
+    fun `deleteComment는 댓글을 삭제한다`() {
+        val dailyMessage = createMockDailyMessage()
+        val member = createMockMember("member123", "테스트유저")
+        val comment = DailyMessageComment(
+            id = 1L,
+            content = "삭제할 댓글",
+            dailyMessage = dailyMessage,
+            member = member,
+            parentComment = null
+        )
+
+        dailyMessageCommentWriter.deleteComment(comment)
+
+        verify(dailyMessageCommentRepository).delete(comment)
+    }
 }

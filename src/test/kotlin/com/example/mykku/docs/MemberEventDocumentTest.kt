@@ -4,6 +4,8 @@ import com.example.mykku.event.domain.EventStatusType
 import com.example.mykku.event.dto.EventListResponse
 import com.example.mykku.event.dto.PagedEventsResponse
 import io.restassured.http.ContentType
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
@@ -14,132 +16,129 @@ import java.time.LocalDateTime
 
 class MemberEventDocumentTest : BaseDocumentTest() {
 
-    @Test
-    fun `내가 참여한 이벤트 목록 조회`() {
-        val eventList = listOf(
-            EventListResponse(
-                id = 1L,
-                title = "첫 번째 이벤트",
-                startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
-                expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
-                status = EventStatusType.ACTIVE,
-                thumbnailUrl = "https://example.com/thumbnail1.jpg",
-                isSaved = true
-            ),
-            EventListResponse(
-                id = 2L,
-                title = "두 번째 이벤트",
-                startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
-                expiredAt = LocalDateTime.of(2025, 11, 30, 23, 59, 59),
-                status = EventStatusType.EXPIRED,
-                thumbnailUrl = "https://example.com/thumbnail2.jpg",
-                isSaved = false
+    @Nested
+    @DisplayName("내가 참여한 이벤트 목록 조회")
+    inner class GetMyParticipatedEvents {
+
+        private val apiConfig = ApiRequestConfig(
+            tag = Tag.MEMBER_API,
+            summary = "내가 참여한 이벤트 목록 조회",
+            description = "현재 로그인한 회원이 참여한 이벤트 목록을 조회합니다.",
+            queryParameters = listOf(
+                parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
+                parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
             )
         )
 
-        val response = PagedEventsResponse(
-            content = eventList,
-            page = 0,
-            size = 20,
-            totalElements = 2,
-            totalPages = 1,
-            isLast = true
-        )
-
-        `when`(eventService.getMyParticipatedEvents(any(), any(), any())).thenReturn(response)
-
-        val documentFilter = document("member/events", 200)
-            .request(
-                request()
-                    .tag(Tag.MEMBER_API)
-                    .summary("내가 참여한 이벤트 목록 조회")
-                    .description("현재 로그인한 회원이 참여한 이벤트 목록을 조회합니다.")
-                    .queryParameter(
-                        parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
-                        parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
-                    )
+        @Test
+        fun `성공`() {
+            val eventList = listOf(
+                EventListResponse(
+                    id = 1L,
+                    title = "첫 번째 이벤트",
+                    startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
+                    expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
+                    status = EventStatusType.ACTIVE,
+                    thumbnailUrl = "https://example.com/thumbnail1.jpg",
+                    isSaved = true
+                ),
+                EventListResponse(
+                    id = 2L,
+                    title = "두 번째 이벤트",
+                    startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
+                    expiredAt = LocalDateTime.of(2025, 11, 30, 23, 59, 59),
+                    status = EventStatusType.EXPIRED,
+                    thumbnailUrl = "https://example.com/thumbnail2.jpg",
+                    isSaved = false
+                )
             )
-            .response(
-                response()
-                    .responseBodyField(
-                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
-                        fieldWithPath("data.content[]").type(JsonFieldType.ARRAY).description("이벤트 목록"),
-                        fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("이벤트 ID"),
-                        fieldWithPath("data.content[].title").type(JsonFieldType.STRING).description("이벤트 제목"),
-                        fieldWithPath("data.content[].startedAt").type(JsonFieldType.STRING).description("시작일"),
-                        fieldWithPath("data.content[].expiredAt").type(JsonFieldType.STRING).description("만료일"),
-                        fieldWithPath("data.content[].status").type(JsonFieldType.STRING).description("이벤트 상태 (ACTIVE, EXPIRED)"),
-                        fieldWithPath("data.content[].thumbnailUrl").type(JsonFieldType.STRING)
-                            .description("썸네일 이미지 URL").optional(),
-                        fieldWithPath("data.content[].isSaved").type(JsonFieldType.BOOLEAN).description("저장 여부"),
-                        fieldWithPath("data.page").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
-                        fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
-                        fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 요소 수"),
-                        fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
-                        fieldWithPath("data.isLast").type(JsonFieldType.BOOLEAN).description("마지막 페이지 여부")
-                    )
+
+            val response = PagedEventsResponse(
+                content = eventList,
+                page = 0,
+                size = 20,
+                totalElements = 2,
+                totalPages = 1,
+                isLast = true
             )
-            .build()
 
-        given(documentFilter)
-            .headers(AUTH_HEADER)
-            .contentType(ContentType.JSON)
-            .param("page", 0)
-            .param("size", 20)
-            .`when`()
-            .get("/api/v1/members/me/events")
-            .then()
-            .statusCode(200)
-    }
+            `when`(eventService.getMyParticipatedEvents(any(), any(), any())).thenReturn(response)
 
-    @Test
-    fun `내가 참여한 이벤트 목록 조회 - 빈 목록`() {
-        val response = PagedEventsResponse(
-            content = emptyList(),
-            page = 0,
-            size = 20,
-            totalElements = 0,
-            totalPages = 0,
-            isLast = true
-        )
+            val documentFilter = document("member/events", 200)
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
+                            fieldWithPath("data.content[]").type(JsonFieldType.ARRAY).description("이벤트 목록"),
+                            fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("이벤트 ID"),
+                            fieldWithPath("data.content[].title").type(JsonFieldType.STRING).description("이벤트 제목"),
+                            fieldWithPath("data.content[].startedAt").type(JsonFieldType.STRING).description("시작일"),
+                            fieldWithPath("data.content[].expiredAt").type(JsonFieldType.STRING).description("만료일"),
+                            fieldWithPath("data.content[].status").type(JsonFieldType.STRING).description("이벤트 상태 (ACTIVE, EXPIRED)"),
+                            fieldWithPath("data.content[].thumbnailUrl").type(JsonFieldType.STRING)
+                                .description("썸네일 이미지 URL").optional(),
+                            fieldWithPath("data.content[].isSaved").type(JsonFieldType.BOOLEAN).description("저장 여부"),
+                            fieldWithPath("data.page").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
+                            fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
+                            fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 요소 수"),
+                            fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
+                            fieldWithPath("data.isLast").type(JsonFieldType.BOOLEAN).description("마지막 페이지 여부")
+                        )
+                )
+                .build()
 
-        `when`(eventService.getMyParticipatedEvents(any(), any(), any())).thenReturn(response)
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .param("page", 0)
+                .param("size", 20)
+                .`when`()
+                .get("/api/v1/members/me/events")
+                .then()
+                .statusCode(200)
+        }
 
-        val documentFilter = document("member/events", "empty")
-            .request(
-                request()
-                    .tag(Tag.MEMBER_API)
-                    .summary("내가 참여한 이벤트 목록 조회 - 빈 목록")
-                    .description("참여한 이벤트가 없는 경우 빈 목록을 반환합니다.")
-                    .queryParameter(
-                        parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
-                        parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
-                    )
+        @Test
+        fun `빈 목록`() {
+            val response = PagedEventsResponse(
+                content = emptyList(),
+                page = 0,
+                size = 20,
+                totalElements = 0,
+                totalPages = 0,
+                isLast = true
             )
-            .response(
-                response()
-                    .responseBodyField(
-                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
-                        fieldWithPath("data.content[]").type(JsonFieldType.ARRAY).description("빈 이벤트 목록"),
-                        fieldWithPath("data.page").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
-                        fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
-                        fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 요소 수"),
-                        fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
-                        fieldWithPath("data.isLast").type(JsonFieldType.BOOLEAN).description("마지막 페이지 여부")
-                    )
-            )
-            .build()
 
-        given(documentFilter)
-            .headers(AUTH_HEADER)
-            .contentType(ContentType.JSON)
-            .param("page", 0)
-            .param("size", 20)
-            .`when`()
-            .get("/api/v1/members/me/events")
-            .then()
-            .statusCode(200)
+            `when`(eventService.getMyParticipatedEvents(any(), any(), any())).thenReturn(response)
+
+            val documentFilter = document("member/events", "empty")
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
+                            fieldWithPath("data.content[]").type(JsonFieldType.ARRAY).description("빈 이벤트 목록"),
+                            fieldWithPath("data.page").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
+                            fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
+                            fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 요소 수"),
+                            fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
+                            fieldWithPath("data.isLast").type(JsonFieldType.BOOLEAN).description("마지막 페이지 여부")
+                        )
+                )
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .param("page", 0)
+                .param("size", 20)
+                .`when`()
+                .get("/api/v1/members/me/events")
+                .then()
+                .statusCode(200)
+        }
     }
 }

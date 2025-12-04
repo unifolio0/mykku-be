@@ -21,6 +21,8 @@ class FeedException(
 
         fun feedCommentContentTooLong(): FeedException = FeedException(FeedErrorCode.FEED_COMMENT_CONTENT_TOO_LONG)
 
+        fun feedCommentForbiddenAccess(): FeedException = FeedException(FeedErrorCode.FEED_COMMENT_FORBIDDEN_ACCESS)
+
         fun tagTitleTooLong(): FeedException = FeedException(FeedErrorCode.TAG_TITLE_TOO_LONG)
 
         fun tagInvalidFormat(): FeedException = FeedException(FeedErrorCode.TAG_INVALID_FORMAT)
