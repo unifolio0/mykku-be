@@ -297,4 +297,91 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
             .then()
             .statusCode(403)
     }
+
+    @Test
+    fun `하루 덕담 댓글 삭제`() {
+        val commentId = 1L
+
+        val documentFilter = document("daily-message-comment/delete", 200)
+            .request(
+                request()
+                    .tag(Tag.DAILY_MESSAGE_COMMENT_API)
+                    .summary("하루 덕담 댓글 삭제")
+                    .description("하루 덕담 댓글을 삭제합니다.")
+                    .pathParameter(
+                        parameterWithName("commentId").description("삭제할 댓글 ID")
+                    )
+            )
+            .response(
+                response()
+                    .responseBodyField(
+                        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터")
+                    )
+            )
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .`when`()
+            .delete("/api/v1/daily-messages/comments/{commentId}", commentId)
+            .then()
+            .statusCode(200)
+    }
+
+    @Test
+    fun `하루 덕담 댓글 삭제 - 댓글을 찾을 수 없음`() {
+        val commentId = 999L
+
+        `when`(dailyMessageCommentService.deleteComment(eq(commentId), any()))
+            .thenThrow(DailyMessageException(DailyMessageErrorCode.DAILY_MESSAGE_COMMENT_NOT_FOUND))
+
+        val documentFilter = document("daily-message-comment/delete", "DAILY_MESSAGE_COMMENT_NOT_FOUND")
+            .request(
+                request()
+                    .tag(Tag.DAILY_MESSAGE_COMMENT_API)
+                    .summary("하루 덕담 댓글 삭제 - 댓글을 찾을 수 없음")
+                    .description("존재하지 않는 댓글을 삭제하려 할 때 발생하는 에러입니다.")
+                    .pathParameter(
+                        parameterWithName("commentId").description("삭제할 댓글 ID")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .`when`()
+            .delete("/api/v1/daily-messages/comments/{commentId}", commentId)
+            .then()
+            .statusCode(404)
+    }
+
+    @Test
+    fun `하루 덕담 댓글 삭제 - 권한 없음`() {
+        val commentId = 1L
+
+        `when`(dailyMessageCommentService.deleteComment(eq(commentId), any()))
+            .thenThrow(DailyMessageException(DailyMessageErrorCode.COMMENT_FORBIDDEN_ACCESS))
+
+        val documentFilter = document("daily-message-comment/delete", "COMMENT_FORBIDDEN_ACCESS")
+            .request(
+                request()
+                    .tag(Tag.DAILY_MESSAGE_COMMENT_API)
+                    .summary("하루 덕담 댓글 삭제 - 권한 없음")
+                    .description("해당 댓글을 삭제할 권한이 없을 때 발생하는 에러입니다.")
+                    .pathParameter(
+                        parameterWithName("commentId").description("삭제할 댓글 ID")
+                    )
+            )
+            .response(RestDocumentationResponse.ERROR_RESPONSE)
+            .build()
+
+        given(documentFilter)
+            .headers(AUTH_HEADER)
+            .`when`()
+            .delete("/api/v1/daily-messages/comments/{commentId}", commentId)
+            .then()
+            .statusCode(403)
+    }
 }
