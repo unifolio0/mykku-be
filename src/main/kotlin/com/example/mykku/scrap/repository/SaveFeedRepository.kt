@@ -17,4 +17,7 @@ interface SaveFeedRepository : JpaRepository<SaveFeed, Long> {
     fun findByMemberAndFolder(member: Member, folder: Folder?, pageable: Pageable): Page<SaveFeed>
     fun findByMemberAndFeed(member: Member, feed: Feed): SaveFeed?
     fun deleteByMemberAndFeed(member: Member, feed: Feed)
+
+    fun existsByMemberIdAndFeedId(memberId: String, feedId: Long): Boolean
+    fun countByFeedId(feedId: Long): Int
 }

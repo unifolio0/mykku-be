@@ -14,4 +14,7 @@ interface SaveFanNoteRepository : JpaRepository<SaveFanNote, Long> {
     fun findByMember(member: Member, pageable: Pageable): Page<SaveFanNote>
     fun findByMemberAndFanNote(member: Member, fanNote: FanNote): SaveFanNote?
     fun deleteByMemberAndFanNote(member: Member, fanNote: FanNote)
+
+    fun existsByMemberIdAndFanNoteId(memberId: String, fanNoteId: Long): Boolean
+    fun countByFanNoteId(fanNoteId: Long): Int
 }
