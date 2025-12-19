@@ -2,11 +2,11 @@ package com.example.mykku.home
 
 import com.example.mykku.BaseServiceTest
 import com.example.mykku.dailymessage.domain.DailyMessage
-import com.example.mykku.dailymessage.tool.DailyMessageReader
+import com.example.mykku.dailymessage.application.port.out.DailyMessageQueryPort
 import com.example.mykku.event.dto.EventPreviewResponse
 import com.example.mykku.event.tool.EventReader
+import com.example.mykku.feed.application.port.out.FeedQueryPort
 import com.example.mykku.feed.dto.FeedPreviewResponse
-import com.example.mykku.feed.tool.FeedReader
 import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
@@ -17,10 +17,10 @@ import kotlin.test.assertEquals
 class HomeServiceTest : BaseServiceTest() {
 
     @Mock
-    private lateinit var dailyMessageReader: DailyMessageReader
+    private lateinit var dailyMessageQueryPort: DailyMessageQueryPort
 
     @Mock
-    private lateinit var feedReader: FeedReader
+    private lateinit var feedQueryPort: FeedQueryPort
 
     @Mock
     private lateinit var eventReader: EventReader
@@ -40,9 +40,9 @@ class HomeServiceTest : BaseServiceTest() {
         val events = listOf<EventPreviewResponse>()
         val feeds = listOf<FeedPreviewResponse>()
 
-        whenever(dailyMessageReader.getTodayDailyMessage()).thenReturn(dailyMessage)
+        whenever(dailyMessageQueryPort.getTodayDailyMessage()).thenReturn(dailyMessage)
         whenever(eventReader.getProcessingEventPreviews()).thenReturn(events)
-        whenever(feedReader.getFeedPreviews()).thenReturn(feeds)
+        whenever(feedQueryPort.getFeedPreviews()).thenReturn(feeds)
 
         // when
         val result = homeService.getHomeData()

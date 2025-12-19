@@ -1,9 +1,9 @@
 package com.example.mykku.scrap
 
-import com.example.mykku.dailymessage.tool.DailyMessageReader
-import com.example.mykku.fannote.tool.FanNoteReader
+import com.example.mykku.dailymessage.application.port.out.DailyMessageQueryPort
+import com.example.mykku.fannote.application.port.out.FanNoteQueryPort
 import com.example.mykku.event.tool.EventReader
-import com.example.mykku.feed.tool.FeedReader
+import com.example.mykku.feed.application.port.out.FeedQueryPort
 import com.example.mykku.member.domain.Member
 import com.example.mykku.scrap.dto.*
 import com.example.mykku.scrap.tool.*
@@ -23,28 +23,28 @@ class ScrapService(
     private val saveFanNoteReader: SaveFanNoteReader,
     private val saveFanNoteWriter: SaveFanNoteWriter,
     private val folderReader: FolderReader,
-    private val feedReader: FeedReader,
-    private val dailyMessageReader: DailyMessageReader,
+    private val feedQueryPort: FeedQueryPort,
+    private val dailyMessageQueryPort: DailyMessageQueryPort,
     private val eventReader: EventReader,
-    private val fanNoteReader: FanNoteReader
+    private val fanNoteQueryPort: FanNoteQueryPort
 ) {
 
     @Transactional
     fun saveFeed(feedId: Long, request: SaveFeedRequest, member: Member) {
-        val feed = feedReader.getFeedById(feedId)
+        val feed = feedQueryPort.getFeedById(feedId)
         val folder = folderReader.getFolderById(request.folderId, member)
         saveFeedWriter.saveFeed(member, feed, folder)
     }
 
     @Transactional
     fun unsaveFeed(feedId: Long, member: Member) {
-        val feed = feedReader.getFeedById(feedId)
+        val feed = feedQueryPort.getFeedById(feedId)
         saveFeedWriter.unsaveFeed(member, feed)
     }
 
     @Transactional
     fun updateSaveFeedFolder(feedId: Long, request: UpdateSaveFeedFolderRequest, member: Member) {
-        val feed = feedReader.getFeedById(feedId)
+        val feed = feedQueryPort.getFeedById(feedId)
         val folder = folderReader.getFolderById(request.folderId, member)
         saveFeedWriter.updateFolder(member, feed, folder)
     }
@@ -58,13 +58,13 @@ class ScrapService(
 
     @Transactional
     fun saveDailyMessage(dailyMessageId: Long, member: Member) {
-        val dailyMessage = dailyMessageReader.getDailyMessage(dailyMessageId)
+        val dailyMessage = dailyMessageQueryPort.getDailyMessage(dailyMessageId)
         saveDailyMessageWriter.saveDailyMessage(member, dailyMessage)
     }
 
     @Transactional
     fun unsaveDailyMessage(dailyMessageId: Long, member: Member) {
-        val dailyMessage = dailyMessageReader.getDailyMessage(dailyMessageId)
+        val dailyMessage = dailyMessageQueryPort.getDailyMessage(dailyMessageId)
         saveDailyMessageWriter.unsaveDailyMessage(member, dailyMessage)
     }
 
@@ -94,13 +94,13 @@ class ScrapService(
 
     @Transactional
     fun saveFanNote(fanNoteId: Long, member: Member) {
-        val fanNote = fanNoteReader.findById(fanNoteId)
+        val fanNote = fanNoteQueryPort.findById(fanNoteId)
         saveFanNoteWriter.saveFanNote(member, fanNote)
     }
 
     @Transactional
     fun unsaveFanNote(fanNoteId: Long, member: Member) {
-        val fanNote = fanNoteReader.findById(fanNoteId)
+        val fanNote = fanNoteQueryPort.findById(fanNoteId)
         saveFanNoteWriter.unsaveFanNote(member, fanNote)
     }
 

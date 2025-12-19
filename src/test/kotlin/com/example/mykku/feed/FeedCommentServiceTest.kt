@@ -2,15 +2,15 @@ package com.example.mykku.feed
 
 import com.example.mykku.BaseServiceTest
 import com.example.mykku.board.domain.Board
+import com.example.mykku.feed.application.port.out.FeedCommentQueryPort
+import com.example.mykku.feed.application.port.out.FeedCommentRepositoryPort
+import com.example.mykku.feed.application.port.out.FeedQueryPort
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedComment
 import com.example.mykku.feed.dto.CreateFeedCommentRequest
 import com.example.mykku.feed.dto.UpdateFeedCommentRequest
 import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.feed.exception.FeedErrorCode
-import com.example.mykku.feed.tool.FeedCommentReader
-import com.example.mykku.feed.tool.FeedCommentWriter
-import com.example.mykku.feed.tool.FeedReader
 import com.example.mykku.like.tool.LikeFeedCommentReader
 import com.example.mykku.member.application.port.out.MemberQueryPort
 import com.example.mykku.member.domain.Member
@@ -30,13 +30,13 @@ import kotlin.test.assertEquals
 class FeedCommentServiceTest : BaseServiceTest() {
 
     @Mock
-    private lateinit var feedReader: FeedReader
+    private lateinit var feedQueryPort: FeedQueryPort
 
     @Mock
-    private lateinit var feedCommentReader: FeedCommentReader
+    private lateinit var feedCommentQueryPort: FeedCommentQueryPort
 
     @Mock
-    private lateinit var feedCommentWriter: FeedCommentWriter
+    private lateinit var feedCommentRepositoryPort: FeedCommentRepositoryPort
 
     @Mock
     private lateinit var likeFeedCommentReader: LikeFeedCommentReader
@@ -104,9 +104,9 @@ class FeedCommentServiceTest : BaseServiceTest() {
         val commentsPage = PageImpl(listOf(parentComment), pageable, 1)
         val repliesMap = mapOf(1L to listOf(replyComment))
 
-        whenever(feedReader.getFeedById(1L)).thenReturn(feed)
-        whenever(feedCommentReader.getCommentsByFeed(feed, pageable)).thenReturn(commentsPage)
-        whenever(feedCommentReader.getRepliesByParentComments(listOf(parentComment))).thenReturn(repliesMap)
+        whenever(feedQueryPort.getFeedById(1L)).thenReturn(feed)
+        whenever(feedCommentQueryPort.getCommentsByFeed(feed, pageable)).thenReturn(commentsPage)
+        whenever(feedCommentQueryPort.getRepliesByParentComments(listOf(parentComment))).thenReturn(repliesMap)
         whenever(likeFeedCommentReader.isLiked("member1", parentComment)).thenReturn(false)
         whenever(likeFeedCommentReader.isLiked("member1", replyComment)).thenReturn(false)
 
@@ -131,9 +131,9 @@ class FeedCommentServiceTest : BaseServiceTest() {
         val pageable: Pageable = PageRequest.of(0, 10)
         val commentsPage = PageImpl<FeedComment>(emptyList(), pageable, 0)
 
-        whenever(feedReader.getFeedById(1L)).thenReturn(feed)
-        whenever(feedCommentReader.getCommentsByFeed(feed, pageable)).thenReturn(commentsPage)
-        whenever(feedCommentReader.getRepliesByParentComments(emptyList())).thenReturn(emptyMap())
+        whenever(feedQueryPort.getFeedById(1L)).thenReturn(feed)
+        whenever(feedCommentQueryPort.getCommentsByFeed(feed, pageable)).thenReturn(commentsPage)
+        whenever(feedCommentQueryPort.getRepliesByParentComments(emptyList())).thenReturn(emptyMap())
 
         // when
         val result = feedCommentService.getComments(1L, "member1", pageable)
@@ -160,9 +160,9 @@ class FeedCommentServiceTest : BaseServiceTest() {
 
         val commentsPage = PageImpl(listOf(parentComment), pageable, 1)
 
-        whenever(feedReader.getFeedById(1L)).thenReturn(feed)
-        whenever(feedCommentReader.getCommentsByFeed(feed, pageable)).thenReturn(commentsPage)
-        whenever(feedCommentReader.getRepliesByParentComments(listOf(parentComment))).thenReturn(emptyMap())
+        whenever(feedQueryPort.getFeedById(1L)).thenReturn(feed)
+        whenever(feedCommentQueryPort.getCommentsByFeed(feed, pageable)).thenReturn(commentsPage)
+        whenever(feedCommentQueryPort.getRepliesByParentComments(listOf(parentComment))).thenReturn(emptyMap())
 
         // when
         val result = feedCommentService.getComments(1L, null, pageable)
@@ -184,9 +184,9 @@ class FeedCommentServiceTest : BaseServiceTest() {
             parentComment = null
         )
 
-        whenever(feedReader.getFeedById(1L)).thenReturn(feed)
+        whenever(feedQueryPort.getFeedById(1L)).thenReturn(feed)
         whenever(memberQueryPort.getMemberById(MemberId("member1"))).thenReturn(member)
-        whenever(feedCommentWriter.createComment("새 댓글", feed, member, null)).thenReturn(savedComment)
+        whenever(feedCommentRepositoryPort.createComment("새 댓글", feed, member, null)).thenReturn(savedComment)
 
         // when
         val result = feedCommentService.createComment(1L, "member1", request)
@@ -196,7 +196,7 @@ class FeedCommentServiceTest : BaseServiceTest() {
         assertEquals("새 댓글", result.content)
         assertEquals("member1", result.author.memberId)
         assertEquals("testUser", result.author.nickname)
-        verify(feedCommentWriter).createComment("새 댓글", feed, member, null)
+        verify(feedCommentRepositoryPort).createComment("새 댓글", feed, member, null)
     }
 
     @Test
@@ -218,10 +218,10 @@ class FeedCommentServiceTest : BaseServiceTest() {
             parentComment = parentComment
         )
 
-        whenever(feedReader.getFeedById(1L)).thenReturn(feed)
+        whenever(feedQueryPort.getFeedById(1L)).thenReturn(feed)
         whenever(memberQueryPort.getMemberById(MemberId("member1"))).thenReturn(member)
-        whenever(feedCommentReader.getFeedCommentById(1L)).thenReturn(parentComment)
-        whenever(feedCommentWriter.createComment("답글", feed, member, parentComment)).thenReturn(savedReply)
+        whenever(feedCommentQueryPort.getFeedCommentById(1L)).thenReturn(parentComment)
+        whenever(feedCommentRepositoryPort.createComment("답글", feed, member, parentComment)).thenReturn(savedReply)
 
         // when
         val result = feedCommentService.createComment(1L, "member1", request)
@@ -229,7 +229,7 @@ class FeedCommentServiceTest : BaseServiceTest() {
         // then
         assertEquals(11L, result.id)
         assertEquals("답글", result.content)
-        verify(feedCommentWriter).createComment("답글", feed, member, parentComment)
+        verify(feedCommentRepositoryPort).createComment("답글", feed, member, parentComment)
     }
 
     @Test
@@ -251,8 +251,8 @@ class FeedCommentServiceTest : BaseServiceTest() {
             parentComment = null
         )
 
-        whenever(feedCommentReader.getFeedCommentById(1L)).thenReturn(comment)
-        whenever(feedCommentWriter.updateComment(comment, "수정된 댓글")).thenReturn(updatedComment)
+        whenever(feedCommentQueryPort.getFeedCommentById(1L)).thenReturn(comment)
+        whenever(feedCommentRepositoryPort.updateComment(comment, "수정된 댓글")).thenReturn(updatedComment)
 
         // when
         val result = feedCommentService.updateComment(1L, "member1", request)
@@ -260,7 +260,7 @@ class FeedCommentServiceTest : BaseServiceTest() {
         // then
         assertEquals(1L, result.id)
         assertEquals("수정된 댓글", result.content)
-        verify(feedCommentWriter).updateComment(comment, "수정된 댓글")
+        verify(feedCommentRepositoryPort).updateComment(comment, "수정된 댓글")
     }
 
     @Test
@@ -275,7 +275,7 @@ class FeedCommentServiceTest : BaseServiceTest() {
         )
         val request = UpdateFeedCommentRequest(content = "수정된 댓글")
 
-        whenever(feedCommentReader.getFeedCommentById(1L)).thenReturn(comment)
+        whenever(feedCommentQueryPort.getFeedCommentById(1L)).thenReturn(comment)
 
         // when & then
         val exception = assertThrows<FeedException> {
@@ -295,13 +295,13 @@ class FeedCommentServiceTest : BaseServiceTest() {
             parentComment = null
         )
 
-        whenever(feedCommentReader.getFeedCommentById(1L)).thenReturn(comment)
+        whenever(feedCommentQueryPort.getFeedCommentById(1L)).thenReturn(comment)
 
         // when
         feedCommentService.deleteComment(1L, "member1")
 
         // then
-        verify(feedCommentWriter).deleteComment(comment)
+        verify(feedCommentRepositoryPort).deleteComment(comment)
     }
 
     @Test
@@ -315,7 +315,7 @@ class FeedCommentServiceTest : BaseServiceTest() {
             parentComment = null
         )
 
-        whenever(feedCommentReader.getFeedCommentById(1L)).thenReturn(comment)
+        whenever(feedCommentQueryPort.getFeedCommentById(1L)).thenReturn(comment)
 
         // when & then
         val exception = assertThrows<FeedException> {

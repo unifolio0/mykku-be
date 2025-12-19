@@ -1,5 +1,7 @@
 package com.example.mykku.feed.tool
 
+import com.example.mykku.feed.application.port.out.FeedCommentQueryPort
+import com.example.mykku.feed.application.port.out.FeedQueryPort
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedComment
 import com.example.mykku.feed.domain.FeedImage
@@ -13,7 +15,8 @@ import org.springframework.stereotype.Component
 
 @Component
 class FeedDtoConverter(
-    private val feedReader: FeedReader,
+    private val feedQueryPort: FeedQueryPort,
+    private val feedCommentQueryPort: FeedCommentQueryPort,
     private val likeFeedReader: LikeFeedReader,
     private val saveFeedReader: SaveFeedReader
 ) {
@@ -48,9 +51,9 @@ class FeedDtoConverter(
         feedComments: List<FeedComment>?
     ): FeedData {
         return FeedData(
-            images = feedImages ?: feedReader.getFeedImagesByFeed(feed),
-            tags = feedTags ?: feedReader.getFeedTagsByFeed(feed),
-            comments = feedComments ?: feedReader.getFeedCommentsByFeed(
+            images = feedImages ?: feedQueryPort.getFeedImagesByFeed(feed),
+            tags = feedTags ?: feedQueryPort.getFeedTagsByFeed(feed),
+            comments = feedComments ?: feedCommentQueryPort.getCommentsByFeed(
                 feed, PageRequest.of(0, 1)
             ).content
         )
@@ -70,7 +73,7 @@ class FeedDtoConverter(
 
     private fun getContestTagTitles(feedTags: List<FeedTag>): Set<String> {
         val tagTitles = feedTags.map { it.title }
-        val contestTags = feedReader.getContestTagsByTitles(tagTitles)
+        val contestTags = feedQueryPort.getContestTagsByTitles(tagTitles)
         return contestTags.map { it.title }.toSet()
     }
 
@@ -120,14 +123,14 @@ class FeedDtoConverter(
 
     private fun fetchBatchFeedData(feeds: List<Feed>): BatchFeedDataMaps {
         return BatchFeedDataMaps(
-            feedImagesMap = feedReader.getFeedImagesByFeeds(feeds),
-            feedTagsMap = feedReader.getFeedTagsByFeeds(feeds)
+            feedImagesMap = feedQueryPort.getFeedImagesByFeeds(feeds),
+            feedTagsMap = feedQueryPort.getFeedTagsByFeeds(feeds)
         )
     }
 
     private fun fetchContestTagsMap(feedTagsMap: Map<Long, List<FeedTag>>): Map<String, Any> {
         val allFeedTags = feedTagsMap.values.flatten()
-        return feedReader.getContestTagsByFeedTags(allFeedTags)
+        return feedQueryPort.getContestTagsByFeedTags(allFeedTags)
     }
 
     private fun createFeedResponseFromBatch(
@@ -163,7 +166,7 @@ class FeedDtoConverter(
     }
 
     private fun fetchFirstComment(feed: Feed): List<FeedComment> {
-        return feedReader.getFeedCommentsByFeed(feed, PageRequest.of(0, 1)).content
+        return feedCommentQueryPort.getCommentsByFeed(feed, PageRequest.of(0, 1)).content
     }
 
     private fun extractContestTagTitles(

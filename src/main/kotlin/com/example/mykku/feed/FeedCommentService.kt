@@ -1,5 +1,8 @@
 package com.example.mykku.feed
 
+import com.example.mykku.feed.application.port.out.FeedCommentQueryPort
+import com.example.mykku.feed.application.port.out.FeedCommentRepositoryPort
+import com.example.mykku.feed.application.port.out.FeedQueryPort
 import com.example.mykku.feed.dto.CommentAuthorResponse
 import com.example.mykku.feed.dto.CreateFeedCommentRequest
 import com.example.mykku.feed.dto.FeedCommentReplyResponse
@@ -8,9 +11,6 @@ import com.example.mykku.feed.dto.FeedCommentsResponse
 import com.example.mykku.feed.dto.SingleFeedCommentResponse
 import com.example.mykku.feed.dto.UpdateFeedCommentRequest
 import com.example.mykku.feed.exception.FeedException
-import com.example.mykku.feed.tool.FeedCommentReader
-import com.example.mykku.feed.tool.FeedCommentWriter
-import com.example.mykku.feed.tool.FeedReader
 import com.example.mykku.like.tool.LikeFeedCommentReader
 import com.example.mykku.member.application.port.out.MemberQueryPort
 import com.example.mykku.member.domain.model.MemberId
@@ -20,18 +20,18 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class FeedCommentService(
-    private val feedReader: FeedReader,
-    private val feedCommentReader: FeedCommentReader,
-    private val feedCommentWriter: FeedCommentWriter,
+    private val feedQueryPort: FeedQueryPort,
+    private val feedCommentQueryPort: FeedCommentQueryPort,
+    private val feedCommentRepositoryPort: FeedCommentRepositoryPort,
     private val likeFeedCommentReader: LikeFeedCommentReader,
     private val memberQueryPort: MemberQueryPort,
 ) {
     @Transactional(readOnly = true)
     fun getComments(feedId: Long, memberId: String?, pageable: Pageable): FeedCommentsResponse {
-        val feed = feedReader.getFeedById(feedId)
-        val commentsPage = feedCommentReader.getCommentsByFeed(feed, pageable)
+        val feed = feedQueryPort.getFeedById(feedId)
+        val commentsPage = feedCommentQueryPort.getCommentsByFeed(feed, pageable)
 
-        val repliesMap = feedCommentReader.getRepliesByParentComments(commentsPage.content)
+        val repliesMap = feedCommentQueryPort.getRepliesByParentComments(commentsPage.content)
 
         val commentResponses = commentsPage.content.map { comment ->
             val replies = repliesMap[comment.id] ?: emptyList()
@@ -84,14 +84,14 @@ class FeedCommentService(
         memberId: String,
         request: CreateFeedCommentRequest,
     ): SingleFeedCommentResponse {
-        val feed = feedReader.getFeedById(feedId)
+        val feed = feedQueryPort.getFeedById(feedId)
         val member = memberQueryPort.getMemberById(MemberId(memberId))
 
         val parentComment = request.parentCommentId?.let { parentId ->
-            feedCommentReader.getFeedCommentById(parentId)
+            feedCommentQueryPort.getFeedCommentById(parentId)
         }
 
-        val comment = feedCommentWriter.createComment(
+        val comment = feedCommentRepositoryPort.createComment(
             content = request.content,
             feed = feed,
             member = member,
@@ -117,13 +117,13 @@ class FeedCommentService(
         memberId: String,
         request: UpdateFeedCommentRequest,
     ): SingleFeedCommentResponse {
-        val comment = feedCommentReader.getFeedCommentById(commentId)
+        val comment = feedCommentQueryPort.getFeedCommentById(commentId)
 
         if (comment.member.id != memberId) {
             throw FeedException.feedCommentForbiddenAccess()
         }
 
-        val updatedComment = feedCommentWriter.updateComment(
+        val updatedComment = feedCommentRepositoryPort.updateComment(
             comment = comment,
             newContent = request.content,
         )
@@ -143,12 +143,12 @@ class FeedCommentService(
 
     @Transactional
     fun deleteComment(commentId: Long, memberId: String) {
-        val comment = feedCommentReader.getFeedCommentById(commentId)
+        val comment = feedCommentQueryPort.getFeedCommentById(commentId)
 
         if (comment.member.id != memberId) {
             throw FeedException.feedCommentForbiddenAccess()
         }
 
-        feedCommentWriter.deleteComment(comment)
+        feedCommentRepositoryPort.deleteComment(comment)
     }
 }

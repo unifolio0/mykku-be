@@ -1,5 +1,6 @@
-package com.example.mykku.fannote.tool
+package com.example.mykku.fannote.infrastructure.adapter
 
+import com.example.mykku.fannote.application.port.out.FanNoteRepositoryPort
 import com.example.mykku.fannote.domain.FanNote
 import com.example.mykku.fannote.domain.FanNotePage
 import com.example.mykku.fannote.repository.FanNotePageRepository
@@ -8,28 +9,28 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
 @Component
-class FanNoteWriter(
+class FanNoteRepositoryAdapter(
     private val fanNoteRepository: FanNoteRepository,
     private val fanNotePageRepository: FanNotePageRepository
-) {
+) : FanNoteRepositoryPort {
 
     @Transactional
-    fun save(fanNote: FanNote): FanNote {
+    override fun save(fanNote: FanNote): FanNote {
         return fanNoteRepository.save(fanNote)
     }
 
     @Transactional
-    fun savePage(page: FanNotePage): FanNotePage {
+    override fun savePage(page: FanNotePage): FanNotePage {
         return fanNotePageRepository.save(page)
     }
 
     @Transactional
-    fun saveAllPages(pages: List<FanNotePage>) {
+    override fun saveAllPages(pages: List<FanNotePage>) {
         fanNotePageRepository.saveAll(pages)
     }
 
     @Transactional
-    fun deleteById(id: Long) {
+    override fun deleteById(id: Long) {
         val pages = fanNotePageRepository.findByFanNoteIdOrderByPageNumber(id)
         fanNotePageRepository.deleteAll(pages)
         fanNoteRepository.deleteById(id)

@@ -2,7 +2,9 @@ package com.example.mykku.board.infrastructure.adapter
 
 import com.example.mykku.board.application.port.out.BoardQueryPort
 import com.example.mykku.board.application.port.out.BoardSummary
+import com.example.mykku.board.domain.Board
 import com.example.mykku.board.domain.model.BoardId
+import com.example.mykku.board.exception.BoardException
 import com.example.mykku.board.repository.BoardRepository
 import org.springframework.stereotype.Component
 
@@ -25,5 +27,15 @@ class BoardQueryAdapter(
 
     override fun existsById(id: BoardId): Boolean {
         return boardRepository.existsById(id.value)
+    }
+
+    override fun existsByTitle(title: String): Boolean {
+        return boardRepository.existsByTitle(title)
+    }
+
+    override fun getBoardById(id: Long): Board {
+        return boardRepository.findById(id).orElseThrow {
+            BoardException.boardNotFound()
+        }
     }
 }

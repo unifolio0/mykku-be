@@ -2,13 +2,13 @@ package com.example.mykku.scrap
 
 import com.example.mykku.BaseServiceTest
 import com.example.mykku.dailymessage.domain.DailyMessage
-import com.example.mykku.dailymessage.tool.DailyMessageReader
+import com.example.mykku.dailymessage.application.port.out.DailyMessageQueryPort
 import com.example.mykku.fannote.domain.FanNote
-import com.example.mykku.fannote.tool.FanNoteReader
+import com.example.mykku.fannote.application.port.out.FanNoteQueryPort
 import com.example.mykku.event.domain.Event
 import com.example.mykku.event.tool.EventReader
+import com.example.mykku.feed.application.port.out.FeedQueryPort
 import com.example.mykku.feed.domain.Feed
-import com.example.mykku.feed.tool.FeedReader
 import com.example.mykku.scrap.domain.Folder
 import com.example.mykku.scrap.domain.SaveDailyMessage
 import com.example.mykku.scrap.domain.SaveEvent
@@ -58,16 +58,16 @@ class ScrapServiceTest : BaseServiceTest() {
     private lateinit var folderReader: FolderReader
 
     @Mock
-    private lateinit var feedReader: FeedReader
+    private lateinit var feedQueryPort: FeedQueryPort
 
     @Mock
-    private lateinit var dailyMessageReader: DailyMessageReader
+    private lateinit var dailyMessageQueryPort: DailyMessageQueryPort
 
     @Mock
     private lateinit var eventReader: EventReader
 
     @Mock
-    private lateinit var fanNoteReader: FanNoteReader
+    private lateinit var fanNoteQueryPort: FanNoteQueryPort
 
     @InjectMocks
     private lateinit var scrapService: ScrapService
@@ -88,14 +88,14 @@ class ScrapServiceTest : BaseServiceTest() {
         )
         val folder = Folder(id = folderId, member = member, name = "폴더", description = null)
 
-        whenever(feedReader.getFeedById(feedId)).thenReturn(feed)
+        whenever(feedQueryPort.getFeedById(feedId)).thenReturn(feed)
         whenever(folderReader.getFolderById(folderId, member)).thenReturn(folder)
 
         // when
         scrapService.saveFeed(feedId, request, member)
 
         // then
-        verify(feedReader).getFeedById(feedId)
+        verify(feedQueryPort).getFeedById(feedId)
         verify(folderReader).getFolderById(folderId, member)
         verify(saveFeedWriter).saveFeed(member, feed, folder)
     }
@@ -113,13 +113,13 @@ class ScrapServiceTest : BaseServiceTest() {
             member = member
         )
 
-        whenever(feedReader.getFeedById(feedId)).thenReturn(feed)
+        whenever(feedQueryPort.getFeedById(feedId)).thenReturn(feed)
 
         // when
         scrapService.unsaveFeed(feedId, member)
 
         // then
-        verify(feedReader).getFeedById(feedId)
+        verify(feedQueryPort).getFeedById(feedId)
         verify(saveFeedWriter).unsaveFeed(member, feed)
     }
 
@@ -139,14 +139,14 @@ class ScrapServiceTest : BaseServiceTest() {
         )
         val newFolder = Folder(id = newFolderId, member = member, name = "새 폴더", description = null)
 
-        whenever(feedReader.getFeedById(feedId)).thenReturn(feed)
+        whenever(feedQueryPort.getFeedById(feedId)).thenReturn(feed)
         whenever(folderReader.getFolderById(newFolderId, member)).thenReturn(newFolder)
 
         // when
         scrapService.updateSaveFeedFolder(feedId, request, member)
 
         // then
-        verify(feedReader).getFeedById(feedId)
+        verify(feedQueryPort).getFeedById(feedId)
         verify(folderReader).getFolderById(newFolderId, member)
         verify(saveFeedWriter).updateFolder(member, feed, newFolder)
     }
@@ -222,13 +222,13 @@ class ScrapServiceTest : BaseServiceTest() {
             date = LocalDate.now()
         )
 
-        whenever(dailyMessageReader.getDailyMessage(dailyMessageId)).thenReturn(dailyMessage)
+        whenever(dailyMessageQueryPort.getDailyMessage(dailyMessageId)).thenReturn(dailyMessage)
 
         // when
         scrapService.saveDailyMessage(dailyMessageId, member)
 
         // then
-        verify(dailyMessageReader).getDailyMessage(dailyMessageId)
+        verify(dailyMessageQueryPort).getDailyMessage(dailyMessageId)
         verify(saveDailyMessageWriter).saveDailyMessage(member, dailyMessage)
     }
 
@@ -244,13 +244,13 @@ class ScrapServiceTest : BaseServiceTest() {
             date = LocalDate.now()
         )
 
-        whenever(dailyMessageReader.getDailyMessage(dailyMessageId)).thenReturn(dailyMessage)
+        whenever(dailyMessageQueryPort.getDailyMessage(dailyMessageId)).thenReturn(dailyMessage)
 
         // when
         scrapService.unsaveDailyMessage(dailyMessageId, member)
 
         // then
-        verify(dailyMessageReader).getDailyMessage(dailyMessageId)
+        verify(dailyMessageQueryPort).getDailyMessage(dailyMessageId)
         verify(saveDailyMessageWriter).unsaveDailyMessage(member, dailyMessage)
     }
 
@@ -364,13 +364,13 @@ class ScrapServiceTest : BaseServiceTest() {
             coverImageUrl = null
         )
 
-        whenever(fanNoteReader.findById(fanNoteId)).thenReturn(fanNote)
+        whenever(fanNoteQueryPort.findById(fanNoteId)).thenReturn(fanNote)
 
         // when
         scrapService.saveFanNote(fanNoteId, member)
 
         // then
-        verify(fanNoteReader).findById(fanNoteId)
+        verify(fanNoteQueryPort).findById(fanNoteId)
         verify(saveFanNoteWriter).saveFanNote(member, fanNote)
     }
 
@@ -388,13 +388,13 @@ class ScrapServiceTest : BaseServiceTest() {
             coverImageUrl = null
         )
 
-        whenever(fanNoteReader.findById(fanNoteId)).thenReturn(fanNote)
+        whenever(fanNoteQueryPort.findById(fanNoteId)).thenReturn(fanNote)
 
         // when
         scrapService.unsaveFanNote(fanNoteId, member)
 
         // then
-        verify(fanNoteReader).findById(fanNoteId)
+        verify(fanNoteQueryPort).findById(fanNoteId)
         verify(saveFanNoteWriter).unsaveFanNote(member, fanNote)
     }
 

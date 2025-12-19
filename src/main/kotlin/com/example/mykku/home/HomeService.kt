@@ -1,24 +1,24 @@
 package com.example.mykku.home
 
+import com.example.mykku.dailymessage.application.port.out.DailyMessageQueryPort
 import com.example.mykku.dailymessage.dto.DailyMessageSummaryResponse
-import com.example.mykku.dailymessage.tool.DailyMessageReader
 import com.example.mykku.event.tool.EventReader
-import com.example.mykku.feed.tool.FeedReader
+import com.example.mykku.feed.application.port.out.FeedQueryPort
 import com.example.mykku.home.dto.HomeResponse
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class HomeService(
-    private val dailyMessageReader: DailyMessageReader,
-    private val feedReader: FeedReader,
+    private val dailyMessageQueryPort: DailyMessageQueryPort,
+    private val feedQueryPort: FeedQueryPort,
     private val eventReader: EventReader,
 ) {
     @Transactional(readOnly = true)
     fun getHomeData(): HomeResponse {
-        val todayDailyMessage = dailyMessageReader.getTodayDailyMessage()
+        val todayDailyMessage = dailyMessageQueryPort.getTodayDailyMessage()
         val events = eventReader.getProcessingEventPreviews()
-        val feeds = feedReader.getFeedPreviews()
+        val feeds = feedQueryPort.getFeedPreviews()
 
         return HomeResponse(
             dailyMessage = DailyMessageSummaryResponse(

@@ -1,14 +1,14 @@
 package com.example.mykku.like
 
 import com.example.mykku.BaseServiceTest
-import com.example.mykku.board.tool.BoardReader
+import com.example.mykku.board.application.port.out.BoardQueryPort
 import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.domain.DailyMessageComment
-import com.example.mykku.dailymessage.tool.DailyMessageCommentReader
+import com.example.mykku.dailymessage.application.port.out.DailyMessageCommentQueryPort
+import com.example.mykku.feed.application.port.out.FeedCommentQueryPort
+import com.example.mykku.feed.application.port.out.FeedQueryPort
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedComment
-import com.example.mykku.feed.tool.FeedCommentReader
-import com.example.mykku.feed.tool.FeedReader
 import com.example.mykku.like.domain.LikeBoard
 import com.example.mykku.like.domain.LikeDailyMessageComment
 import com.example.mykku.like.domain.LikeFeed
@@ -34,7 +34,7 @@ class LikeServiceTest : BaseServiceTest() {
     private lateinit var memberQueryPort: MemberQueryPort
 
     @Mock
-    private lateinit var boardReader: BoardReader
+    private lateinit var boardQueryPort: BoardQueryPort
 
     @Mock
     private lateinit var likeBoardWriter: LikeBoardWriter
@@ -43,7 +43,7 @@ class LikeServiceTest : BaseServiceTest() {
     private lateinit var likeBoardReader: LikeBoardReader
 
     @Mock
-    private lateinit var dailyMessageCommentReader: DailyMessageCommentReader
+    private lateinit var dailyMessageCommentQueryPort: DailyMessageCommentQueryPort
 
     @Mock
     private lateinit var likeDailyMessageCommentWriter: LikeDailyMessageCommentWriter
@@ -52,7 +52,7 @@ class LikeServiceTest : BaseServiceTest() {
     private lateinit var likeDailyMessageCommentReader: LikeDailyMessageCommentReader
 
     @Mock
-    private lateinit var feedCommentReader: FeedCommentReader
+    private lateinit var feedCommentQueryPort: FeedCommentQueryPort
 
     @Mock
     private lateinit var likeFeedCommentWriter: LikeFeedCommentWriter
@@ -61,7 +61,7 @@ class LikeServiceTest : BaseServiceTest() {
     private lateinit var likeFeedCommentReader: LikeFeedCommentReader
 
     @Mock
-    private lateinit var feedReader: FeedReader
+    private lateinit var feedQueryPort: FeedQueryPort
 
     @Mock
     private lateinit var likeFeedWriter: LikeFeedWriter
@@ -100,7 +100,7 @@ class LikeServiceTest : BaseServiceTest() {
         val likeBoard = LikeBoard(id = 1L, member = member, board = board)
 
         whenever(memberQueryPort.getMemberById(MemberId("member1"))).thenReturn(member)
-        whenever(boardReader.getBoardById(1L)).thenReturn(board)
+        whenever(boardQueryPort.getBoardById(1L)).thenReturn(board)
         whenever(likeBoardWriter.createLikeBoard(board = board, member = member)).thenReturn(likeBoard)
 
         // when
@@ -132,7 +132,7 @@ class LikeServiceTest : BaseServiceTest() {
         val likeFeed = LikeFeed(id = 1L, member = member, feed = feed)
 
         whenever(memberQueryPort.getMemberById(MemberId("member1"))).thenReturn(member)
-        whenever(feedReader.getFeedById(1L)).thenReturn(feed)
+        whenever(feedQueryPort.getFeedById(1L)).thenReturn(feed)
         whenever(likeFeedWriter.createLikeFeed(feed = feed, member = member)).thenReturn(likeFeed)
 
         // when
@@ -174,7 +174,7 @@ class LikeServiceTest : BaseServiceTest() {
         )
 
         whenever(memberQueryPort.getMemberById(MemberId("member1"))).thenReturn(member)
-        whenever(dailyMessageCommentReader.getDailyMessageCommentById(1L)).thenReturn(dailyMessageComment)
+        whenever(dailyMessageCommentQueryPort.getDailyMessageCommentById(1L)).thenReturn(dailyMessageComment)
         whenever(
             likeDailyMessageCommentWriter.createLikeDailyMessageComment(
                 dailyMessageComment = dailyMessageComment,
@@ -218,7 +218,7 @@ class LikeServiceTest : BaseServiceTest() {
         val likeFeedComment = LikeFeedComment(id = 1L, member = member, feedComment = feedComment)
 
         whenever(memberQueryPort.getMemberById(MemberId("member1"))).thenReturn(member)
-        whenever(feedCommentReader.getFeedCommentById(1L)).thenReturn(feedComment)
+        whenever(feedCommentQueryPort.getFeedCommentById(1L)).thenReturn(feedComment)
         whenever(
             likeFeedCommentWriter.createLikeFeedComment(
                 feedComment = feedComment,

@@ -1,9 +1,9 @@
 package com.example.mykku.like
 
-import com.example.mykku.board.tool.BoardReader
-import com.example.mykku.dailymessage.tool.DailyMessageCommentReader
-import com.example.mykku.feed.tool.FeedCommentReader
-import com.example.mykku.feed.tool.FeedReader
+import com.example.mykku.board.application.port.out.BoardQueryPort
+import com.example.mykku.dailymessage.application.port.out.DailyMessageCommentQueryPort
+import com.example.mykku.feed.application.port.out.FeedCommentQueryPort
+import com.example.mykku.feed.application.port.out.FeedQueryPort
 import com.example.mykku.like.dto.*
 import com.example.mykku.like.tool.*
 import com.example.mykku.member.application.port.out.MemberQueryPort
@@ -17,19 +17,19 @@ import org.springframework.transaction.annotation.Transactional
 class LikeService(
     private val memberQueryPort: MemberQueryPort,
 
-    private val boardReader: BoardReader,
+    private val boardQueryPort: BoardQueryPort,
     private val likeBoardWriter: LikeBoardWriter,
     private val likeBoardReader: LikeBoardReader,
 
-    private val dailyMessageCommentReader: DailyMessageCommentReader,
+    private val dailyMessageCommentQueryPort: DailyMessageCommentQueryPort,
     private val likeDailyMessageCommentWriter: LikeDailyMessageCommentWriter,
     private val likeDailyMessageCommentReader: LikeDailyMessageCommentReader,
 
-    private val feedCommentReader: FeedCommentReader,
+    private val feedCommentQueryPort: FeedCommentQueryPort,
     private val likeFeedCommentWriter: LikeFeedCommentWriter,
     private val likeFeedCommentReader: LikeFeedCommentReader,
 
-    private val feedReader: FeedReader,
+    private val feedQueryPort: FeedQueryPort,
     private val likeFeedWriter: LikeFeedWriter,
     private val likeFeedReader: LikeFeedReader,
 
@@ -45,7 +45,7 @@ class LikeService(
     fun likeBoard(request: LikeBoardRequest, memberId: String): LikeBoardResponse {
         likeBoardReader.validateLikeBoardNotExists(memberId = memberId, boardId = request.boardId)
         val member = memberQueryPort.getMemberById(MemberId(memberId))
-        val board = boardReader.getBoardById(request.boardId)
+        val board = boardQueryPort.getBoardById(request.boardId)
         val likeBoard = likeBoardWriter.createLikeBoard(board = board, member = member)
         return LikeBoardResponse(likeBoard)
     }
@@ -60,7 +60,7 @@ class LikeService(
     fun likeFeed(memberId: String, request: LikeFeedRequest): LikeFeedResponse {
         likeFeedReader.validateLikeFeedNotExists(memberId = memberId, feedId = request.feedId)
         val member = memberQueryPort.getMemberById(MemberId(memberId))
-        val feed = feedReader.getFeedById(request.feedId)
+        val feed = feedQueryPort.getFeedById(request.feedId)
         val likeFeed = likeFeedWriter.createLikeFeed(feed = feed, member = member)
 
         eventPublisher.publishEvent(
@@ -90,7 +90,7 @@ class LikeService(
             dailyMessageCommentId = request.dailyMessageCommentId
         )
         val member = memberQueryPort.getMemberById(MemberId(memberId))
-        val dailyMessageComment = dailyMessageCommentReader.getDailyMessageCommentById(request.dailyMessageCommentId)
+        val dailyMessageComment = dailyMessageCommentQueryPort.getDailyMessageCommentById(request.dailyMessageCommentId)
         val likeDailyMessageComment = likeDailyMessageCommentWriter.createLikeDailyMessageComment(
             dailyMessageComment = dailyMessageComment,
             member = member
@@ -117,7 +117,7 @@ class LikeService(
             feedCommentId = request.feedCommentId
         )
         val member = memberQueryPort.getMemberById(MemberId(memberId))
-        val feedComment = feedCommentReader.getFeedCommentById(request.feedCommentId)
+        val feedComment = feedCommentQueryPort.getFeedCommentById(request.feedCommentId)
         val likeFeedComment = likeFeedCommentWriter.createLikeFeedComment(
             feedComment = feedComment,
             member = member

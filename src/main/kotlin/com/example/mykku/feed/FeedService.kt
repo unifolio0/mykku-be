@@ -1,17 +1,17 @@
 package com.example.mykku.feed
 
+import com.example.mykku.board.application.port.out.BoardQueryPort
 import com.example.mykku.board.domain.Board
-import com.example.mykku.board.tool.BoardReader
 import com.example.mykku.contest.tool.ContestParticipationReader
 import com.example.mykku.contest.tool.ContestParticipationWriter
 import com.example.mykku.contest.tool.ContestReader
+import com.example.mykku.feed.application.port.out.FeedQueryPort
+import com.example.mykku.feed.application.port.out.FeedRepositoryPort
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedImage
 import com.example.mykku.feed.domain.FeedTag
 import com.example.mykku.feed.dto.*
 import com.example.mykku.feed.tool.FeedDtoConverter
-import com.example.mykku.feed.tool.FeedReader
-import com.example.mykku.feed.tool.FeedWriter
 import com.example.mykku.image.ImageUploadService
 import com.example.mykku.image.dto.ImageUploadResult
 import com.example.mykku.like.tool.LikeFeedReader
@@ -27,10 +27,10 @@ import org.springframework.web.multipart.MultipartFile
 
 @Service
 class FeedService(
-    private val feedReader: FeedReader,
-    private val feedWriter: FeedWriter,
+    private val feedQueryPort: FeedQueryPort,
+    private val feedRepositoryPort: FeedRepositoryPort,
     private val feedDtoConverter: FeedDtoConverter,
-    private val boardReader: BoardReader,
+    private val boardQueryPort: BoardQueryPort,
     private val memberQueryPort: MemberQueryPort,
     private val likeFeedReader: LikeFeedReader,
     private val saveFeedReader: SaveFeedReader,
@@ -41,10 +41,10 @@ class FeedService(
 ) {
     @Transactional
     fun createFeed(request: CreateFeedRequest, member: Member): CreateFeedResponse {
-        val board = boardReader.getBoardById(request.boardId)
+        val board = boardQueryPort.getBoardById(request.boardId)
         val imageResults = uploadImages(request.images)
 
-        val (feed, feedImages, feedTags) = feedWriter.createFeed(
+        val (feed, feedImages, feedTags) = feedRepositoryPort.createFeed(
             title = request.title,
             content = request.content,
             board = board,
@@ -121,7 +121,7 @@ class FeedService(
     @Transactional(readOnly = true)
     fun getFeeds(memberId: String): FeedsResponse {
         val follower = memberQueryPort.getFollowingMembers(MemberId(memberId))
-        val feeds = feedReader.getFeedsByFollower(follower)
+        val feeds = feedQueryPort.getFeedsByFollower(follower)
         return FeedsResponse(
             feeds = feeds.map { feed -> feedDtoConverter.convertToFeedResponse(memberId, feed) }
         )
@@ -134,7 +134,7 @@ class FeedService(
         minCommonFollowers: Long = 10
     ): PagedFeedsResponse {
         val allMembers = collectMembers(memberId, minCommonFollowers)
-        val feedPage = feedReader.getFeedsByMembersWithPagination(allMembers, pageable)
+        val feedPage = feedQueryPort.getFeedsByMembersWithPagination(allMembers, pageable)
         return createPagedResponse(memberId, feedPage)
     }
 
@@ -164,14 +164,14 @@ class FeedService(
         memberId: String?,
         pageable: Pageable
     ): PagedFeedsResponse {
-        val board = boardReader.getBoardById(boardId)
-        val feedPage = feedReader.getFeedsByBoardWithPagination(board, pageable)
+        val board = boardQueryPort.getBoardById(boardId)
+        val feedPage = feedQueryPort.getFeedsByBoardWithPagination(board, pageable)
         return createPagedResponse(memberId ?: "", feedPage)
     }
 
     @Transactional(readOnly = true)
     fun getFeedDetail(feedId: Long, memberId: String?): FeedDetailResponse {
-        val feed = feedReader.getFeedById(feedId)
+        val feed = feedQueryPort.getFeedById(feedId)
         val feedData = fetchFeedDetailData(feed)
         val interactions = fetchUserInteractions(memberId, feed)
         val contestTagTitles = fetchContestTagTitles(feedData.feedTags)
@@ -181,8 +181,8 @@ class FeedService(
 
     private fun fetchFeedDetailData(feed: Feed): FeedDetailData {
         return FeedDetailData(
-            feedImages = feedReader.getFeedImagesByFeed(feed),
-            feedTags = feedReader.getFeedTagsByFeed(feed)
+            feedImages = feedQueryPort.getFeedImagesByFeed(feed),
+            feedTags = feedQueryPort.getFeedTagsByFeed(feed)
         )
     }
 
@@ -198,7 +198,7 @@ class FeedService(
 
     private fun fetchContestTagTitles(feedTags: List<FeedTag>): Set<String> {
         val tagTitles = feedTags.map { it.title }
-        val contestTags = feedReader.getContestTagsByTitles(tagTitles)
+        val contestTags = feedQueryPort.getContestTagsByTitles(tagTitles)
         return contestTags.map { it.title }.toSet()
     }
 

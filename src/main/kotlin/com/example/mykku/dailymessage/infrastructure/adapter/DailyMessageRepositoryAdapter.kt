@@ -1,22 +1,23 @@
-package com.example.mykku.dailymessage.tool
+package com.example.mykku.dailymessage.infrastructure.adapter
 
+import com.example.mykku.dailymessage.application.port.out.DailyMessageRepositoryPort
 import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.repository.DailyMessageRepository
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
 @Component
-class DailyMessageWriter(
+class DailyMessageRepositoryAdapter(
     private val dailyMessageRepository: DailyMessageRepository
-) {
+) : DailyMessageRepositoryPort {
 
     @Transactional
-    fun save(dailyMessage: DailyMessage): DailyMessage {
+    override fun save(dailyMessage: DailyMessage): DailyMessage {
         return dailyMessageRepository.save(dailyMessage)
     }
 
     @Transactional
-    fun deleteById(id: Long) {
+    override fun deleteById(id: Long) {
         dailyMessageRepository.deleteById(id)
     }
 }
