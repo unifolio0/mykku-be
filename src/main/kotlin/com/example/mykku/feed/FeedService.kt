@@ -15,8 +15,9 @@ import com.example.mykku.feed.tool.FeedWriter
 import com.example.mykku.image.ImageUploadService
 import com.example.mykku.image.dto.ImageUploadResult
 import com.example.mykku.like.tool.LikeFeedReader
+import com.example.mykku.member.application.port.out.MemberQueryPort
 import com.example.mykku.member.domain.Member
-import com.example.mykku.member.tool.MemberReader
+import com.example.mykku.member.domain.model.MemberId
 import com.example.mykku.scrap.tool.SaveFeedReader
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -30,7 +31,7 @@ class FeedService(
     private val feedWriter: FeedWriter,
     private val feedDtoConverter: FeedDtoConverter,
     private val boardReader: BoardReader,
-    private val memberReader: MemberReader,
+    private val memberQueryPort: MemberQueryPort,
     private val likeFeedReader: LikeFeedReader,
     private val saveFeedReader: SaveFeedReader,
     private val imageUploadService: ImageUploadService,
@@ -119,7 +120,7 @@ class FeedService(
 
     @Transactional(readOnly = true)
     fun getFeeds(memberId: String): FeedsResponse {
-        val follower = memberReader.getFollowerByMemberId(memberId)
+        val follower = memberQueryPort.getFollowingMembers(MemberId(memberId))
         val feeds = feedReader.getFeedsByFollower(follower)
         return FeedsResponse(
             feeds = feeds.map { feed -> feedDtoConverter.convertToFeedResponse(memberId, feed) }
@@ -138,9 +139,10 @@ class FeedService(
     }
 
     private fun collectMembers(memberId: String, minCommonFollowers: Long): List<Member> {
-        val followingMembers = memberReader.getFollowerByMemberId(memberId)
-        val recommendedMembers = memberReader.getRecommendedMembersByCommonFollowers(
-            memberId, minCommonFollowers
+        val memberIdValue = MemberId(memberId)
+        val followingMembers = memberQueryPort.getFollowingMembers(memberIdValue)
+        val recommendedMembers = memberQueryPort.getRecommendedMembersByCommonFollowers(
+            memberIdValue, minCommonFollowers
         )
         return (followingMembers + recommendedMembers).distinct()
     }

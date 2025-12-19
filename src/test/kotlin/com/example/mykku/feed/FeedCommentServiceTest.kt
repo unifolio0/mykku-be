@@ -12,8 +12,9 @@ import com.example.mykku.feed.tool.FeedCommentReader
 import com.example.mykku.feed.tool.FeedCommentWriter
 import com.example.mykku.feed.tool.FeedReader
 import com.example.mykku.like.tool.LikeFeedCommentReader
+import com.example.mykku.member.application.port.out.MemberQueryPort
 import com.example.mykku.member.domain.Member
-import com.example.mykku.member.tool.MemberReader
+import com.example.mykku.member.domain.model.MemberId
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.InjectMocks
@@ -41,7 +42,7 @@ class FeedCommentServiceTest : BaseServiceTest() {
     private lateinit var likeFeedCommentReader: LikeFeedCommentReader
 
     @Mock
-    private lateinit var memberReader: MemberReader
+    private lateinit var memberQueryPort: MemberQueryPort
 
     @InjectMocks
     private lateinit var feedCommentService: FeedCommentService
@@ -184,7 +185,7 @@ class FeedCommentServiceTest : BaseServiceTest() {
         )
 
         whenever(feedReader.getFeedById(1L)).thenReturn(feed)
-        whenever(memberReader.getMemberById("member1")).thenReturn(member)
+        whenever(memberQueryPort.getMemberById(MemberId("member1"))).thenReturn(member)
         whenever(feedCommentWriter.createComment("새 댓글", feed, member, null)).thenReturn(savedComment)
 
         // when
@@ -218,7 +219,7 @@ class FeedCommentServiceTest : BaseServiceTest() {
         )
 
         whenever(feedReader.getFeedById(1L)).thenReturn(feed)
-        whenever(memberReader.getMemberById("member1")).thenReturn(member)
+        whenever(memberQueryPort.getMemberById(MemberId("member1"))).thenReturn(member)
         whenever(feedCommentReader.getFeedCommentById(1L)).thenReturn(parentComment)
         whenever(feedCommentWriter.createComment("답글", feed, member, parentComment)).thenReturn(savedReply)
 

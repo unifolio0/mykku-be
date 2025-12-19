@@ -7,7 +7,8 @@ import com.example.mykku.dailymessage.tool.DailyMessageCommentReader
 import com.example.mykku.dailymessage.tool.DailyMessageCommentWriter
 import com.example.mykku.dailymessage.tool.DailyMessageReader
 import com.example.mykku.dailymessage.exception.DailyMessageException
-import com.example.mykku.member.tool.MemberReader
+import com.example.mykku.member.application.port.out.MemberQueryPort
+import com.example.mykku.member.domain.model.MemberId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -16,7 +17,7 @@ class DailyMessageCommentService(
     private val dailyMessageReader: DailyMessageReader,
     private val dailyMessageCommentReader: DailyMessageCommentReader,
     private val dailyMessageCommentWriter: DailyMessageCommentWriter,
-    private val memberReader: MemberReader,
+    private val memberQueryPort: MemberQueryPort,
 ) {
     @Transactional
     fun createComment(
@@ -25,7 +26,7 @@ class DailyMessageCommentService(
         request: CreateCommentRequest,
     ): CommentResponse {
         val dailyMessage = dailyMessageReader.getDailyMessage(dailyMessageId)
-        val member = memberReader.getMemberById(memberId)
+        val member = memberQueryPort.getMemberById(MemberId(memberId))
 
         val parentComment = request.parentCommentId?.let { parentId ->
             dailyMessageCommentReader.getCommentByDailyMessageId(parentId, dailyMessageId)

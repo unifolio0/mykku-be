@@ -19,9 +19,10 @@ import com.example.mykku.feed.tool.FeedWriter
 import com.example.mykku.image.ImageUploadService
 import com.example.mykku.image.dto.ImageUploadResult
 import com.example.mykku.like.tool.LikeFeedReader
+import com.example.mykku.member.application.port.out.MemberQueryPort
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
-import com.example.mykku.member.tool.MemberReader
+import com.example.mykku.member.domain.model.MemberId
 import com.example.mykku.scrap.tool.SaveFeedReader
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -55,7 +56,7 @@ class FeedServiceTest : BaseServiceTest() {
     private lateinit var boardReader: BoardReader
 
     @Mock
-    private lateinit var memberReader: MemberReader
+    private lateinit var memberQueryPort: MemberQueryPort
 
     @Mock
     private lateinit var likeFeedReader: LikeFeedReader
@@ -219,7 +220,7 @@ class FeedServiceTest : BaseServiceTest() {
             feedWriter = feedWriter,
             feedDtoConverter = feedDtoConverter,
             boardReader = boardReader,
-            memberReader = memberReader,
+            memberQueryPort = memberQueryPort,
             likeFeedReader = likeFeedReader,
             saveFeedReader = saveFeedReader,
             imageUploadService = noOpImageUploadService,
@@ -272,7 +273,7 @@ class FeedServiceTest : BaseServiceTest() {
             parentComment = null
         )
 
-        whenever(memberReader.getFollowerByMemberId("member1")).thenReturn(listOf(follower))
+        whenever(memberQueryPort.getFollowingMembers(MemberId("member1"))).thenReturn(listOf(follower))
         whenever(feedReader.getFeedsByFollower(listOf(follower))).thenReturn(listOf(feed))
         
         // FeedDtoConverter mocking
@@ -343,8 +344,8 @@ class FeedServiceTest : BaseServiceTest() {
         val pageable = PageRequest.of(0, 10)
         val feedPage = PageImpl(listOf(feed1, feed2), pageable, 2)
         
-        whenever(memberReader.getFollowerByMemberId(memberId)).thenReturn(listOf(followingMember))
-        whenever(memberReader.getRecommendedMembersByCommonFollowers(memberId, 10L))
+        whenever(memberQueryPort.getFollowingMembers(MemberId(memberId))).thenReturn(listOf(followingMember))
+        whenever(memberQueryPort.getRecommendedMembersByCommonFollowers(MemberId(memberId), 10L))
             .thenReturn(listOf(recommendedMember))
         whenever(feedReader.getFeedsByMembersWithPagination(any(), eq(pageable)))
             .thenReturn(feedPage)
@@ -607,8 +608,8 @@ class FeedServiceTest : BaseServiceTest() {
         val pageable = PageRequest.of(0, 10)
         val feedPage = PageImpl(listOf(feed), pageable, 1)
         
-        whenever(memberReader.getFollowerByMemberId(memberId)).thenReturn(emptyList())
-        whenever(memberReader.getRecommendedMembersByCommonFollowers(memberId, 10L))
+        whenever(memberQueryPort.getFollowingMembers(MemberId(memberId))).thenReturn(emptyList())
+        whenever(memberQueryPort.getRecommendedMembersByCommonFollowers(MemberId(memberId), 10L))
             .thenReturn(listOf(recommendedMember))
         whenever(feedReader.getFeedsByMembersWithPagination(listOf(recommendedMember), pageable))
             .thenReturn(feedPage)
@@ -642,8 +643,8 @@ class FeedServiceTest : BaseServiceTest() {
         val pageable = PageRequest.of(0, 10)
         val feedPage = PageImpl<Feed>(emptyList(), pageable, 0)
         
-        whenever(memberReader.getFollowerByMemberId(memberId)).thenReturn(emptyList())
-        whenever(memberReader.getRecommendedMembersByCommonFollowers(memberId, minCommonFollowers))
+        whenever(memberQueryPort.getFollowingMembers(MemberId(memberId))).thenReturn(emptyList())
+        whenever(memberQueryPort.getRecommendedMembersByCommonFollowers(MemberId(memberId), minCommonFollowers))
             .thenReturn(emptyList())
         whenever(feedReader.getFeedsByMembersWithPagination(emptyList(), pageable))
             .thenReturn(feedPage)

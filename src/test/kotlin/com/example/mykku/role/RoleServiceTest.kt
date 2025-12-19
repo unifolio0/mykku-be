@@ -1,7 +1,7 @@
 package com.example.mykku.role
 
+import com.example.mykku.member.application.port.out.MemberQueryPort
 import com.example.mykku.member.domain.Member
-import com.example.mykku.member.tool.MemberWriter
 import com.example.mykku.role.domain.MemberRole
 import com.example.mykku.role.domain.Role
 import com.example.mykku.role.exception.RoleErrorCode
@@ -25,7 +25,7 @@ class RoleServiceTest {
     private lateinit var memberRoleReader: MemberRoleReader
 
     @Mock
-    private lateinit var memberWriter: MemberWriter
+    private lateinit var memberQueryPort: MemberQueryPort
 
     @InjectMocks
     private lateinit var roleService: RoleService
@@ -87,7 +87,7 @@ class RoleServiceTest {
 
         assertThat(member.role).isEqualTo(role2)
         verify(memberRoleReader).getMemberRoleById(1L, member)
-        verify(memberWriter).save(member)
+        verify(memberQueryPort).saveMember(member)
     }
 
     @Test

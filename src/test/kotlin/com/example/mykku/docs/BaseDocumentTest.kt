@@ -14,7 +14,7 @@ import com.example.mykku.feed.FeedCommentService
 import com.example.mykku.feed.FeedService
 import com.example.mykku.home.HomeService
 import com.example.mykku.like.LikeService
-import com.example.mykku.member.MemberService
+import com.example.mykku.member.application.port.`in`.ChangePasswordUseCase
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.repository.MemberRepository
@@ -85,7 +85,7 @@ abstract class BaseDocumentTest {
     protected lateinit var notificationService: NotificationService
 
     @MockitoBean
-    protected lateinit var memberService: MemberService
+    protected lateinit var changePasswordUseCase: ChangePasswordUseCase
 
     @MockitoBean
     protected lateinit var likeService: LikeService

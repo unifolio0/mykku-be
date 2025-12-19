@@ -18,7 +18,8 @@ import com.example.mykku.like.dto.LikeDailyMessageCommentRequest
 import com.example.mykku.like.dto.LikeFeedCommentRequest
 import com.example.mykku.like.dto.LikeFeedRequest
 import com.example.mykku.like.tool.*
-import com.example.mykku.member.tool.MemberReader
+import com.example.mykku.member.application.port.out.MemberQueryPort
+import com.example.mykku.member.domain.model.MemberId
 import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
@@ -30,7 +31,7 @@ import kotlin.test.assertEquals
 class LikeServiceTest : BaseServiceTest() {
 
     @Mock
-    private lateinit var memberReader: MemberReader
+    private lateinit var memberQueryPort: MemberQueryPort
 
     @Mock
     private lateinit var boardReader: BoardReader
@@ -98,7 +99,7 @@ class LikeServiceTest : BaseServiceTest() {
         val request = LikeBoardRequest(boardId = 1L)
         val likeBoard = LikeBoard(id = 1L, member = member, board = board)
 
-        whenever(memberReader.getMemberById("member1")).thenReturn(member)
+        whenever(memberQueryPort.getMemberById(MemberId("member1"))).thenReturn(member)
         whenever(boardReader.getBoardById(1L)).thenReturn(board)
         whenever(likeBoardWriter.createLikeBoard(board = board, member = member)).thenReturn(likeBoard)
 
@@ -130,7 +131,7 @@ class LikeServiceTest : BaseServiceTest() {
         val request = LikeFeedRequest(feedId = 1L)
         val likeFeed = LikeFeed(id = 1L, member = member, feed = feed)
 
-        whenever(memberReader.getMemberById("member1")).thenReturn(member)
+        whenever(memberQueryPort.getMemberById(MemberId("member1"))).thenReturn(member)
         whenever(feedReader.getFeedById(1L)).thenReturn(feed)
         whenever(likeFeedWriter.createLikeFeed(feed = feed, member = member)).thenReturn(likeFeed)
 
@@ -172,7 +173,7 @@ class LikeServiceTest : BaseServiceTest() {
             dailyMessageComment = dailyMessageComment
         )
 
-        whenever(memberReader.getMemberById("member1")).thenReturn(member)
+        whenever(memberQueryPort.getMemberById(MemberId("member1"))).thenReturn(member)
         whenever(dailyMessageCommentReader.getDailyMessageCommentById(1L)).thenReturn(dailyMessageComment)
         whenever(
             likeDailyMessageCommentWriter.createLikeDailyMessageComment(
@@ -216,7 +217,7 @@ class LikeServiceTest : BaseServiceTest() {
         val request = LikeFeedCommentRequest(feedCommentId = 1L)
         val likeFeedComment = LikeFeedComment(id = 1L, member = member, feedComment = feedComment)
 
-        whenever(memberReader.getMemberById("member1")).thenReturn(member)
+        whenever(memberQueryPort.getMemberById(MemberId("member1"))).thenReturn(member)
         whenever(feedCommentReader.getFeedCommentById(1L)).thenReturn(feedComment)
         whenever(
             likeFeedCommentWriter.createLikeFeedComment(

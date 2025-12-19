@@ -4,8 +4,8 @@ import com.example.mykku.auth.dto.*
 import com.example.mykku.auth.tool.JwtTokenProvider
 import com.example.mykku.auth.tool.OAuthLoginStrategy
 import com.example.mykku.auth.exception.AuthException
+import com.example.mykku.member.application.port.out.MemberQueryPort
 import com.example.mykku.member.domain.SocialProvider
-import com.example.mykku.member.tool.MemberReader
 import com.example.mykku.BaseServiceTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -19,7 +19,7 @@ class AuthServiceTest : BaseServiceTest() {
     private lateinit var jwtTokenProvider: JwtTokenProvider
 
     @Mock
-    private lateinit var memberReader: MemberReader
+    private lateinit var memberQueryPort: MemberQueryPort
 
     @Mock
     private lateinit var googleLoginStrategy: OAuthLoginStrategy
@@ -39,7 +39,7 @@ class AuthServiceTest : BaseServiceTest() {
     fun setUp() {
         authService = AuthService(
             jwtTokenProvider,
-            memberReader,
+            memberQueryPort,
             listOf(googleLoginStrategy, kakaoLoginStrategy, appleLoginStrategy, naverLoginStrategy)
         )
     }

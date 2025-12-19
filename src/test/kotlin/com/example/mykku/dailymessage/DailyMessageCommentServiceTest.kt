@@ -10,8 +10,9 @@ import com.example.mykku.dailymessage.tool.DailyMessageCommentWriter
 import com.example.mykku.dailymessage.tool.DailyMessageReader
 import com.example.mykku.dailymessage.exception.DailyMessageException
 import com.example.mykku.dailymessage.exception.DailyMessageErrorCode
+import com.example.mykku.member.application.port.out.MemberQueryPort
 import com.example.mykku.member.domain.Member
-import com.example.mykku.member.tool.MemberReader
+import com.example.mykku.member.domain.model.MemberId
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.InjectMocks
@@ -33,7 +34,7 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
     private lateinit var dailyMessageCommentWriter: DailyMessageCommentWriter
 
     @Mock
-    private lateinit var memberReader: MemberReader
+    private lateinit var memberQueryPort: MemberQueryPort
 
     @InjectMocks
     private lateinit var dailyMessageCommentService: DailyMessageCommentService
@@ -88,7 +89,7 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
         )
 
         whenever(dailyMessageReader.getDailyMessage(1L)).thenReturn(dailyMessage)
-        whenever(memberReader.getMemberById("member1")).thenReturn(member)
+        whenever(memberQueryPort.getMemberById(MemberId("member1"))).thenReturn(member)
         whenever(dailyMessageCommentWriter.createComment(
             content = request.content,
             dailyMessage = dailyMessage,
@@ -127,7 +128,7 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
         )
 
         whenever(dailyMessageReader.getDailyMessage(1L)).thenReturn(dailyMessage)
-        whenever(memberReader.getMemberById("member1")).thenReturn(member)
+        whenever(memberQueryPort.getMemberById(MemberId("member1"))).thenReturn(member)
         whenever(dailyMessageCommentReader.getCommentByDailyMessageId(2L, 1L)).thenReturn(parentComment)
         whenever(dailyMessageCommentWriter.createComment(
             content = request.content,

@@ -1,6 +1,7 @@
 package com.example.mykku.admin.service
 
-import com.example.mykku.member.tool.MemberReader
+import com.example.mykku.member.application.port.out.MemberQueryPort
+import com.example.mykku.member.domain.model.MemberId
 import com.example.mykku.role.dto.CreateRoleRequest
 import com.example.mykku.role.dto.MemberRoleResponse
 import com.example.mykku.role.dto.RoleResponse
@@ -20,7 +21,7 @@ class AdminRoleService(
     private val roleWriter: RoleWriter,
     private val memberRoleWriter: MemberRoleWriter,
     private val memberRoleReader: MemberRoleReader,
-    private val memberReader: MemberReader
+    private val memberQueryPort: MemberQueryPort
 ) {
     fun getAllRoles(): List<RoleResponse> {
         val roles = roleReader.getAllRoles()
@@ -44,7 +45,7 @@ class AdminRoleService(
     fun deleteRole(roleId: Long) {
         val role = roleReader.getRoleById(roleId)
 
-        if (memberReader.existsByRole(role)) {
+        if (memberQueryPort.existsByRoleId(role.id!!)) {
             throw RoleException.roleInUse()
         }
 
@@ -58,7 +59,7 @@ class AdminRoleService(
     @Transactional
     fun assignRoleToMember(roleId: Long, memberId: String): MemberRoleResponse {
         val role = roleReader.getRoleById(roleId)
-        val member = memberReader.getMemberById(memberId)
+        val member = memberQueryPort.getMemberById(MemberId(memberId))
 
         val memberRole = memberRoleWriter.assignRole(member, role)
         return MemberRoleResponse(memberRole, member)

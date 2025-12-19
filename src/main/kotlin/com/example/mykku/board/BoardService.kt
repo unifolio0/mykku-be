@@ -7,7 +7,8 @@ import com.example.mykku.board.dto.UpdateBoardResponse
 import com.example.mykku.board.tool.BoardReader
 import com.example.mykku.board.tool.BoardWriter
 import com.example.mykku.like.tool.LikeBoardWriter
-import com.example.mykku.member.tool.MemberReader
+import com.example.mykku.member.application.port.out.MemberQueryPort
+import com.example.mykku.member.domain.model.MemberId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -15,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional
 class BoardService(
     private val boardReader: BoardReader,
     private val boardWriter: BoardWriter,
-    private val memberReader: MemberReader,
+    private val memberQueryPort: MemberQueryPort,
     private val likeBoardWriter: LikeBoardWriter
 ) {
     @Transactional
@@ -28,7 +29,7 @@ class BoardService(
             title = request.title,
             logo = request.logo
         )
-        val member = memberReader.getMemberById(memberId)
+        val member = memberQueryPort.getMemberById(MemberId(memberId))
         likeBoardWriter.createLikeBoard(
             member = member,
             board = board

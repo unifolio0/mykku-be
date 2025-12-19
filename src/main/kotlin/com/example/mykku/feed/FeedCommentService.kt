@@ -12,7 +12,8 @@ import com.example.mykku.feed.tool.FeedCommentReader
 import com.example.mykku.feed.tool.FeedCommentWriter
 import com.example.mykku.feed.tool.FeedReader
 import com.example.mykku.like.tool.LikeFeedCommentReader
-import com.example.mykku.member.tool.MemberReader
+import com.example.mykku.member.application.port.out.MemberQueryPort
+import com.example.mykku.member.domain.model.MemberId
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -23,7 +24,7 @@ class FeedCommentService(
     private val feedCommentReader: FeedCommentReader,
     private val feedCommentWriter: FeedCommentWriter,
     private val likeFeedCommentReader: LikeFeedCommentReader,
-    private val memberReader: MemberReader,
+    private val memberQueryPort: MemberQueryPort,
 ) {
     @Transactional(readOnly = true)
     fun getComments(feedId: Long, memberId: String?, pageable: Pageable): FeedCommentsResponse {
@@ -84,7 +85,7 @@ class FeedCommentService(
         request: CreateFeedCommentRequest,
     ): SingleFeedCommentResponse {
         val feed = feedReader.getFeedById(feedId)
-        val member = memberReader.getMemberById(memberId)
+        val member = memberQueryPort.getMemberById(MemberId(memberId))
 
         val parentComment = request.parentCommentId?.let { parentId ->
             feedCommentReader.getFeedCommentById(parentId)

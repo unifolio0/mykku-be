@@ -1,7 +1,8 @@
 package com.example.mykku.admin.service
 
+import com.example.mykku.member.application.port.out.MemberQueryPort
 import com.example.mykku.member.domain.Member
-import com.example.mykku.member.tool.MemberReader
+import com.example.mykku.member.domain.model.MemberId
 import com.example.mykku.role.domain.MemberRole
 import com.example.mykku.role.domain.Role
 import com.example.mykku.role.dto.CreateRoleRequest
@@ -20,7 +21,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -34,7 +34,7 @@ class AdminRoleServiceTest {
     private lateinit var roleWriter: RoleWriter
 
     @Mock
-    private lateinit var memberReader: MemberReader
+    private lateinit var memberQueryPort: MemberQueryPort
 
     @Mock
     private lateinit var memberRoleReader: MemberRoleReader
@@ -118,13 +118,13 @@ class AdminRoleServiceTest {
     @Test
     fun `칭호를 삭제할 수 있다`() {
         whenever(roleReader.getRoleById(1L)).thenReturn(role)
-        whenever(memberReader.existsByRole(role)).thenReturn(false)
+        whenever(memberQueryPort.existsByRoleId(role.id!!)).thenReturn(false)
         whenever(memberRoleReader.existsByRole(role)).thenReturn(false)
 
         adminRoleService.deleteRole(1L)
 
         verify(roleReader).getRoleById(1L)
-        verify(memberReader).existsByRole(role)
+        verify(memberQueryPort).existsByRoleId(role.id!!)
         verify(memberRoleReader).existsByRole(role)
         verify(roleWriter).delete(role)
     }
@@ -142,13 +142,13 @@ class AdminRoleServiceTest {
         whenever(memberRole.role).thenReturn(role)
         whenever(memberRole.createdAt).thenReturn(java.time.LocalDateTime.now())
         whenever(roleReader.getRoleById(1L)).thenReturn(role)
-        whenever(memberReader.getMemberById("test-id")).thenReturn(member)
+        whenever(memberQueryPort.getMemberById(MemberId("test-id"))).thenReturn(member)
         whenever(memberRoleWriter.assignRole(member, role)).thenReturn(memberRole)
 
         adminRoleService.assignRoleToMember(1L, "test-id")
 
         verify(roleReader).getRoleById(1L)
-        verify(memberReader).getMemberById("test-id")
+        verify(memberQueryPort).getMemberById(MemberId("test-id"))
         verify(memberRoleWriter).assignRole(member, role)
     }
 }
