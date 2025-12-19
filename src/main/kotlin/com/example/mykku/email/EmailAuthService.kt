@@ -14,8 +14,8 @@ import com.example.mykku.member.domain.model.MemberDomain
 import com.example.mykku.member.domain.model.MemberId
 import com.example.mykku.member.domain.model.Nickname
 import com.example.mykku.member.domain.model.Password
-import com.example.mykku.role.tool.MemberRoleWriter
-import com.example.mykku.role.tool.RoleReader
+import com.example.mykku.role.application.port.out.MemberRoleRepositoryPort
+import com.example.mykku.role.application.port.out.RoleQueryPort
 import java.util.UUID
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -29,8 +29,8 @@ class EmailAuthService(
     private val memberRepositoryPort: MemberRepositoryPort,
     private val passwordEncoder: PasswordEncoder,
     private val jwtTokenProvider: JwtTokenProvider,
-    private val roleReader: RoleReader,
-    private val memberRoleWriter: MemberRoleWriter
+    private val roleQueryPort: RoleQueryPort,
+    private val memberRoleRepositoryPort: MemberRoleRepositoryPort
 ) {
 
     @Transactional

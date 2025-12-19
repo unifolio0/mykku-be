@@ -2,9 +2,9 @@ package com.example.mykku.feed
 
 import com.example.mykku.board.application.port.out.BoardQueryPort
 import com.example.mykku.board.domain.Board
-import com.example.mykku.contest.tool.ContestParticipationReader
-import com.example.mykku.contest.tool.ContestParticipationWriter
-import com.example.mykku.contest.tool.ContestReader
+import com.example.mykku.contest.application.port.out.ContestParticipationQueryPort
+import com.example.mykku.contest.application.port.out.ContestParticipationRepositoryPort
+import com.example.mykku.contest.application.port.out.ContestQueryPort
 import com.example.mykku.feed.application.port.out.FeedQueryPort
 import com.example.mykku.feed.application.port.out.FeedRepositoryPort
 import com.example.mykku.feed.domain.Feed
@@ -14,11 +14,11 @@ import com.example.mykku.feed.dto.*
 import com.example.mykku.feed.tool.FeedDtoConverter
 import com.example.mykku.image.ImageUploadService
 import com.example.mykku.image.dto.ImageUploadResult
-import com.example.mykku.like.tool.LikeFeedReader
+import com.example.mykku.like.application.port.out.LikeFeedQueryPort
 import com.example.mykku.member.application.port.out.MemberQueryPort
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.model.MemberId
-import com.example.mykku.scrap.tool.SaveFeedReader
+import com.example.mykku.scrap.application.port.out.SaveFeedQueryPort
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -32,12 +32,12 @@ class FeedService(
     private val feedDtoConverter: FeedDtoConverter,
     private val boardQueryPort: BoardQueryPort,
     private val memberQueryPort: MemberQueryPort,
-    private val likeFeedReader: LikeFeedReader,
-    private val saveFeedReader: SaveFeedReader,
+    private val likeFeedQueryPort: LikeFeedQueryPort,
+    private val saveFeedQueryPort: SaveFeedQueryPort,
     private val imageUploadService: ImageUploadService,
-    private val contestReader: ContestReader,
-    private val contestParticipationWriter: ContestParticipationWriter,
-    private val contestParticipationReader: ContestParticipationReader
+    private val contestQueryPort: ContestQueryPort,
+    private val contestParticipationRepositoryPort: ContestParticipationRepositoryPort,
+    private val contestParticipationQueryPort: ContestParticipationQueryPort
 ) {
     @Transactional
     fun createFeed(request: CreateFeedRequest, member: Member): CreateFeedResponse {
@@ -66,15 +66,15 @@ class FeedService(
         if (feedTags.isEmpty()) return
 
         val feedTagTitles = feedTags.map { it.title }.toSet()
-        val activeContestsWithTags = contestReader.getActiveContestsWithAllTags()
+        val activeContestsWithTags = contestQueryPort.getActiveContestsWithAllTags()
 
         activeContestsWithTags
             .filter { (_, requiredTags) ->
                 requiredTags.isNotEmpty() && feedTagTitles.containsAll(requiredTags)
             }
             .forEach { (contest, _) ->
-                if (!contestParticipationReader.existsByMemberAndContestAndFeed(member, contest, feed)) {
-                    contestParticipationWriter.participateViaFeed(member, contest, feed)
+                if (!contestParticipationQueryPort.existsByMemberAndContestAndFeed(member, contest, feed)) {
+                    contestParticipationRepositoryPort.participateViaFeed(member, contest, feed)
                 }
             }
     }
@@ -191,8 +191,8 @@ class FeedService(
         feed: Feed
     ): UserInteractions {
         return UserInteractions(
-            isLiked = memberId?.let { likeFeedReader.isLiked(it, feed) } ?: false,
-            isSaved = memberId?.let { saveFeedReader.isSaved(it, feed) } ?: false
+            isLiked = memberId?.let { likeFeedQueryPort.isLiked(it, feed) } ?: false,
+            isSaved = memberId?.let { saveFeedQueryPort.isSaved(it, feed) } ?: false
         )
     }
 

@@ -1,7 +1,7 @@
 package com.example.mykku.auth.tool.strategy
 
+import com.example.mykku.auth.application.port.out.JwtTokenPort
 import com.example.mykku.auth.dto.LoginResponse
-import com.example.mykku.auth.tool.JwtTokenProvider
 import com.example.mykku.auth.tool.MemberOrchestrator
 import com.example.mykku.auth.tool.OAuthLoginStrategy
 import com.example.mykku.auth.tool.OAuthMemberExtractor
@@ -14,7 +14,7 @@ class GoogleLoginStrategy(
     private val googleOauthClient: GoogleOauthClient,
     private val oauthMemberExtractor: OAuthMemberExtractor,
     private val memberOrchestrator: MemberOrchestrator,
-    private val jwtTokenProvider: JwtTokenProvider
+    private val jwtTokenPort: JwtTokenPort
 ) : OAuthLoginStrategy {
 
     override fun supports(provider: SocialProvider): Boolean {
@@ -25,6 +25,6 @@ class GoogleLoginStrategy(
         val userInfo = googleOauthClient.verifyAndGetUserInfo(token)
         val memberInfo = oauthMemberExtractor.extractFromGoogle(userInfo)
         val (member, isExistingUser) = memberOrchestrator.findOrCreate(memberInfo)
-        return jwtTokenProvider.createLoginResponse(member, memberInfo.email, isExistingUser)
+        return jwtTokenPort.createLoginResponse(member, memberInfo.email, isExistingUser)
     }
 }

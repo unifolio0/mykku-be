@@ -8,8 +8,8 @@ import com.example.mykku.feed.domain.FeedImage
 import com.example.mykku.feed.domain.FeedTag
 import com.example.mykku.feed.dto.AuthorResponse
 import com.example.mykku.feed.dto.FeedResponse
-import com.example.mykku.like.tool.LikeFeedReader
-import com.example.mykku.scrap.tool.SaveFeedReader
+import com.example.mykku.like.application.port.out.LikeFeedQueryPort
+import com.example.mykku.scrap.application.port.out.SaveFeedQueryPort
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Component
 
@@ -17,8 +17,8 @@ import org.springframework.stereotype.Component
 class FeedDtoConverter(
     private val feedQueryPort: FeedQueryPort,
     private val feedCommentQueryPort: FeedCommentQueryPort,
-    private val likeFeedReader: LikeFeedReader,
-    private val saveFeedReader: SaveFeedReader
+    private val likeFeedQueryPort: LikeFeedQueryPort,
+    private val saveFeedQueryPort: SaveFeedQueryPort
 ) {
 
     fun convertToFeedResponse(
@@ -61,11 +61,11 @@ class FeedDtoConverter(
 
     private fun fetchInteractions(memberId: String, feed: Feed): InteractionData {
         val isLiked = if (memberId.isNotEmpty()) {
-            likeFeedReader.isLiked(memberId, feed)
+            likeFeedQueryPort.isLiked(memberId, feed)
         } else false
 
         val isSaved = if (memberId.isNotEmpty()) {
-            saveFeedReader.isSaved(memberId, feed)
+            saveFeedQueryPort.isSaved(memberId, feed)
         } else false
 
         return InteractionData(isLiked, isSaved)
@@ -111,11 +111,11 @@ class FeedDtoConverter(
 
     private fun fetchBatchInteractions(memberId: String, feeds: List<Feed>): BatchInteractions {
         val likedFeedIds = if (memberId.isNotEmpty()) {
-            likeFeedReader.getLikedFeedsByMember(memberId, feeds)
+            likeFeedQueryPort.getLikedFeedsByMember(memberId, feeds)
         } else emptySet()
 
         val savedFeedIds = if (memberId.isNotEmpty()) {
-            saveFeedReader.getSavedFeedsByMember(memberId, feeds)
+            saveFeedQueryPort.getSavedFeedsByMember(memberId, feeds)
         } else emptySet()
 
         return BatchInteractions(likedFeedIds, savedFeedIds)

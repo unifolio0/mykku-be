@@ -3,8 +3,8 @@ package com.example.mykku.home
 import com.example.mykku.BaseServiceTest
 import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.application.port.out.DailyMessageQueryPort
+import com.example.mykku.event.application.port.out.EventQueryPort
 import com.example.mykku.event.dto.EventPreviewResponse
-import com.example.mykku.event.tool.EventReader
 import com.example.mykku.feed.application.port.out.FeedQueryPort
 import com.example.mykku.feed.dto.FeedPreviewResponse
 import org.junit.jupiter.api.Test
@@ -23,7 +23,7 @@ class HomeServiceTest : BaseServiceTest() {
     private lateinit var feedQueryPort: FeedQueryPort
 
     @Mock
-    private lateinit var eventReader: EventReader
+    private lateinit var eventQueryPort: EventQueryPort
 
     @InjectMocks
     private lateinit var homeService: HomeService
@@ -41,7 +41,7 @@ class HomeServiceTest : BaseServiceTest() {
         val feeds = listOf<FeedPreviewResponse>()
 
         whenever(dailyMessageQueryPort.getTodayDailyMessage()).thenReturn(dailyMessage)
-        whenever(eventReader.getProcessingEventPreviews()).thenReturn(events)
+        whenever(eventQueryPort.getProcessingEventPreviews()).thenReturn(events)
         whenever(feedQueryPort.getFeedPreviews()).thenReturn(feeds)
 
         // when

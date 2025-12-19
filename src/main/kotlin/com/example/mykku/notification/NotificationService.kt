@@ -1,12 +1,12 @@
 package com.example.mykku.notification
 
 import com.example.mykku.member.domain.Member
+import com.example.mykku.notification.application.port.out.NotificationQueryPort
+import com.example.mykku.notification.application.port.out.NotificationRepositoryPort
+import com.example.mykku.notification.application.port.out.NotificationSettingQueryPort
 import com.example.mykku.notification.domain.NotificationType
 import com.example.mykku.notification.dto.NotificationResponse
 import com.example.mykku.notification.exception.NotificationException
-import com.example.mykku.notification.tool.NotificationReader
-import com.example.mykku.notification.tool.NotificationSettingReader
-import com.example.mykku.notification.tool.NotificationWriter
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -14,54 +14,54 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class NotificationService(
-    private val notificationReader: NotificationReader,
-    private val notificationWriter: NotificationWriter,
-    private val notificationSettingReader: NotificationSettingReader,
+    private val notificationQueryPort: NotificationQueryPort,
+    private val notificationRepositoryPort: NotificationRepositoryPort,
+    private val notificationSettingQueryPort: NotificationSettingQueryPort,
     private val fcmService: FcmService
 ) {
 
     @Transactional(readOnly = true)
     fun getNotifications(member: Member, pageable: Pageable): Page<NotificationResponse> {
-        val notifications = notificationReader.getNotificationsByReceiver(member, pageable)
+        val notifications = notificationQueryPort.getNotificationsByReceiver(member, pageable)
         return notifications.map { NotificationResponse.from(it) }
     }
 
     @Transactional(readOnly = true)
     fun getUnreadNotifications(member: Member, pageable: Pageable): Page<NotificationResponse> {
-        val notifications = notificationReader.getUnreadNotifications(member, pageable)
+        val notifications = notificationQueryPort.getUnreadNotifications(member, pageable)
         return notifications.map { NotificationResponse.from(it) }
     }
 
     @Transactional(readOnly = true)
     fun getUnreadCount(member: Member): Long {
-        return notificationReader.getUnreadCount(member)
+        return notificationQueryPort.getUnreadCount(member)
     }
 
     @Transactional
     fun markAsRead(notificationId: Long, member: Member) {
-        val notification = notificationReader.getNotificationById(notificationId)
+        val notification = notificationQueryPort.getNotificationById(notificationId)
 
         if (notification.receiver.id != member.id) {
             throw NotificationException.notificationNotAuthorized()
         }
 
-        notificationWriter.markAsRead(notification)
+        notificationRepositoryPort.markAsRead(notification)
     }
 
     @Transactional
     fun markAllAsRead(member: Member) {
-        notificationWriter.markAllAsReadByReceiver(member)
+        notificationRepositoryPort.markAllAsReadByReceiver(member)
     }
 
     @Transactional
     fun deleteNotification(notificationId: Long, member: Member) {
-        val notification = notificationReader.getNotificationById(notificationId)
+        val notification = notificationQueryPort.getNotificationById(notificationId)
 
         if (notification.receiver.id != member.id) {
             throw NotificationException.notificationNotAuthorized()
         }
 
-        notificationWriter.deleteNotification(notification)
+        notificationRepositoryPort.deleteNotification(notification)
     }
 
     @Transactional
@@ -77,11 +77,11 @@ class NotificationService(
             "Notification content exceeds maximum length of 500 characters: ${content.length}"
         }
 
-        if (!notificationSettingReader.isNotificationEnabled(receiver, type)) {
+        if (!notificationSettingQueryPort.isNotificationEnabled(receiver, type)) {
             return
         }
 
-        val notification = notificationWriter.createNotification(
+        val notification = notificationRepositoryPort.createNotification(
             type = type,
             sender = sender,
             receiver = receiver,

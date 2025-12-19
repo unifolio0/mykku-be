@@ -3,9 +3,9 @@ package com.example.mykku.feed
 import com.example.mykku.BaseServiceTest
 import com.example.mykku.board.application.port.out.BoardQueryPort
 import com.example.mykku.board.domain.Board
-import com.example.mykku.contest.tool.ContestParticipationReader
-import com.example.mykku.contest.tool.ContestParticipationWriter
-import com.example.mykku.contest.tool.ContestReader
+import com.example.mykku.contest.application.port.out.ContestParticipationQueryPort
+import com.example.mykku.contest.application.port.out.ContestParticipationRepositoryPort
+import com.example.mykku.contest.application.port.out.ContestQueryPort
 import com.example.mykku.image.exception.ImageErrorCode
 import com.example.mykku.image.exception.ImageException
 import com.example.mykku.feed.domain.Feed
@@ -18,12 +18,12 @@ import com.example.mykku.feed.dto.CreateFeedRequest
 import com.example.mykku.feed.tool.FeedDtoConverter
 import com.example.mykku.image.ImageUploadService
 import com.example.mykku.image.dto.ImageUploadResult
-import com.example.mykku.like.tool.LikeFeedReader
+import com.example.mykku.like.application.port.out.LikeFeedQueryPort
 import com.example.mykku.member.application.port.out.MemberQueryPort
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.domain.model.MemberId
-import com.example.mykku.scrap.tool.SaveFeedReader
+import com.example.mykku.scrap.application.port.out.SaveFeedQueryPort
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.InjectMocks
@@ -59,22 +59,22 @@ class FeedServiceTest : BaseServiceTest() {
     private lateinit var memberQueryPort: MemberQueryPort
 
     @Mock
-    private lateinit var likeFeedReader: LikeFeedReader
+    private lateinit var likeFeedQueryPort: LikeFeedQueryPort
 
     @Mock
-    private lateinit var saveFeedReader: SaveFeedReader
+    private lateinit var saveFeedQueryPort: SaveFeedQueryPort
 
     @Mock
     private lateinit var imageUploadService: ImageUploadService
 
     @Mock
-    private lateinit var contestReader: ContestReader
+    private lateinit var contestQueryPort: ContestQueryPort
 
     @Mock
-    private lateinit var contestParticipationWriter: ContestParticipationWriter
+    private lateinit var contestParticipationRepositoryPort: ContestParticipationRepositoryPort
 
     @Mock
-    private lateinit var contestParticipationReader: ContestParticipationReader
+    private lateinit var contestParticipationQueryPort: ContestParticipationQueryPort
 
     @InjectMocks
     private lateinit var feedService: FeedService
@@ -221,12 +221,12 @@ class FeedServiceTest : BaseServiceTest() {
             feedDtoConverter = feedDtoConverter,
             boardQueryPort = boardQueryPort,
             memberQueryPort = memberQueryPort,
-            likeFeedReader = likeFeedReader,
-            saveFeedReader = saveFeedReader,
+            likeFeedQueryPort = likeFeedQueryPort,
+            saveFeedQueryPort = saveFeedQueryPort,
             imageUploadService = noOpImageUploadService,
-            contestReader = contestReader,
-            contestParticipationWriter = contestParticipationWriter,
-            contestParticipationReader = contestParticipationReader
+            contestQueryPort = contestQueryPort,
+            contestParticipationRepositoryPort = contestParticipationRepositoryPort,
+            contestParticipationQueryPort = contestParticipationQueryPort
         )
 
         val imageFile = mock<MultipartFile>()
@@ -524,8 +524,8 @@ class FeedServiceTest : BaseServiceTest() {
         val feedTag = FeedTag(title = "태그1", feed = feed)
         
         whenever(feedQueryPort.getFeedById(feedId)).thenReturn(feed)
-        whenever(likeFeedReader.isLiked(memberId, feed)).thenReturn(true)
-        whenever(saveFeedReader.isSaved(memberId, feed)).thenReturn(false)
+        whenever(likeFeedQueryPort.isLiked(memberId, feed)).thenReturn(true)
+        whenever(saveFeedQueryPort.isSaved(memberId, feed)).thenReturn(false)
         whenever(feedQueryPort.getFeedImagesByFeed(feed)).thenReturn(listOf(feedImage))
         whenever(feedQueryPort.getFeedTagsByFeed(feed)).thenReturn(listOf(feedTag))
         whenever(feedQueryPort.getContestTagsByTitles(listOf("태그1"))).thenReturn(emptyList())

@@ -5,12 +5,12 @@ import com.example.mykku.contest.domain.Contest
 import com.example.mykku.contest.domain.ContestSortType
 import com.example.mykku.contest.domain.ContestStatusType
 import com.example.mykku.contest.dto.*
+import com.example.mykku.contest.application.port.out.ContestParticipationQueryPort
+import com.example.mykku.contest.application.port.out.ContestQueryPort
+import com.example.mykku.contest.application.port.out.ContestRepositoryPort
 import com.example.mykku.contest.tool.ContestDtoConverter
-import com.example.mykku.contest.tool.ContestParticipationReader
-import com.example.mykku.contest.tool.ContestReader
-import com.example.mykku.contest.tool.ContestWriter
 import com.example.mykku.member.domain.Member
-import com.example.mykku.scrap.tool.SaveContestReader
+import com.example.mykku.scrap.application.port.out.SaveContestQueryPort
 import org.springframework.data.domain.PageImpl
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -18,16 +18,16 @@ import java.time.LocalDateTime
 
 @Service
 class ContestService(
-    private val contestWriter: ContestWriter,
-    private val contestReader: ContestReader,
-    private val contestParticipationReader: ContestParticipationReader,
-    private val saveContestReader: SaveContestReader,
+    private val contestRepositoryPort: ContestRepositoryPort,
+    private val contestQueryPort: ContestQueryPort,
+    private val contestParticipationQueryPort: ContestParticipationQueryPort,
+    private val saveContestQueryPort: SaveContestQueryPort,
     private val contestDtoConverter: ContestDtoConverter
 ) {
 
     @Transactional
     fun createContest(request: CreateContestRequest): CreateContestResponse {
-        val (contest, contestImages, contestTags) = contestWriter.createContest(
+        val (contest, contestImages, contestTags) = contestRepositoryPort.createContest(
             title = request.title,
             description = request.description,
             startedAt = request.startedAt,
@@ -59,7 +59,7 @@ class ContestService(
         member: Member
     ): PagedContestsResponse {
         val pageable = PageableValidator.validateAndCreate(page, size)
-        val contestPage = contestReader.getContestsWithPagination(status, sortType, pageable, LocalDateTime.now())
+        val contestPage = contestQueryPort.getContestsWithPagination(status, sortType, pageable, LocalDateTime.now())
 
         val contestListResponses = convertToContestListResponses(contestPage.content, member)
         val responseMap = contestListResponses.associateBy { it.id }
@@ -71,9 +71,9 @@ class ContestService(
     }
 
     private fun convertToContestListResponses(contests: List<Contest>, member: Member): List<ContestListResponse> {
-        val imagesByContestId = contestReader.getContestImages(contests)
-        val tagsByContestId = contestReader.getContestTags(contests)
-        val savedContestIds = saveContestReader.getSavedContestIds(member, contests)
+        val imagesByContestId = contestQueryPort.getContestImages(contests)
+        val tagsByContestId = contestQueryPort.getContestTags(contests)
+        val savedContestIds = saveContestQueryPort.getSavedContestIds(member, contests)
 
         return contests.map { contest ->
             val images = imagesByContestId[contest.id!!] ?: emptyList()
@@ -85,10 +85,10 @@ class ContestService(
 
     @Transactional(readOnly = true)
     fun getContestDetail(contestId: Long, member: Member): ContestDetailResponse {
-        val contest = contestReader.getContestByIdWithRelations(contestId)
-        val images = contestReader.getContestImages(listOf(contest))[contest.id] ?: emptyList()
-        val tags = contestReader.getContestTags(listOf(contest))[contest.id] ?: emptyList()
-        val isSaved = saveContestReader.isSaved(member, contest)
+        val contest = contestQueryPort.getContestByIdWithRelations(contestId)
+        val images = contestQueryPort.getContestImages(listOf(contest))[contest.id] ?: emptyList()
+        val tags = contestQueryPort.getContestTags(listOf(contest))[contest.id] ?: emptyList()
+        val isSaved = saveContestQueryPort.isSaved(member, contest)
 
         return contestDtoConverter.toContestDetailResponse(contest, images, tags, isSaved)
     }
@@ -96,7 +96,7 @@ class ContestService(
     @Transactional(readOnly = true)
     fun getMyParticipatedContests(member: Member, page: Int, size: Int): PagedContestsResponse {
         val pageable = PageableValidator.validateAndCreate(page, size)
-        val contestPage = contestParticipationReader.getParticipatedContests(member, pageable)
+        val contestPage = contestParticipationQueryPort.getParticipatedContests(member, pageable)
 
         val contestListResponses = convertToContestListResponses(contestPage.content, member)
         val responsePage = PageImpl(contestListResponses, contestPage.pageable, contestPage.totalElements)

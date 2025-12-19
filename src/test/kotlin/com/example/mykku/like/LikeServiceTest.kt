@@ -17,7 +17,7 @@ import com.example.mykku.like.dto.LikeBoardRequest
 import com.example.mykku.like.dto.LikeDailyMessageCommentRequest
 import com.example.mykku.like.dto.LikeFeedCommentRequest
 import com.example.mykku.like.dto.LikeFeedRequest
-import com.example.mykku.like.tool.*
+import com.example.mykku.like.application.port.out.*
 import com.example.mykku.member.application.port.out.MemberQueryPort
 import com.example.mykku.member.domain.model.MemberId
 import org.junit.jupiter.api.Test
@@ -37,37 +37,37 @@ class LikeServiceTest : BaseServiceTest() {
     private lateinit var boardQueryPort: BoardQueryPort
 
     @Mock
-    private lateinit var likeBoardWriter: LikeBoardWriter
+    private lateinit var likeBoardRepositoryPort: LikeBoardRepositoryPort
 
     @Mock
-    private lateinit var likeBoardReader: LikeBoardReader
+    private lateinit var likeBoardQueryPort: LikeBoardQueryPort
 
     @Mock
     private lateinit var dailyMessageCommentQueryPort: DailyMessageCommentQueryPort
 
     @Mock
-    private lateinit var likeDailyMessageCommentWriter: LikeDailyMessageCommentWriter
+    private lateinit var likeDailyMessageCommentRepositoryPort: LikeDailyMessageCommentRepositoryPort
 
     @Mock
-    private lateinit var likeDailyMessageCommentReader: LikeDailyMessageCommentReader
+    private lateinit var likeDailyMessageCommentQueryPort: LikeDailyMessageCommentQueryPort
 
     @Mock
     private lateinit var feedCommentQueryPort: FeedCommentQueryPort
 
     @Mock
-    private lateinit var likeFeedCommentWriter: LikeFeedCommentWriter
+    private lateinit var likeFeedCommentRepositoryPort: LikeFeedCommentRepositoryPort
 
     @Mock
-    private lateinit var likeFeedCommentReader: LikeFeedCommentReader
+    private lateinit var likeFeedCommentQueryPort: LikeFeedCommentQueryPort
 
     @Mock
     private lateinit var feedQueryPort: FeedQueryPort
 
     @Mock
-    private lateinit var likeFeedWriter: LikeFeedWriter
+    private lateinit var likeFeedRepositoryPort: LikeFeedRepositoryPort
 
     @Mock
-    private lateinit var likeFeedReader: LikeFeedReader
+    private lateinit var likeFeedQueryPort: LikeFeedQueryPort
 
     @Mock
     private lateinit var eventPublisher: ApplicationEventPublisher
@@ -84,7 +84,7 @@ class LikeServiceTest : BaseServiceTest() {
         val likeBoard = LikeBoard(id = 1L, member = member, board = board)
         val likedBoards = listOf(likeBoard)
 
-        whenever(likeBoardReader.getLikedBoards(memberId = "member1")).thenReturn(likedBoards)
+        whenever(likeBoardQueryPort.getLikedBoards(memberId = "member1")).thenReturn(likedBoards)
 
         // when
         val result = likeService.getLikedBoards("member1")
@@ -101,7 +101,7 @@ class LikeServiceTest : BaseServiceTest() {
 
         whenever(memberQueryPort.getMemberById(MemberId("member1"))).thenReturn(member)
         whenever(boardQueryPort.getBoardById(1L)).thenReturn(board)
-        whenever(likeBoardWriter.createLikeBoard(board = board, member = member)).thenReturn(likeBoard)
+        whenever(likeBoardRepositoryPort.createLikeBoard(board = board, member = member)).thenReturn(likeBoard)
 
         // when
         val result = likeService.likeBoard(request, "member1")
@@ -133,7 +133,7 @@ class LikeServiceTest : BaseServiceTest() {
 
         whenever(memberQueryPort.getMemberById(MemberId("member1"))).thenReturn(member)
         whenever(feedQueryPort.getFeedById(1L)).thenReturn(feed)
-        whenever(likeFeedWriter.createLikeFeed(feed = feed, member = member)).thenReturn(likeFeed)
+        whenever(likeFeedRepositoryPort.createLikeFeed(feed = feed, member = member)).thenReturn(likeFeed)
 
         // when
         val result = likeService.likeFeed("member1", request)
@@ -176,7 +176,7 @@ class LikeServiceTest : BaseServiceTest() {
         whenever(memberQueryPort.getMemberById(MemberId("member1"))).thenReturn(member)
         whenever(dailyMessageCommentQueryPort.getDailyMessageCommentById(1L)).thenReturn(dailyMessageComment)
         whenever(
-            likeDailyMessageCommentWriter.createLikeDailyMessageComment(
+            likeDailyMessageCommentRepositoryPort.createLikeDailyMessageComment(
                 dailyMessageComment = dailyMessageComment,
                 member = member
             )
@@ -220,7 +220,7 @@ class LikeServiceTest : BaseServiceTest() {
         whenever(memberQueryPort.getMemberById(MemberId("member1"))).thenReturn(member)
         whenever(feedCommentQueryPort.getFeedCommentById(1L)).thenReturn(feedComment)
         whenever(
-            likeFeedCommentWriter.createLikeFeedComment(
+            likeFeedCommentRepositoryPort.createLikeFeedComment(
                 feedComment = feedComment,
                 member = member
             )

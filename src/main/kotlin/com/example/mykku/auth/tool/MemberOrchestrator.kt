@@ -2,15 +2,15 @@ package com.example.mykku.auth.tool
 
 import com.example.mykku.member.application.port.out.MemberQueryPort
 import com.example.mykku.member.domain.Member
-import com.example.mykku.role.tool.MemberRoleWriter
-import com.example.mykku.role.tool.RoleReader
+import com.example.mykku.role.application.port.out.MemberRoleRepositoryPort
+import com.example.mykku.role.application.port.out.RoleQueryPort
 import org.springframework.stereotype.Component
 
 @Component
 class MemberOrchestrator(
     private val memberQueryPort: MemberQueryPort,
-    private val roleReader: RoleReader,
-    private val memberRoleWriter: MemberRoleWriter
+    private val roleQueryPort: RoleQueryPort,
+    private val memberRoleRepositoryPort: MemberRoleRepositoryPort
 ) {
 
     fun findOrCreate(memberInfo: OAuthMemberInfo): Pair<Member, Boolean> {

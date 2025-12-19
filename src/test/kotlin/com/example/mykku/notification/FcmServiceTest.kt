@@ -1,8 +1,8 @@
 package com.example.mykku.notification
 
 import com.example.mykku.BaseServiceTest
+import com.example.mykku.notification.application.port.out.FcmTokenQueryPort
 import com.example.mykku.notification.domain.FcmToken
-import com.example.mykku.notification.tool.FcmTokenReader
 import com.google.firebase.messaging.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -15,7 +15,7 @@ import org.mockito.kotlin.*
 class FcmServiceTest : BaseServiceTest() {
 
     @Mock
-    private lateinit var fcmTokenReader: FcmTokenReader
+    private lateinit var fcmTokenQueryPort: FcmTokenQueryPort
 
     @Mock
     private lateinit var firebaseMessaging: FirebaseMessaging
@@ -50,7 +50,7 @@ class FcmServiceTest : BaseServiceTest() {
             on { failureCount } doReturn 0
         }
 
-        whenever(fcmTokenReader.getTokensByMember(member)).thenReturn(tokens)
+        whenever(fcmTokenQueryPort.getTokensByMember(member)).thenReturn(tokens)
         whenever(firebaseMessaging.sendEachForMulticast(any<MulticastMessage>())).thenReturn(batchResponse)
 
         fcmService.sendNotificationToMember(
@@ -75,7 +75,7 @@ class FcmServiceTest : BaseServiceTest() {
             on { failureCount } doReturn 0
         }
 
-        whenever(fcmTokenReader.getTokensByMember(member)).thenReturn(tokens)
+        whenever(fcmTokenQueryPort.getTokensByMember(member)).thenReturn(tokens)
         whenever(firebaseMessaging.sendEachForMulticast(any<MulticastMessage>())).thenReturn(batchResponse)
 
         fcmService.sendNotificationToMember(
@@ -92,7 +92,7 @@ class FcmServiceTest : BaseServiceTest() {
 
     @Test
     fun `sendNotificationToMember는 토큰이 없으면 알림을 전송하지 않는다`() {
-        whenever(fcmTokenReader.getTokensByMember(member)).thenReturn(emptyList())
+        whenever(fcmTokenQueryPort.getTokensByMember(member)).thenReturn(emptyList())
 
         fcmService.sendNotificationToMember(
             member = member,
@@ -125,7 +125,7 @@ class FcmServiceTest : BaseServiceTest() {
             on { responses } doReturn listOf(failedResponse, successResponse)
         }
 
-        whenever(fcmTokenReader.getTokensByMember(member)).thenReturn(tokens)
+        whenever(fcmTokenQueryPort.getTokensByMember(member)).thenReturn(tokens)
         whenever(firebaseMessaging.sendEachForMulticast(any<MulticastMessage>())).thenReturn(batchResponse)
 
         fcmService.sendNotificationToMember(

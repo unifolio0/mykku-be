@@ -1,11 +1,11 @@
 package com.example.mykku.notification
 
 import com.example.mykku.BaseServiceTest
+import com.example.mykku.notification.application.port.out.NotificationSettingQueryPort
+import com.example.mykku.notification.application.port.out.NotificationSettingRepositoryPort
 import com.example.mykku.notification.domain.NotificationSetting
 import com.example.mykku.notification.domain.NotificationType
 import com.example.mykku.notification.dto.UpdateNotificationSettingRequest
-import com.example.mykku.notification.tool.NotificationSettingReader
-import com.example.mykku.notification.tool.NotificationSettingWriter
 import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
@@ -17,10 +17,10 @@ import kotlin.test.assertEquals
 class NotificationSettingServiceTest : BaseServiceTest() {
 
     @Mock
-    private lateinit var notificationSettingReader: NotificationSettingReader
+    private lateinit var notificationSettingQueryPort: NotificationSettingQueryPort
 
     @Mock
-    private lateinit var notificationSettingWriter: NotificationSettingWriter
+    private lateinit var notificationSettingRepositoryPort: NotificationSettingRepositoryPort
 
     @InjectMocks
     private lateinit var notificationSettingService: NotificationSettingService
@@ -36,7 +36,7 @@ class NotificationSettingServiceTest : BaseServiceTest() {
 
         val settings = listOf(setting1, setting2)
 
-        whenever(notificationSettingReader.getSettingsByMember(member))
+        whenever(notificationSettingQueryPort.getSettingsByMember(member))
             .thenReturn(settings)
 
         val result = notificationSettingService.getOrCreateSettings(member)
@@ -53,15 +53,15 @@ class NotificationSettingServiceTest : BaseServiceTest() {
             initializeBaseEntityFields(setting, id = index.toLong() + 1)
         }
 
-        whenever(notificationSettingReader.getSettingsByMember(member))
+        whenever(notificationSettingQueryPort.getSettingsByMember(member))
             .thenReturn(emptyList())
-        whenever(notificationSettingWriter.createDefaultSettings(member))
+        whenever(notificationSettingRepositoryPort.createDefaultSettings(member))
             .thenReturn(defaultSettings)
 
         val result = notificationSettingService.getOrCreateSettings(member)
 
         assertEquals(5, result.size)
-        verify(notificationSettingWriter).createDefaultSettings(member)
+        verify(notificationSettingRepositoryPort).createDefaultSettings(member)
     }
 
     @Test
@@ -78,14 +78,14 @@ class NotificationSettingServiceTest : BaseServiceTest() {
         )
         initializeBaseEntityFields(setting, id = 1L)
 
-        whenever(notificationSettingWriter.createOrUpdateSetting(any(), any(), any()))
+        whenever(notificationSettingRepositoryPort.createOrUpdateSetting(any(), any(), any()))
             .thenReturn(setting)
 
         val result = notificationSettingService.updateSetting(member, request)
 
         assertEquals(NotificationType.FEED_LIKE, result.notificationType)
         assertEquals(false, result.isEnabled)
-        verify(notificationSettingWriter).createOrUpdateSetting(
+        verify(notificationSettingRepositoryPort).createOrUpdateSetting(
             member = member,
             notificationType = request.notificationType,
             isEnabled = request.isEnabled
@@ -106,7 +106,7 @@ class NotificationSettingServiceTest : BaseServiceTest() {
         )
         initializeBaseEntityFields(setting, id = 2L)
 
-        whenever(notificationSettingWriter.createOrUpdateSetting(any(), any(), any()))
+        whenever(notificationSettingRepositoryPort.createOrUpdateSetting(any(), any(), any()))
             .thenReturn(setting)
 
         val result = notificationSettingService.updateSetting(member, request)

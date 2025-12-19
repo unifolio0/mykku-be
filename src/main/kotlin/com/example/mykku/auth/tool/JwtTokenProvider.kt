@@ -1,5 +1,6 @@
 package com.example.mykku.auth.tool
 
+import com.example.mykku.auth.application.port.out.JwtTokenPort
 import com.example.mykku.auth.config.JwtProperties
 import com.example.mykku.auth.dto.LoginResponse
 import com.example.mykku.auth.dto.MemberInfo
@@ -13,12 +14,12 @@ import java.util.*
 
 @Component
 class JwtTokenProvider(
-    val jwtProperties: JwtProperties
-) {
+    private val jwtProperties: JwtProperties
+) : JwtTokenPort {
     private val logger = LoggerFactory.getLogger(JwtTokenProvider::class.java)
     private val secretKey = Keys.hmacShaKeyFor(jwtProperties.secret.toByteArray())
 
-    fun generateAccessToken(memberId: String, email: String): String {
+    override fun generateAccessToken(memberId: String, email: String): String {
         val now = Date()
         val expiryDate = Date(now.time + jwtProperties.accessTokenExpiration)
 
@@ -32,7 +33,7 @@ class JwtTokenProvider(
             .compact()
     }
 
-    fun generateRefreshToken(memberId: String): String {
+    override fun generateRefreshToken(memberId: String): String {
         val now = Date()
         val expiryDate = Date(now.time + jwtProperties.refreshTokenExpiration)
 
@@ -45,7 +46,7 @@ class JwtTokenProvider(
             .compact()
     }
 
-    fun createLoginResponse(member: Member, userEmail: String, isExistingUser: Boolean): LoginResponse {
+    override fun createLoginResponse(member: Member, userEmail: String, isExistingUser: Boolean): LoginResponse {
         val accessToken = generateAccessToken(member.id, userEmail)
         val refreshToken = generateRefreshToken(member.id)
 
@@ -64,7 +65,7 @@ class JwtTokenProvider(
         )
     }
 
-    fun validateToken(token: String): Boolean {
+    override fun validateToken(token: String): Boolean {
         return try {
             parseToken(token)
             true
@@ -74,28 +75,30 @@ class JwtTokenProvider(
         }
     }
 
-    fun getMemberIdFromToken(token: String): String {
+    override fun getMemberIdFromToken(token: String): String {
         val claims = parseToken(token)
         return claims.subject
     }
 
-    fun getEmailFromToken(token: String): String {
+    override fun getEmailFromToken(token: String): String {
         val claims = parseToken(token)
         return claims.get("email", String::class.java)
     }
 
-    fun getTokenType(token: String): String? {
+    override fun getTokenType(token: String): String? {
         val claims = parseToken(token)
         return claims.get("tokenType", String::class.java)
     }
 
-    fun isRefreshToken(token: String): Boolean {
+    override fun isRefreshToken(token: String): Boolean {
         return try {
             getTokenType(token) == "refresh"
         } catch (e: Exception) {
             false
         }
     }
+
+    override fun getAccessTokenExpiration(): Long = jwtProperties.accessTokenExpiration
 
     private fun parseToken(token: String): Claims {
         return Jwts.parser()

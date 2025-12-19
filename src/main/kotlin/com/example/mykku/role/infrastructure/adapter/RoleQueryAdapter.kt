@@ -1,57 +1,32 @@
 package com.example.mykku.role.infrastructure.adapter
 
-import com.example.mykku.member.domain.model.MemberId
 import com.example.mykku.role.application.port.out.RoleQueryPort
-import com.example.mykku.role.application.port.out.RoleSummary
-import com.example.mykku.role.domain.model.RoleId
-import com.example.mykku.role.repository.MemberRoleRepository
+import com.example.mykku.role.domain.Role
+import com.example.mykku.role.exception.RoleException
 import com.example.mykku.role.repository.RoleRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 
 @Component
 class RoleQueryAdapter(
-    private val roleRepository: RoleRepository,
-    private val memberRoleRepository: MemberRoleRepository
+    private val roleRepository: RoleRepository
 ) : RoleQueryPort {
 
-    override fun findById(id: RoleId): RoleSummary? {
-        return roleRepository.findById(id.value)
-            .map { role ->
-                RoleSummary(
-                    id = role.id!!,
-                    name = role.name,
-                    description = role.description
-                )
-            }
-            .orElse(null)
+    override fun getRoleById(roleId: Long): Role {
+        return roleRepository.findByIdOrNull(roleId)
+            ?: throw RoleException.roleNotFound()
     }
 
-    override fun findByName(name: String): RoleSummary? {
-        return roleRepository.findByName(name)?.let { role ->
-            RoleSummary(
-                id = role.id!!,
-                name = role.name,
-                description = role.description
-            )
-        }
+    override fun getRoleByName(name: String): Role {
+        return roleRepository.findByName(name)
+            ?: throw RoleException.roleNotFound()
     }
 
-    override fun existsById(id: RoleId): Boolean {
-        return roleRepository.existsById(id.value)
+    override fun getAllRoles(): List<Role> {
+        return roleRepository.findAll()
     }
 
-    override fun getMemberRoles(memberId: MemberId): List<RoleSummary> {
-        return memberRoleRepository.findByMemberId(memberId.value)
-            .map { memberRole ->
-                RoleSummary(
-                    id = memberRole.role.id!!,
-                    name = memberRole.role.name,
-                    description = memberRole.role.description
-                )
-            }
-    }
-
-    override fun hasMemberRole(memberId: MemberId, roleName: String): Boolean {
-        return memberRoleRepository.existsByMemberIdAndRoleName(memberId.value, roleName)
+    override fun existsByName(name: String): Boolean {
+        return roleRepository.existsByName(name)
     }
 }

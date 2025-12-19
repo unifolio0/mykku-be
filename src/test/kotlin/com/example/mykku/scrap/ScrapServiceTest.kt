@@ -6,7 +6,7 @@ import com.example.mykku.dailymessage.application.port.out.DailyMessageQueryPort
 import com.example.mykku.fannote.domain.FanNote
 import com.example.mykku.fannote.application.port.out.FanNoteQueryPort
 import com.example.mykku.event.domain.Event
-import com.example.mykku.event.tool.EventReader
+import com.example.mykku.event.application.port.out.EventQueryPort
 import com.example.mykku.feed.application.port.out.FeedQueryPort
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.scrap.domain.Folder
@@ -16,7 +16,7 @@ import com.example.mykku.scrap.domain.SaveFanNote
 import com.example.mykku.scrap.domain.SaveFeed
 import com.example.mykku.scrap.dto.SaveFeedRequest
 import com.example.mykku.scrap.dto.UpdateSaveFeedFolderRequest
-import com.example.mykku.scrap.tool.*
+import com.example.mykku.scrap.application.port.out.*
 import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
@@ -31,31 +31,31 @@ import kotlin.test.assertEquals
 class ScrapServiceTest : BaseServiceTest() {
 
     @Mock
-    private lateinit var saveFeedReader: SaveFeedReader
+    private lateinit var saveFeedQueryPort: SaveFeedQueryPort
 
     @Mock
-    private lateinit var saveFeedWriter: SaveFeedWriter
+    private lateinit var saveFeedRepositoryPort: SaveFeedRepositoryPort
 
     @Mock
-    private lateinit var saveDailyMessageReader: SaveDailyMessageReader
+    private lateinit var saveDailyMessageQueryPort: SaveDailyMessageQueryPort
 
     @Mock
-    private lateinit var saveDailyMessageWriter: SaveDailyMessageWriter
+    private lateinit var saveDailyMessageRepositoryPort: SaveDailyMessageRepositoryPort
 
     @Mock
-    private lateinit var saveEventReader: SaveEventReader
+    private lateinit var saveEventQueryPort: SaveEventQueryPort
 
     @Mock
-    private lateinit var saveEventWriter: SaveEventWriter
+    private lateinit var saveEventRepositoryPort: SaveEventRepositoryPort
 
     @Mock
-    private lateinit var saveFanNoteReader: SaveFanNoteReader
+    private lateinit var saveFanNoteQueryPort: SaveFanNoteQueryPort
 
     @Mock
-    private lateinit var saveFanNoteWriter: SaveFanNoteWriter
+    private lateinit var saveFanNoteRepositoryPort: SaveFanNoteRepositoryPort
 
     @Mock
-    private lateinit var folderReader: FolderReader
+    private lateinit var folderQueryPort: FolderQueryPort
 
     @Mock
     private lateinit var feedQueryPort: FeedQueryPort
@@ -64,7 +64,7 @@ class ScrapServiceTest : BaseServiceTest() {
     private lateinit var dailyMessageQueryPort: DailyMessageQueryPort
 
     @Mock
-    private lateinit var eventReader: EventReader
+    private lateinit var eventQueryPort: EventQueryPort
 
     @Mock
     private lateinit var fanNoteQueryPort: FanNoteQueryPort
@@ -89,15 +89,15 @@ class ScrapServiceTest : BaseServiceTest() {
         val folder = Folder(id = folderId, member = member, name = "폴더", description = null)
 
         whenever(feedQueryPort.getFeedById(feedId)).thenReturn(feed)
-        whenever(folderReader.getFolderById(folderId, member)).thenReturn(folder)
+        whenever(folderQueryPort.getFolderById(folderId, member)).thenReturn(folder)
 
         // when
         scrapService.saveFeed(feedId, request, member)
 
         // then
         verify(feedQueryPort).getFeedById(feedId)
-        verify(folderReader).getFolderById(folderId, member)
-        verify(saveFeedWriter).saveFeed(member, feed, folder)
+        verify(folderQueryPort).getFolderById(folderId, member)
+        verify(saveFeedRepositoryPort).saveFeed(member, feed, folder)
     }
 
     @Test
@@ -120,7 +120,7 @@ class ScrapServiceTest : BaseServiceTest() {
 
         // then
         verify(feedQueryPort).getFeedById(feedId)
-        verify(saveFeedWriter).unsaveFeed(member, feed)
+        verify(saveFeedRepositoryPort).unsaveFeed(member, feed)
     }
 
     @Test
@@ -140,15 +140,15 @@ class ScrapServiceTest : BaseServiceTest() {
         val newFolder = Folder(id = newFolderId, member = member, name = "새 폴더", description = null)
 
         whenever(feedQueryPort.getFeedById(feedId)).thenReturn(feed)
-        whenever(folderReader.getFolderById(newFolderId, member)).thenReturn(newFolder)
+        whenever(folderQueryPort.getFolderById(newFolderId, member)).thenReturn(newFolder)
 
         // when
         scrapService.updateSaveFeedFolder(feedId, request, member)
 
         // then
         verify(feedQueryPort).getFeedById(feedId)
-        verify(folderReader).getFolderById(newFolderId, member)
-        verify(saveFeedWriter).updateFolder(member, feed, newFolder)
+        verify(folderQueryPort).getFolderById(newFolderId, member)
+        verify(saveFeedRepositoryPort).updateFolder(member, feed, newFolder)
     }
 
     @Test
@@ -170,16 +170,16 @@ class ScrapServiceTest : BaseServiceTest() {
         val pageable = PageRequest.of(0, 20)
         val page = PageImpl(saveFeeds, pageable, 1)
 
-        whenever(folderReader.getFolderById(folderId, member)).thenReturn(folder)
-        whenever(saveFeedReader.getSavedFeedsByFolder(member, folder, pageable)).thenReturn(page)
+        whenever(folderQueryPort.getFolderById(folderId, member)).thenReturn(folder)
+        whenever(saveFeedQueryPort.getSavedFeedsByFolder(member, folder, pageable)).thenReturn(page)
 
         // when
         val result = scrapService.getSavedFeeds(member, folderId, pageable)
 
         // then
         assertEquals(1, result.content.size)
-        verify(folderReader).getFolderById(folderId, member)
-        verify(saveFeedReader).getSavedFeedsByFolder(member, folder, pageable)
+        verify(folderQueryPort).getFolderById(folderId, member)
+        verify(saveFeedQueryPort).getSavedFeedsByFolder(member, folder, pageable)
     }
 
     @Test
@@ -200,14 +200,14 @@ class ScrapServiceTest : BaseServiceTest() {
         val pageable = PageRequest.of(0, 20)
         val page = PageImpl(saveFeeds, pageable, 1)
 
-        whenever(saveFeedReader.getSavedFeedsByFolder(member, null, pageable)).thenReturn(page)
+        whenever(saveFeedQueryPort.getSavedFeedsByFolder(member, null, pageable)).thenReturn(page)
 
         // when
         val result = scrapService.getSavedFeeds(member, null, pageable)
 
         // then
         assertEquals(1, result.content.size)
-        verify(saveFeedReader).getSavedFeedsByFolder(member, null, pageable)
+        verify(saveFeedQueryPort).getSavedFeedsByFolder(member, null, pageable)
     }
 
     @Test
@@ -229,7 +229,7 @@ class ScrapServiceTest : BaseServiceTest() {
 
         // then
         verify(dailyMessageQueryPort).getDailyMessage(dailyMessageId)
-        verify(saveDailyMessageWriter).saveDailyMessage(member, dailyMessage)
+        verify(saveDailyMessageRepositoryPort).saveDailyMessage(member, dailyMessage)
     }
 
     @Test
@@ -251,7 +251,7 @@ class ScrapServiceTest : BaseServiceTest() {
 
         // then
         verify(dailyMessageQueryPort).getDailyMessage(dailyMessageId)
-        verify(saveDailyMessageWriter).unsaveDailyMessage(member, dailyMessage)
+        verify(saveDailyMessageRepositoryPort).unsaveDailyMessage(member, dailyMessage)
     }
 
     @Test
@@ -270,14 +270,14 @@ class ScrapServiceTest : BaseServiceTest() {
         val pageable = PageRequest.of(0, 20)
         val page = PageImpl(saveDailyMessages, pageable, 1)
 
-        whenever(saveDailyMessageReader.getSavedDailyMessages(member, pageable)).thenReturn(page)
+        whenever(saveDailyMessageQueryPort.getSavedDailyMessages(member, pageable)).thenReturn(page)
 
         // when
         val result = scrapService.getSavedDailyMessages(member, pageable)
 
         // then
         assertEquals(1, result.content.size)
-        verify(saveDailyMessageReader).getSavedDailyMessages(member, pageable)
+        verify(saveDailyMessageQueryPort).getSavedDailyMessages(member, pageable)
     }
 
     @Test
@@ -292,14 +292,14 @@ class ScrapServiceTest : BaseServiceTest() {
             expiredAt = LocalDateTime.now().plusDays(7)
         )
 
-        whenever(eventReader.getEventById(eventId)).thenReturn(event)
+        whenever(eventQueryPort.getEventById(eventId)).thenReturn(event)
 
         // when
         scrapService.saveEvent(eventId, member)
 
         // then
-        verify(eventReader).getEventById(eventId)
-        verify(saveEventWriter).saveEvent(member, event)
+        verify(eventQueryPort).getEventById(eventId)
+        verify(saveEventRepositoryPort).saveEvent(member, event)
     }
 
     @Test
@@ -314,14 +314,14 @@ class ScrapServiceTest : BaseServiceTest() {
             expiredAt = LocalDateTime.now().plusDays(7)
         )
 
-        whenever(eventReader.getEventById(eventId)).thenReturn(event)
+        whenever(eventQueryPort.getEventById(eventId)).thenReturn(event)
 
         // when
         scrapService.unsaveEvent(eventId, member)
 
         // then
-        verify(eventReader).getEventById(eventId)
-        verify(saveEventWriter).unsaveEvent(member, event)
+        verify(eventQueryPort).getEventById(eventId)
+        verify(saveEventRepositoryPort).unsaveEvent(member, event)
     }
 
     @Test
@@ -340,14 +340,14 @@ class ScrapServiceTest : BaseServiceTest() {
         val pageable = PageRequest.of(0, 20)
         val page = PageImpl(saveEvents, pageable, 1)
 
-        whenever(saveEventReader.getSavedEvents(member, pageable)).thenReturn(page)
+        whenever(saveEventQueryPort.getSavedEvents(member, pageable)).thenReturn(page)
 
         // when
         val result = scrapService.getSavedEvents(member, pageable)
 
         // then
         assertEquals(1, result.content.size)
-        verify(saveEventReader).getSavedEvents(member, pageable)
+        verify(saveEventQueryPort).getSavedEvents(member, pageable)
     }
 
     @Test
@@ -371,7 +371,7 @@ class ScrapServiceTest : BaseServiceTest() {
 
         // then
         verify(fanNoteQueryPort).findById(fanNoteId)
-        verify(saveFanNoteWriter).saveFanNote(member, fanNote)
+        verify(saveFanNoteRepositoryPort).saveFanNote(member, fanNote)
     }
 
     @Test
@@ -395,7 +395,7 @@ class ScrapServiceTest : BaseServiceTest() {
 
         // then
         verify(fanNoteQueryPort).findById(fanNoteId)
-        verify(saveFanNoteWriter).unsaveFanNote(member, fanNote)
+        verify(saveFanNoteRepositoryPort).unsaveFanNote(member, fanNote)
     }
 
     @Test
@@ -416,13 +416,13 @@ class ScrapServiceTest : BaseServiceTest() {
         val pageable = PageRequest.of(0, 20)
         val page = PageImpl(saveFanNotes, pageable, 1)
 
-        whenever(saveFanNoteReader.getSavedFanNotes(member, pageable)).thenReturn(page)
+        whenever(saveFanNoteQueryPort.getSavedFanNotes(member, pageable)).thenReturn(page)
 
         // when
         val result = scrapService.getSavedFanNotes(member, pageable)
 
         // then
         assertEquals(1, result.content.size)
-        verify(saveFanNoteReader).getSavedFanNotes(member, pageable)
+        verify(saveFanNoteQueryPort).getSavedFanNotes(member, pageable)
     }
 }

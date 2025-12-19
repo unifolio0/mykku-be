@@ -51,10 +51,10 @@ class EmailAuthServiceTest : BaseServiceTest() {
     private lateinit var jwtTokenProvider: JwtTokenProvider
 
     @Mock
-    private lateinit var roleReader: com.example.mykku.role.tool.RoleReader
+    private lateinit var roleQueryPort: com.example.mykku.role.application.port.out.RoleQueryPort
 
     @Mock
-    private lateinit var memberRoleWriter: com.example.mykku.role.tool.MemberRoleWriter
+    private lateinit var memberRoleRepositoryPort: com.example.mykku.role.application.port.out.MemberRoleRepositoryPort
 
     @InjectMocks
     private lateinit var emailAuthService: EmailAuthService

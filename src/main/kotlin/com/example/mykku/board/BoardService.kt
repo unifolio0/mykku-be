@@ -7,7 +7,7 @@ import com.example.mykku.board.dto.CreateBoardResponse
 import com.example.mykku.board.dto.UpdateBoardRequest
 import com.example.mykku.board.dto.UpdateBoardResponse
 import com.example.mykku.board.exception.BoardException
-import com.example.mykku.like.tool.LikeBoardWriter
+import com.example.mykku.like.application.port.out.LikeBoardRepositoryPort
 import com.example.mykku.member.application.port.out.MemberQueryPort
 import com.example.mykku.member.domain.model.MemberId
 import org.springframework.stereotype.Service
@@ -18,7 +18,7 @@ class BoardService(
     private val boardQueryPort: BoardQueryPort,
     private val boardRepositoryPort: BoardRepositoryPort,
     private val memberQueryPort: MemberQueryPort,
-    private val likeBoardWriter: LikeBoardWriter
+    private val likeBoardRepositoryPort: LikeBoardRepositoryPort
 ) {
     @Transactional
     fun createBoard(
@@ -31,7 +31,7 @@ class BoardService(
             logo = request.logo
         )
         val member = memberQueryPort.getMemberById(MemberId(memberId))
-        likeBoardWriter.createLikeBoard(
+        likeBoardRepositoryPort.createLikeBoard(
             member = member,
             board = board
         )

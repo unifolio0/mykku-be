@@ -7,7 +7,7 @@ import com.example.mykku.board.domain.Board
 import com.example.mykku.board.dto.CreateBoardRequest
 import com.example.mykku.board.dto.UpdateBoardRequest
 import com.example.mykku.like.domain.LikeBoard
-import com.example.mykku.like.tool.LikeBoardWriter
+import com.example.mykku.like.application.port.out.LikeBoardRepositoryPort
 import com.example.mykku.member.application.port.out.MemberQueryPort
 import com.example.mykku.member.domain.model.MemberId
 import org.junit.jupiter.api.Test
@@ -28,7 +28,7 @@ class BoardServiceTest : BaseServiceTest() {
     private lateinit var memberQueryPort: MemberQueryPort
 
     @Mock
-    private lateinit var likeBoardWriter: LikeBoardWriter
+    private lateinit var likeBoardRepositoryPort: LikeBoardRepositoryPort
 
     @InjectMocks
     private lateinit var boardService: BoardService
@@ -45,7 +45,7 @@ class BoardServiceTest : BaseServiceTest() {
         whenever(boardQueryPort.existsByTitle(request.title)).thenReturn(false)
         whenever(boardRepositoryPort.createBoard(title = request.title, logo = request.logo)).thenReturn(board)
         whenever(memberQueryPort.getMemberById(MemberId("member1"))).thenReturn(member)
-        whenever(likeBoardWriter.createLikeBoard(member = member, board = board)).thenReturn(likeBoard)
+        whenever(likeBoardRepositoryPort.createLikeBoard(member = member, board = board)).thenReturn(likeBoard)
 
         // when
         val result = boardService.createBoard(request, "member1")

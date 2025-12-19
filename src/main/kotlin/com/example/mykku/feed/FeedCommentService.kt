@@ -11,7 +11,7 @@ import com.example.mykku.feed.dto.FeedCommentsResponse
 import com.example.mykku.feed.dto.SingleFeedCommentResponse
 import com.example.mykku.feed.dto.UpdateFeedCommentRequest
 import com.example.mykku.feed.exception.FeedException
-import com.example.mykku.like.tool.LikeFeedCommentReader
+import com.example.mykku.like.application.port.out.LikeFeedCommentQueryPort
 import com.example.mykku.member.application.port.out.MemberQueryPort
 import com.example.mykku.member.domain.model.MemberId
 import org.springframework.data.domain.Pageable
@@ -23,7 +23,7 @@ class FeedCommentService(
     private val feedQueryPort: FeedQueryPort,
     private val feedCommentQueryPort: FeedCommentQueryPort,
     private val feedCommentRepositoryPort: FeedCommentRepositoryPort,
-    private val likeFeedCommentReader: LikeFeedCommentReader,
+    private val likeFeedCommentQueryPort: LikeFeedCommentQueryPort,
     private val memberQueryPort: MemberQueryPort,
 ) {
     @Transactional(readOnly = true)
@@ -45,7 +45,7 @@ class FeedCommentService(
                         profileImage = reply.member.profileImage
                     ),
                     likeCount = reply.likeCount,
-                    isLiked = memberId?.let { likeFeedCommentReader.isLiked(it, reply) } ?: false,
+                    isLiked = memberId?.let { likeFeedCommentQueryPort.isLiked(it, reply) } ?: false,
                     createdAt = reply.createdAt,
                     updatedAt = reply.updatedAt
                 )
@@ -60,7 +60,7 @@ class FeedCommentService(
                     profileImage = comment.member.profileImage
                 ),
                 likeCount = comment.likeCount,
-                isLiked = memberId?.let { likeFeedCommentReader.isLiked(it, comment) } ?: false,
+                isLiked = memberId?.let { likeFeedCommentQueryPort.isLiked(it, comment) } ?: false,
                 replies = replyResponses,
                 replyCount = replyResponses.size,
                 createdAt = comment.createdAt,

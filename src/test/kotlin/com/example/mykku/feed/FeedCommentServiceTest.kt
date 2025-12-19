@@ -11,7 +11,7 @@ import com.example.mykku.feed.dto.CreateFeedCommentRequest
 import com.example.mykku.feed.dto.UpdateFeedCommentRequest
 import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.feed.exception.FeedErrorCode
-import com.example.mykku.like.tool.LikeFeedCommentReader
+import com.example.mykku.like.application.port.out.LikeFeedCommentQueryPort
 import com.example.mykku.member.application.port.out.MemberQueryPort
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.model.MemberId
@@ -39,7 +39,7 @@ class FeedCommentServiceTest : BaseServiceTest() {
     private lateinit var feedCommentRepositoryPort: FeedCommentRepositoryPort
 
     @Mock
-    private lateinit var likeFeedCommentReader: LikeFeedCommentReader
+    private lateinit var likeFeedCommentQueryPort: LikeFeedCommentQueryPort
 
     @Mock
     private lateinit var memberQueryPort: MemberQueryPort
@@ -107,8 +107,8 @@ class FeedCommentServiceTest : BaseServiceTest() {
         whenever(feedQueryPort.getFeedById(1L)).thenReturn(feed)
         whenever(feedCommentQueryPort.getCommentsByFeed(feed, pageable)).thenReturn(commentsPage)
         whenever(feedCommentQueryPort.getRepliesByParentComments(listOf(parentComment))).thenReturn(repliesMap)
-        whenever(likeFeedCommentReader.isLiked("member1", parentComment)).thenReturn(false)
-        whenever(likeFeedCommentReader.isLiked("member1", replyComment)).thenReturn(false)
+        whenever(likeFeedCommentQueryPort.isLiked("member1", parentComment)).thenReturn(false)
+        whenever(likeFeedCommentQueryPort.isLiked("member1", replyComment)).thenReturn(false)
 
         // when
         val result = feedCommentService.getComments(1L, "member1", pageable)
