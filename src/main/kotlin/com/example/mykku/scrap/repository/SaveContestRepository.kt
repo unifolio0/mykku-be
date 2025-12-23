@@ -15,4 +15,7 @@ interface SaveContestRepository : JpaRepository<SaveContest, Long> {
     fun findByMemberAndContest(member: Member, contest: Contest): SaveContest?
     fun deleteByMemberAndContest(member: Member, contest: Contest)
     fun findByMemberAndContestIn(member: Member, contests: List<Contest>): List<SaveContest>
+
+    fun existsByMemberIdAndContestId(memberId: String, contestId: Long): Boolean
+    fun countByContestId(contestId: Long): Int
 }

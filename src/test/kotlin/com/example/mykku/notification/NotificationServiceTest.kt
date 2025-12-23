@@ -1,13 +1,13 @@
 package com.example.mykku.notification
 
 import com.example.mykku.BaseServiceTest
+import com.example.mykku.notification.application.port.out.NotificationQueryPort
+import com.example.mykku.notification.application.port.out.NotificationRepositoryPort
+import com.example.mykku.notification.application.port.out.NotificationSettingQueryPort
 import com.example.mykku.notification.domain.Notification
 import com.example.mykku.notification.domain.NotificationType
 import com.example.mykku.notification.exception.NotificationErrorCode
 import com.example.mykku.notification.exception.NotificationException
-import com.example.mykku.notification.tool.NotificationReader
-import com.example.mykku.notification.tool.NotificationSettingReader
-import com.example.mykku.notification.tool.NotificationWriter
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.InjectMocks
@@ -23,13 +23,13 @@ import kotlin.test.assertEquals
 class NotificationServiceTest : BaseServiceTest() {
 
     @Mock
-    private lateinit var notificationReader: NotificationReader
+    private lateinit var notificationQueryPort: NotificationQueryPort
 
     @Mock
-    private lateinit var notificationWriter: NotificationWriter
+    private lateinit var notificationRepositoryPort: NotificationRepositoryPort
 
     @Mock
-    private lateinit var notificationSettingReader: NotificationSettingReader
+    private lateinit var notificationSettingQueryPort: NotificationSettingQueryPort
 
     @Mock
     private lateinit var fcmService: FcmService
@@ -66,7 +66,7 @@ class NotificationServiceTest : BaseServiceTest() {
         val pageable = PageRequest.of(0, 20)
         val page = PageImpl(listOf(notification1, notification2))
 
-        whenever(notificationReader.getNotificationsByReceiver(receiver, pageable))
+        whenever(notificationQueryPort.getNotificationsByReceiver(receiver, pageable))
             .thenReturn(page)
 
         val result = notificationService.getNotifications(receiver, pageable)
@@ -82,7 +82,7 @@ class NotificationServiceTest : BaseServiceTest() {
         val pageable = PageRequest.of(0, 20)
         val page = PageImpl(listOf(unreadNotification))
 
-        whenever(notificationReader.getUnreadNotifications(receiver, pageable))
+        whenever(notificationQueryPort.getUnreadNotifications(receiver, pageable))
             .thenReturn(page)
 
         val result = notificationService.getUnreadNotifications(receiver, pageable)
@@ -93,7 +93,7 @@ class NotificationServiceTest : BaseServiceTest() {
 
     @Test
     fun `읽지 않은 알림 개수를 조회한다`() {
-        whenever(notificationReader.getUnreadCount(receiver)).thenReturn(5L)
+        whenever(notificationQueryPort.getUnreadCount(receiver)).thenReturn(5L)
 
         val count = notificationService.getUnreadCount(receiver)
 
@@ -104,11 +104,11 @@ class NotificationServiceTest : BaseServiceTest() {
     fun `알림을 읽음 처리한다`() {
         val notification = createTestNotification(id = 1L, receiver = receiver, isRead = false)
 
-        whenever(notificationReader.getNotificationById(1L)).thenReturn(notification)
+        whenever(notificationQueryPort.getNotificationById(1L)).thenReturn(notification)
 
         notificationService.markAsRead(1L, receiver)
 
-        verify(notificationWriter).markAsRead(notification)
+        verify(notificationRepositoryPort).markAsRead(notification)
     }
 
     @Test
@@ -116,7 +116,7 @@ class NotificationServiceTest : BaseServiceTest() {
         val otherUser = createTestMember(id = "other", nickname = "다른사용자")
         val notification = createTestNotification(id = 1L, receiver = otherUser)
 
-        whenever(notificationReader.getNotificationById(1L)).thenReturn(notification)
+        whenever(notificationQueryPort.getNotificationById(1L)).thenReturn(notification)
 
         val exception = assertThrows<NotificationException> {
             notificationService.markAsRead(1L, receiver)
@@ -127,23 +127,23 @@ class NotificationServiceTest : BaseServiceTest() {
 
     @Test
     fun `모든 알림을 읽음 처리한다`() {
-        whenever(notificationWriter.markAllAsReadByReceiver(receiver))
+        whenever(notificationRepositoryPort.markAllAsReadByReceiver(receiver))
             .thenReturn(2)
 
         notificationService.markAllAsRead(receiver)
 
-        verify(notificationWriter).markAllAsReadByReceiver(receiver)
+        verify(notificationRepositoryPort).markAllAsReadByReceiver(receiver)
     }
 
     @Test
     fun `알림을 삭제한다`() {
         val notification = createTestNotification(id = 1L, receiver = receiver)
 
-        whenever(notificationReader.getNotificationById(1L)).thenReturn(notification)
+        whenever(notificationQueryPort.getNotificationById(1L)).thenReturn(notification)
 
         notificationService.deleteNotification(1L, receiver)
 
-        verify(notificationWriter).deleteNotification(notification)
+        verify(notificationRepositoryPort).deleteNotification(notification)
     }
 
     @Test
@@ -151,7 +151,7 @@ class NotificationServiceTest : BaseServiceTest() {
         val otherUser = createTestMember(id = "other", nickname = "다른사용자")
         val notification = createTestNotification(id = 1L, receiver = otherUser)
 
-        whenever(notificationReader.getNotificationById(1L)).thenReturn(notification)
+        whenever(notificationQueryPort.getNotificationById(1L)).thenReturn(notification)
 
         val exception = assertThrows<NotificationException> {
             notificationService.deleteNotification(1L, receiver)
@@ -162,9 +162,9 @@ class NotificationServiceTest : BaseServiceTest() {
 
     @Test
     fun `알림 설정이 활성화된 경우 알림을 생성하고 발송한다`() {
-        whenever(notificationSettingReader.isNotificationEnabled(receiver, NotificationType.FEED_LIKE))
+        whenever(notificationSettingQueryPort.isNotificationEnabled(receiver, NotificationType.FEED_LIKE))
             .thenReturn(true)
-        whenever(notificationWriter.createNotification(any(), any(), any(), any(), any(), any()))
+        whenever(notificationRepositoryPort.createNotification(any(), any(), any(), any(), any(), any()))
             .thenReturn(createTestNotification())
 
         notificationService.createAndSendNotification(
@@ -176,7 +176,7 @@ class NotificationServiceTest : BaseServiceTest() {
             relatedResourceType = "FEED"
         )
 
-        verify(notificationWriter).createNotification(
+        verify(notificationRepositoryPort).createNotification(
             type = NotificationType.FEED_LIKE,
             sender = sender,
             receiver = receiver,
@@ -189,7 +189,7 @@ class NotificationServiceTest : BaseServiceTest() {
 
     @Test
     fun `알림 설정이 비활성화된 경우 알림을 생성하지 않는다`() {
-        whenever(notificationSettingReader.isNotificationEnabled(receiver, NotificationType.FEED_LIKE))
+        whenever(notificationSettingQueryPort.isNotificationEnabled(receiver, NotificationType.FEED_LIKE))
             .thenReturn(false)
 
         notificationService.createAndSendNotification(
@@ -199,7 +199,7 @@ class NotificationServiceTest : BaseServiceTest() {
             content = "테스트 알림"
         )
 
-        verify(notificationWriter, org.mockito.kotlin.never()).createNotification(
+        verify(notificationRepositoryPort, org.mockito.kotlin.never()).createNotification(
             any(),
             any(),
             any(),

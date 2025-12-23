@@ -39,7 +39,7 @@ class MemberDocumentTest : BaseDocumentTest() {
                 newPassword = "newPassword123!"
             )
 
-            doNothing().whenever(memberService).changePassword(any(), any(), any())
+            doNothing().whenever(changePasswordUseCase).execute(any())
 
             val documentFilter = document("member/change-password", 200)
                 .request(request().applyConfig(apiConfig))
@@ -70,7 +70,7 @@ class MemberDocumentTest : BaseDocumentTest() {
             )
 
             doThrow(MemberException(MemberErrorCode.INVALID_CURRENT_PASSWORD))
-                .whenever(memberService).changePassword(any(), any(), any())
+                .whenever(changePasswordUseCase).execute(any())
 
             val documentFilter = document("member/change-password", "INVALID_CURRENT_PASSWORD")
                 .request(request().applyConfig(apiConfig))

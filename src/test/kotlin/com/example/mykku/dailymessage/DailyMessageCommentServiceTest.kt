@@ -5,13 +5,14 @@ import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.domain.DailyMessageComment
 import com.example.mykku.dailymessage.dto.CreateCommentRequest
 import com.example.mykku.dailymessage.dto.UpdateCommentRequest
-import com.example.mykku.dailymessage.tool.DailyMessageCommentReader
-import com.example.mykku.dailymessage.tool.DailyMessageCommentWriter
-import com.example.mykku.dailymessage.tool.DailyMessageReader
+import com.example.mykku.dailymessage.application.port.out.DailyMessageCommentQueryPort
+import com.example.mykku.dailymessage.application.port.out.DailyMessageCommentRepositoryPort
+import com.example.mykku.dailymessage.application.port.out.DailyMessageQueryPort
 import com.example.mykku.dailymessage.exception.DailyMessageException
 import com.example.mykku.dailymessage.exception.DailyMessageErrorCode
+import com.example.mykku.member.application.port.out.MemberQueryPort
 import com.example.mykku.member.domain.Member
-import com.example.mykku.member.tool.MemberReader
+import com.example.mykku.member.domain.model.MemberId
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.InjectMocks
@@ -24,16 +25,16 @@ import kotlin.test.assertEquals
 class DailyMessageCommentServiceTest : BaseServiceTest() {
 
     @Mock
-    private lateinit var dailyMessageReader: DailyMessageReader
+    private lateinit var dailyMessageQueryPort: DailyMessageQueryPort
 
     @Mock
-    private lateinit var dailyMessageCommentReader: DailyMessageCommentReader
+    private lateinit var dailyMessageCommentQueryPort: DailyMessageCommentQueryPort
 
     @Mock
-    private lateinit var dailyMessageCommentWriter: DailyMessageCommentWriter
+    private lateinit var dailyMessageCommentRepositoryPort: DailyMessageCommentRepositoryPort
 
     @Mock
-    private lateinit var memberReader: MemberReader
+    private lateinit var memberQueryPort: MemberQueryPort
 
     @InjectMocks
     private lateinit var dailyMessageCommentService: DailyMessageCommentService
@@ -87,9 +88,9 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
             dailyMessage = dailyMessage
         )
 
-        whenever(dailyMessageReader.getDailyMessage(1L)).thenReturn(dailyMessage)
-        whenever(memberReader.getMemberById("member1")).thenReturn(member)
-        whenever(dailyMessageCommentWriter.createComment(
+        whenever(dailyMessageQueryPort.getDailyMessage(1L)).thenReturn(dailyMessage)
+        whenever(memberQueryPort.getMemberById(MemberId("member1"))).thenReturn(member)
+        whenever(dailyMessageCommentRepositoryPort.createComment(
             content = request.content,
             dailyMessage = dailyMessage,
             member = member,
@@ -126,10 +127,10 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
             parentComment = parentComment
         )
 
-        whenever(dailyMessageReader.getDailyMessage(1L)).thenReturn(dailyMessage)
-        whenever(memberReader.getMemberById("member1")).thenReturn(member)
-        whenever(dailyMessageCommentReader.getCommentByDailyMessageId(2L, 1L)).thenReturn(parentComment)
-        whenever(dailyMessageCommentWriter.createComment(
+        whenever(dailyMessageQueryPort.getDailyMessage(1L)).thenReturn(dailyMessage)
+        whenever(memberQueryPort.getMemberById(MemberId("member1"))).thenReturn(member)
+        whenever(dailyMessageCommentQueryPort.getCommentByDailyMessageId(2L, 1L)).thenReturn(parentComment)
+        whenever(dailyMessageCommentRepositoryPort.createComment(
             content = request.content,
             dailyMessage = dailyMessage,
             member = member,
@@ -162,8 +163,8 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
             dailyMessage = dailyMessage
         )
 
-        whenever(dailyMessageCommentReader.getComment(1L)).thenReturn(comment)
-        whenever(dailyMessageCommentWriter.updateComment(
+        whenever(dailyMessageCommentQueryPort.getComment(1L)).thenReturn(comment)
+        whenever(dailyMessageCommentRepositoryPort.updateComment(
             comment = comment,
             newContent = request.content
         )).thenReturn(updatedComment)
@@ -189,7 +190,7 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
             dailyMessage = dailyMessage
         )
 
-        whenever(dailyMessageCommentReader.getComment(1L)).thenReturn(comment)
+        whenever(dailyMessageCommentQueryPort.getComment(1L)).thenReturn(comment)
 
         // when & then
         val exception = assertThrows<DailyMessageException> {
@@ -209,13 +210,13 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
             dailyMessage = dailyMessage
         )
 
-        whenever(dailyMessageCommentReader.getComment(1L)).thenReturn(comment)
+        whenever(dailyMessageCommentQueryPort.getComment(1L)).thenReturn(comment)
 
         // when
         dailyMessageCommentService.deleteComment(1L, member.id)
 
         // then
-        org.mockito.kotlin.verify(dailyMessageCommentWriter).deleteComment(comment)
+        org.mockito.kotlin.verify(dailyMessageCommentRepositoryPort).deleteComment(comment)
     }
 
     @Test
@@ -230,7 +231,7 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
             dailyMessage = dailyMessage
         )
 
-        whenever(dailyMessageCommentReader.getComment(1L)).thenReturn(comment)
+        whenever(dailyMessageCommentQueryPort.getComment(1L)).thenReturn(comment)
 
         // when & then
         val exception = assertThrows<DailyMessageException> {

@@ -1,12 +1,12 @@
 package com.example.mykku.role
 
+import com.example.mykku.member.application.port.out.MemberQueryPort
 import com.example.mykku.member.domain.Member
-import com.example.mykku.member.tool.MemberWriter
 import com.example.mykku.role.domain.MemberRole
 import com.example.mykku.role.domain.Role
 import com.example.mykku.role.exception.RoleErrorCode
 import com.example.mykku.role.exception.RoleException
-import com.example.mykku.role.tool.MemberRoleReader
+import com.example.mykku.role.application.port.out.MemberRoleQueryPort
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -22,10 +22,10 @@ import org.mockito.kotlin.whenever
 class RoleServiceTest {
 
     @Mock
-    private lateinit var memberRoleReader: MemberRoleReader
+    private lateinit var memberRoleQueryPort: MemberRoleQueryPort
 
     @Mock
-    private lateinit var memberWriter: MemberWriter
+    private lateinit var memberQueryPort: MemberQueryPort
 
     @InjectMocks
     private lateinit var roleService: RoleService
@@ -60,18 +60,18 @@ class RoleServiceTest {
         whenever(memberRole2.createdAt).thenReturn(java.time.LocalDateTime.now())
 
         val memberRoles = listOf(memberRole1, memberRole2)
-        whenever(memberRoleReader.getMemberRolesByMember(member)).thenReturn(memberRoles)
+        whenever(memberRoleQueryPort.getMemberRolesByMember(member)).thenReturn(memberRoles)
 
         val result = roleService.getMyRoles(member)
 
         assertThat(result).hasSize(2)
         assertThat(result.map { it.role.name }).contains("칭호1", "칭호2")
-        verify(memberRoleReader).getMemberRolesByMember(member)
+        verify(memberRoleQueryPort).getMemberRolesByMember(member)
     }
 
     @Test
     fun `내 칭호가 없으면 빈 리스트를 반환한다`() {
-        whenever(memberRoleReader.getMemberRolesByMember(member)).thenReturn(emptyList())
+        whenever(memberRoleQueryPort.getMemberRolesByMember(member)).thenReturn(emptyList())
 
         val result = roleService.getMyRoles(member)
 
@@ -81,18 +81,18 @@ class RoleServiceTest {
     @Test
     fun `대표 칭호를 변경할 수 있다`() {
         val memberRole = MemberRole(id = 1L, member = member, role = role2)
-        whenever(memberRoleReader.getMemberRoleById(1L, member)).thenReturn(memberRole)
+        whenever(memberRoleQueryPort.getMemberRoleById(1L, member)).thenReturn(memberRole)
 
         roleService.changeRepresentativeRole(member, 1L)
 
         assertThat(member.role).isEqualTo(role2)
-        verify(memberRoleReader).getMemberRoleById(1L, member)
-        verify(memberWriter).save(member)
+        verify(memberRoleQueryPort).getMemberRoleById(1L, member)
+        verify(memberQueryPort).saveMember(member)
     }
 
     @Test
     fun `보유하지 않은 칭호로 대표 칭호를 변경하려 하면 예외가 발생한다`() {
-        whenever(memberRoleReader.getMemberRoleById(999L, member)).thenThrow(
+        whenever(memberRoleQueryPort.getMemberRoleById(999L, member)).thenThrow(
             RoleException(RoleErrorCode.MEMBER_ROLE_NOT_FOUND)
         )
 
@@ -105,7 +105,7 @@ class RoleServiceTest {
 
     @Test
     fun `다른 회원의 칭호로 대표 칭호를 변경하려 하면 예외가 발생한다`() {
-        whenever(memberRoleReader.getMemberRoleById(1L, member)).thenThrow(
+        whenever(memberRoleQueryPort.getMemberRoleById(1L, member)).thenThrow(
             RoleException(RoleErrorCode.MEMBER_ROLE_UNAUTHORIZED)
         )
 

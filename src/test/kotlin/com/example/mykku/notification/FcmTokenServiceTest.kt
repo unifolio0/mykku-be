@@ -1,11 +1,11 @@
 package com.example.mykku.notification
 
 import com.example.mykku.BaseServiceTest
+import com.example.mykku.notification.application.port.out.FcmTokenQueryPort
+import com.example.mykku.notification.application.port.out.FcmTokenRepositoryPort
 import com.example.mykku.notification.domain.FcmToken
 import com.example.mykku.notification.dto.FcmTokenResponse
 import com.example.mykku.notification.dto.RegisterFcmTokenRequest
-import com.example.mykku.notification.tool.FcmTokenReader
-import com.example.mykku.notification.tool.FcmTokenWriter
 import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
@@ -17,10 +17,10 @@ import kotlin.test.assertEquals
 class FcmTokenServiceTest : BaseServiceTest() {
 
     @Mock
-    private lateinit var fcmTokenReader: FcmTokenReader
+    private lateinit var fcmTokenQueryPort: FcmTokenQueryPort
 
     @Mock
-    private lateinit var fcmTokenWriter: FcmTokenWriter
+    private lateinit var fcmTokenRepositoryPort: FcmTokenRepositoryPort
 
     @InjectMocks
     private lateinit var fcmTokenService: FcmTokenService
@@ -42,14 +42,14 @@ class FcmTokenServiceTest : BaseServiceTest() {
         )
         initializeBaseEntityFields(fcmToken)
 
-        whenever(fcmTokenWriter.registerOrUpdateToken(member, request.token, request.deviceId, request.deviceType))
+        whenever(fcmTokenRepositoryPort.registerOrUpdateToken(member, request.token, request.deviceId, request.deviceType))
             .thenReturn(fcmToken)
 
         val result = fcmTokenService.registerOrUpdateToken(member, request)
 
         assertEquals(request.deviceId, result.deviceId)
         assertEquals(request.deviceType, result.deviceType)
-        verify(fcmTokenWriter).registerOrUpdateToken(member, request.token, request.deviceId, request.deviceType)
+        verify(fcmTokenRepositoryPort).registerOrUpdateToken(member, request.token, request.deviceId, request.deviceType)
     }
 
     @Test
@@ -68,13 +68,13 @@ class FcmTokenServiceTest : BaseServiceTest() {
         existingToken.updateToken(request.token)
         initializeBaseEntityFields(existingToken)
 
-        whenever(fcmTokenWriter.registerOrUpdateToken(member, request.token, request.deviceId, request.deviceType))
+        whenever(fcmTokenRepositoryPort.registerOrUpdateToken(member, request.token, request.deviceId, request.deviceType))
             .thenReturn(existingToken)
 
         val result = fcmTokenService.registerOrUpdateToken(member, request)
 
         assertEquals(request.deviceId, result.deviceId)
-        verify(fcmTokenWriter).registerOrUpdateToken(member, request.token, request.deviceId, request.deviceType)
+        verify(fcmTokenRepositoryPort).registerOrUpdateToken(member, request.token, request.deviceId, request.deviceType)
     }
 
     @Test
@@ -94,7 +94,7 @@ class FcmTokenServiceTest : BaseServiceTest() {
         initializeBaseEntityFields(token1, id = 1L)
         initializeBaseEntityFields(token2, id = 2L)
 
-        whenever(fcmTokenReader.getTokensByMember(member))
+        whenever(fcmTokenQueryPort.getTokensByMember(member))
             .thenReturn(listOf(token1, token2))
 
         val result = fcmTokenService.getTokens(member)
@@ -102,18 +102,18 @@ class FcmTokenServiceTest : BaseServiceTest() {
         assertEquals(2, result.size)
         assertEquals("device_001", result[0].deviceId)
         assertEquals("device_002", result[1].deviceId)
-        verify(fcmTokenReader).getTokensByMember(member)
+        verify(fcmTokenQueryPort).getTokensByMember(member)
     }
 
     @Test
     fun `getTokens - 토큰이 없으면 빈 목록을 반환한다`() {
-        whenever(fcmTokenReader.getTokensByMember(member))
+        whenever(fcmTokenQueryPort.getTokensByMember(member))
             .thenReturn(emptyList())
 
         val result = fcmTokenService.getTokens(member)
 
         assertEquals(0, result.size)
-        verify(fcmTokenReader).getTokensByMember(member)
+        verify(fcmTokenQueryPort).getTokensByMember(member)
     }
 
     @Test
@@ -122,6 +122,6 @@ class FcmTokenServiceTest : BaseServiceTest() {
 
         fcmTokenService.deleteToken(member, deviceId)
 
-        verify(fcmTokenWriter).deleteByMemberAndDeviceId(member, deviceId)
+        verify(fcmTokenRepositoryPort).deleteByMemberAndDeviceId(member, deviceId)
     }
 }

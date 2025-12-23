@@ -1,16 +1,16 @@
 package com.example.mykku.event
 
 import com.example.mykku.common.util.PageableValidator
+import com.example.mykku.event.application.port.out.EventParticipationQueryPort
+import com.example.mykku.event.application.port.out.EventQueryPort
+import com.example.mykku.event.application.port.out.EventRepositoryPort
 import com.example.mykku.event.domain.Event
 import com.example.mykku.event.domain.EventSortType
 import com.example.mykku.event.domain.EventStatusType
 import com.example.mykku.event.dto.*
-import com.example.mykku.event.tool.EventDtoConverter
-import com.example.mykku.event.tool.EventParticipationReader
-import com.example.mykku.event.tool.EventReader
-import com.example.mykku.event.tool.EventWriter
+import com.example.mykku.event.application.service.EventDtoConverter
 import com.example.mykku.member.domain.Member
-import com.example.mykku.scrap.tool.SaveEventReader
+import com.example.mykku.scrap.application.port.out.SaveEventQueryPort
 import org.springframework.data.domain.PageImpl
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -18,16 +18,16 @@ import java.time.LocalDateTime
 
 @Service
 class EventService(
-    private val eventWriter: EventWriter,
-    private val eventReader: EventReader,
-    private val eventParticipationReader: EventParticipationReader,
-    private val saveEventReader: SaveEventReader,
+    private val eventRepositoryPort: EventRepositoryPort,
+    private val eventQueryPort: EventQueryPort,
+    private val eventParticipationQueryPort: EventParticipationQueryPort,
+    private val saveEventQueryPort: SaveEventQueryPort,
     private val eventDtoConverter: EventDtoConverter
 ) {
 
     @Transactional
     fun createEvent(request: CreateEventRequest): CreateEventResponse {
-        val (event, eventImages) = eventWriter.createEvent(
+        val (event, eventImages) = eventRepositoryPort.createEvent(
             title = request.title,
             description = request.description,
             startedAt = request.startedAt,
@@ -57,7 +57,7 @@ class EventService(
         member: Member
     ): PagedEventsResponse {
         val pageable = PageableValidator.validateAndCreate(page, size)
-        val eventPage = eventReader.getEventsWithPagination(status, sortType, pageable, LocalDateTime.now())
+        val eventPage = eventQueryPort.getEventsWithPagination(status, sortType, pageable, LocalDateTime.now())
 
         val eventListResponses = convertToEventListResponses(eventPage.content, member)
         val responseMap = eventListResponses.associateBy { it.id }
@@ -69,8 +69,8 @@ class EventService(
     }
 
     private fun convertToEventListResponses(events: List<Event>, member: Member): List<EventListResponse> {
-        val imagesByEventId = eventReader.getEventImages(events)
-        val savedEventIds = saveEventReader.getSavedEventIds(member, events)
+        val imagesByEventId = eventQueryPort.getEventImages(events)
+        val savedEventIds = saveEventQueryPort.getSavedEventIds(member, events)
 
         return events.map { event ->
             val images = imagesByEventId[event.id!!] ?: emptyList()
@@ -81,9 +81,9 @@ class EventService(
 
     @Transactional(readOnly = true)
     fun getEventDetail(eventId: Long, member: Member): EventDetailResponse {
-        val event = eventReader.getEventByIdWithRelations(eventId)
-        val images = eventReader.getEventImages(listOf(event))[event.id] ?: emptyList()
-        val isSaved = saveEventReader.isSaved(member, event)
+        val event = eventQueryPort.getEventByIdWithRelations(eventId)
+        val images = eventQueryPort.getEventImages(listOf(event))[event.id] ?: emptyList()
+        val isSaved = saveEventQueryPort.isSaved(member, event)
 
         return eventDtoConverter.toEventDetailResponse(event, images, isSaved)
     }
@@ -91,7 +91,7 @@ class EventService(
     @Transactional(readOnly = true)
     fun getMyParticipatedEvents(member: Member, page: Int, size: Int): PagedEventsResponse {
         val pageable = PageableValidator.validateAndCreate(page, size)
-        val eventPage = eventParticipationReader.getParticipatedEvents(member, pageable)
+        val eventPage = eventParticipationQueryPort.getParticipatedEvents(member, pageable)
 
         val eventListResponses = convertToEventListResponses(eventPage.content, member)
         val responsePage = PageImpl(eventListResponses, eventPage.pageable, eventPage.totalElements)

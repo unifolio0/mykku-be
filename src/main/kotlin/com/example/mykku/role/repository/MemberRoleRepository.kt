@@ -16,4 +16,10 @@ interface MemberRoleRepository : JpaRepository<MemberRole, Long> {
 
     @Query("SELECT mr FROM MemberRole mr JOIN FETCH mr.role WHERE mr.member = :member")
     fun findByMemberWithRole(member: Member): List<MemberRole>
+
+    @Query("SELECT mr FROM MemberRole mr JOIN FETCH mr.role WHERE mr.member.id = :memberId")
+    fun findByMemberId(memberId: String): List<MemberRole>
+
+    @Query("SELECT CASE WHEN COUNT(mr) > 0 THEN true ELSE false END FROM MemberRole mr WHERE mr.member.id = :memberId AND mr.role.name = :roleName")
+    fun existsByMemberIdAndRoleName(memberId: String, roleName: String): Boolean
 }

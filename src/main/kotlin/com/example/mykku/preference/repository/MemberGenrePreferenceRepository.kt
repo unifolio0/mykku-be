@@ -11,4 +11,7 @@ interface MemberGenrePreferenceRepository : JpaRepository<MemberGenrePreference,
     fun findByMember(member: Member): List<MemberGenrePreference>
     fun deleteByMember(member: Member)
     fun existsByMemberAndGenreType(member: Member, genreType: GenreType): Boolean
+
+    fun findByMemberId(memberId: String): List<MemberGenrePreference>
+    fun existsByMemberIdAndGenreType(memberId: String, genreType: GenreType): Boolean
 }

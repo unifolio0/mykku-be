@@ -1,6 +1,9 @@
 package com.example.mykku.contest
 
 import com.example.mykku.BaseServiceTest
+import com.example.mykku.contest.application.port.out.ContestParticipationQueryPort
+import com.example.mykku.contest.application.port.out.ContestQueryPort
+import com.example.mykku.contest.application.port.out.ContestRepositoryPort
 import com.example.mykku.contest.domain.Contest
 import com.example.mykku.contest.domain.ContestImage
 import com.example.mykku.contest.domain.ContestSortType
@@ -11,11 +14,9 @@ import com.example.mykku.contest.dto.ContestImageRequest
 import com.example.mykku.contest.dto.ContestImageResponse
 import com.example.mykku.contest.dto.ContestListResponse
 import com.example.mykku.contest.dto.CreateContestRequest
-import com.example.mykku.contest.tool.ContestDtoConverter
-import com.example.mykku.contest.tool.ContestParticipationReader
-import com.example.mykku.contest.tool.ContestReader
-import com.example.mykku.contest.tool.ContestWriter
-import com.example.mykku.scrap.tool.SaveContestReader
+import com.example.mykku.contest.application.service.ContestDtoConverter
+import com.example.mykku.scrap.application.port.out.SaveContestQueryPort
+import java.time.LocalDateTime
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -27,22 +28,21 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.whenever
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
-import java.time.LocalDateTime
 
 @DisplayName("ContestService 테스트")
 class ContestServiceTest : BaseServiceTest() {
 
     @Mock
-    private lateinit var contestWriter: ContestWriter
+    private lateinit var contestRepositoryPort: ContestRepositoryPort
 
     @Mock
-    private lateinit var contestReader: ContestReader
+    private lateinit var contestQueryPort: ContestQueryPort
 
     @Mock
-    private lateinit var contestParticipationReader: ContestParticipationReader
+    private lateinit var contestParticipationQueryPort: ContestParticipationQueryPort
 
     @Mock
-    private lateinit var saveContestReader: SaveContestReader
+    private lateinit var saveContestQueryPort: SaveContestQueryPort
 
     @Mock
     private lateinit var contestDtoConverter: ContestDtoConverter
@@ -66,7 +66,13 @@ class ContestServiceTest : BaseServiceTest() {
             tags = listOf("디자인", "개발")
         )
 
-        val contest = Contest(id = 1L, title = request.title, description = request.description, startedAt = LocalDateTime.now(), expiredAt = request.expiredAt)
+        val contest = Contest(
+            id = 1L,
+            title = request.title,
+            description = request.description,
+            startedAt = LocalDateTime.now(),
+            expiredAt = request.expiredAt
+        )
         initializeBaseEntityFields(contest, LocalDateTime.now())
 
         val images = listOf(
@@ -79,7 +85,13 @@ class ContestServiceTest : BaseServiceTest() {
             ContestTag(id = 2L, title = "개발", contest = contest)
         )
 
-        whenever(contestWriter.createContest(any(), anyOrNull(), any(), any(), any(), any())).thenReturn(Triple(contest, images, tags))
+        whenever(contestRepositoryPort.createContest(any(), anyOrNull(), any(), any(), any(), any())).thenReturn(
+            Triple(
+                contest,
+                images,
+                tags
+            )
+        )
 
         // when
         val result = contestService.createContest(request)
@@ -102,10 +114,17 @@ class ContestServiceTest : BaseServiceTest() {
             expiredAt = LocalDateTime.now().plusDays(7)
         )
 
-        val contest = Contest(id = 1L, title = request.title, startedAt = LocalDateTime.now(), expiredAt = request.expiredAt)
+        val contest =
+            Contest(id = 1L, title = request.title, startedAt = LocalDateTime.now(), expiredAt = request.expiredAt)
         initializeBaseEntityFields(contest, LocalDateTime.now())
 
-        whenever(contestWriter.createContest(any(), anyOrNull(), any(), any(), any(), any())).thenReturn(Triple(contest, emptyList(), emptyList()))
+        whenever(contestRepositoryPort.createContest(any(), anyOrNull(), any(), any(), any(), any())).thenReturn(
+            Triple(
+                contest,
+                emptyList(),
+                emptyList()
+            )
+        )
 
         // when
         val result = contestService.createContest(request)
@@ -121,25 +140,53 @@ class ContestServiceTest : BaseServiceTest() {
     fun `콘테스트 목록을 조회한다`() {
         // given
         val member = createTestMember()
-        val contest1 = Contest(id = 1L, title = "콘테스트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
-        val contest2 = Contest(id = 2L, title = "콘테스트2", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
+        val contest1 = Contest(
+            id = 1L,
+            title = "콘테스트1",
+            startedAt = LocalDateTime.now(),
+            expiredAt = LocalDateTime.now().plusDays(7)
+        )
+        val contest2 = Contest(
+            id = 2L,
+            title = "콘테스트2",
+            startedAt = LocalDateTime.now(),
+            expiredAt = LocalDateTime.now().plusDays(7)
+        )
         val contests = listOf(contest1, contest2)
         val pageable = PageRequest.of(0, 20)
         val page = PageImpl(contests, pageable, contests.size.toLong())
 
         val image1 = ContestImage(id = 1L, url = "url1", orderIndex = 0, contest = contest1)
-        val imagesByContestId = mapOf(1L to listOf(image1), 2L to emptyList<ContestImage>())
+        val imagesByContestId = mapOf(1L to listOf(image1), 2L to emptyList())
 
         val tag1 = ContestTag(id = 1L, title = "디자인", contest = contest1)
-        val tagsByContestId = mapOf(1L to listOf(tag1), 2L to emptyList<ContestTag>())
+        val tagsByContestId = mapOf(1L to listOf(tag1), 2L to emptyList())
 
-        val response1 = ContestListResponse(id = 1L, title = "콘테스트1", startedAt = LocalDateTime.now(), expiredAt = contest1.expiredAt, status = ContestStatusType.ACTIVE, thumbnailUrl = "url1", tags = listOf("디자인"), isSaved = true)
-        val response2 = ContestListResponse(id = 2L, title = "콘테스트2", startedAt = LocalDateTime.now(), expiredAt = contest2.expiredAt, status = ContestStatusType.ACTIVE, thumbnailUrl = null, tags = emptyList(), isSaved = false)
+        val response1 = ContestListResponse(
+            id = 1L,
+            title = "콘테스트1",
+            startedAt = LocalDateTime.now(),
+            expiredAt = contest1.expiredAt,
+            status = ContestStatusType.ACTIVE,
+            thumbnailUrl = "url1",
+            tags = listOf("디자인"),
+            isSaved = true
+        )
+        val response2 = ContestListResponse(
+            id = 2L,
+            title = "콘테스트2",
+            startedAt = LocalDateTime.now(),
+            expiredAt = contest2.expiredAt,
+            status = ContestStatusType.ACTIVE,
+            thumbnailUrl = null,
+            tags = emptyList(),
+            isSaved = false
+        )
 
-        whenever(contestReader.getContestsWithPagination(any(), any(), any(), any())).thenReturn(page)
-        whenever(contestReader.getContestImages(contests)).thenReturn(imagesByContestId)
-        whenever(contestReader.getContestTags(contests)).thenReturn(tagsByContestId)
-        whenever(saveContestReader.getSavedContestIds(eq(member), any())).thenReturn(setOf(1L))
+        whenever(contestQueryPort.getContestsWithPagination(any(), any(), any(), any())).thenReturn(page)
+        whenever(contestQueryPort.getContestImages(contests)).thenReturn(imagesByContestId)
+        whenever(contestQueryPort.getContestTags(contests)).thenReturn(tagsByContestId)
+        whenever(saveContestQueryPort.getSavedContestIds(eq(member), any())).thenReturn(setOf(1L))
         whenever(contestDtoConverter.toContestListResponse(eq(contest1), any(), any(), eq(true))).thenReturn(response1)
         whenever(contestDtoConverter.toContestListResponse(eq(contest2), any(), any(), eq(false))).thenReturn(response2)
 
@@ -156,7 +203,13 @@ class ContestServiceTest : BaseServiceTest() {
     fun `콘테스트 상세를 조회한다`() {
         // given
         val member = createTestMember()
-        val contest = Contest(id = 1L, title = "테스트 콘테스트", description = "설명", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
+        val contest = Contest(
+            id = 1L,
+            title = "테스트 콘테스트",
+            description = "설명",
+            startedAt = LocalDateTime.now(),
+            expiredAt = LocalDateTime.now().plusDays(7)
+        )
         initializeBaseEntityFields(contest, LocalDateTime.now())
 
         val images = listOf(
@@ -182,10 +235,10 @@ class ContestServiceTest : BaseServiceTest() {
             createdAt = contest.createdAt
         )
 
-        whenever(contestReader.getContestByIdWithRelations(1L)).thenReturn(contest)
-        whenever(contestReader.getContestImages(listOf(contest))).thenReturn(imagesByContestId)
-        whenever(contestReader.getContestTags(listOf(contest))).thenReturn(tagsByContestId)
-        whenever(saveContestReader.isSaved(member, contest)).thenReturn(true)
+        whenever(contestQueryPort.getContestByIdWithRelations(1L)).thenReturn(contest)
+        whenever(contestQueryPort.getContestImages(listOf(contest))).thenReturn(imagesByContestId)
+        whenever(contestQueryPort.getContestTags(listOf(contest))).thenReturn(tagsByContestId)
+        whenever(saveContestQueryPort.isSaved(member, contest)).thenReturn(true)
         whenever(contestDtoConverter.toContestDetailResponse(contest, images, tags, true)).thenReturn(expectedResponse)
 
         // when
@@ -202,7 +255,12 @@ class ContestServiceTest : BaseServiceTest() {
     fun `저장하지 않은 콘테스트 상세를 조회한다`() {
         // given
         val member = createTestMember()
-        val contest = Contest(id = 1L, title = "테스트 콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
+        val contest = Contest(
+            id = 1L,
+            title = "테스트 콘테스트",
+            startedAt = LocalDateTime.now(),
+            expiredAt = LocalDateTime.now().plusDays(7)
+        )
         initializeBaseEntityFields(contest, LocalDateTime.now())
 
         val imagesByContestId = mapOf(1L to emptyList<ContestImage>())
@@ -221,11 +279,13 @@ class ContestServiceTest : BaseServiceTest() {
             createdAt = contest.createdAt
         )
 
-        whenever(contestReader.getContestByIdWithRelations(1L)).thenReturn(contest)
-        whenever(contestReader.getContestImages(listOf(contest))).thenReturn(imagesByContestId)
-        whenever(contestReader.getContestTags(listOf(contest))).thenReturn(tagsByContestId)
-        whenever(saveContestReader.isSaved(member, contest)).thenReturn(false)
-        whenever(contestDtoConverter.toContestDetailResponse(eq(contest), any(), any(), eq(false))).thenReturn(expectedResponse)
+        whenever(contestQueryPort.getContestByIdWithRelations(1L)).thenReturn(contest)
+        whenever(contestQueryPort.getContestImages(listOf(contest))).thenReturn(imagesByContestId)
+        whenever(contestQueryPort.getContestTags(listOf(contest))).thenReturn(tagsByContestId)
+        whenever(saveContestQueryPort.isSaved(member, contest)).thenReturn(false)
+        whenever(contestDtoConverter.toContestDetailResponse(eq(contest), any(), any(), eq(false))).thenReturn(
+            expectedResponse
+        )
 
         // when
         val result = contestService.getContestDetail(1L, member)
@@ -239,25 +299,53 @@ class ContestServiceTest : BaseServiceTest() {
     fun `내가 참여한 콘테스트 목록을 조회한다`() {
         // given
         val member = createTestMember()
-        val contest1 = Contest(id = 1L, title = "콘테스트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
-        val contest2 = Contest(id = 2L, title = "콘테스트2", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
+        val contest1 = Contest(
+            id = 1L,
+            title = "콘테스트1",
+            startedAt = LocalDateTime.now(),
+            expiredAt = LocalDateTime.now().plusDays(7)
+        )
+        val contest2 = Contest(
+            id = 2L,
+            title = "콘테스트2",
+            startedAt = LocalDateTime.now(),
+            expiredAt = LocalDateTime.now().plusDays(7)
+        )
         val contests = listOf(contest1, contest2)
         val pageable = PageRequest.of(0, 20)
         val page = PageImpl(contests, pageable, contests.size.toLong())
 
         val image1 = ContestImage(id = 1L, url = "url1", orderIndex = 0, contest = contest1)
-        val imagesByContestId = mapOf(1L to listOf(image1), 2L to emptyList<ContestImage>())
+        val imagesByContestId = mapOf(1L to listOf(image1), 2L to emptyList())
 
         val tag1 = ContestTag(id = 1L, title = "디자인", contest = contest1)
-        val tagsByContestId = mapOf(1L to listOf(tag1), 2L to emptyList<ContestTag>())
+        val tagsByContestId = mapOf(1L to listOf(tag1), 2L to emptyList())
 
-        val response1 = ContestListResponse(id = 1L, title = "콘테스트1", startedAt = LocalDateTime.now(), expiredAt = contest1.expiredAt, status = ContestStatusType.ACTIVE, thumbnailUrl = "url1", tags = listOf("디자인"), isSaved = true)
-        val response2 = ContestListResponse(id = 2L, title = "콘테스트2", startedAt = LocalDateTime.now(), expiredAt = contest2.expiredAt, status = ContestStatusType.ACTIVE, thumbnailUrl = null, tags = emptyList(), isSaved = false)
+        val response1 = ContestListResponse(
+            id = 1L,
+            title = "콘테스트1",
+            startedAt = LocalDateTime.now(),
+            expiredAt = contest1.expiredAt,
+            status = ContestStatusType.ACTIVE,
+            thumbnailUrl = "url1",
+            tags = listOf("디자인"),
+            isSaved = true
+        )
+        val response2 = ContestListResponse(
+            id = 2L,
+            title = "콘테스트2",
+            startedAt = LocalDateTime.now(),
+            expiredAt = contest2.expiredAt,
+            status = ContestStatusType.ACTIVE,
+            thumbnailUrl = null,
+            tags = emptyList(),
+            isSaved = false
+        )
 
-        whenever(contestParticipationReader.getParticipatedContests(eq(member), any())).thenReturn(page)
-        whenever(contestReader.getContestImages(contests)).thenReturn(imagesByContestId)
-        whenever(contestReader.getContestTags(contests)).thenReturn(tagsByContestId)
-        whenever(saveContestReader.getSavedContestIds(eq(member), any())).thenReturn(setOf(1L))
+        whenever(contestParticipationQueryPort.getParticipatedContests(eq(member), any())).thenReturn(page)
+        whenever(contestQueryPort.getContestImages(contests)).thenReturn(imagesByContestId)
+        whenever(contestQueryPort.getContestTags(contests)).thenReturn(tagsByContestId)
+        whenever(saveContestQueryPort.getSavedContestIds(eq(member), any())).thenReturn(setOf(1L))
         whenever(contestDtoConverter.toContestListResponse(eq(contest1), any(), any(), eq(true))).thenReturn(response1)
         whenever(contestDtoConverter.toContestListResponse(eq(contest2), any(), any(), eq(false))).thenReturn(response2)
 

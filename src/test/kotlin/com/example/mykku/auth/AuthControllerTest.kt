@@ -1,8 +1,8 @@
 package com.example.mykku.auth
 
 import com.example.mykku.BaseControllerTest
+import com.example.mykku.auth.application.port.out.JwtTokenPort
 import com.example.mykku.auth.dto.RefreshTokenRequest
-import com.example.mykku.auth.tool.JwtTokenProvider
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import io.restassured.RestAssured
@@ -18,7 +18,7 @@ import com.example.mykku.role.domain.Role
 class AuthControllerTest : BaseControllerTest() {
 
     @Autowired
-    private lateinit var jwtTokenProvider: JwtTokenProvider
+    private lateinit var jwtTokenPort: JwtTokenPort
 
     @Test
     @DisplayName("리프레시 토큰으로 액세스 토큰 재발급 - 정상 케이스")
@@ -37,7 +37,7 @@ class AuthControllerTest : BaseControllerTest() {
             )
         )
 
-        val refreshToken = jwtTokenProvider.generateRefreshToken(member.id)
+        val refreshToken = jwtTokenPort.generateRefreshToken(member.id)
         val request = RefreshTokenRequest(refreshToken = refreshToken)
 
         // when & then
@@ -89,7 +89,7 @@ class AuthControllerTest : BaseControllerTest() {
         )
 
         // 액세스 토큰 생성 (리프레시 토큰이 아님)
-        val accessToken = jwtTokenProvider.generateAccessToken(member.id, member.email)
+        val accessToken = jwtTokenPort.generateAccessToken(member.id, member.email)
         val request = RefreshTokenRequest(refreshToken = accessToken)
 
         // when & then
@@ -120,8 +120,8 @@ class AuthControllerTest : BaseControllerTest() {
             )
         )
 
-        val refreshToken = jwtTokenProvider.generateRefreshToken(member.id)
-        memberRepository.delete(member) // 회원 삭제
+        val refreshToken = jwtTokenPort.generateRefreshToken(member.id)
+        memberRepository.delete(member)
 
         val request = RefreshTokenRequest(refreshToken = refreshToken)
 

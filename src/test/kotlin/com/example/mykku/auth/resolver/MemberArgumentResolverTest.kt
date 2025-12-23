@@ -1,7 +1,7 @@
 package com.example.mykku.auth.resolver
 
+import com.example.mykku.auth.application.port.out.JwtTokenPort
 import com.example.mykku.auth.config.CurrentMember
-import com.example.mykku.auth.tool.JwtTokenProvider
 import com.example.mykku.auth.exception.AuthException
 import com.example.mykku.auth.exception.AuthErrorCode
 import com.example.mykku.member.domain.Member
@@ -22,7 +22,7 @@ import com.example.mykku.role.domain.Role
 class MemberArgumentResolverTest {
 
     private lateinit var resolver: MemberArgumentResolver
-    private lateinit var jwtTokenProvider: JwtTokenProvider
+    private lateinit var jwtTokenPort: JwtTokenPort
     private lateinit var memberRepository: MemberRepository
     private lateinit var parameter: MethodParameter
     private lateinit var webRequest: NativeWebRequest
@@ -30,9 +30,9 @@ class MemberArgumentResolverTest {
 
     @BeforeEach
     fun setUp() {
-        jwtTokenProvider = mock()
+        jwtTokenPort = mock()
         memberRepository = mock()
-        resolver = MemberArgumentResolver(jwtTokenProvider, memberRepository)
+        resolver = MemberArgumentResolver(jwtTokenPort, memberRepository)
         parameter = mock()
         webRequest = mock()
         request = mock()
@@ -82,8 +82,8 @@ class MemberArgumentResolverTest {
         )
 
         whenever(request.getHeader("Authorization")).thenReturn("Bearer $token")
-        whenever(jwtTokenProvider.validateToken(token)).thenReturn(true)
-        whenever(jwtTokenProvider.getMemberIdFromToken(token)).thenReturn(memberId)
+        whenever(jwtTokenPort.validateToken(token)).thenReturn(true)
+        whenever(jwtTokenPort.getMemberIdFromToken(token)).thenReturn(memberId)
         whenever(memberRepository.findById(memberId)).thenReturn(Optional.of(member))
 
         // when
@@ -132,7 +132,7 @@ class MemberArgumentResolverTest {
         whenever(annotation.required).thenReturn(true)
         whenever(parameter.getParameterAnnotation(CurrentMember::class.java)).thenReturn(annotation)
         whenever(request.getHeader("Authorization")).thenReturn("Bearer $token")
-        whenever(jwtTokenProvider.validateToken(token)).thenReturn(false)
+        whenever(jwtTokenPort.validateToken(token)).thenReturn(false)
 
         // when & then
         assertThrows<AuthException> {
@@ -150,7 +150,7 @@ class MemberArgumentResolverTest {
         whenever(annotation.required).thenReturn(false)
         whenever(parameter.getParameterAnnotation(CurrentMember::class.java)).thenReturn(annotation)
         whenever(request.getHeader("Authorization")).thenReturn("Bearer $token")
-        whenever(jwtTokenProvider.validateToken(token)).thenReturn(false)
+        whenever(jwtTokenPort.validateToken(token)).thenReturn(false)
 
         // when
         val result = resolver.resolveArgument(parameter, null, webRequest, null)
@@ -168,8 +168,8 @@ class MemberArgumentResolverTest {
         whenever(annotation.required).thenReturn(false)
         whenever(parameter.getParameterAnnotation(CurrentMember::class.java)).thenReturn(annotation)
         whenever(request.getHeader("Authorization")).thenReturn("Bearer $token")
-        whenever(jwtTokenProvider.validateToken(token)).thenReturn(true)
-        whenever(jwtTokenProvider.getMemberIdFromToken(token)).thenReturn(memberId)
+        whenever(jwtTokenPort.validateToken(token)).thenReturn(true)
+        whenever(jwtTokenPort.getMemberIdFromToken(token)).thenReturn(memberId)
         whenever(memberRepository.findById(memberId)).thenReturn(Optional.empty())
 
         // when
