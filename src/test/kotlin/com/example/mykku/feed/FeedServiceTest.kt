@@ -15,7 +15,7 @@ import com.example.mykku.feed.domain.FeedTag
 import com.example.mykku.feed.application.port.out.FeedQueryPort
 import com.example.mykku.feed.application.port.out.FeedRepositoryPort
 import com.example.mykku.feed.dto.CreateFeedRequest
-import com.example.mykku.feed.tool.FeedDtoConverter
+import com.example.mykku.feed.application.service.FeedDtoConverter
 import com.example.mykku.image.ImageUploadService
 import com.example.mykku.image.dto.ImageUploadResult
 import com.example.mykku.like.application.port.out.LikeFeedQueryPort

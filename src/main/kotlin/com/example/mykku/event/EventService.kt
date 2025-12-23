@@ -8,7 +8,7 @@ import com.example.mykku.event.domain.Event
 import com.example.mykku.event.domain.EventSortType
 import com.example.mykku.event.domain.EventStatusType
 import com.example.mykku.event.dto.*
-import com.example.mykku.event.tool.EventDtoConverter
+import com.example.mykku.event.application.service.EventDtoConverter
 import com.example.mykku.member.domain.Member
 import com.example.mykku.scrap.application.port.out.SaveEventQueryPort
 import org.springframework.data.domain.PageImpl

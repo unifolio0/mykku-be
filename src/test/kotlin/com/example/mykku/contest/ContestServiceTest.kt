@@ -14,7 +14,7 @@ import com.example.mykku.contest.dto.ContestImageRequest
 import com.example.mykku.contest.dto.ContestImageResponse
 import com.example.mykku.contest.dto.ContestListResponse
 import com.example.mykku.contest.dto.CreateContestRequest
-import com.example.mykku.contest.tool.ContestDtoConverter
+import com.example.mykku.contest.application.service.ContestDtoConverter
 import com.example.mykku.scrap.application.port.out.SaveContestQueryPort
 import java.time.LocalDateTime
 import org.assertj.core.api.Assertions.assertThat

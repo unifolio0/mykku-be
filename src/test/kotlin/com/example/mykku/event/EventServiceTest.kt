@@ -13,7 +13,7 @@ import com.example.mykku.event.dto.EventImageRequest
 import com.example.mykku.event.dto.EventListResponse
 import com.example.mykku.event.dto.EventDetailResponse
 import com.example.mykku.event.dto.EventImageResponse
-import com.example.mykku.event.tool.EventDtoConverter
+import com.example.mykku.event.application.service.EventDtoConverter
 import com.example.mykku.scrap.application.port.out.SaveEventQueryPort
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName

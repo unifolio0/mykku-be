@@ -1,11 +1,11 @@
 package com.example.mykku.email
 
+import com.example.mykku.auth.application.port.out.JwtTokenPort
 import com.example.mykku.auth.dto.LoginResponse
-import com.example.mykku.auth.tool.JwtTokenProvider
+import com.example.mykku.email.application.port.out.EmailSenderPort
+import com.example.mykku.email.application.port.out.VerificationCodePort
 import com.example.mykku.email.domain.VerificationPurpose
 import com.example.mykku.email.exception.EmailAuthException
-import com.example.mykku.email.tool.EmailSender
-import com.example.mykku.email.tool.RedisVerificationCodeManager
 import com.example.mykku.email.util.TemporaryPasswordGenerator
 import com.example.mykku.member.application.port.out.MemberQueryPort
 import com.example.mykku.member.application.port.out.MemberRepositoryPort
@@ -23,12 +23,12 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class EmailAuthService(
-    private val emailSender: EmailSender,
-    private val redisVerificationCodeManager: RedisVerificationCodeManager,
+    private val emailSenderPort: EmailSenderPort,
+    private val verificationCodePort: VerificationCodePort,
     private val memberQueryPort: MemberQueryPort,
     private val memberRepositoryPort: MemberRepositoryPort,
     private val passwordEncoder: PasswordEncoder,
-    private val jwtTokenProvider: JwtTokenProvider,
+    private val jwtTokenPort: JwtTokenPort,
     private val roleQueryPort: RoleQueryPort,
     private val memberRoleRepositoryPort: MemberRoleRepositoryPort
 ) {
@@ -39,10 +39,11 @@ class EmailAuthService(
             throw EmailAuthException.emailAlreadyExists()
         }
 
-        val code = redisVerificationCodeManager.saveVerificationCode(email, purpose.name)
+        val code = verificationCodePort.generateCode()
+        verificationCodePort.saveCode(email, code, purpose)
 
         try {
-            emailSender.sendVerificationCode(
+            emailSenderPort.sendVerificationCode(
                 to = email,
                 code = code,
                 purpose = purpose
@@ -54,14 +55,14 @@ class EmailAuthService(
 
     @Transactional
     fun verifyCode(email: String, code: String, purpose: VerificationPurpose) {
-        val savedCode = redisVerificationCodeManager.getVerificationCode(email, purpose.name)
+        val savedCode = verificationCodePort.getCode(email, purpose)
             ?: throw EmailAuthException.verificationCodeExpired()
 
         if (savedCode != code) {
             throw EmailAuthException.invalidVerificationCode()
         }
 
-        redisVerificationCodeManager.deleteVerificationCode(email, purpose.name)
+        verificationCodePort.deleteCode(email, purpose)
     }
 
     @Transactional
@@ -83,7 +84,7 @@ class EmailAuthService(
         val savedMember = memberRepositoryPort.save(memberDomain)
 
         val member = memberQueryPort.getMemberById(savedMember.id)
-        return jwtTokenProvider.createLoginResponse(member, email, false)
+        return jwtTokenPort.createLoginResponse(member, email, false)
     }
 
     @Transactional(readOnly = true)
@@ -95,7 +96,7 @@ class EmailAuthService(
             throw EmailAuthException.invalidEmailOrPassword()
         }
 
-        return jwtTokenProvider.createLoginResponse(member, email, true)
+        return jwtTokenPort.createLoginResponse(member, email, true)
     }
 
     @Transactional
@@ -128,7 +129,7 @@ class EmailAuthService(
         memberRepositoryPort.save(memberDomain)
 
         try {
-            emailSender.sendTemporaryPassword(
+            emailSenderPort.sendTemporaryPassword(
                 to = email,
                 temporaryPassword = temporaryPassword
             )

@@ -1,14 +1,14 @@
 package com.example.mykku.email
 
 import com.example.mykku.BaseServiceTest
+import com.example.mykku.auth.application.port.out.JwtTokenPort
 import com.example.mykku.auth.dto.LoginResponse
 import com.example.mykku.auth.dto.MemberInfo
-import com.example.mykku.auth.tool.JwtTokenProvider
+import com.example.mykku.email.application.port.out.EmailSenderPort
+import com.example.mykku.email.application.port.out.VerificationCodePort
 import com.example.mykku.email.domain.VerificationPurpose
 import com.example.mykku.email.exception.EmailAuthErrorCode
 import com.example.mykku.email.exception.EmailAuthException
-import com.example.mykku.email.tool.EmailSender
-import com.example.mykku.email.tool.RedisVerificationCodeManager
 import com.example.mykku.member.application.port.out.MemberQueryPort
 import com.example.mykku.member.application.port.out.MemberRepositoryPort
 import com.example.mykku.member.domain.Member
@@ -33,10 +33,10 @@ import org.springframework.security.crypto.password.PasswordEncoder
 class EmailAuthServiceTest : BaseServiceTest() {
 
     @Mock
-    private lateinit var emailSender: EmailSender
+    private lateinit var emailSenderPort: EmailSenderPort
 
     @Mock
-    private lateinit var redisVerificationCodeManager: RedisVerificationCodeManager
+    private lateinit var verificationCodePort: VerificationCodePort
 
     @Mock
     private lateinit var memberQueryPort: MemberQueryPort
@@ -48,7 +48,7 @@ class EmailAuthServiceTest : BaseServiceTest() {
     private lateinit var passwordEncoder: PasswordEncoder
 
     @Mock
-    private lateinit var jwtTokenProvider: JwtTokenProvider
+    private lateinit var jwtTokenPort: JwtTokenPort
 
     @Mock
     private lateinit var roleQueryPort: com.example.mykku.role.application.port.out.RoleQueryPort
@@ -65,14 +65,14 @@ class EmailAuthServiceTest : BaseServiceTest() {
         val code = "123456"
 
         whenever(memberQueryPort.existsByEmailString(email)).thenReturn(false)
-        whenever(redisVerificationCodeManager.saveVerificationCode(email, VerificationPurpose.SIGNUP.name))
-            .thenReturn(code)
+        whenever(verificationCodePort.generateCode()).thenReturn(code)
 
         emailAuthService.sendVerificationCode(email, VerificationPurpose.SIGNUP)
 
         verify(memberQueryPort).existsByEmailString(email)
-        verify(redisVerificationCodeManager).saveVerificationCode(email, VerificationPurpose.SIGNUP.name)
-        verify(emailSender).sendVerificationCode(email, code, VerificationPurpose.SIGNUP)
+        verify(verificationCodePort).generateCode()
+        verify(verificationCodePort).saveCode(email, code, VerificationPurpose.SIGNUP)
+        verify(emailSenderPort).sendVerificationCode(email, code, VerificationPurpose.SIGNUP)
     }
 
     @Test
@@ -93,13 +93,13 @@ class EmailAuthServiceTest : BaseServiceTest() {
         val email = "test@example.com"
         val code = "123456"
 
-        whenever(redisVerificationCodeManager.saveVerificationCode(email, VerificationPurpose.PASSWORD_RESET.name))
-            .thenReturn(code)
+        whenever(verificationCodePort.generateCode()).thenReturn(code)
 
         emailAuthService.sendVerificationCode(email, VerificationPurpose.PASSWORD_RESET)
 
-        verify(redisVerificationCodeManager).saveVerificationCode(email, VerificationPurpose.PASSWORD_RESET.name)
-        verify(emailSender).sendVerificationCode(email, code, VerificationPurpose.PASSWORD_RESET)
+        verify(verificationCodePort).generateCode()
+        verify(verificationCodePort).saveCode(email, code, VerificationPurpose.PASSWORD_RESET)
+        verify(emailSenderPort).sendVerificationCode(email, code, VerificationPurpose.PASSWORD_RESET)
     }
 
     @Test
@@ -107,13 +107,13 @@ class EmailAuthServiceTest : BaseServiceTest() {
         val email = "test@example.com"
         val code = "123456"
 
-        whenever(redisVerificationCodeManager.getVerificationCode(email, VerificationPurpose.SIGNUP.name))
+        whenever(verificationCodePort.getCode(email, VerificationPurpose.SIGNUP))
             .thenReturn(code)
 
         emailAuthService.verifyCode(email, code, VerificationPurpose.SIGNUP)
 
-        verify(redisVerificationCodeManager).getVerificationCode(email, VerificationPurpose.SIGNUP.name)
-        verify(redisVerificationCodeManager).deleteVerificationCode(email, VerificationPurpose.SIGNUP.name)
+        verify(verificationCodePort).getCode(email, VerificationPurpose.SIGNUP)
+        verify(verificationCodePort).deleteCode(email, VerificationPurpose.SIGNUP)
     }
 
     @Test
@@ -121,7 +121,7 @@ class EmailAuthServiceTest : BaseServiceTest() {
         val email = "test@example.com"
         val code = "123456"
 
-        whenever(redisVerificationCodeManager.getVerificationCode(email, VerificationPurpose.SIGNUP.name))
+        whenever(verificationCodePort.getCode(email, VerificationPurpose.SIGNUP))
             .thenReturn(null)
 
         val exception = assertThrows<EmailAuthException> {
@@ -137,7 +137,7 @@ class EmailAuthServiceTest : BaseServiceTest() {
         val correctCode = "123456"
         val wrongCode = "654321"
 
-        whenever(redisVerificationCodeManager.getVerificationCode(email, VerificationPurpose.SIGNUP.name))
+        whenever(verificationCodePort.getCode(email, VerificationPurpose.SIGNUP))
             .thenReturn(correctCode)
 
         val exception = assertThrows<EmailAuthException> {
@@ -186,7 +186,7 @@ class EmailAuthServiceTest : BaseServiceTest() {
         whenever(passwordEncoder.encode(password)).thenReturn(encodedPassword)
         whenever(memberRepositoryPort.save(any())).thenReturn(memberDomain)
         whenever(memberQueryPort.getMemberById(MemberId("memberId"))).thenReturn(member)
-        whenever(jwtTokenProvider.createLoginResponse(any(), any(), any())).thenReturn(loginResponse)
+        whenever(jwtTokenPort.createLoginResponse(any(), any(), any())).thenReturn(loginResponse)
 
         val result = emailAuthService.signup(email, password, nickname)
 
@@ -195,7 +195,7 @@ class EmailAuthServiceTest : BaseServiceTest() {
         verify(memberQueryPort).existsByEmailString(email)
         verify(passwordEncoder).encode(password)
         verify(memberRepositoryPort).save(any())
-        verify(jwtTokenProvider).createLoginResponse(any(), any(), any())
+        verify(jwtTokenPort).createLoginResponse(any(), any(), any())
     }
 
     @Test
@@ -245,7 +245,7 @@ class EmailAuthServiceTest : BaseServiceTest() {
 
         whenever(memberQueryPort.findMemberByEmail(email)).thenReturn(member)
         whenever(passwordEncoder.matches(password, encodedPassword)).thenReturn(true)
-        whenever(jwtTokenProvider.createLoginResponse(member, email, true)).thenReturn(loginResponse)
+        whenever(jwtTokenPort.createLoginResponse(member, email, true)).thenReturn(loginResponse)
 
         val result = emailAuthService.login(email, password)
 
@@ -253,7 +253,7 @@ class EmailAuthServiceTest : BaseServiceTest() {
         assertEquals(loginResponse.accessToken, result.accessToken)
         verify(memberQueryPort).findMemberByEmail(email)
         verify(passwordEncoder).matches(password, encodedPassword)
-        verify(jwtTokenProvider).createLoginResponse(member, email, true)
+        verify(jwtTokenPort).createLoginResponse(member, email, true)
     }
 
     @Test
@@ -320,7 +320,7 @@ class EmailAuthServiceTest : BaseServiceTest() {
             nickname = Nickname("테스트")
         )
 
-        whenever(redisVerificationCodeManager.getVerificationCode(email, VerificationPurpose.PASSWORD_RESET.name))
+        whenever(verificationCodePort.getCode(email, VerificationPurpose.PASSWORD_RESET))
             .thenReturn(code)
         whenever(memberQueryPort.findMemberByEmail(email)).thenReturn(member)
         whenever(passwordEncoder.encode(newPassword)).thenReturn(encodedPassword)
@@ -329,12 +329,12 @@ class EmailAuthServiceTest : BaseServiceTest() {
 
         emailAuthService.resetPassword(email, code, newPassword)
 
-        verify(redisVerificationCodeManager).getVerificationCode(email, VerificationPurpose.PASSWORD_RESET.name)
+        verify(verificationCodePort).getCode(email, VerificationPurpose.PASSWORD_RESET)
         verify(memberQueryPort).findMemberByEmail(email)
         verify(passwordEncoder).encode(newPassword)
         verify(memberRepositoryPort).findById(MemberId("memberId"))
         verify(memberRepositoryPort).save(any())
-        verify(redisVerificationCodeManager).deleteVerificationCode(email, VerificationPurpose.PASSWORD_RESET.name)
+        verify(verificationCodePort).deleteCode(email, VerificationPurpose.PASSWORD_RESET)
     }
 
     @Test
@@ -343,7 +343,7 @@ class EmailAuthServiceTest : BaseServiceTest() {
         val code = "123456"
         val newPassword = "newPassword123!"
 
-        whenever(redisVerificationCodeManager.getVerificationCode(email, VerificationPurpose.PASSWORD_RESET.name))
+        whenever(verificationCodePort.getCode(email, VerificationPurpose.PASSWORD_RESET))
             .thenReturn(null)
 
         val exception = assertThrows<EmailAuthException> {
@@ -360,7 +360,7 @@ class EmailAuthServiceTest : BaseServiceTest() {
         val wrongCode = "654321"
         val newPassword = "newPassword123!"
 
-        whenever(redisVerificationCodeManager.getVerificationCode(email, VerificationPurpose.PASSWORD_RESET.name))
+        whenever(verificationCodePort.getCode(email, VerificationPurpose.PASSWORD_RESET))
             .thenReturn(correctCode)
 
         val exception = assertThrows<EmailAuthException> {
@@ -403,7 +403,7 @@ class EmailAuthServiceTest : BaseServiceTest() {
         verify(passwordEncoder).encode(any())
         verify(memberRepositoryPort).findById(MemberId("memberId"))
         verify(memberRepositoryPort).save(any())
-        verify(emailSender).sendTemporaryPassword(any(), any())
+        verify(emailSenderPort).sendTemporaryPassword(any(), any())
     }
 
     @Test
@@ -444,7 +444,7 @@ class EmailAuthServiceTest : BaseServiceTest() {
         whenever(passwordEncoder.encode(any())).thenReturn("encodedPassword")
         whenever(memberRepositoryPort.findById(MemberId("memberId"))).thenReturn(memberDomain)
         whenever(memberRepositoryPort.save(any())).thenReturn(memberDomain)
-        whenever(emailSender.sendTemporaryPassword(any(), any())).thenThrow(RuntimeException("Email send failed"))
+        whenever(emailSenderPort.sendTemporaryPassword(any(), any())).thenThrow(RuntimeException("Email send failed"))
 
         val exception = assertThrows<EmailAuthException> {
             emailAuthService.sendTemporaryPassword(email)

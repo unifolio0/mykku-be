@@ -1,6 +1,8 @@
 package com.example.mykku.email.application.port.out
 
+import com.example.mykku.email.domain.VerificationPurpose
+
 interface EmailSenderPort {
-    fun sendVerificationEmail(email: String, code: String)
-    fun sendTemporaryPasswordEmail(email: String, temporaryPassword: String)
+    fun sendVerificationCode(to: String, code: String, purpose: VerificationPurpose)
+    fun sendTemporaryPassword(to: String, temporaryPassword: String)
 }

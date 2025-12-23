@@ -1,7 +1,7 @@
 package com.example.mykku.auth.resolver
 
+import com.example.mykku.auth.application.port.out.JwtTokenPort
 import com.example.mykku.auth.config.CurrentMember
-import com.example.mykku.auth.tool.JwtTokenProvider
 import com.example.mykku.auth.exception.AuthException
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.repository.MemberRepository
@@ -15,7 +15,7 @@ import org.springframework.web.method.support.ModelAndViewContainer
 
 @Component
 class MemberArgumentResolver(
-    private val jwtTokenProvider: JwtTokenProvider,
+    private val jwtTokenPort: JwtTokenPort,
     private val memberRepository: MemberRepository
 ) : HandlerMethodArgumentResolver {
 
@@ -41,11 +41,11 @@ class MemberArgumentResolver(
         val token = extractToken(request)
             ?: return handleNullableParameter(parameter)
 
-        if (!jwtTokenProvider.validateToken(token)) {
+        if (!jwtTokenPort.validateToken(token)) {
             return handleNullableParameter(parameter)
         }
 
-        val memberId = jwtTokenProvider.getMemberIdFromToken(token)
+        val memberId = jwtTokenPort.getMemberIdFromToken(token)
 
         return memberRepository.findById(memberId)
             .orElse(null)

@@ -8,7 +8,7 @@ import com.example.mykku.contest.dto.*
 import com.example.mykku.contest.application.port.out.ContestParticipationQueryPort
 import com.example.mykku.contest.application.port.out.ContestQueryPort
 import com.example.mykku.contest.application.port.out.ContestRepositoryPort
-import com.example.mykku.contest.tool.ContestDtoConverter
+import com.example.mykku.contest.application.service.ContestDtoConverter
 import com.example.mykku.member.domain.Member
 import com.example.mykku.scrap.application.port.out.SaveContestQueryPort
 import org.springframework.data.domain.PageImpl

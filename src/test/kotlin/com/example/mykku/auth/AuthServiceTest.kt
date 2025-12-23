@@ -1,11 +1,11 @@
 package com.example.mykku.auth
 
 import com.example.mykku.BaseServiceTest
+import com.example.mykku.auth.application.port.out.JwtTokenPort
+import com.example.mykku.auth.application.port.out.OAuthLoginPort
 import com.example.mykku.auth.dto.LoginResponse
 import com.example.mykku.auth.dto.MemberInfo
 import com.example.mykku.auth.dto.MobileLoginRequest
-import com.example.mykku.auth.tool.JwtTokenProvider
-import com.example.mykku.auth.tool.OAuthLoginStrategy
 import com.example.mykku.member.application.port.out.MemberQueryPort
 import com.example.mykku.member.domain.SocialProvider
 import kotlin.test.assertEquals
@@ -17,29 +17,29 @@ import org.mockito.kotlin.whenever
 class AuthServiceTest : BaseServiceTest() {
 
     @Mock
-    private lateinit var jwtTokenProvider: JwtTokenProvider
+    private lateinit var jwtTokenPort: JwtTokenPort
 
     @Mock
     private lateinit var memberQueryPort: MemberQueryPort
 
     @Mock
-    private lateinit var googleLoginStrategy: OAuthLoginStrategy
+    private lateinit var googleLoginStrategy: OAuthLoginPort
 
     @Mock
-    private lateinit var kakaoLoginStrategy: OAuthLoginStrategy
+    private lateinit var kakaoLoginStrategy: OAuthLoginPort
 
     @Mock
-    private lateinit var appleLoginStrategy: OAuthLoginStrategy
+    private lateinit var appleLoginStrategy: OAuthLoginPort
 
     @Mock
-    private lateinit var naverLoginStrategy: OAuthLoginStrategy
+    private lateinit var naverLoginStrategy: OAuthLoginPort
 
     private lateinit var authService: AuthService
 
     @BeforeEach
     fun setUp() {
         authService = AuthService(
-            jwtTokenProvider,
+            jwtTokenPort,
             memberQueryPort,
             listOf(googleLoginStrategy, kakaoLoginStrategy, appleLoginStrategy, naverLoginStrategy)
         )

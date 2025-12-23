@@ -1,8 +1,8 @@
 package com.example.mykku.docs
 
 import com.example.mykku.admin.service.AdminRoleService
+import com.example.mykku.auth.application.port.out.JwtTokenPort
 import com.example.mykku.auth.AuthService
-import com.example.mykku.auth.tool.JwtTokenProvider
 import com.example.mykku.board.BoardService
 import com.example.mykku.contest.ContestService
 import com.example.mykku.dailymessage.DailyMessageCommentService
@@ -136,7 +136,7 @@ abstract class BaseDocumentTest {
     }
 
     @MockitoBean
-    protected lateinit var jwtTokenProvider: JwtTokenProvider
+    protected lateinit var jwtTokenPort: JwtTokenPort
 
     @Autowired
     protected lateinit var memberRepository: MemberRepository
@@ -187,8 +187,8 @@ abstract class BaseDocumentTest {
             )
         )
 
-        doReturn(true).`when`(jwtTokenProvider).validateToken(TEST_ACCESS_TOKEN)
-        doReturn(TEST_MEMBER_ID).`when`(jwtTokenProvider).getMemberIdFromToken(TEST_ACCESS_TOKEN)
+        doReturn(true).`when`(jwtTokenPort).validateToken(TEST_ACCESS_TOKEN)
+        doReturn(TEST_MEMBER_ID).`when`(jwtTokenPort).getMemberIdFromToken(TEST_ACCESS_TOKEN)
     }
 
     protected fun request(): RestDocumentationRequest = RestDocumentationRequest()
