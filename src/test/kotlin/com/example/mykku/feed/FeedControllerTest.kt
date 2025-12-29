@@ -393,4 +393,161 @@ class FeedControllerTest : BaseControllerTest() {
             .body("data.currentPage", equalTo(0))
             .body("data.size", equalTo(5))
     }
+
+    @Test
+    @DisplayName("피드 삭제 - 정상 케이스")
+    fun `deleteFeed - 작성자가 정상적으로 피드를 삭제한다`() {
+        // given
+        val member = memberRepository.save(
+            Member(
+                id = "member1",
+                socialId = "member1",
+                provider = SocialProvider.GOOGLE,
+                email = "member1@example.com",
+                nickname = "Member1",
+                role = null,
+                profileImage = ""
+            )
+        )
+        val board = boardRepository.save(
+            Board(
+                title = "테스트 게시판",
+                logo = "test_logo.png"
+            )
+        )
+        val feed = feedRepository.save(
+            Feed(
+                title = "삭제할 피드",
+                content = "삭제할 피드 내용",
+                member = member,
+                board = board
+            )
+        )
+        val authHeader = TestTokenGenerator.getBearerToken("member1")
+
+        // when & then
+        RestAssured.given()
+            .header("Authorization", authHeader)
+        .`when`()
+            .delete("/api/v1/feeds/{feedId}", feed.id)
+        .then()
+            .statusCode(200)
+            .body("message", equalTo("피드가 성공적으로 삭제되었습니다."))
+    }
+
+    @Test
+    @DisplayName("피드 삭제 - 인증되지 않은 사용자")
+    fun `deleteFeed - 인증되지 않은 사용자는 피드를 삭제할 수 없다`() {
+        // given
+        val member = memberRepository.save(
+            Member(
+                id = "member1",
+                socialId = "member1",
+                provider = SocialProvider.GOOGLE,
+                email = "member1@example.com",
+                nickname = "Member1",
+                role = null,
+                profileImage = ""
+            )
+        )
+        val board = boardRepository.save(
+            Board(
+                title = "테스트 게시판",
+                logo = "test_logo.png"
+            )
+        )
+        val feed = feedRepository.save(
+            Feed(
+                title = "삭제할 피드",
+                content = "삭제할 피드 내용",
+                member = member,
+                board = board
+            )
+        )
+
+        // when & then
+        RestAssured.given()
+        .`when`()
+            .delete("/api/v1/feeds/{feedId}", feed.id)
+        .then()
+            .statusCode(401)
+    }
+
+    @Test
+    @DisplayName("피드 삭제 - 다른 사용자의 피드 삭제 시도")
+    fun `deleteFeed - 다른 사용자의 피드는 삭제할 수 없다`() {
+        // given
+        val owner = memberRepository.save(
+            Member(
+                id = "owner-id",
+                socialId = "owner-social",
+                provider = SocialProvider.GOOGLE,
+                email = "owner@example.com",
+                nickname = "Owner",
+                role = null,
+                profileImage = ""
+            )
+        )
+        memberRepository.save(
+            Member(
+                id = "other-member",
+                socialId = "other-social",
+                provider = SocialProvider.GOOGLE,
+                email = "other@example.com",
+                nickname = "Other",
+                role = null,
+                profileImage = ""
+            )
+        )
+        val board = boardRepository.save(
+            Board(
+                title = "테스트 게시판",
+                logo = "test_logo.png"
+            )
+        )
+        val feed = feedRepository.save(
+            Feed(
+                title = "삭제할 피드",
+                content = "삭제할 피드 내용",
+                member = owner,
+                board = board
+            )
+        )
+        val authHeader = TestTokenGenerator.getBearerToken("other-member")
+
+        // when & then
+        RestAssured.given()
+            .header("Authorization", authHeader)
+        .`when`()
+            .delete("/api/v1/feeds/{feedId}", feed.id)
+        .then()
+            .statusCode(403)
+    }
+
+    @Test
+    @DisplayName("피드 삭제 - 존재하지 않는 피드")
+    fun `deleteFeed - 존재하지 않는 피드는 삭제할 수 없다`() {
+        // given
+        memberRepository.save(
+            Member(
+                id = "member1",
+                socialId = "member1",
+                provider = SocialProvider.GOOGLE,
+                email = "member1@example.com",
+                nickname = "Member1",
+                role = null,
+                profileImage = ""
+            )
+        )
+        val authHeader = TestTokenGenerator.getBearerToken("member1")
+        val nonExistentFeedId = 99999L
+
+        // when & then
+        RestAssured.given()
+            .header("Authorization", authHeader)
+        .`when`()
+            .delete("/api/v1/feeds/{feedId}", nonExistentFeedId)
+        .then()
+            .statusCode(404)
+    }
 }

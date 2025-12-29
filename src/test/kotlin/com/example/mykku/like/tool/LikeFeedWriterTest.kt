@@ -64,4 +64,13 @@ class LikeFeedWriterTest : BaseToolTest() {
 
         verify(likeFeedRepository).deleteByMemberIdAndFeedId(memberId, feedId)
     }
+
+    @Test
+    fun `deleteAllByFeedId는 피드의 모든 좋아요를 삭제한다`() {
+        val feedId = 1L
+
+        likeFeedWriter.deleteAllByFeedId(feedId)
+
+        verify(likeFeedRepository).deleteAllByFeedId(feedId)
+    }
 }

@@ -9,15 +9,20 @@ import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedImage
 import com.example.mykku.feed.domain.FeedTag
 import com.example.mykku.feed.dto.*
+import com.example.mykku.feed.exception.FeedException
+import com.example.mykku.feed.tool.FeedCommentWriter
 import com.example.mykku.feed.tool.FeedDtoConverter
 import com.example.mykku.feed.tool.FeedReader
 import com.example.mykku.feed.tool.FeedWriter
 import com.example.mykku.image.ImageUploadService
 import com.example.mykku.image.dto.ImageUploadResult
+import com.example.mykku.like.tool.LikeFeedCommentWriter
 import com.example.mykku.like.tool.LikeFeedReader
+import com.example.mykku.like.tool.LikeFeedWriter
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.tool.MemberReader
 import com.example.mykku.scrap.tool.SaveFeedReader
+import com.example.mykku.scrap.tool.SaveFeedWriter
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -36,7 +41,11 @@ class FeedService(
     private val imageUploadService: ImageUploadService,
     private val contestReader: ContestReader,
     private val contestParticipationWriter: ContestParticipationWriter,
-    private val contestParticipationReader: ContestParticipationReader
+    private val contestParticipationReader: ContestParticipationReader,
+    private val feedCommentWriter: FeedCommentWriter,
+    private val likeFeedWriter: LikeFeedWriter,
+    private val likeFeedCommentWriter: LikeFeedCommentWriter,
+    private val saveFeedWriter: SaveFeedWriter
 ) {
     @Transactional
     fun createFeed(request: CreateFeedRequest, member: Member): CreateFeedResponse {
@@ -227,4 +236,27 @@ class FeedService(
         val isSaved: Boolean
     )
 
+    @Transactional
+    fun deleteFeed(feedId: Long, member: Member) {
+        val feed = feedReader.getFeedById(feedId)
+        validateFeedOwner(feed, member)
+        deleteRelatedData(feed)
+        feedWriter.deleteFeed(feed, member)
+    }
+
+    private fun validateFeedOwner(feed: Feed, member: Member) {
+        if (feed.member.id != member.id) {
+            throw FeedException.feedForbiddenAccess()
+        }
+    }
+
+    private fun deleteRelatedData(feed: Feed) {
+        val comments = feedReader.getAllCommentsByFeed(feed)
+        val commentIds = comments.mapNotNull { it.id }
+
+        likeFeedCommentWriter.deleteAllByFeedCommentIds(commentIds)
+        feedCommentWriter.deleteAllByFeed(feed)
+        likeFeedWriter.deleteAllByFeedId(feed.id!!)
+        saveFeedWriter.deleteAllByFeed(feed)
+    }
 }

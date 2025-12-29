@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository
 interface FeedTagRepository : JpaRepository<FeedTag, Long> {
     fun findByFeed(feed: Feed): List<FeedTag>
     fun findByFeedIn(feeds: List<Feed>): List<FeedTag>
+
+    fun deleteAllByFeed(feed: Feed)
 }

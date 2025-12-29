@@ -175,4 +175,23 @@ class SaveFeedWriterTest : BaseToolTest() {
 
         assertEquals(ScrapErrorCode.SAVE_FEED_NOT_FOUND, exception.errorCode)
     }
+
+    @Test
+    fun `deleteAllByFeed는 피드의 모든 스크랩을 삭제한다`() {
+        // given
+        val member = createMockMember()
+        val feed = Feed(
+            id = 1L,
+            title = "테스트 피드",
+            content = "내용",
+            board = createMockBoard(),
+            member = member
+        )
+
+        // when
+        saveFeedWriter.deleteAllByFeed(feed)
+
+        // then
+        verify(saveFeedRepository).deleteAllByFeed(feed)
+    }
 }

@@ -37,4 +37,8 @@ class FeedCommentWriter(
     fun deleteComment(comment: FeedComment) {
         feedCommentRepository.delete(comment)
     }
+
+    fun deleteAllByFeed(feed: Feed) {
+        feedCommentRepository.deleteAllByFeed(feed)
+    }
 }

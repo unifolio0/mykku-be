@@ -121,9 +121,9 @@ class FeedController(
         @CurrentMember(required = false) member: Member?
     ): ResponseEntity<ApiResponse<FeedCommentsResponse>> {
         val pageable = PageableValidator.validateAndCreate(
-            page, 
-            size, 
-            "createdAt", 
+            page,
+            size,
+            "createdAt",
             Sort.Direction.DESC
         )
         val comments = feedCommentService.getComments(feedId, member?.id, pageable)
@@ -131,6 +131,20 @@ class FeedController(
             ApiResponse(
                 message = "댓글 목록을 성공적으로 조회했습니다.",
                 data = comments
+            )
+        )
+    }
+
+    @DeleteMapping("/feeds/{feedId}")
+    fun deleteFeed(
+        @PathVariable feedId: Long,
+        @CurrentMember member: Member
+    ): ResponseEntity<ApiResponse<Unit>> {
+        feedService.deleteFeed(feedId, member)
+        return ResponseEntity.ok(
+            ApiResponse(
+                message = "피드가 성공적으로 삭제되었습니다.",
+                data = Unit
             )
         )
     }

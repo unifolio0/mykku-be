@@ -11,6 +11,8 @@ class FeedException(
     companion object {
         fun feedNotFound(): FeedException = FeedException(FeedErrorCode.FEED_NOT_FOUND)
 
+        fun feedForbiddenAccess(): FeedException = FeedException(FeedErrorCode.FEED_FORBIDDEN_ACCESS)
+
         fun feedContentTooLong(): FeedException = FeedException(FeedErrorCode.FEED_CONTENT_TOO_LONG)
 
         fun feedImageLimitExceeded(): FeedException = FeedException(FeedErrorCode.FEED_IMAGE_LIMIT_EXCEEDED)

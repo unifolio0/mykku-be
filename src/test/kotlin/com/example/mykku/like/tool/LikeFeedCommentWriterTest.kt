@@ -69,4 +69,22 @@ class LikeFeedCommentWriterTest : BaseToolTest() {
 
         verify(likeFeedCommentRepository).deleteByMemberIdAndFeedCommentId(memberId, feedCommentId)
     }
+
+    @Test
+    fun `deleteAllByFeedCommentIds는 주어진 댓글들의 모든 좋아요를 삭제한다`() {
+        val feedCommentIds = listOf(1L, 2L, 3L)
+
+        likeFeedCommentWriter.deleteAllByFeedCommentIds(feedCommentIds)
+
+        verify(likeFeedCommentRepository).deleteAllByFeedCommentIdIn(feedCommentIds)
+    }
+
+    @Test
+    fun `deleteAllByFeedCommentIds는 빈 리스트일 경우 삭제하지 않는다`() {
+        val feedCommentIds = emptyList<Long>()
+
+        likeFeedCommentWriter.deleteAllByFeedCommentIds(feedCommentIds)
+
+        verify(likeFeedCommentRepository, org.mockito.kotlin.never()).deleteAllByFeedCommentIdIn(any())
+    }
 }

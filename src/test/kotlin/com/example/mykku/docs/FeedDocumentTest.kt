@@ -748,4 +748,84 @@ class FeedDocumentTest : BaseDocumentTest() {
                 .statusCode(404)
         }
     }
+
+    @Nested
+    @DisplayName("피드 삭제")
+    inner class DeleteFeed {
+
+        private val apiConfig = ApiRequestConfig(
+            tag = Tag.FEED_API,
+            summary = "피드 삭제",
+            description = "피드를 삭제합니다. 작성자만 삭제할 수 있으며, 관련된 모든 데이터(이미지, 태그, 댓글, 좋아요, 스크랩)가 함께 삭제됩니다.",
+            pathParameters = listOf(
+                parameterWithName("feedId").description("삭제할 피드의 ID")
+            )
+        )
+
+        @Test
+        fun `성공`() {
+            val feedId = 1L
+
+            val documentFilter = document("feed/delete", 200)
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터 (빈 객체)")
+                        )
+                )
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .delete("/api/v1/feeds/{feedId}", feedId)
+                .then()
+                .statusCode(200)
+        }
+
+        @Test
+        fun `피드를 찾을 수 없음`() {
+            val feedId = 999L
+
+            `when`(feedService.deleteFeed(eq(feedId), any()))
+                .thenThrow(FeedException(FeedErrorCode.FEED_NOT_FOUND))
+
+            val documentFilter = document("feed/delete", "FEED_NOT_FOUND")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .delete("/api/v1/feeds/{feedId}", feedId)
+                .then()
+                .statusCode(404)
+        }
+
+        @Test
+        fun `권한 없음`() {
+            val feedId = 1L
+
+            `when`(feedService.deleteFeed(eq(feedId), any()))
+                .thenThrow(FeedException(FeedErrorCode.FEED_FORBIDDEN_ACCESS))
+
+            val documentFilter = document("feed/delete", "FEED_FORBIDDEN_ACCESS")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .delete("/api/v1/feeds/{feedId}", feedId)
+                .then()
+                .statusCode(403)
+        }
+    }
 }

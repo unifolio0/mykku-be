@@ -24,4 +24,8 @@ interface FeedCommentRepository : JpaRepository<FeedComment, Long> {
     fun findByParentCommentIn(@Param("parentComments") parentComments: List<FeedComment>): List<FeedComment>
     
     fun countByFeed(feed: Feed): Long
+
+    fun findAllByFeed(feed: Feed): List<FeedComment>
+
+    fun deleteAllByFeed(feed: Feed)
 }
