@@ -96,4 +96,8 @@ class ContestReader(
             contest to tags
         }
     }
+
+    fun getContestsByStatus(status: ContestStatusType): List<Contest> {
+        return contestRepository.findByStatus(status)
+    }
 }

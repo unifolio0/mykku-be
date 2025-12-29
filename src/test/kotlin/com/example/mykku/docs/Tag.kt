@@ -5,6 +5,8 @@ enum class Tag(val displayName: String) {
     HOME_API("홈 API"),
     EVENT_API("이벤트 API"),
     CONTEST_API("콘테스트 API"),
+    CONTEST_WINNER_API("콘테스트 수상작 API"),
+    ADMIN_CONTEST_API("관리자 콘테스트 API"),
     FEED_API("피드 API"),
     FEED_COMMENT_API("피드 댓글 API"),
     BOARD_API("보드 API"),

@@ -2,6 +2,7 @@ package com.example.mykku.contest.tool
 
 import com.example.mykku.contest.domain.Contest
 import com.example.mykku.contest.domain.ContestImage
+import com.example.mykku.contest.domain.ContestStatusType
 import com.example.mykku.contest.domain.ContestTag
 import com.example.mykku.contest.dto.ContestImageRequest
 import com.example.mykku.contest.exception.ContestException
@@ -70,5 +71,11 @@ class ContestWriter(
         val savedContestTags = contestTagRepository.saveAll(contestTags)
 
         return Triple(savedContest, savedContestImages, savedContestTags)
+    }
+
+    @Transactional
+    fun updateContestStatus(contest: Contest, status: ContestStatusType): Contest {
+        contest.status = status
+        return contestRepository.save(contest)
     }
 }

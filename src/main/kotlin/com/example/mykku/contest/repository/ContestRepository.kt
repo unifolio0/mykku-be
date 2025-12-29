@@ -32,4 +32,6 @@ interface ContestRepository : JpaRepository<Contest, Long> {
     fun findByExpiredAtLessThanEqualOrderByCreatedAtDesc(dateTime: LocalDateTime, pageable: Pageable): Page<Contest>
 
     fun findAllByOrderByCreatedAtDesc(pageable: Pageable): Page<Contest>
+
+    fun findByStatus(status: ContestStatusType): List<Contest>
 }

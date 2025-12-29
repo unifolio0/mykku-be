@@ -5,6 +5,7 @@ import com.example.mykku.auth.AuthService
 import com.example.mykku.auth.tool.JwtTokenProvider
 import com.example.mykku.board.BoardService
 import com.example.mykku.contest.ContestService
+import com.example.mykku.contest.ContestWinnerService
 import com.example.mykku.dailymessage.DailyMessageCommentService
 import com.example.mykku.dailymessage.DailyMessageService
 import com.example.mykku.email.EmailAuthService
@@ -68,6 +69,9 @@ abstract class BaseDocumentTest {
 
     @MockitoBean
     protected lateinit var contestService: ContestService
+
+    @MockitoBean
+    protected lateinit var contestWinnerService: ContestWinnerService
 
     @MockitoBean
     protected lateinit var scrapService: ScrapService

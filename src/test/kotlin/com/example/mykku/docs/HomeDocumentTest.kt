@@ -62,7 +62,12 @@ class HomeDocumentTest : BaseDocumentTest() {
                                 winnerRank = 1,
                                 description = "우수 작품",
                                 acceptanceSpeech = "감사합니다",
-                                image = "https://example.com/winner.jpg"
+                                feedId = 1L,
+                                feedTitle = "수상작 피드 제목",
+                                feedImageUrl = "https://example.com/winner.jpg",
+                                authorId = "author123",
+                                authorNickname = "작가닉네임",
+                                authorProfileImage = "https://example.com/profile.jpg"
                             )
                         )
                     )
@@ -104,8 +109,18 @@ class HomeDocumentTest : BaseDocumentTest() {
                                 .description("작품 설명"),
                             fieldWithPath("data.contests[].winners[].acceptanceSpeech").type(JsonFieldType.STRING)
                                 .description("수상 소감"),
-                            fieldWithPath("data.contests[].winners[].image").type(JsonFieldType.STRING)
-                                .description("수상작 이미지 URL")
+                            fieldWithPath("data.contests[].winners[].feedId").type(JsonFieldType.NUMBER)
+                                .description("수상작 피드 ID"),
+                            fieldWithPath("data.contests[].winners[].feedTitle").type(JsonFieldType.STRING)
+                                .description("수상작 피드 제목"),
+                            fieldWithPath("data.contests[].winners[].feedImageUrl").type(JsonFieldType.STRING)
+                                .description("수상작 이미지 URL"),
+                            fieldWithPath("data.contests[].winners[].authorId").type(JsonFieldType.STRING)
+                                .description("작성자 ID"),
+                            fieldWithPath("data.contests[].winners[].authorNickname").type(JsonFieldType.STRING)
+                                .description("작성자 닉네임"),
+                            fieldWithPath("data.contests[].winners[].authorProfileImage").type(JsonFieldType.STRING)
+                                .description("작성자 프로필 이미지")
                         )
                 )
                 .build()

@@ -2,7 +2,9 @@ package com.example.mykku.contest.tool
 
 import com.example.mykku.contest.domain.Contest
 import com.example.mykku.contest.domain.ContestParticipation
+import com.example.mykku.contest.exception.ContestException
 import com.example.mykku.contest.repository.ContestParticipationRepository
+import org.springframework.data.repository.findByIdOrNull
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.member.domain.Member
 import org.springframework.data.domain.Page
@@ -37,5 +39,10 @@ class ContestParticipationReader(
 
     fun getParticipatedContests(member: Member, pageable: Pageable): Page<Contest> {
         return contestParticipationRepository.findContestsByMember(member, pageable)
+    }
+
+    fun getParticipationById(participationId: Long): ContestParticipation {
+        return contestParticipationRepository.findByIdOrNull(participationId)
+            ?: throw ContestException.participationNotFound()
     }
 }
