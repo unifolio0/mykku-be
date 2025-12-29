@@ -45,4 +45,9 @@ class ContestParticipationReader(
         return contestParticipationRepository.findByIdOrNull(participationId)
             ?: throw ContestException.participationNotFound()
     }
+
+
+    fun getParticipationsByFeed(feed: Feed): List<ContestParticipation> {
+        return contestParticipationRepository.findByFeed(feed)
+    }
 }

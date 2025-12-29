@@ -5,6 +5,7 @@ import com.example.mykku.board.tool.BoardReader
 import com.example.mykku.contest.tool.ContestParticipationReader
 import com.example.mykku.contest.tool.ContestParticipationWriter
 import com.example.mykku.contest.tool.ContestReader
+import com.example.mykku.contest.tool.ContestWinnerWriter
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedImage
 import com.example.mykku.feed.domain.FeedTag
@@ -45,7 +46,8 @@ class FeedService(
     private val feedCommentWriter: FeedCommentWriter,
     private val likeFeedWriter: LikeFeedWriter,
     private val likeFeedCommentWriter: LikeFeedCommentWriter,
-    private val saveFeedWriter: SaveFeedWriter
+    private val saveFeedWriter: SaveFeedWriter,
+    private val contestWinnerWriter: ContestWinnerWriter
 ) {
     @Transactional
     fun createFeed(request: CreateFeedRequest, member: Member): CreateFeedResponse {
@@ -258,5 +260,9 @@ class FeedService(
         feedCommentWriter.deleteAllByFeed(feed)
         likeFeedWriter.deleteAllByFeedId(feed.id!!)
         saveFeedWriter.deleteAllByFeed(feed)
+
+        val participations = contestParticipationReader.getParticipationsByFeed(feed)
+        contestWinnerWriter.deleteAllByParticipations(participations)
+        contestParticipationWriter.deleteAllByFeed(feed)
     }
 }

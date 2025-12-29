@@ -38,6 +38,14 @@ class ContestWinnerWriter(
         return contestWinnerRepository.save(winner)
     }
 
+
+    @Transactional
+    fun deleteAllByParticipations(participations: List<ContestParticipation>) {
+        if (participations.isNotEmpty()) {
+            contestWinnerRepository.deleteAllByParticipationIn(participations)
+        }
+    }
+
     data class WinnerData(
         val rank: Int,
         val description: String,

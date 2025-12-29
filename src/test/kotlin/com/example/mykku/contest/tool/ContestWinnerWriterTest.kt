@@ -142,4 +142,27 @@ class ContestWinnerWriterTest : BaseToolTest() {
 
         assertThat(result.acceptanceSpeech).isEmpty()
     }
+
+    @Test
+    @DisplayName("참여 목록에 연관된 수상자를 모두 삭제한다")
+    fun `참여 목록에 연관된 수상자를 모두 삭제한다`() {
+        val member = createMockMember()
+        val board = createMockBoard()
+        val contest = Contest(id = 1L, title = "콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
+        val feed = Feed(id = 10L, title = "피드", content = "내용", board = board, member = member)
+        val participation = ContestParticipation(id = 1L, contest = contest, member = member, feed = feed)
+        val participations = listOf(participation)
+
+        contestWinnerWriter.deleteAllByParticipations(participations)
+
+        verify(contestWinnerRepository).deleteAllByParticipationIn(participations)
+    }
+
+    @Test
+    @DisplayName("빈 참여 목록이면 삭제하지 않는다")
+    fun `빈 참여 목록이면 삭제하지 않는다`() {
+        contestWinnerWriter.deleteAllByParticipations(emptyList())
+
+        org.mockito.kotlin.verifyNoInteractions(contestWinnerRepository)
+    }
 }

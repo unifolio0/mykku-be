@@ -6,6 +6,7 @@ import com.example.mykku.board.tool.BoardReader
 import com.example.mykku.contest.tool.ContestParticipationReader
 import com.example.mykku.contest.tool.ContestParticipationWriter
 import com.example.mykku.contest.tool.ContestReader
+import com.example.mykku.contest.tool.ContestWinnerWriter
 import com.example.mykku.image.exception.ImageErrorCode
 import com.example.mykku.image.exception.ImageException
 import com.example.mykku.feed.domain.Feed
@@ -95,6 +96,9 @@ class FeedServiceTest : BaseServiceTest() {
 
     @Mock
     private lateinit var saveFeedWriter: SaveFeedWriter
+
+    @Mock
+    private lateinit var contestWinnerWriter: ContestWinnerWriter
 
     @InjectMocks
     private lateinit var feedService: FeedService
@@ -250,7 +254,8 @@ class FeedServiceTest : BaseServiceTest() {
             feedCommentWriter = feedCommentWriter,
             likeFeedWriter = likeFeedWriter,
             likeFeedCommentWriter = likeFeedCommentWriter,
-            saveFeedWriter = saveFeedWriter
+            saveFeedWriter = saveFeedWriter,
+            contestWinnerWriter = contestWinnerWriter
         )
 
         val imageFile = mock<MultipartFile>()
@@ -694,6 +699,7 @@ class FeedServiceTest : BaseServiceTest() {
 
         whenever(feedReader.getFeedById(feedId)).thenReturn(feed)
         whenever(feedReader.getAllCommentsByFeed(feed)).thenReturn(comments)
+        whenever(contestParticipationReader.getParticipationsByFeed(feed)).thenReturn(emptyList())
 
         // when
         feedService.deleteFeed(feedId, member)
@@ -703,6 +709,9 @@ class FeedServiceTest : BaseServiceTest() {
         verify(feedCommentWriter).deleteAllByFeed(feed)
         verify(likeFeedWriter).deleteAllByFeedId(feedId)
         verify(saveFeedWriter).deleteAllByFeed(feed)
+        verify(contestParticipationReader).getParticipationsByFeed(feed)
+        verify(contestWinnerWriter).deleteAllByParticipations(emptyList())
+        verify(contestParticipationWriter).deleteAllByFeed(feed)
         verify(feedWriter).deleteFeed(feed, member)
     }
 
@@ -746,6 +755,7 @@ class FeedServiceTest : BaseServiceTest() {
 
         whenever(feedReader.getFeedById(feedId)).thenReturn(feed)
         whenever(feedReader.getAllCommentsByFeed(feed)).thenReturn(emptyList())
+        whenever(contestParticipationReader.getParticipationsByFeed(feed)).thenReturn(emptyList())
 
         // when
         feedService.deleteFeed(feedId, member)
@@ -755,6 +765,9 @@ class FeedServiceTest : BaseServiceTest() {
         verify(feedCommentWriter).deleteAllByFeed(feed)
         verify(likeFeedWriter).deleteAllByFeedId(feedId)
         verify(saveFeedWriter).deleteAllByFeed(feed)
+        verify(contestParticipationReader).getParticipationsByFeed(feed)
+        verify(contestWinnerWriter).deleteAllByParticipations(emptyList())
+        verify(contestParticipationWriter).deleteAllByFeed(feed)
         verify(feedWriter).deleteFeed(feed, member)
     }
 }
