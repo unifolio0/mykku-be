@@ -5,7 +5,7 @@ import com.example.mykku.fannote.exception.FanNoteException
 import com.example.mykku.fannote.exception.FanNoteErrorCode
 import com.example.mykku.fannote.domain.FanNote
 import com.example.mykku.fannote.domain.FanNotePage
-import com.example.mykku.fannote.application.port.out.FanNoteQueryPort
+import com.example.mykku.fannote.tool.FanNoteReader
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
@@ -21,7 +21,7 @@ import java.time.LocalDate
 class FanNoteServiceTest : BaseServiceTest() {
 
     @Mock
-    private lateinit var fanNoteQueryPort: FanNoteQueryPort
+    private lateinit var fanNoteReader: FanNoteReader
 
     @InjectMocks
     private lateinit var fanNoteService: FanNoteService
@@ -34,7 +34,7 @@ class FanNoteServiceTest : BaseServiceTest() {
         val fanNote2 = createFanNote(2L, "덕질노트2", LocalDate.of(2024, 1, 2))
         val fanNotePage = PageImpl(listOf(fanNote1, fanNote2), pageable, 2)
 
-        given(fanNoteQueryPort.findAllWithPagination(pageable)).willReturn(fanNotePage)
+        given(fanNoteReader.findAllWithPagination(pageable)).willReturn(fanNotePage)
 
         // when
         val result = fanNoteService.getFanNoteList(pageable)
@@ -46,7 +46,7 @@ class FanNoteServiceTest : BaseServiceTest() {
         assertThat(result.content[1].id).isEqualTo(2L)
         assertThat(result.content[1].title).isEqualTo("덕질노트2")
 
-        verify(fanNoteQueryPort).findAllWithPagination(pageable)
+        verify(fanNoteReader).findAllWithPagination(pageable)
     }
 
     @Test
@@ -59,8 +59,8 @@ class FanNoteServiceTest : BaseServiceTest() {
 
         val pages = listOf(page1, page2)
 
-        given(fanNoteQueryPort.findById(fanNoteId)).willReturn(fanNote)
-        given(fanNoteQueryPort.findPagesByFanNoteId(fanNoteId)).willReturn(pages)
+        given(fanNoteReader.findById(fanNoteId)).willReturn(fanNote)
+        given(fanNoteReader.findPagesByFanNoteId(fanNoteId)).willReturn(pages)
 
         // when
         val result = fanNoteService.getFanNoteDetail(fanNoteId)
@@ -73,15 +73,15 @@ class FanNoteServiceTest : BaseServiceTest() {
         assertThat(result.pages[0].imageUrl).isEqualTo("https://s3.amazonaws.com/mykku/page1.jpg")
         assertThat(result.pages[1].pageNumber).isEqualTo(2)
 
-        verify(fanNoteQueryPort).findById(fanNoteId)
-        verify(fanNoteQueryPort).findPagesByFanNoteId(fanNoteId)
+        verify(fanNoteReader).findById(fanNoteId)
+        verify(fanNoteReader).findPagesByFanNoteId(fanNoteId)
     }
 
     @Test
     fun `존재하지 않는 덕질노트 조회 시 예외가 발생한다`() {
         // given
         val fanNoteId = 999L
-        given(fanNoteQueryPort.findById(fanNoteId)).willThrow(FanNoteException(FanNoteErrorCode.FAN_NOTE_NOT_FOUND))
+        given(fanNoteReader.findById(fanNoteId)).willThrow(FanNoteException(FanNoteErrorCode.FAN_NOTE_NOT_FOUND))
 
         // when & then
         assertThatThrownBy { fanNoteService.getFanNoteDetail(fanNoteId) }
@@ -95,7 +95,7 @@ class FanNoteServiceTest : BaseServiceTest() {
         val pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "productionDate"))
         val emptyPage = PageImpl<FanNote>(emptyList(), pageable, 0)
 
-        given(fanNoteQueryPort.findAllWithPagination(pageable)).willReturn(emptyPage)
+        given(fanNoteReader.findAllWithPagination(pageable)).willReturn(emptyPage)
 
         // when
         val result = fanNoteService.getFanNoteList(pageable)
@@ -105,7 +105,7 @@ class FanNoteServiceTest : BaseServiceTest() {
         assertThat(result.totalElements).isEqualTo(0)
         assertThat(result.totalPages).isEqualTo(0)
 
-        verify(fanNoteQueryPort).findAllWithPagination(pageable)
+        verify(fanNoteReader).findAllWithPagination(pageable)
     }
 
     @Test
@@ -114,8 +114,8 @@ class FanNoteServiceTest : BaseServiceTest() {
         val fanNoteId = 1L
         val fanNote = createFanNote(fanNoteId, "페이지 없는 덕질노트", LocalDate.of(2024, 1, 1))
 
-        given(fanNoteQueryPort.findById(fanNoteId)).willReturn(fanNote)
-        given(fanNoteQueryPort.findPagesByFanNoteId(fanNoteId)).willReturn(emptyList())
+        given(fanNoteReader.findById(fanNoteId)).willReturn(fanNote)
+        given(fanNoteReader.findPagesByFanNoteId(fanNoteId)).willReturn(emptyList())
 
         // when
         val result = fanNoteService.getFanNoteDetail(fanNoteId)
@@ -125,8 +125,8 @@ class FanNoteServiceTest : BaseServiceTest() {
         assertThat(result.title).isEqualTo("페이지 없는 덕질노트")
         assertThat(result.pages).isEmpty()
 
-        verify(fanNoteQueryPort).findById(fanNoteId)
-        verify(fanNoteQueryPort).findPagesByFanNoteId(fanNoteId)
+        verify(fanNoteReader).findById(fanNoteId)
+        verify(fanNoteReader).findPagesByFanNoteId(fanNoteId)
     }
 
     private fun createFanNote(id: Long, title: String, productionDate: LocalDate): FanNote {

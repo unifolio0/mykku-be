@@ -1,6 +1,5 @@
 package com.example.mykku.dailymessage
 
-import com.example.mykku.dailymessage.application.port.out.DailyMessageQueryPort
 import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.domain.DailyMessageComment
 import com.example.mykku.dailymessage.domain.SortDirection
@@ -8,17 +7,20 @@ import com.example.mykku.dailymessage.dto.CommentResponse
 import com.example.mykku.dailymessage.dto.DailyMessageResponse
 import com.example.mykku.dailymessage.dto.DailyMessageSummaryResponse
 import com.example.mykku.dailymessage.dto.ReplyResponse
+import com.example.mykku.dailymessage.repository.DailyMessageCommentRepository
+import com.example.mykku.dailymessage.tool.DailyMessageReader
 import java.time.LocalDate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class DailyMessageService(
-    private val dailyMessageQueryPort: DailyMessageQueryPort
+    private val dailyMessageReader: DailyMessageReader,
+    private val dailyMessageCommentRepository: DailyMessageCommentRepository
 ) {
     @Transactional(readOnly = true)
     fun getDailyMessages(date: LocalDate, limit: Int, sort: SortDirection): List<DailyMessageSummaryResponse> {
-        val dailyMessages = dailyMessageQueryPort.getDailyMessages(date, limit, sort)
+        val dailyMessages = dailyMessageReader.getDailyMessages(date, limit, sort)
 
         return dailyMessages.map { it.toResponse() }
     }
@@ -34,8 +36,8 @@ class DailyMessageService(
 
     @Transactional(readOnly = true)
     fun getDailyMessage(id: Long): DailyMessageResponse {
-        val dailyMessage = dailyMessageQueryPort.getDailyMessage(id)
-        val allComments = dailyMessageQueryPort.getCommentsByDailyMessage(dailyMessage)
+        val dailyMessage = dailyMessageReader.getDailyMessage(id)
+        val allComments = dailyMessageCommentRepository.findByDailyMessage(dailyMessage)
         val repliesByParentId = getReplies(allComments)
         val comments = getCommentResponses(allComments, repliesByParentId)
 

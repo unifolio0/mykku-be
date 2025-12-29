@@ -14,6 +14,4 @@ interface LikeFeedRepository : JpaRepository<LikeFeed, Long> {
     fun deleteByMemberIdAndFeedId(memberId: String, feedId: Long)
     
     fun findByMemberIdAndFeedIdIn(memberId: String, feedIds: List<Long>): List<LikeFeed>
-
-    fun countByFeedId(feedId: Long): Int
 }

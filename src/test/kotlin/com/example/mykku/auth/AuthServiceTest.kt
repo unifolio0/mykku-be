@@ -1,46 +1,45 @@
 package com.example.mykku.auth
 
-import com.example.mykku.BaseServiceTest
-import com.example.mykku.auth.application.port.out.JwtTokenPort
-import com.example.mykku.auth.application.port.out.OAuthLoginPort
-import com.example.mykku.auth.dto.LoginResponse
-import com.example.mykku.auth.dto.MemberInfo
-import com.example.mykku.auth.dto.MobileLoginRequest
-import com.example.mykku.member.application.port.out.MemberQueryPort
+import com.example.mykku.auth.dto.*
+import com.example.mykku.auth.tool.JwtTokenProvider
+import com.example.mykku.auth.tool.OAuthLoginStrategy
+import com.example.mykku.auth.exception.AuthException
 import com.example.mykku.member.domain.SocialProvider
-import kotlin.test.assertEquals
+import com.example.mykku.member.tool.MemberReader
+import com.example.mykku.BaseServiceTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mock
 import org.mockito.kotlin.whenever
+import kotlin.test.assertEquals
 
 class AuthServiceTest : BaseServiceTest() {
 
     @Mock
-    private lateinit var jwtTokenPort: JwtTokenPort
+    private lateinit var jwtTokenProvider: JwtTokenProvider
 
     @Mock
-    private lateinit var memberQueryPort: MemberQueryPort
+    private lateinit var memberReader: MemberReader
 
     @Mock
-    private lateinit var googleLoginStrategy: OAuthLoginPort
+    private lateinit var googleLoginStrategy: OAuthLoginStrategy
 
     @Mock
-    private lateinit var kakaoLoginStrategy: OAuthLoginPort
+    private lateinit var kakaoLoginStrategy: OAuthLoginStrategy
 
     @Mock
-    private lateinit var appleLoginStrategy: OAuthLoginPort
+    private lateinit var appleLoginStrategy: OAuthLoginStrategy
 
     @Mock
-    private lateinit var naverLoginStrategy: OAuthLoginPort
+    private lateinit var naverLoginStrategy: OAuthLoginStrategy
 
     private lateinit var authService: AuthService
 
     @BeforeEach
     fun setUp() {
         authService = AuthService(
-            jwtTokenPort,
-            memberQueryPort,
+            jwtTokenProvider,
+            memberReader,
             listOf(googleLoginStrategy, kakaoLoginStrategy, appleLoginStrategy, naverLoginStrategy)
         )
     }

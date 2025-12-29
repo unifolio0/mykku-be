@@ -9,6 +9,4 @@ interface LikeFeedCommentRepository : JpaRepository<LikeFeedComment, Long> {
     fun existsByMemberIdAndFeedCommentId(memberId: String, feedCommentId: Long): Boolean
 
     fun deleteByMemberIdAndFeedCommentId(memberId: String, feedCommentId: Long)
-
-    fun countByFeedCommentId(feedCommentId: Long): Int
 }

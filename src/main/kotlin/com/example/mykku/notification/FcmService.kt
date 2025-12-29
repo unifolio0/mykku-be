@@ -1,7 +1,7 @@
 package com.example.mykku.notification
 
 import com.example.mykku.member.domain.Member
-import com.example.mykku.notification.application.port.out.FcmTokenQueryPort
+import com.example.mykku.notification.tool.FcmTokenReader
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.MulticastMessage
 import org.slf4j.LoggerFactory
@@ -11,7 +11,7 @@ import com.google.firebase.messaging.Notification as FcmNotification
 
 @Service
 class FcmService(
-    private val fcmTokenQueryPort: FcmTokenQueryPort
+    private val fcmTokenReader: FcmTokenReader
 ) {
 
     private val logger = LoggerFactory.getLogger(FcmService::class.java)
@@ -23,7 +23,7 @@ class FcmService(
         body: String,
         data: Map<String, String> = emptyMap()
     ) {
-        val tokens = fcmTokenQueryPort.getTokensByMember(member)
+        val tokens = fcmTokenReader.getTokensByMember(member)
         if (tokens.isEmpty()) {
             logger.info("No FCM tokens found for member: ${member.id}")
             return

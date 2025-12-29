@@ -14,7 +14,4 @@ interface SaveDailyMessageRepository : JpaRepository<SaveDailyMessage, Long> {
     fun findByMember(member: Member, pageable: Pageable): Page<SaveDailyMessage>
     fun findByMemberAndDailyMessage(member: Member, dailyMessage: DailyMessage): SaveDailyMessage?
     fun deleteByMemberAndDailyMessage(member: Member, dailyMessage: DailyMessage)
-
-    fun existsByMemberIdAndDailyMessageId(memberId: String, dailyMessageId: Long): Boolean
-    fun countByDailyMessageId(dailyMessageId: Long): Int
 }

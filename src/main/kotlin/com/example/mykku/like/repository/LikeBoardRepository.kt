@@ -13,6 +13,4 @@ interface LikeBoardRepository : JpaRepository<LikeBoard, Long> {
     fun existsByMemberIdAndBoardId(memberId: String, boardId: Long): Boolean
 
     fun deleteByMemberIdAndBoardId(memberId: String, boardId: Long)
-
-    fun countByBoardId(boardId: Long): Int
 }

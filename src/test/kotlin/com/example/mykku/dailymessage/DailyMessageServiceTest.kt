@@ -4,7 +4,8 @@ import com.example.mykku.BaseServiceTest
 import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.domain.DailyMessageComment
 import com.example.mykku.dailymessage.domain.SortDirection
-import com.example.mykku.dailymessage.application.port.out.DailyMessageQueryPort
+import com.example.mykku.dailymessage.repository.DailyMessageCommentRepository
+import com.example.mykku.dailymessage.tool.DailyMessageReader
 import com.example.mykku.member.domain.Member
 import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks
@@ -17,7 +18,10 @@ import kotlin.test.assertEquals
 class DailyMessageServiceTest : BaseServiceTest() {
 
     @Mock
-    private lateinit var dailyMessageQueryPort: DailyMessageQueryPort
+    private lateinit var dailyMessageReader: DailyMessageReader
+
+    @Mock
+    private lateinit var dailyMessageCommentRepository: DailyMessageCommentRepository
 
     @InjectMocks
     private lateinit var dailyMessageService: DailyMessageService
@@ -74,7 +78,7 @@ class DailyMessageServiceTest : BaseServiceTest() {
         
         val dailyMessages = listOf(dailyMessage)
 
-        whenever(dailyMessageQueryPort.getDailyMessages(date, limit, sort)).thenReturn(dailyMessages)
+        whenever(dailyMessageReader.getDailyMessages(date, limit, sort)).thenReturn(dailyMessages)
 
         // when
         val result = dailyMessageService.getDailyMessages(date, limit, sort)
@@ -115,8 +119,8 @@ class DailyMessageServiceTest : BaseServiceTest() {
 
         val allComments = listOf(parentComment, replyComment)
 
-        whenever(dailyMessageQueryPort.getDailyMessage(1L)).thenReturn(dailyMessage)
-        whenever(dailyMessageQueryPort.getCommentsByDailyMessage(dailyMessage)).thenReturn(allComments)
+        whenever(dailyMessageReader.getDailyMessage(1L)).thenReturn(dailyMessage)
+        whenever(dailyMessageCommentRepository.findByDailyMessage(dailyMessage)).thenReturn(allComments)
 
         // when
         val result = dailyMessageService.getDailyMessage(1L)
@@ -139,8 +143,8 @@ class DailyMessageServiceTest : BaseServiceTest() {
             date = LocalDate.now()
         )
 
-        whenever(dailyMessageQueryPort.getDailyMessage(1L)).thenReturn(dailyMessage)
-        whenever(dailyMessageQueryPort.getCommentsByDailyMessage(dailyMessage)).thenReturn(emptyList())
+        whenever(dailyMessageReader.getDailyMessage(1L)).thenReturn(dailyMessage)
+        whenever(dailyMessageCommentRepository.findByDailyMessage(dailyMessage)).thenReturn(emptyList())
 
         // when
         val result = dailyMessageService.getDailyMessage(1L)

@@ -1,9 +1,9 @@
 package com.example.mykku.email
 
 import com.example.mykku.BaseControllerTest
-import com.example.mykku.email.application.port.out.VerificationCodePort
 import com.example.mykku.email.domain.VerificationPurpose
 import com.example.mykku.email.dto.*
+import com.example.mykku.email.tool.RedisVerificationCodeManager
 import com.example.mykku.member.domain.Member
 import com.example.mykku.role.domain.Role
 import io.restassured.RestAssured
@@ -23,10 +23,11 @@ class EmailAuthControllerTest : BaseControllerTest() {
     private lateinit var passwordEncoder: PasswordEncoder
 
     @Autowired
-    private lateinit var verificationCodePort: VerificationCodePort
+    private lateinit var redisVerificationCodeManager: RedisVerificationCodeManager
 
     @BeforeEach
     fun setUp() {
+        redisVerificationCodeManager.deleteReservationLock()
     }
 
     @Test
@@ -98,8 +99,10 @@ class EmailAuthControllerTest : BaseControllerTest() {
     @DisplayName("인증 코드 검증 - 성공")
     fun `verifyCode - 유효한 인증 코드 검증 성공`() {
         val email = "verify@example.com"
-        val code = verificationCodePort.generateCode()
-        verificationCodePort.saveCode(email, code, VerificationPurpose.SIGNUP)
+        val code = redisVerificationCodeManager.saveVerificationCode(
+            email = email,
+            purpose = VerificationPurpose.SIGNUP.name
+        )
 
         val request = VerifyCodeRequest(
             email = email,
@@ -121,8 +124,10 @@ class EmailAuthControllerTest : BaseControllerTest() {
     @DisplayName("인증 코드 검증 - 잘못된 코드")
     fun `verifyCode - 잘못된 인증 코드 검증 시 실패`() {
         val email = "verify@example.com"
-        val code = verificationCodePort.generateCode()
-        verificationCodePort.saveCode(email, code, VerificationPurpose.SIGNUP)
+        redisVerificationCodeManager.saveVerificationCode(
+            email = email,
+            purpose = VerificationPurpose.SIGNUP.name
+        )
 
         val request = VerifyCodeRequest(
             email = email,
@@ -322,8 +327,10 @@ class EmailAuthControllerTest : BaseControllerTest() {
         )
         memberRepository.save(member)
 
-        val code = verificationCodePort.generateCode()
-        verificationCodePort.saveCode(email, code, VerificationPurpose.PASSWORD_RESET)
+        val code = redisVerificationCodeManager.saveVerificationCode(
+            email = email,
+            purpose = VerificationPurpose.PASSWORD_RESET.name
+        )
 
         val request = ResetPasswordRequest(
             email = email,
@@ -345,8 +352,10 @@ class EmailAuthControllerTest : BaseControllerTest() {
     @DisplayName("비밀번호 재설정 - 잘못된 인증 코드")
     fun `resetPassword - 잘못된 인증 코드로 비밀번호 재설정 시 실패`() {
         val email = "reset@example.com"
-        val code = verificationCodePort.generateCode()
-        verificationCodePort.saveCode(email, code, VerificationPurpose.PASSWORD_RESET)
+        redisVerificationCodeManager.saveVerificationCode(
+            email = email,
+            purpose = VerificationPurpose.PASSWORD_RESET.name
+        )
 
         val request = ResetPasswordRequest(
             email = email,

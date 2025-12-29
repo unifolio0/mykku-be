@@ -11,7 +11,4 @@ interface MemberGoodsPreferenceRepository : JpaRepository<MemberGoodsPreference,
     fun findByMember(member: Member): List<MemberGoodsPreference>
     fun deleteByMember(member: Member)
     fun existsByMemberAndGoodsType(member: Member, goodsType: GoodsType): Boolean
-
-    fun findByMemberId(memberId: String): List<MemberGoodsPreference>
-    fun existsByMemberIdAndGoodsType(memberId: String, goodsType: GoodsType): Boolean
 }

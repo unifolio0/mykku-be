@@ -9,6 +9,4 @@ interface LikeDailyMessageCommentRepository : JpaRepository<LikeDailyMessageComm
     fun existsByMemberIdAndDailyMessageCommentId(memberId: String, dailyMessageCommentId: Long): Boolean
 
     fun deleteByMemberIdAndDailyMessageCommentId(memberId: String, dailyMessageCommentId: Long)
-
-    fun countByDailyMessageCommentId(dailyMessageCommentId: Long): Int
 }

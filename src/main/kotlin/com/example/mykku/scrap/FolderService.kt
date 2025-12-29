@@ -5,25 +5,25 @@ import com.example.mykku.scrap.dto.CreateFolderRequest
 import com.example.mykku.scrap.dto.FolderResponse
 import com.example.mykku.scrap.dto.FoldersResponse
 import com.example.mykku.scrap.dto.UpdateFolderRequest
-import com.example.mykku.scrap.application.port.out.FolderQueryPort
-import com.example.mykku.scrap.application.port.out.FolderRepositoryPort
+import com.example.mykku.scrap.tool.FolderReader
+import com.example.mykku.scrap.tool.FolderWriter
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class FolderService(
-    private val folderQueryPort: FolderQueryPort,
-    private val folderRepositoryPort: FolderRepositoryPort
+    private val folderReader: FolderReader,
+    private val folderWriter: FolderWriter
 ) {
     @Transactional
     fun createFolder(request: CreateFolderRequest, member: Member): FolderResponse {
-        val folder = folderRepositoryPort.createFolder(member, request.name, request.description)
+        val folder = folderWriter.createFolder(member, request.name, request.description)
         return FolderResponse.from(folder)
     }
 
     @Transactional(readOnly = true)
     fun getFolders(member: Member): FoldersResponse {
-        val folders = folderQueryPort.getFoldersByMember(member)
+        val folders = folderReader.getFoldersByMember(member)
         return FoldersResponse(
             folders = folders.map { FolderResponse.from(it) }
         )
@@ -31,12 +31,12 @@ class FolderService(
 
     @Transactional
     fun updateFolder(folderId: Long, request: UpdateFolderRequest, member: Member): FolderResponse {
-        val folder = folderRepositoryPort.updateFolder(folderId, member, request.name, request.description)
+        val folder = folderWriter.updateFolder(folderId, member, request.name, request.description)
         return FolderResponse.from(folder)
     }
 
     @Transactional
     fun deleteFolder(folderId: Long, member: Member) {
-        folderRepositoryPort.deleteFolder(folderId, member)
+        folderWriter.deleteFolder(folderId, member)
     }
 }

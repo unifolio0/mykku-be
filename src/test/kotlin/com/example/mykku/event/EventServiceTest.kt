@@ -1,9 +1,6 @@
 package com.example.mykku.event
 
 import com.example.mykku.BaseServiceTest
-import com.example.mykku.event.application.port.out.EventParticipationQueryPort
-import com.example.mykku.event.application.port.out.EventQueryPort
-import com.example.mykku.event.application.port.out.EventRepositoryPort
 import com.example.mykku.event.domain.Event
 import com.example.mykku.event.domain.EventImage
 import com.example.mykku.event.domain.EventSortType
@@ -13,8 +10,11 @@ import com.example.mykku.event.dto.EventImageRequest
 import com.example.mykku.event.dto.EventListResponse
 import com.example.mykku.event.dto.EventDetailResponse
 import com.example.mykku.event.dto.EventImageResponse
-import com.example.mykku.event.application.service.EventDtoConverter
-import com.example.mykku.scrap.application.port.out.SaveEventQueryPort
+import com.example.mykku.event.tool.EventDtoConverter
+import com.example.mykku.event.tool.EventParticipationReader
+import com.example.mykku.event.tool.EventReader
+import com.example.mykku.event.tool.EventWriter
+import com.example.mykku.scrap.tool.SaveEventReader
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -32,16 +32,16 @@ import java.time.LocalDateTime
 class EventServiceTest : BaseServiceTest() {
 
     @Mock
-    private lateinit var eventRepositoryPort: EventRepositoryPort
+    private lateinit var eventWriter: EventWriter
 
     @Mock
-    private lateinit var eventQueryPort: EventQueryPort
+    private lateinit var eventReader: EventReader
 
     @Mock
-    private lateinit var eventParticipationQueryPort: EventParticipationQueryPort
+    private lateinit var eventParticipationReader: EventParticipationReader
 
     @Mock
-    private lateinit var saveEventQueryPort: SaveEventQueryPort
+    private lateinit var saveEventReader: SaveEventReader
 
     @Mock
     private lateinit var eventDtoConverter: EventDtoConverter
@@ -72,7 +72,7 @@ class EventServiceTest : BaseServiceTest() {
             EventImage(id = 2L, url = "url2", orderIndex = 1, event = event)
         )
 
-        whenever(eventRepositoryPort.createEvent(any(), anyOrNull(), any(), any(), any())).thenReturn(Pair(event, images))
+        whenever(eventWriter.createEvent(any(), anyOrNull(), any(), any(), any())).thenReturn(Pair(event, images))
 
         // when
         val result = eventService.createEvent(request)
@@ -97,7 +97,7 @@ class EventServiceTest : BaseServiceTest() {
         val event = Event(id = 1L, title = request.title, startedAt = LocalDateTime.now(), expiredAt = request.expiredAt)
         initializeBaseEntityFields(event, LocalDateTime.now())
 
-        whenever(eventRepositoryPort.createEvent(any(), anyOrNull(), any(), any(), any())).thenReturn(Pair(event, emptyList()))
+        whenever(eventWriter.createEvent(any(), anyOrNull(), any(), any(), any())).thenReturn(Pair(event, emptyList()))
 
         // when
         val result = eventService.createEvent(request)
@@ -124,9 +124,9 @@ class EventServiceTest : BaseServiceTest() {
         val response1 = EventListResponse(id = 1L, title = "이벤트1", startedAt = event1.startedAt, expiredAt = event1.expiredAt, status = event1.status, thumbnailUrl = "url1", isSaved = true)
         val response2 = EventListResponse(id = 2L, title = "이벤트2", startedAt = event2.startedAt, expiredAt = event2.expiredAt, status = event2.status, thumbnailUrl = null, isSaved = false)
 
-        whenever(eventQueryPort.getEventsWithPagination(any(), any(), any(), any())).thenReturn(page)
-        whenever(eventQueryPort.getEventImages(events)).thenReturn(imagesByEventId)
-        whenever(saveEventQueryPort.getSavedEventIds(eq(member), any())).thenReturn(setOf(1L))
+        whenever(eventReader.getEventsWithPagination(any(), any(), any(), any())).thenReturn(page)
+        whenever(eventReader.getEventImages(events)).thenReturn(imagesByEventId)
+        whenever(saveEventReader.getSavedEventIds(eq(member), any())).thenReturn(setOf(1L))
         whenever(eventDtoConverter.toEventListResponse(eq(event1), any(), eq(true))).thenReturn(response1)
         whenever(eventDtoConverter.toEventListResponse(eq(event2), any(), eq(false))).thenReturn(response2)
 
@@ -163,9 +163,9 @@ class EventServiceTest : BaseServiceTest() {
             createdAt = event.createdAt
         )
 
-        whenever(eventQueryPort.getEventByIdWithRelations(1L)).thenReturn(event)
-        whenever(eventQueryPort.getEventImages(listOf(event))).thenReturn(imagesByEventId)
-        whenever(saveEventQueryPort.isSaved(member, event)).thenReturn(true)
+        whenever(eventReader.getEventByIdWithRelations(1L)).thenReturn(event)
+        whenever(eventReader.getEventImages(listOf(event))).thenReturn(imagesByEventId)
+        whenever(saveEventReader.isSaved(member, event)).thenReturn(true)
         whenever(eventDtoConverter.toEventDetailResponse(event, images, true)).thenReturn(expectedResponse)
 
         // when
@@ -199,9 +199,9 @@ class EventServiceTest : BaseServiceTest() {
             createdAt = event.createdAt
         )
 
-        whenever(eventQueryPort.getEventByIdWithRelations(1L)).thenReturn(event)
-        whenever(eventQueryPort.getEventImages(listOf(event))).thenReturn(imagesByEventId)
-        whenever(saveEventQueryPort.isSaved(member, event)).thenReturn(false)
+        whenever(eventReader.getEventByIdWithRelations(1L)).thenReturn(event)
+        whenever(eventReader.getEventImages(listOf(event))).thenReturn(imagesByEventId)
+        whenever(saveEventReader.isSaved(member, event)).thenReturn(false)
         whenever(eventDtoConverter.toEventDetailResponse(eq(event), any(), eq(false))).thenReturn(expectedResponse)
 
         // when
@@ -228,9 +228,9 @@ class EventServiceTest : BaseServiceTest() {
         val response1 = EventListResponse(id = 1L, title = "이벤트1", startedAt = event1.startedAt, expiredAt = event1.expiredAt, status = event1.status, thumbnailUrl = "url1", isSaved = true)
         val response2 = EventListResponse(id = 2L, title = "이벤트2", startedAt = event2.startedAt, expiredAt = event2.expiredAt, status = event2.status, thumbnailUrl = null, isSaved = false)
 
-        whenever(eventParticipationQueryPort.getParticipatedEvents(eq(member), any())).thenReturn(page)
-        whenever(eventQueryPort.getEventImages(events)).thenReturn(imagesByEventId)
-        whenever(saveEventQueryPort.getSavedEventIds(eq(member), any())).thenReturn(setOf(1L))
+        whenever(eventParticipationReader.getParticipatedEvents(eq(member), any())).thenReturn(page)
+        whenever(eventReader.getEventImages(events)).thenReturn(imagesByEventId)
+        whenever(saveEventReader.getSavedEventIds(eq(member), any())).thenReturn(setOf(1L))
         whenever(eventDtoConverter.toEventListResponse(eq(event1), any(), eq(true))).thenReturn(response1)
         whenever(eventDtoConverter.toEventListResponse(eq(event2), any(), eq(false))).thenReturn(response2)
 

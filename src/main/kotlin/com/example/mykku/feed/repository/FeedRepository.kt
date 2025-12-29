@@ -13,7 +13,6 @@ import org.springframework.stereotype.Repository
 @Repository
 interface FeedRepository : JpaRepository<Feed, Long> {
     fun findAllByMemberIn(members: List<Member>): List<Feed>
-    fun findByMemberId(memberId: String): List<Feed>
     
     @Query("""
         SELECT f FROM Feed f 

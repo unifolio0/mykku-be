@@ -1,13 +1,8 @@
 package com.example.mykku.preference
 
 import com.example.mykku.BaseServiceTest
-import com.example.mykku.preference.application.port.out.GenrePreferenceQueryPort
-import com.example.mykku.preference.application.port.out.GenrePreferenceRepositoryPort
-import com.example.mykku.preference.application.port.out.GoodsPreferenceQueryPort
-import com.example.mykku.preference.application.port.out.GoodsPreferenceRepositoryPort
-import com.example.mykku.preference.application.port.out.MoodPreferenceQueryPort
-import com.example.mykku.preference.application.port.out.MoodPreferenceRepositoryPort
 import com.example.mykku.preference.domain.*
+import com.example.mykku.preference.tool.*
 import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
@@ -18,22 +13,22 @@ import kotlin.test.assertEquals
 class PreferenceServiceTest : BaseServiceTest() {
 
     @Mock
-    private lateinit var genrePreferenceQueryPort: GenrePreferenceQueryPort
+    private lateinit var genrePreferenceReader: GenrePreferenceReader
 
     @Mock
-    private lateinit var genrePreferenceRepositoryPort: GenrePreferenceRepositoryPort
+    private lateinit var genrePreferenceWriter: GenrePreferenceWriter
 
     @Mock
-    private lateinit var goodsPreferenceQueryPort: GoodsPreferenceQueryPort
+    private lateinit var goodsPreferenceReader: GoodsPreferenceReader
 
     @Mock
-    private lateinit var goodsPreferenceRepositoryPort: GoodsPreferenceRepositoryPort
+    private lateinit var goodsPreferenceWriter: GoodsPreferenceWriter
 
     @Mock
-    private lateinit var moodPreferenceQueryPort: MoodPreferenceQueryPort
+    private lateinit var moodPreferenceReader: MoodPreferenceReader
 
     @Mock
-    private lateinit var moodPreferenceRepositoryPort: MoodPreferenceRepositoryPort
+    private lateinit var moodPreferenceWriter: MoodPreferenceWriter
 
     @InjectMocks
     private lateinit var preferenceService: PreferenceService
@@ -48,7 +43,7 @@ class PreferenceServiceTest : BaseServiceTest() {
         preferenceService.updateGenrePreferences(member, genreTypes)
 
         // then
-        verify(genrePreferenceRepositoryPort).replacePreferences(member, genreTypes)
+        verify(genrePreferenceWriter).replacePreferences(member, genreTypes)
     }
 
     @Test
@@ -60,7 +55,7 @@ class PreferenceServiceTest : BaseServiceTest() {
             MemberGenrePreference(id = 2L, member = member, genreType = GenreType.GAME_ESPORTS)
         )
 
-        whenever(genrePreferenceQueryPort.findByMember(member))
+        whenever(genrePreferenceReader.findByMember(member))
             .thenReturn(preferences)
 
         // when
@@ -70,7 +65,7 @@ class PreferenceServiceTest : BaseServiceTest() {
         assertEquals(2, result.size)
         assertEquals(GenreType.KPOP, result[0])
         assertEquals(GenreType.GAME_ESPORTS, result[1])
-        verify(genrePreferenceQueryPort).findByMember(member)
+        verify(genrePreferenceReader).findByMember(member)
     }
 
     @Test
@@ -83,7 +78,7 @@ class PreferenceServiceTest : BaseServiceTest() {
         preferenceService.updateGoodsPreferences(member, goodsTypes)
 
         // then
-        verify(goodsPreferenceRepositoryPort).replacePreferences(member, goodsTypes)
+        verify(goodsPreferenceWriter).replacePreferences(member, goodsTypes)
     }
 
     @Test
@@ -95,7 +90,7 @@ class PreferenceServiceTest : BaseServiceTest() {
             MemberGoodsPreference(id = 2L, member = member, goodsType = GoodsType.UCHIWA)
         )
 
-        whenever(goodsPreferenceQueryPort.findByMember(member))
+        whenever(goodsPreferenceReader.findByMember(member))
             .thenReturn(preferences)
 
         // when
@@ -105,7 +100,7 @@ class PreferenceServiceTest : BaseServiceTest() {
         assertEquals(2, result.size)
         assertEquals(GoodsType.PHOTOCARD_HOLDER, result[0])
         assertEquals(GoodsType.UCHIWA, result[1])
-        verify(goodsPreferenceQueryPort).findByMember(member)
+        verify(goodsPreferenceReader).findByMember(member)
     }
 
     @Test
@@ -118,7 +113,7 @@ class PreferenceServiceTest : BaseServiceTest() {
         preferenceService.updateMoodPreferences(member, moodTypes)
 
         // then
-        verify(moodPreferenceRepositoryPort).replacePreferences(member, moodTypes)
+        verify(moodPreferenceWriter).replacePreferences(member, moodTypes)
     }
 
     @Test
@@ -130,7 +125,7 @@ class PreferenceServiceTest : BaseServiceTest() {
             MemberMoodPreference(id = 2L, member = member, moodType = MoodType.Y2K)
         )
 
-        whenever(moodPreferenceQueryPort.findByMember(member))
+        whenever(moodPreferenceReader.findByMember(member))
             .thenReturn(preferences)
 
         // when
@@ -140,6 +135,6 @@ class PreferenceServiceTest : BaseServiceTest() {
         assertEquals(2, result.size)
         assertEquals(MoodType.KITSCH, result[0])
         assertEquals(MoodType.Y2K, result[1])
-        verify(moodPreferenceQueryPort).findByMember(member)
+        verify(moodPreferenceReader).findByMember(member)
     }
 }

@@ -1,15 +1,15 @@
 package com.example.mykku.board
 
 import com.example.mykku.BaseServiceTest
-import com.example.mykku.board.application.port.out.BoardQueryPort
-import com.example.mykku.board.application.port.out.BoardRepositoryPort
 import com.example.mykku.board.domain.Board
 import com.example.mykku.board.dto.CreateBoardRequest
 import com.example.mykku.board.dto.UpdateBoardRequest
+import com.example.mykku.board.tool.BoardReader
+import com.example.mykku.board.tool.BoardWriter
 import com.example.mykku.like.domain.LikeBoard
-import com.example.mykku.like.application.port.out.LikeBoardRepositoryPort
-import com.example.mykku.member.application.port.out.MemberQueryPort
-import com.example.mykku.member.domain.model.MemberId
+import com.example.mykku.like.tool.LikeBoardWriter
+import com.example.mykku.member.domain.Member
+import com.example.mykku.member.tool.MemberReader
 import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
@@ -19,16 +19,16 @@ import kotlin.test.assertEquals
 class BoardServiceTest : BaseServiceTest() {
 
     @Mock
-    private lateinit var boardQueryPort: BoardQueryPort
+    private lateinit var boardReader: BoardReader
 
     @Mock
-    private lateinit var boardRepositoryPort: BoardRepositoryPort
+    private lateinit var boardWriter: BoardWriter
 
     @Mock
-    private lateinit var memberQueryPort: MemberQueryPort
+    private lateinit var memberReader: MemberReader
 
     @Mock
-    private lateinit var likeBoardRepositoryPort: LikeBoardRepositoryPort
+    private lateinit var likeBoardWriter: LikeBoardWriter
 
     @InjectMocks
     private lateinit var boardService: BoardService
@@ -42,10 +42,9 @@ class BoardServiceTest : BaseServiceTest() {
         val board = Board(id = 1L, title = request.title, logo = request.logo)
         val likeBoard = LikeBoard(member = member, board = board)
 
-        whenever(boardQueryPort.existsByTitle(request.title)).thenReturn(false)
-        whenever(boardRepositoryPort.createBoard(title = request.title, logo = request.logo)).thenReturn(board)
-        whenever(memberQueryPort.getMemberById(MemberId("member1"))).thenReturn(member)
-        whenever(likeBoardRepositoryPort.createLikeBoard(member = member, board = board)).thenReturn(likeBoard)
+        whenever(boardWriter.createBoard(title = request.title, logo = request.logo)).thenReturn(board)
+        whenever(memberReader.getMemberById("member1")).thenReturn(member)
+        whenever(likeBoardWriter.createLikeBoard(member = member, board = board)).thenReturn(likeBoard)
 
         // when
         val result = boardService.createBoard(request, "member1")
@@ -63,9 +62,8 @@ class BoardServiceTest : BaseServiceTest() {
         val beforeBoard = Board(id = 1L, title = "원본 보드", logo = "old_logo.png")
         val afterBoard = Board(id = 1L, title = request.title, logo = request.logo)
 
-        whenever(boardQueryPort.getBoardById(1L)).thenReturn(beforeBoard)
-        whenever(boardQueryPort.existsByTitle(request.title)).thenReturn(false)
-        whenever(boardRepositoryPort.updateBoard(
+        whenever(boardReader.getBoardById(1L)).thenReturn(beforeBoard)
+        whenever(boardWriter.updateBoard(
             board = beforeBoard,
             title = request.title,
             logo = request.logo
@@ -87,8 +85,8 @@ class BoardServiceTest : BaseServiceTest() {
         val beforeBoard = Board(id = 1L, title = "같은 제목", logo = "old_logo.png")
         val afterBoard = Board(id = 1L, title = request.title, logo = request.logo)
 
-        whenever(boardQueryPort.getBoardById(1L)).thenReturn(beforeBoard)
-        whenever(boardRepositoryPort.updateBoard(
+        whenever(boardReader.getBoardById(1L)).thenReturn(beforeBoard)
+        whenever(boardWriter.updateBoard(
             board = beforeBoard,
             title = request.title,
             logo = request.logo
@@ -108,9 +106,8 @@ class BoardServiceTest : BaseServiceTest() {
         val beforeBoard = Board(id = 1L, title = "원본 제목", logo = "old_logo.png")
         val afterBoard = Board(id = 1L, title = request.title, logo = request.logo)
 
-        whenever(boardQueryPort.getBoardById(1L)).thenReturn(beforeBoard)
-        whenever(boardQueryPort.existsByTitle(request.title)).thenReturn(false)
-        whenever(boardRepositoryPort.updateBoard(
+        whenever(boardReader.getBoardById(1L)).thenReturn(beforeBoard)
+        whenever(boardWriter.updateBoard(
             board = beforeBoard,
             title = request.title,
             logo = request.logo

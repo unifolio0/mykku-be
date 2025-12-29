@@ -1,8 +1,5 @@
 package com.example.mykku.feed
 
-import com.example.mykku.feed.application.port.out.FeedCommentQueryPort
-import com.example.mykku.feed.application.port.out.FeedCommentRepositoryPort
-import com.example.mykku.feed.application.port.out.FeedQueryPort
 import com.example.mykku.feed.dto.CommentAuthorResponse
 import com.example.mykku.feed.dto.CreateFeedCommentRequest
 import com.example.mykku.feed.dto.FeedCommentReplyResponse
@@ -11,27 +8,29 @@ import com.example.mykku.feed.dto.FeedCommentsResponse
 import com.example.mykku.feed.dto.SingleFeedCommentResponse
 import com.example.mykku.feed.dto.UpdateFeedCommentRequest
 import com.example.mykku.feed.exception.FeedException
-import com.example.mykku.like.application.port.out.LikeFeedCommentQueryPort
-import com.example.mykku.member.application.port.out.MemberQueryPort
-import com.example.mykku.member.domain.model.MemberId
+import com.example.mykku.feed.tool.FeedCommentReader
+import com.example.mykku.feed.tool.FeedCommentWriter
+import com.example.mykku.feed.tool.FeedReader
+import com.example.mykku.like.tool.LikeFeedCommentReader
+import com.example.mykku.member.tool.MemberReader
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class FeedCommentService(
-    private val feedQueryPort: FeedQueryPort,
-    private val feedCommentQueryPort: FeedCommentQueryPort,
-    private val feedCommentRepositoryPort: FeedCommentRepositoryPort,
-    private val likeFeedCommentQueryPort: LikeFeedCommentQueryPort,
-    private val memberQueryPort: MemberQueryPort,
+    private val feedReader: FeedReader,
+    private val feedCommentReader: FeedCommentReader,
+    private val feedCommentWriter: FeedCommentWriter,
+    private val likeFeedCommentReader: LikeFeedCommentReader,
+    private val memberReader: MemberReader,
 ) {
     @Transactional(readOnly = true)
     fun getComments(feedId: Long, memberId: String?, pageable: Pageable): FeedCommentsResponse {
-        val feed = feedQueryPort.getFeedById(feedId)
-        val commentsPage = feedCommentQueryPort.getCommentsByFeed(feed, pageable)
+        val feed = feedReader.getFeedById(feedId)
+        val commentsPage = feedCommentReader.getCommentsByFeed(feed, pageable)
 
-        val repliesMap = feedCommentQueryPort.getRepliesByParentComments(commentsPage.content)
+        val repliesMap = feedCommentReader.getRepliesByParentComments(commentsPage.content)
 
         val commentResponses = commentsPage.content.map { comment ->
             val replies = repliesMap[comment.id] ?: emptyList()
@@ -45,7 +44,7 @@ class FeedCommentService(
                         profileImage = reply.member.profileImage
                     ),
                     likeCount = reply.likeCount,
-                    isLiked = memberId?.let { likeFeedCommentQueryPort.isLiked(it, reply) } ?: false,
+                    isLiked = memberId?.let { likeFeedCommentReader.isLiked(it, reply) } ?: false,
                     createdAt = reply.createdAt,
                     updatedAt = reply.updatedAt
                 )
@@ -60,7 +59,7 @@ class FeedCommentService(
                     profileImage = comment.member.profileImage
                 ),
                 likeCount = comment.likeCount,
-                isLiked = memberId?.let { likeFeedCommentQueryPort.isLiked(it, comment) } ?: false,
+                isLiked = memberId?.let { likeFeedCommentReader.isLiked(it, comment) } ?: false,
                 replies = replyResponses,
                 replyCount = replyResponses.size,
                 createdAt = comment.createdAt,
@@ -84,14 +83,14 @@ class FeedCommentService(
         memberId: String,
         request: CreateFeedCommentRequest,
     ): SingleFeedCommentResponse {
-        val feed = feedQueryPort.getFeedById(feedId)
-        val member = memberQueryPort.getMemberById(MemberId(memberId))
+        val feed = feedReader.getFeedById(feedId)
+        val member = memberReader.getMemberById(memberId)
 
         val parentComment = request.parentCommentId?.let { parentId ->
-            feedCommentQueryPort.getFeedCommentById(parentId)
+            feedCommentReader.getFeedCommentById(parentId)
         }
 
-        val comment = feedCommentRepositoryPort.createComment(
+        val comment = feedCommentWriter.createComment(
             content = request.content,
             feed = feed,
             member = member,
@@ -117,13 +116,13 @@ class FeedCommentService(
         memberId: String,
         request: UpdateFeedCommentRequest,
     ): SingleFeedCommentResponse {
-        val comment = feedCommentQueryPort.getFeedCommentById(commentId)
+        val comment = feedCommentReader.getFeedCommentById(commentId)
 
         if (comment.member.id != memberId) {
             throw FeedException.feedCommentForbiddenAccess()
         }
 
-        val updatedComment = feedCommentRepositoryPort.updateComment(
+        val updatedComment = feedCommentWriter.updateComment(
             comment = comment,
             newContent = request.content,
         )
@@ -143,12 +142,12 @@ class FeedCommentService(
 
     @Transactional
     fun deleteComment(commentId: Long, memberId: String) {
-        val comment = feedCommentQueryPort.getFeedCommentById(commentId)
+        val comment = feedCommentReader.getFeedCommentById(commentId)
 
         if (comment.member.id != memberId) {
             throw FeedException.feedCommentForbiddenAccess()
         }
 
-        feedCommentRepositoryPort.deleteComment(comment)
+        feedCommentWriter.deleteComment(comment)
     }
 }

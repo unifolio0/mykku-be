@@ -34,7 +34,4 @@ interface NotificationRepository : JpaRepository<Notification, Long> {
     fun markAllAsReadByReceiver(@Param("receiver") receiver: Member): Int
 
     fun deleteAllByReceiver(receiver: Member)
-
-    fun countByReceiverIdAndIsReadFalse(receiverId: String): Int
-    fun existsByReceiverIdAndIsReadFalse(receiverId: String): Boolean
 }

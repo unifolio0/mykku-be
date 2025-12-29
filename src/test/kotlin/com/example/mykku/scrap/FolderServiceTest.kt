@@ -4,8 +4,8 @@ import com.example.mykku.BaseServiceTest
 import com.example.mykku.scrap.domain.Folder
 import com.example.mykku.scrap.dto.CreateFolderRequest
 import com.example.mykku.scrap.dto.UpdateFolderRequest
-import com.example.mykku.scrap.application.port.out.FolderQueryPort
-import com.example.mykku.scrap.application.port.out.FolderRepositoryPort
+import com.example.mykku.scrap.tool.FolderReader
+import com.example.mykku.scrap.tool.FolderWriter
 import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
@@ -16,10 +16,10 @@ import kotlin.test.assertEquals
 class FolderServiceTest : BaseServiceTest() {
 
     @Mock
-    private lateinit var folderQueryPort: FolderQueryPort
+    private lateinit var folderReader: FolderReader
 
     @Mock
-    private lateinit var folderRepositoryPort: FolderRepositoryPort
+    private lateinit var folderWriter: FolderWriter
 
     @InjectMocks
     private lateinit var folderService: FolderService
@@ -39,7 +39,7 @@ class FolderServiceTest : BaseServiceTest() {
             description = request.description
         ).also { initializeBaseEntityFields(it) }
 
-        whenever(folderRepositoryPort.createFolder(member, request.name, request.description))
+        whenever(folderWriter.createFolder(member, request.name, request.description))
             .thenReturn(createdFolder)
 
         // when
@@ -49,7 +49,7 @@ class FolderServiceTest : BaseServiceTest() {
         assertEquals(1L, result.id)
         assertEquals("새 폴더", result.name)
         assertEquals("폴더 설명", result.description)
-        verify(folderRepositoryPort).createFolder(member, request.name, request.description)
+        verify(folderWriter).createFolder(member, request.name, request.description)
     }
 
     @Test
@@ -62,7 +62,7 @@ class FolderServiceTest : BaseServiceTest() {
             Folder(id = 3L, member = member, name = "폴더3", description = null).also { initializeBaseEntityFields(it) }
         )
 
-        whenever(folderQueryPort.getFoldersByMember(member))
+        whenever(folderReader.getFoldersByMember(member))
             .thenReturn(folders)
 
         // when
@@ -73,7 +73,7 @@ class FolderServiceTest : BaseServiceTest() {
         assertEquals("폴더1", result.folders[0].name)
         assertEquals("폴더2", result.folders[1].name)
         assertEquals("폴더3", result.folders[2].name)
-        verify(folderQueryPort).getFoldersByMember(member)
+        verify(folderReader).getFoldersByMember(member)
     }
 
     @Test
@@ -92,7 +92,7 @@ class FolderServiceTest : BaseServiceTest() {
             description = request.description
         ).also { initializeBaseEntityFields(it) }
 
-        whenever(folderRepositoryPort.updateFolder(folderId, member, request.name, request.description))
+        whenever(folderWriter.updateFolder(folderId, member, request.name, request.description))
             .thenReturn(updatedFolder)
 
         // when
@@ -102,7 +102,7 @@ class FolderServiceTest : BaseServiceTest() {
         assertEquals(folderId, result.id)
         assertEquals("수정된 폴더", result.name)
         assertEquals("수정된 설명", result.description)
-        verify(folderRepositoryPort).updateFolder(folderId, member, request.name, request.description)
+        verify(folderWriter).updateFolder(folderId, member, request.name, request.description)
     }
 
     @Test
@@ -115,6 +115,6 @@ class FolderServiceTest : BaseServiceTest() {
         folderService.deleteFolder(folderId, member)
 
         // then
-        verify(folderRepositoryPort).deleteFolder(folderId, member)
+        verify(folderWriter).deleteFolder(folderId, member)
     }
 }

@@ -15,7 +15,4 @@ interface SaveEventRepository : JpaRepository<SaveEvent, Long> {
     fun findByMemberAndEvent(member: Member, event: Event): SaveEvent?
     fun deleteByMemberAndEvent(member: Member, event: Event)
     fun findByMemberAndEventIn(member: Member, events: List<Event>): List<SaveEvent>
-
-    fun existsByMemberIdAndEventId(memberId: String, eventId: Long): Boolean
-    fun countByEventId(eventId: Long): Int
 }

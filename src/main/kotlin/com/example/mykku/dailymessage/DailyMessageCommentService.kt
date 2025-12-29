@@ -1,23 +1,22 @@
 package com.example.mykku.dailymessage
 
-import com.example.mykku.dailymessage.application.port.out.DailyMessageCommentQueryPort
-import com.example.mykku.dailymessage.application.port.out.DailyMessageCommentRepositoryPort
-import com.example.mykku.dailymessage.application.port.out.DailyMessageQueryPort
 import com.example.mykku.dailymessage.dto.CommentResponse
 import com.example.mykku.dailymessage.dto.CreateCommentRequest
 import com.example.mykku.dailymessage.dto.UpdateCommentRequest
+import com.example.mykku.dailymessage.tool.DailyMessageCommentReader
+import com.example.mykku.dailymessage.tool.DailyMessageCommentWriter
+import com.example.mykku.dailymessage.tool.DailyMessageReader
 import com.example.mykku.dailymessage.exception.DailyMessageException
-import com.example.mykku.member.application.port.out.MemberQueryPort
-import com.example.mykku.member.domain.model.MemberId
+import com.example.mykku.member.tool.MemberReader
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class DailyMessageCommentService(
-    private val dailyMessageQueryPort: DailyMessageQueryPort,
-    private val dailyMessageCommentQueryPort: DailyMessageCommentQueryPort,
-    private val dailyMessageCommentRepositoryPort: DailyMessageCommentRepositoryPort,
-    private val memberQueryPort: MemberQueryPort,
+    private val dailyMessageReader: DailyMessageReader,
+    private val dailyMessageCommentReader: DailyMessageCommentReader,
+    private val dailyMessageCommentWriter: DailyMessageCommentWriter,
+    private val memberReader: MemberReader,
 ) {
     @Transactional
     fun createComment(
@@ -25,14 +24,14 @@ class DailyMessageCommentService(
         memberId: String,
         request: CreateCommentRequest,
     ): CommentResponse {
-        val dailyMessage = dailyMessageQueryPort.getDailyMessage(dailyMessageId)
-        val member = memberQueryPort.getMemberById(MemberId(memberId))
+        val dailyMessage = dailyMessageReader.getDailyMessage(dailyMessageId)
+        val member = memberReader.getMemberById(memberId)
 
         val parentComment = request.parentCommentId?.let { parentId ->
-            dailyMessageCommentQueryPort.getCommentByDailyMessageId(parentId, dailyMessageId)
+            dailyMessageCommentReader.getCommentByDailyMessageId(parentId, dailyMessageId)
         }
 
-        val comment = dailyMessageCommentRepositoryPort.createComment(
+        val comment = dailyMessageCommentWriter.createComment(
             content = request.content,
             dailyMessage = dailyMessage,
             member = member,
@@ -56,13 +55,13 @@ class DailyMessageCommentService(
         memberId: String,
         request: UpdateCommentRequest,
     ): CommentResponse {
-        val comment = dailyMessageCommentQueryPort.getComment(commentId)
+        val comment = dailyMessageCommentReader.getComment(commentId)
 
         if (comment.member.id != memberId) {
             throw DailyMessageException.commentForbiddenAccess()
         }
 
-        val updatedComment = dailyMessageCommentRepositoryPort.updateComment(
+        val updatedComment = dailyMessageCommentWriter.updateComment(
             comment = comment,
             newContent = request.content,
         )
@@ -80,12 +79,12 @@ class DailyMessageCommentService(
 
     @Transactional
     fun deleteComment(commentId: Long, memberId: String) {
-        val comment = dailyMessageCommentQueryPort.getComment(commentId)
+        val comment = dailyMessageCommentReader.getComment(commentId)
 
         if (comment.member.id != memberId) {
             throw DailyMessageException.commentForbiddenAccess()
         }
 
-        dailyMessageCommentRepositoryPort.deleteComment(comment)
+        dailyMessageCommentWriter.deleteComment(comment)
     }
 }

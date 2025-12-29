@@ -11,7 +11,4 @@ interface MemberMoodPreferenceRepository : JpaRepository<MemberMoodPreference, L
     fun findByMember(member: Member): List<MemberMoodPreference>
     fun deleteByMember(member: Member)
     fun existsByMemberAndMoodType(member: Member, moodType: MoodType): Boolean
-
-    fun findByMemberId(memberId: String): List<MemberMoodPreference>
-    fun existsByMemberIdAndMoodType(memberId: String, moodType: MoodType): Boolean
 }
