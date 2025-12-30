@@ -94,4 +94,19 @@ class Member(
             throw MemberException.memberNicknameInvalidFormat()
         }
     }
+
+    fun updateProfile(newNickname: String?, newProfileImage: String?) {
+        newNickname?.let {
+            if (it.length > NICKNAME_MAX_LENGTH) {
+                throw MemberException.memberNicknameTooLong()
+            }
+            if (!VALID_NICKNAME_PATTERN.matches(it)) {
+                throw MemberException.memberNicknameInvalidFormat()
+            }
+            this.nickname = it
+        }
+        newProfileImage?.let {
+            this.profileImage = it
+        }
+    }
 }

@@ -15,6 +15,8 @@ class MemberException(
 
         fun memberNicknameInvalidFormat(): MemberException = MemberException(MemberErrorCode.MEMBER_NICKNAME_INVALID_FORMAT)
 
+        fun nicknameAlreadyExists(): MemberException = MemberException(MemberErrorCode.NICKNAME_ALREADY_EXISTS)
+
         fun invalidCurrentPassword(): MemberException = MemberException(MemberErrorCode.INVALID_CURRENT_PASSWORD)
     }
 }

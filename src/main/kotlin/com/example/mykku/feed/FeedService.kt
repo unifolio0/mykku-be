@@ -121,6 +121,7 @@ class FeedService(
     private fun mapFeedImages(feedImages: List<FeedImage>): List<FeedImageResponse> {
         return feedImages.map {
             FeedImageResponse(
+                id = it.id!!,
                 url = it.url,
                 width = it.width,
                 height = it.height
@@ -263,5 +264,51 @@ class FeedService(
         val participations = contestParticipationReader.getParticipationsByFeed(feed)
         contestWinnerWriter.deleteAllByParticipations(participations)
         contestParticipationWriter.deleteAllByFeed(feed)
+    }
+
+    @Transactional
+    fun updateFeed(feedId: Long, request: UpdateFeedRequest, member: Member): FeedDetailResponse {
+        val feed = feedReader.getFeedById(feedId)
+        validateFeedOwner(feed, member)
+
+        validateFinalImageCount(feed, request)
+
+        val board = request.boardId?.let { boardReader.getBoardById(it) }
+        val newImageResults = uploadImages(request.newImages)
+
+        val (updatedFeed, updatedImages, updatedTags) = feedWriter.updateFeed(
+            feed = feed,
+            title = request.title,
+            content = request.content,
+            board = board,
+            deleteImageIds = request.deleteImageIds,
+            newImageResults = newImageResults,
+            tagTitles = request.tags
+        )
+
+        val contestTagTitles = fetchContestTagTitles(updatedTags)
+        val interactions = fetchUserInteractions(member.id, updatedFeed)
+
+        return FeedDetailResponse(
+            feed = updatedFeed,
+            author = AuthorResponse(member),
+            isLiked = interactions.isLiked,
+            isSaved = interactions.isSaved,
+            contestTagTitles = contestTagTitles,
+            feedImages = updatedImages,
+            feedTags = updatedTags
+        )
+    }
+
+    private fun validateFinalImageCount(feed: Feed, request: UpdateFeedRequest) {
+        val existingImages = feedReader.getFeedImagesByFeed(feed)
+        val existingImageCount = existingImages.size
+        val deleteImageCount = request.deleteImageIds.size
+        val newImageCount = request.newImages.size
+        val finalImageCount = existingImageCount - deleteImageCount + newImageCount
+
+        if (finalImageCount > Feed.IMAGE_MAX_COUNT) {
+            throw FeedException.feedImageLimitExceeded()
+        }
     }
 }

@@ -15,6 +15,7 @@ enum class FeedErrorCode(
     FEED_FORBIDDEN_ACCESS(HttpStatus.FORBIDDEN, "피드에 접근할 권한이 없습니다"),
     FEED_CONTENT_TOO_LONG(HttpStatus.BAD_REQUEST, "피드 내용은 ${Feed.CONTENT_MAX_LENGTH}자 이하여야 합니다"),
     FEED_IMAGE_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "피드 이미지는 ${Feed.IMAGE_MAX_COUNT}개 이하여야 합니다"),
+    FEED_IMAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "삭제할 이미지를 찾을 수 없습니다"),
     FEED_TAG_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "피드 태그는 ${Feed.TAG_MAX_COUNT}개 이하여야 합니다"),
 
     FEED_COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "피드 댓글을 찾을 수 없습니다"),
