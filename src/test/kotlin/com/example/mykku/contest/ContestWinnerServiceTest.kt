@@ -75,7 +75,7 @@ class ContestWinnerServiceTest : BaseServiceTest() {
             val savedWinner = ContestWinner(id = 1L, winnerRank = 1, description = "1등", contest = contest, participation = participation)
 
             whenever(contestReader.getContestById(1L)).thenReturn(contest)
-            whenever(contestParticipationReader.getParticipationById(1L)).thenReturn(participation)
+            whenever(contestParticipationReader.getParticipationsByIds(listOf(1L))).thenReturn(mapOf(1L to participation))
             whenever(contestWinnerWriter.createWinners(eq(contest), any())).thenReturn(listOf(savedWinner))
 
             val result = contestWinnerService.setWinners(1L, request)
@@ -165,7 +165,7 @@ class ContestWinnerServiceTest : BaseServiceTest() {
             )
 
             whenever(contestReader.getContestById(1L)).thenReturn(contest)
-            whenever(contestParticipationReader.getParticipationById(1L)).thenReturn(participation)
+            whenever(contestParticipationReader.getParticipationsByIds(listOf(1L))).thenReturn(mapOf(1L to participation))
 
             val exception = assertThrows<ContestException> {
                 contestWinnerService.setWinners(1L, request)

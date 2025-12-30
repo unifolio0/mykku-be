@@ -96,4 +96,8 @@ class FeedReader(
     fun getAllCommentsByFeed(feed: Feed): List<FeedComment> {
         return feedCommentRepository.findAllByFeed(feed)
     }
+
+    fun getCommentIdsByFeed(feed: Feed): List<Long> {
+        return feedCommentRepository.findIdsByFeed(feed)
+    }
 }

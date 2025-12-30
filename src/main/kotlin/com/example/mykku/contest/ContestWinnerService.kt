@@ -73,13 +73,16 @@ class ContestWinnerService(
         contestId: Long,
         winners: List<SetContestWinnersRequest.WinnerSelection>
     ): Map<Long, com.example.mykku.contest.domain.ContestParticipation> {
-        return winners.associate { selection ->
-            val participation = contestParticipationReader.getParticipationById(selection.participationId)
+        val participationIds = winners.map { it.participationId }
+        val participationsMap = contestParticipationReader.getParticipationsByIds(participationIds)
+
+        participationsMap.values.forEach { participation ->
             if (participation.contest.id != contestId) {
                 throw ContestException.participationNotBelongToContest()
             }
-            selection.participationId to participation
         }
+
+        return participationsMap
     }
 
     private fun buildSetContestWinnersResponse(

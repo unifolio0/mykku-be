@@ -243,7 +243,7 @@ class FeedService(
         val feed = feedReader.getFeedById(feedId)
         validateFeedOwner(feed, member)
         deleteRelatedData(feed)
-        feedWriter.deleteFeed(feed, member)
+        feedWriter.deleteFeed(feed)
     }
 
     private fun validateFeedOwner(feed: Feed, member: Member) {
@@ -253,8 +253,7 @@ class FeedService(
     }
 
     private fun deleteRelatedData(feed: Feed) {
-        val comments = feedReader.getAllCommentsByFeed(feed)
-        val commentIds = comments.mapNotNull { it.id }
+        val commentIds = feedReader.getCommentIdsByFeed(feed)
 
         likeFeedCommentWriter.deleteAllByFeedCommentIds(commentIds)
         feedCommentWriter.deleteAllByFeed(feed)

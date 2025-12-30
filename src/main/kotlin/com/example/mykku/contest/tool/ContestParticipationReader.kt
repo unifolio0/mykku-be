@@ -50,4 +50,15 @@ class ContestParticipationReader(
     fun getParticipationsByFeed(feed: Feed): List<ContestParticipation> {
         return contestParticipationRepository.findByFeed(feed)
     }
+
+    fun getParticipationsByIds(ids: List<Long>): Map<Long, ContestParticipation> {
+        if (ids.isEmpty()) return emptyMap()
+        val participations = contestParticipationRepository.findAllByIdIn(ids)
+        val foundIds = participations.mapNotNull { it.id }.toSet()
+        val missingIds = ids.filter { it !in foundIds }
+        if (missingIds.isNotEmpty()) {
+            throw ContestException.participationNotFound()
+        }
+        return participations.associateBy { it.id!! }
+    }
 }

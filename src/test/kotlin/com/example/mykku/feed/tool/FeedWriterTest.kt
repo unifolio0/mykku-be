@@ -188,32 +188,11 @@ class FeedWriterTest : BaseToolTest() {
         )
 
         // when
-        feedWriter.deleteFeed(feed, member)
+        feedWriter.deleteFeed(feed)
 
         // then
         verify(feedTagRepository).deleteAllByFeed(feed)
         verify(feedImageRepository).deleteAllByFeed(feed)
         verify(feedRepository).delete(feed)
-    }
-
-    @Test
-    fun `deleteFeed는 작성자가 아닌 경우 예외를 발생시킨다`() {
-        // given
-        val owner = createMockMember("owner-id", "소유자")
-        val otherMember = createMockMember("other-id", "다른사용자")
-        val board = createMockBoard()
-        val feed = Feed(
-            id = 1L,
-            title = "테스트 피드",
-            content = "테스트 내용",
-            board = board,
-            member = owner
-        )
-
-        // when & then
-        val exception = assertThrows<FeedException> {
-            feedWriter.deleteFeed(feed, otherMember)
-        }
-        assertEquals(FeedErrorCode.FEED_FORBIDDEN_ACCESS, exception.errorCode)
     }
 }

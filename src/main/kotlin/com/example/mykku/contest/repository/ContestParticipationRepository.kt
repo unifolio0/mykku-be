@@ -22,4 +22,5 @@ interface ContestParticipationRepository : JpaRepository<ContestParticipation, L
     fun findContestsByMember(member: Member, pageable: Pageable): Page<Contest>
 
     fun findByFeed(feed: Feed): List<ContestParticipation>
+    fun findAllByIdIn(ids: List<Long>): List<ContestParticipation>
 }

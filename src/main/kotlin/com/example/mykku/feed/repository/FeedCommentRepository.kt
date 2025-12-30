@@ -27,5 +27,8 @@ interface FeedCommentRepository : JpaRepository<FeedComment, Long> {
 
     fun findAllByFeed(feed: Feed): List<FeedComment>
 
+    @Query("SELECT fc.id FROM FeedComment fc WHERE fc.feed = :feed")
+    fun findIdsByFeed(@Param("feed") feed: Feed): List<Long>
+
     fun deleteAllByFeed(feed: Feed)
 }

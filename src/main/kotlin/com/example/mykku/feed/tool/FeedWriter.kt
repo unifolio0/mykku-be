@@ -80,16 +80,9 @@ class FeedWriter(
         return Triple(savedFeed, savedFeedImages, savedFeedTags)
     }
 
-    fun deleteFeed(feed: Feed, member: Member) {
-        validateFeedOwner(feed, member)
+    fun deleteFeed(feed: Feed) {
         feedTagRepository.deleteAllByFeed(feed)
         feedImageRepository.deleteAllByFeed(feed)
         feedRepository.delete(feed)
-    }
-
-    private fun validateFeedOwner(feed: Feed, member: Member) {
-        if (feed.member.id != member.id) {
-            throw FeedException.feedForbiddenAccess()
-        }
     }
 }

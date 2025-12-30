@@ -693,12 +693,9 @@ class FeedServiceTest : BaseServiceTest() {
         // given
         val feedId = 1L
         val feed = createTestFeed(id = feedId, member = member)
-        val comment1 = FeedComment(id = 1L, content = "댓글1", feed = feed, member = member, parentComment = null)
-        val comment2 = FeedComment(id = 2L, content = "댓글2", feed = feed, member = member, parentComment = null)
-        val comments = listOf(comment1, comment2)
 
         whenever(feedReader.getFeedById(feedId)).thenReturn(feed)
-        whenever(feedReader.getAllCommentsByFeed(feed)).thenReturn(comments)
+        whenever(feedReader.getCommentIdsByFeed(feed)).thenReturn(listOf(1L, 2L))
         whenever(contestParticipationReader.getParticipationsByFeed(feed)).thenReturn(emptyList())
 
         // when
@@ -712,7 +709,7 @@ class FeedServiceTest : BaseServiceTest() {
         verify(contestParticipationReader).getParticipationsByFeed(feed)
         verify(contestWinnerWriter).deleteAllByParticipations(emptyList())
         verify(contestParticipationWriter).deleteAllByFeed(feed)
-        verify(feedWriter).deleteFeed(feed, member)
+        verify(feedWriter).deleteFeed(feed)
     }
 
     @Test
@@ -730,7 +727,7 @@ class FeedServiceTest : BaseServiceTest() {
         }
         assertEquals(FeedErrorCode.FEED_FORBIDDEN_ACCESS, exception.errorCode)
 
-        verify(feedWriter, never()).deleteFeed(any(), any())
+        verify(feedWriter, never()).deleteFeed(any())
     }
 
     @Test
@@ -754,7 +751,7 @@ class FeedServiceTest : BaseServiceTest() {
         val feed = createTestFeed(id = feedId, member = member)
 
         whenever(feedReader.getFeedById(feedId)).thenReturn(feed)
-        whenever(feedReader.getAllCommentsByFeed(feed)).thenReturn(emptyList())
+        whenever(feedReader.getCommentIdsByFeed(feed)).thenReturn(emptyList())
         whenever(contestParticipationReader.getParticipationsByFeed(feed)).thenReturn(emptyList())
 
         // when
@@ -768,6 +765,6 @@ class FeedServiceTest : BaseServiceTest() {
         verify(contestParticipationReader).getParticipationsByFeed(feed)
         verify(contestWinnerWriter).deleteAllByParticipations(emptyList())
         verify(contestParticipationWriter).deleteAllByFeed(feed)
-        verify(feedWriter).deleteFeed(feed, member)
+        verify(feedWriter).deleteFeed(feed)
     }
 }
