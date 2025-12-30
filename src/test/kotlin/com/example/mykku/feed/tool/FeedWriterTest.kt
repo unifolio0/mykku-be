@@ -256,7 +256,7 @@ class FeedWriterTest : BaseToolTest() {
             tagTitles = null
         )
 
-        verify(feedImageRepository).deleteAllByIdIn(listOf(1L))
+        verify(feedImageRepository).deleteAll(listOf(existingImage))
     }
 
     @Test
