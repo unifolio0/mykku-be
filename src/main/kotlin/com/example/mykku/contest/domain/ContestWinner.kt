@@ -13,15 +13,20 @@ class ContestWinner(
     var winnerRank: Int,
 
     @Column(name = "description")
-    var description: String,
+    var description: String = "",
 
     @Column(name = "acceptance_speech")
-    var acceptanceSpeech: String,
-
-    @Column(name = "image")
-    var image: String,
+    var acceptanceSpeech: String = "",
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "contest_id")
     val contest: Contest,
-) : BaseEntity()
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "participation_id")
+    val participation: ContestParticipation
+) : BaseEntity() {
+    fun updateAcceptanceSpeech(speech: String) {
+        this.acceptanceSpeech = speech
+    }
+}

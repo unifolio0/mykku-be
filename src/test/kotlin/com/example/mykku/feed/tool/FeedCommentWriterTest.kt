@@ -134,4 +134,21 @@ class FeedCommentWriterTest : BaseToolTest() {
 
         verify(feedCommentRepository).delete(comment)
     }
+
+    @Test
+    fun `deleteAllByFeed는 피드의 모든 댓글을 삭제한다`() {
+        val member = createMockMember("member123", "테스트유저")
+        val board = createMockBoard()
+        val feed = Feed(
+            id = 1L,
+            title = "테스트 피드",
+            content = "테스트 내용",
+            board = board,
+            member = member
+        )
+
+        feedCommentWriter.deleteAllByFeed(feed)
+
+        verify(feedCommentRepository).deleteAllByFeed(feed)
+    }
 }

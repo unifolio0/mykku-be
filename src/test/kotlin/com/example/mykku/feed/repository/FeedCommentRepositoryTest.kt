@@ -162,4 +162,46 @@ class FeedCommentRepositoryTest : BaseRepositoryTest() {
 
         assertEquals(0, result.size)
     }
+
+    @Test
+    fun `findAllByFeed는 피드의 모든 댓글을 조회한다`() {
+        val (feed, parentComment, childComment) = createTestData()
+
+        val result = feedCommentRepository.findAllByFeed(feed)
+
+        assertEquals(2, result.size)
+        assertTrue(result.any { it.id == parentComment.id })
+        assertTrue(result.any { it.id == childComment.id })
+    }
+
+    @Test
+    fun `findAllByFeed는 댓글이 없는 피드의 경우 빈 리스트를 반환한다`() {
+        val member = createAndSaveMember("empty_feed_member", "빈피드유저")
+        val board = createAndSaveBoard("빈피드보드", "empty.jpg")
+
+        val emptyFeed = Feed(
+            title = "댓글 없는 피드",
+            content = "내용",
+            board = board,
+            member = member
+        )
+        feedRepository.save(emptyFeed)
+
+        val result = feedCommentRepository.findAllByFeed(emptyFeed)
+
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun `deleteAllByFeed는 피드의 모든 댓글을 삭제한다`() {
+        val (feed, _, _) = createTestData()
+
+        val beforeDelete = feedCommentRepository.findAllByFeed(feed)
+        assertEquals(2, beforeDelete.size)
+
+        feedCommentRepository.deleteAllByFeed(feed)
+
+        val afterDelete = feedCommentRepository.findAllByFeed(feed)
+        assertTrue(afterDelete.isEmpty())
+    }
 }

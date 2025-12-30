@@ -21,4 +21,10 @@ class LikeFeedCommentWriter(
     fun deleteLikeFeedComment(memberId: String, feedCommentId: Long) {
         likeFeedCommentRepository.deleteByMemberIdAndFeedCommentId(memberId, feedCommentId)
     }
+
+    fun deleteAllByFeedCommentIds(feedCommentIds: List<Long>) {
+        if (feedCommentIds.isNotEmpty()) {
+            likeFeedCommentRepository.deleteAllByFeedCommentIdIn(feedCommentIds)
+        }
+    }
 }

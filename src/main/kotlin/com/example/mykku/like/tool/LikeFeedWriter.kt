@@ -21,4 +21,8 @@ class LikeFeedWriter(
     fun deleteLikeFeed(memberId: String, feedId: Long) {
         likeFeedRepository.deleteByMemberIdAndFeedId(memberId, feedId)
     }
+
+    fun deleteAllByFeedId(feedId: Long) {
+        likeFeedRepository.deleteAllByFeedId(feedId)
+    }
 }

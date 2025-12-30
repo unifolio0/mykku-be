@@ -42,4 +42,8 @@ class SaveFeedWriter(
 
         saveFeedRepository.deleteByMemberAndFeed(member, feed)
     }
+
+    fun deleteAllByFeed(feed: Feed) {
+        saveFeedRepository.deleteAllByFeed(feed)
+    }
 }

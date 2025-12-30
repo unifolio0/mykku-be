@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
 @Component
+@Transactional
 class FeedWriter(
     private val feedRepository: FeedRepository,
     private val feedImageRepository: FeedImageRepository,
@@ -77,5 +78,11 @@ class FeedWriter(
         val savedFeedTags = feedTagRepository.saveAll(feedTags)
 
         return Triple(savedFeed, savedFeedImages, savedFeedTags)
+    }
+
+    fun deleteFeed(feed: Feed) {
+        feedTagRepository.deleteAllByFeed(feed)
+        feedImageRepository.deleteAllByFeed(feed)
+        feedRepository.delete(feed)
     }
 }

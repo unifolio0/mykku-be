@@ -26,4 +26,12 @@ class ContestParticipationWriter(
 
         return contestParticipationRepository.save(participation)
     }
+
+
+    fun deleteAllByFeed(feed: Feed) {
+        val participations = contestParticipationRepository.findByFeed(feed)
+        if (participations.isNotEmpty()) {
+            contestParticipationRepository.deleteAll(participations)
+        }
+    }
 }

@@ -92,4 +92,12 @@ class FeedReader(
         val contestTags = contestTagRepository.findAllByTitleIn(titles)
         return contestTags.associateBy { it.title }
     }
+
+    fun getAllCommentsByFeed(feed: Feed): List<FeedComment> {
+        return feedCommentRepository.findAllByFeed(feed)
+    }
+
+    fun getCommentIdsByFeed(feed: Feed): List<Long> {
+        return feedCommentRepository.findIdsByFeed(feed)
+    }
 }

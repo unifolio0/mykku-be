@@ -6,6 +6,7 @@ import com.example.mykku.board.tool.BoardReader
 import com.example.mykku.contest.tool.ContestParticipationReader
 import com.example.mykku.contest.tool.ContestParticipationWriter
 import com.example.mykku.contest.tool.ContestReader
+import com.example.mykku.contest.tool.ContestWinnerWriter
 import com.example.mykku.image.exception.ImageErrorCode
 import com.example.mykku.image.exception.ImageException
 import com.example.mykku.feed.domain.Feed
@@ -13,16 +14,25 @@ import com.example.mykku.feed.domain.FeedComment
 import com.example.mykku.feed.domain.FeedImage
 import com.example.mykku.feed.domain.FeedTag
 import com.example.mykku.feed.dto.CreateFeedRequest
+import com.example.mykku.feed.exception.FeedException
+import com.example.mykku.feed.exception.FeedErrorCode
+import com.example.mykku.feed.tool.FeedCommentWriter
 import com.example.mykku.feed.tool.FeedDtoConverter
 import com.example.mykku.feed.tool.FeedReader
 import com.example.mykku.feed.tool.FeedWriter
 import com.example.mykku.image.ImageUploadService
 import com.example.mykku.image.dto.ImageUploadResult
+import com.example.mykku.like.tool.LikeFeedCommentWriter
 import com.example.mykku.like.tool.LikeFeedReader
+import com.example.mykku.like.tool.LikeFeedWriter
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.tool.MemberReader
 import com.example.mykku.scrap.tool.SaveFeedReader
+import com.example.mykku.scrap.tool.SaveFeedWriter
+import org.mockito.kotlin.doNothing
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.InjectMocks
@@ -74,6 +84,21 @@ class FeedServiceTest : BaseServiceTest() {
 
     @Mock
     private lateinit var contestParticipationReader: ContestParticipationReader
+
+    @Mock
+    private lateinit var feedCommentWriter: FeedCommentWriter
+
+    @Mock
+    private lateinit var likeFeedWriter: LikeFeedWriter
+
+    @Mock
+    private lateinit var likeFeedCommentWriter: LikeFeedCommentWriter
+
+    @Mock
+    private lateinit var saveFeedWriter: SaveFeedWriter
+
+    @Mock
+    private lateinit var contestWinnerWriter: ContestWinnerWriter
 
     @InjectMocks
     private lateinit var feedService: FeedService
@@ -225,7 +250,12 @@ class FeedServiceTest : BaseServiceTest() {
             imageUploadService = noOpImageUploadService,
             contestReader = contestReader,
             contestParticipationWriter = contestParticipationWriter,
-            contestParticipationReader = contestParticipationReader
+            contestParticipationReader = contestParticipationReader,
+            feedCommentWriter = feedCommentWriter,
+            likeFeedWriter = likeFeedWriter,
+            likeFeedCommentWriter = likeFeedCommentWriter,
+            saveFeedWriter = saveFeedWriter,
+            contestWinnerWriter = contestWinnerWriter
         )
 
         val imageFile = mock<MultipartFile>()
@@ -641,7 +671,7 @@ class FeedServiceTest : BaseServiceTest() {
         val minCommonFollowers = 5L
         val pageable = PageRequest.of(0, 10)
         val feedPage = PageImpl<Feed>(emptyList(), pageable, 0)
-        
+
         whenever(memberReader.getFollowerByMemberId(memberId)).thenReturn(emptyList())
         whenever(memberReader.getRecommendedMembersByCommonFollowers(memberId, minCommonFollowers))
             .thenReturn(emptyList())
@@ -649,12 +679,92 @@ class FeedServiceTest : BaseServiceTest() {
             .thenReturn(feedPage)
         whenever(feedDtoConverter.convertToFeedResponsesBatch(memberId, emptyList()))
             .thenReturn(emptyList())
-        
+
         // when
         val result = feedService.getFeedsByMemberWithRecommendations(memberId, pageable, minCommonFollowers)
-        
+
         // then
         assertEquals(0, result.feeds.size)
         // minCommonFollowers가 올바르게 전달되었는지는 mock verify로 확인됨
+    }
+
+    @Test
+    fun `deleteFeed - 작성자가 피드를 삭제한다`() {
+        // given
+        val feedId = 1L
+        val feed = createTestFeed(id = feedId, member = member)
+
+        whenever(feedReader.getFeedById(feedId)).thenReturn(feed)
+        whenever(feedReader.getCommentIdsByFeed(feed)).thenReturn(listOf(1L, 2L))
+        whenever(contestParticipationReader.getParticipationsByFeed(feed)).thenReturn(emptyList())
+
+        // when
+        feedService.deleteFeed(feedId, member)
+
+        // then
+        verify(likeFeedCommentWriter).deleteAllByFeedCommentIds(listOf(1L, 2L))
+        verify(feedCommentWriter).deleteAllByFeed(feed)
+        verify(likeFeedWriter).deleteAllByFeedId(feedId)
+        verify(saveFeedWriter).deleteAllByFeed(feed)
+        verify(contestParticipationReader).getParticipationsByFeed(feed)
+        verify(contestWinnerWriter).deleteAllByParticipations(emptyList())
+        verify(contestParticipationWriter).deleteAllByFeed(feed)
+        verify(feedWriter).deleteFeed(feed)
+    }
+
+    @Test
+    fun `deleteFeed - 작성자가 아닌 경우 예외 발생`() {
+        // given
+        val feedId = 1L
+        val otherMember = createTestMember(id = "other-member-id", nickname = "other", email = "other@test.com")
+        val feed = createTestFeed(id = feedId, member = otherMember)
+
+        whenever(feedReader.getFeedById(feedId)).thenReturn(feed)
+
+        // when & then
+        val exception = assertThrows<FeedException> {
+            feedService.deleteFeed(feedId, member)
+        }
+        assertEquals(FeedErrorCode.FEED_FORBIDDEN_ACCESS, exception.errorCode)
+
+        verify(feedWriter, never()).deleteFeed(any())
+    }
+
+    @Test
+    fun `deleteFeed - 피드가 존재하지 않으면 예외 발생`() {
+        // given
+        val feedId = 999L
+
+        whenever(feedReader.getFeedById(feedId)).thenThrow(FeedException.feedNotFound())
+
+        // when & then
+        val exception = assertThrows<FeedException> {
+            feedService.deleteFeed(feedId, member)
+        }
+        assertEquals(FeedErrorCode.FEED_NOT_FOUND, exception.errorCode)
+    }
+
+    @Test
+    fun `deleteFeed - 댓글이 없는 피드도 정상 삭제된다`() {
+        // given
+        val feedId = 1L
+        val feed = createTestFeed(id = feedId, member = member)
+
+        whenever(feedReader.getFeedById(feedId)).thenReturn(feed)
+        whenever(feedReader.getCommentIdsByFeed(feed)).thenReturn(emptyList())
+        whenever(contestParticipationReader.getParticipationsByFeed(feed)).thenReturn(emptyList())
+
+        // when
+        feedService.deleteFeed(feedId, member)
+
+        // then
+        verify(likeFeedCommentWriter).deleteAllByFeedCommentIds(emptyList())
+        verify(feedCommentWriter).deleteAllByFeed(feed)
+        verify(likeFeedWriter).deleteAllByFeedId(feedId)
+        verify(saveFeedWriter).deleteAllByFeed(feed)
+        verify(contestParticipationReader).getParticipationsByFeed(feed)
+        verify(contestWinnerWriter).deleteAllByParticipations(emptyList())
+        verify(contestParticipationWriter).deleteAllByFeed(feed)
+        verify(feedWriter).deleteFeed(feed)
     }
 }

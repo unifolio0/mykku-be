@@ -20,4 +20,7 @@ interface ContestParticipationRepository : JpaRepository<ContestParticipation, L
 
     @Query("SELECT cp.contest FROM ContestParticipation cp WHERE cp.member = :member ORDER BY cp.createdAt DESC")
     fun findContestsByMember(member: Member, pageable: Pageable): Page<Contest>
+
+    fun findByFeed(feed: Feed): List<ContestParticipation>
+    fun findAllByIdIn(ids: List<Long>): List<ContestParticipation>
 }
