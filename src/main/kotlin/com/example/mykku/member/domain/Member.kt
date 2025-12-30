@@ -87,26 +87,25 @@ class Member(
     }
 
     init {
+        validateNickname(nickname)
+    }
+
+    fun updateProfile(newNickname: String?, newProfileImage: String?) {
+        newNickname?.let {
+            validateNickname(it)
+            this.nickname = it
+        }
+        newProfileImage?.let {
+            this.profileImage = it
+        }
+    }
+
+    private fun validateNickname(nickname: String) {
         if (nickname.length > NICKNAME_MAX_LENGTH) {
             throw MemberException.memberNicknameTooLong()
         }
         if (!VALID_NICKNAME_PATTERN.matches(nickname)) {
             throw MemberException.memberNicknameInvalidFormat()
-        }
-    }
-
-    fun updateProfile(newNickname: String?, newProfileImage: String?) {
-        newNickname?.let {
-            if (it.length > NICKNAME_MAX_LENGTH) {
-                throw MemberException.memberNicknameTooLong()
-            }
-            if (!VALID_NICKNAME_PATTERN.matches(it)) {
-                throw MemberException.memberNicknameInvalidFormat()
-            }
-            this.nickname = it
-        }
-        newProfileImage?.let {
-            this.profileImage = it
         }
     }
 }

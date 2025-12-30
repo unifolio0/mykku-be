@@ -111,7 +111,7 @@ class FeedWriter(
             if (imagesToDelete.size != deleteImageIds.size) {
                 throw FeedException.feedImageNotFound()
             }
-            feedImageRepository.deleteAllByIdIn(deleteImageIds)
+            feedImageRepository.deleteAll(imagesToDelete)
         }
 
         if (newImageResults.isNotEmpty()) {
