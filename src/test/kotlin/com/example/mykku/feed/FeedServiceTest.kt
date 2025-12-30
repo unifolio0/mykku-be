@@ -201,6 +201,7 @@ class FeedServiceTest : BaseServiceTest() {
 
         val feedImages = listOf(
             FeedImage(
+                id = 1L,
                 url = imageResult.url,
                 width = imageResult.width,
                 height = imageResult.height,
@@ -289,6 +290,7 @@ class FeedServiceTest : BaseServiceTest() {
         )
 
         val feedImage = FeedImage(
+            id = 1L,
             url = "https://s3.amazonaws.com/image.jpg",
             width = 1920,
             height = 1080,
@@ -304,10 +306,10 @@ class FeedServiceTest : BaseServiceTest() {
 
         whenever(memberReader.getFollowerByMemberId("member1")).thenReturn(listOf(follower))
         whenever(feedReader.getFeedsByFollower(listOf(follower))).thenReturn(listOf(feed))
-        
+
         // FeedDtoConverter mocking
         val feedResponse = com.example.mykku.feed.dto.FeedResponse(
-            feed, 
+            feed,
             com.example.mykku.feed.dto.AuthorResponse(member),
             true,
             false,
@@ -545,20 +547,21 @@ class FeedServiceTest : BaseServiceTest() {
         )
         
         val feedImage = FeedImage(
+            id = 1L,
             url = "https://s3.amazonaws.com/detail.jpg",
             width = 1920,
             height = 1080,
             feed = feed
         )
         val feedTag = FeedTag(title = "태그1", feed = feed)
-        
+
         whenever(feedReader.getFeedById(feedId)).thenReturn(feed)
         whenever(likeFeedReader.isLiked(memberId, feed)).thenReturn(true)
         whenever(saveFeedReader.isSaved(memberId, feed)).thenReturn(false)
         whenever(feedReader.getFeedImagesByFeed(feed)).thenReturn(listOf(feedImage))
         whenever(feedReader.getFeedTagsByFeed(feed)).thenReturn(listOf(feedTag))
         whenever(feedReader.getContestTagsByTitles(listOf("태그1"))).thenReturn(emptyList())
-        
+
         // when
         val result = feedService.getFeedDetail(feedId, memberId)
         
@@ -588,18 +591,19 @@ class FeedServiceTest : BaseServiceTest() {
         )
         
         val feedImage = FeedImage(
+            id = 1L,
             url = "https://s3.amazonaws.com/public.jpg",
             width = 1920,
             height = 1080,
             feed = feed
         )
         val feedTag = FeedTag(title = "공개태그", feed = feed)
-        
+
         whenever(feedReader.getFeedById(feedId)).thenReturn(feed)
         whenever(feedReader.getFeedImagesByFeed(feed)).thenReturn(listOf(feedImage))
         whenever(feedReader.getFeedTagsByFeed(feed)).thenReturn(listOf(feedTag))
         whenever(feedReader.getContestTagsByTitles(listOf("공개태그"))).thenReturn(emptyList())
-        
+
         // when
         val result = feedService.getFeedDetail(feedId, memberId)
         

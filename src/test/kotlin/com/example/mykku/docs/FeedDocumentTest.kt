@@ -117,6 +117,8 @@ class FeedDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.feeds[].title").type(JsonFieldType.STRING).description("피드 제목"),
                             fieldWithPath("data.feeds[].content").type(JsonFieldType.STRING).description("피드 내용"),
                             fieldWithPath("data.feeds[].images").type(JsonFieldType.ARRAY).description("피드 이미지 목록"),
+                            fieldWithPath("data.feeds[].images[].id").type(JsonFieldType.NUMBER).description("이미지 ID")
+                                .optional(),
                             fieldWithPath("data.feeds[].images[].url").type(JsonFieldType.STRING).description("이미지 URL")
                                 .optional(),
                             fieldWithPath("data.feeds[].images[].width").type(JsonFieldType.NUMBER)
@@ -215,6 +217,7 @@ class FeedDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.authorProfileUrl").type(JsonFieldType.STRING)
                                 .description("작성자 프로필 이미지 URL").optional(),
                             fieldWithPath("data.images").type(JsonFieldType.ARRAY).description("이미지 목록"),
+                            fieldWithPath("data.images[].id").type(JsonFieldType.NUMBER).description("이미지 ID"),
                             fieldWithPath("data.images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
                             fieldWithPath("data.images[].width").type(JsonFieldType.NUMBER).description("이미지 가로 크기 (픽셀)"),
                             fieldWithPath("data.images[].height").type(JsonFieldType.NUMBER).description("이미지 세로 크기 (픽셀)"),
@@ -435,6 +438,7 @@ class FeedDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.title").type(JsonFieldType.STRING).description("피드 제목"),
                             fieldWithPath("data.content").type(JsonFieldType.STRING).description("피드 내용"),
                             fieldWithPath("data.images").type(JsonFieldType.ARRAY).description("피드 이미지 목록"),
+                            fieldWithPath("data.images[].id").type(JsonFieldType.NUMBER).description("이미지 ID"),
                             fieldWithPath("data.images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
                             fieldWithPath("data.images[].width").type(JsonFieldType.NUMBER).description("이미지 가로 크기 (픽셀)"),
                             fieldWithPath("data.images[].height").type(JsonFieldType.NUMBER).description("이미지 세로 크기 (픽셀)"),
@@ -576,6 +580,8 @@ class FeedDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.feeds[].title").type(JsonFieldType.STRING).description("피드 제목"),
                             fieldWithPath("data.feeds[].content").type(JsonFieldType.STRING).description("피드 내용"),
                             fieldWithPath("data.feeds[].images").type(JsonFieldType.ARRAY).description("피드 이미지 목록"),
+                            fieldWithPath("data.feeds[].images[].id").type(JsonFieldType.NUMBER).description("이미지 ID")
+                                .optional(),
                             fieldWithPath("data.feeds[].images[].url").type(JsonFieldType.STRING).description("이미지 URL")
                                 .optional(),
                             fieldWithPath("data.feeds[].images[].width").type(JsonFieldType.NUMBER)
@@ -834,6 +840,7 @@ class FeedDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.title").type(JsonFieldType.STRING).description("피드 제목"),
                             fieldWithPath("data.content").type(JsonFieldType.STRING).description("피드 내용"),
                             fieldWithPath("data.images").type(JsonFieldType.ARRAY).description("피드 이미지 목록"),
+                            fieldWithPath("data.images[].id").type(JsonFieldType.NUMBER).description("이미지 ID"),
                             fieldWithPath("data.images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
                             fieldWithPath("data.images[].width").type(JsonFieldType.NUMBER).description("이미지 가로 크기 (픽셀)"),
                             fieldWithPath("data.images[].height").type(JsonFieldType.NUMBER).description("이미지 세로 크기 (픽셀)"),
