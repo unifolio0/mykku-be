@@ -56,6 +56,7 @@ class FeedDocumentTest : BaseDocumentTest() {
                         content = "첫 번째 피드 내용입니다.",
                         images = listOf(
                             FeedImageResponse(
+                                id = 1L,
                                 url = "https://example.com/image1.jpg",
                                 width = 1920,
                                 height = 1080
@@ -116,6 +117,8 @@ class FeedDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.feeds[].title").type(JsonFieldType.STRING).description("피드 제목"),
                             fieldWithPath("data.feeds[].content").type(JsonFieldType.STRING).description("피드 내용"),
                             fieldWithPath("data.feeds[].images").type(JsonFieldType.ARRAY).description("피드 이미지 목록"),
+                            fieldWithPath("data.feeds[].images[].id").type(JsonFieldType.NUMBER).description("이미지 ID")
+                                .optional(),
                             fieldWithPath("data.feeds[].images[].url").type(JsonFieldType.STRING).description("이미지 URL")
                                 .optional(),
                             fieldWithPath("data.feeds[].images[].width").type(JsonFieldType.NUMBER)
@@ -177,6 +180,7 @@ class FeedDocumentTest : BaseDocumentTest() {
                 authorProfileUrl = "https://example.com/profile.jpg",
                 images = listOf(
                     FeedImageResponse(
+                        id = 1L,
                         url = "https://example.com/image1.jpg",
                         width = 1920,
                         height = 1080
@@ -213,6 +217,7 @@ class FeedDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.authorProfileUrl").type(JsonFieldType.STRING)
                                 .description("작성자 프로필 이미지 URL").optional(),
                             fieldWithPath("data.images").type(JsonFieldType.ARRAY).description("이미지 목록"),
+                            fieldWithPath("data.images[].id").type(JsonFieldType.NUMBER).description("이미지 ID"),
                             fieldWithPath("data.images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
                             fieldWithPath("data.images[].width").type(JsonFieldType.NUMBER).description("이미지 가로 크기 (픽셀)"),
                             fieldWithPath("data.images[].height").type(JsonFieldType.NUMBER).description("이미지 세로 크기 (픽셀)"),
@@ -397,6 +402,7 @@ class FeedDocumentTest : BaseDocumentTest() {
                 updatedAt = LocalDateTime.of(2024, 1, 2, 14, 30),
                 images = listOf(
                     FeedImageResponse(
+                        id = 1L,
                         url = "https://example.com/image1.jpg",
                         width = 1920,
                         height = 1080
@@ -432,6 +438,7 @@ class FeedDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.title").type(JsonFieldType.STRING).description("피드 제목"),
                             fieldWithPath("data.content").type(JsonFieldType.STRING).description("피드 내용"),
                             fieldWithPath("data.images").type(JsonFieldType.ARRAY).description("피드 이미지 목록"),
+                            fieldWithPath("data.images[].id").type(JsonFieldType.NUMBER).description("이미지 ID"),
                             fieldWithPath("data.images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
                             fieldWithPath("data.images[].width").type(JsonFieldType.NUMBER).description("이미지 가로 크기 (픽셀)"),
                             fieldWithPath("data.images[].height").type(JsonFieldType.NUMBER).description("이미지 세로 크기 (픽셀)"),
@@ -513,6 +520,7 @@ class FeedDocumentTest : BaseDocumentTest() {
                         content = "자유게시판 피드 내용입니다.",
                         images = listOf(
                             FeedImageResponse(
+                                id = 1L,
                                 url = "https://example.com/image1.jpg",
                                 width = 1920,
                                 height = 1080
@@ -572,6 +580,8 @@ class FeedDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.feeds[].title").type(JsonFieldType.STRING).description("피드 제목"),
                             fieldWithPath("data.feeds[].content").type(JsonFieldType.STRING).description("피드 내용"),
                             fieldWithPath("data.feeds[].images").type(JsonFieldType.ARRAY).description("피드 이미지 목록"),
+                            fieldWithPath("data.feeds[].images[].id").type(JsonFieldType.NUMBER).description("이미지 ID")
+                                .optional(),
                             fieldWithPath("data.feeds[].images[].url").type(JsonFieldType.STRING).description("이미지 URL")
                                 .optional(),
                             fieldWithPath("data.feeds[].images[].width").type(JsonFieldType.NUMBER)
@@ -746,6 +756,202 @@ class FeedDocumentTest : BaseDocumentTest() {
                 .get("/api/v1/feeds/{feedId}/comments", feedId)
                 .then()
                 .statusCode(404)
+        }
+    }
+
+    @Nested
+    @DisplayName("피드 수정")
+    inner class UpdateFeed {
+
+        private val apiConfig = ApiRequestConfig(
+            tag = Tag.FEED_API,
+            summary = "피드 수정",
+            description = "기존 피드를 수정합니다. 제목, 내용, 게시판, 태그, 이미지를 수정할 수 있습니다.",
+            pathParameters = listOf(
+                parameterWithName("feedId").description("수정할 피드의 ID")
+            ),
+            requestParts = listOf(
+                org.springframework.restdocs.request.RequestDocumentation.partWithName("request")
+                    .description("피드 수정 요청 정보 (JSON)"),
+                org.springframework.restdocs.request.RequestDocumentation.partWithName("images")
+                    .description("새로 추가할 이미지 파일들 (선택사항)").optional()
+            )
+        )
+
+        @Test
+        fun `성공`() {
+            val feedId = 1L
+            val feedDetailResponse = FeedDetailResponse(
+                id = feedId,
+                author = AuthorResponse(
+                    memberId = "member1",
+                    nickname = "작성자닉네임",
+                    profileImage = "https://example.com/profile.jpg",
+                    role = "일반 덕후"
+                ),
+                boardId = 1L,
+                boardTitle = "자유게시판",
+                title = "수정된 피드 제목",
+                content = "수정된 피드 내용입니다.",
+                createdAt = LocalDateTime.of(2024, 1, 1, 12, 0),
+                updatedAt = LocalDateTime.of(2024, 1, 2, 14, 30),
+                images = listOf(
+                    FeedImageResponse(
+                        id = 2L,
+                        url = "https://example.com/new-image.jpg",
+                        width = 1920,
+                        height = 1080
+                    )
+                ),
+                tags = listOf(
+                    TagResponse(title = "수정된태그", isContest = false)
+                ),
+                likeCount = 25,
+                isLiked = true,
+                isSaved = false,
+                commentCount = 10
+            )
+
+            `when`(feedService.updateFeed(eq(feedId), any(), any())).thenReturn(feedDetailResponse)
+
+            val requestJson = """{
+                "title": "수정된 피드 제목",
+                "content": "수정된 피드 내용입니다.",
+                "boardId": null,
+                "tags": ["수정된태그"],
+                "deleteImageIds": [1]
+            }"""
+
+            val documentFilter = document("feed/update", 200)
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                            fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("피드 ID"),
+                            fieldWithPath("data.author").type(JsonFieldType.OBJECT).description("작성자 정보"),
+                            fieldWithPath("data.author.memberId").type(JsonFieldType.STRING).description("작성자 ID"),
+                            fieldWithPath("data.author.nickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
+                            fieldWithPath("data.author.profileImage").type(JsonFieldType.STRING)
+                                .description("작성자 프로필 이미지 URL").optional(),
+                            fieldWithPath("data.author.role").type(JsonFieldType.STRING).description("작성자 칭호"),
+                            fieldWithPath("data.boardId").type(JsonFieldType.NUMBER).description("게시판 ID"),
+                            fieldWithPath("data.boardTitle").type(JsonFieldType.STRING).description("게시판 이름"),
+                            fieldWithPath("data.title").type(JsonFieldType.STRING).description("피드 제목"),
+                            fieldWithPath("data.content").type(JsonFieldType.STRING).description("피드 내용"),
+                            fieldWithPath("data.images").type(JsonFieldType.ARRAY).description("피드 이미지 목록"),
+                            fieldWithPath("data.images[].id").type(JsonFieldType.NUMBER).description("이미지 ID"),
+                            fieldWithPath("data.images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
+                            fieldWithPath("data.images[].width").type(JsonFieldType.NUMBER).description("이미지 가로 크기 (픽셀)"),
+                            fieldWithPath("data.images[].height").type(JsonFieldType.NUMBER).description("이미지 세로 크기 (픽셀)"),
+                            fieldWithPath("data.tags").type(JsonFieldType.ARRAY).description("피드 태그 목록"),
+                            fieldWithPath("data.tags[].title").type(JsonFieldType.STRING).description("태그 제목"),
+                            fieldWithPath("data.tags[].isContest").type(JsonFieldType.BOOLEAN).description("콘테스트 태그 여부"),
+                            fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
+                            fieldWithPath("data.commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
+                            fieldWithPath("data.isLiked").type(JsonFieldType.BOOLEAN).description("현재 사용자의 좋아요 여부"),
+                            fieldWithPath("data.isSaved").type(JsonFieldType.BOOLEAN).description("현재 사용자의 저장 여부"),
+                            fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성 일시"),
+                            fieldWithPath("data.updatedAt").type(JsonFieldType.STRING).description("수정 일시")
+                        )
+                )
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .multiPart("request", requestJson, "application/json")
+                .multiPart("images", "new-image.jpg", "image data".toByteArray(), "image/jpeg")
+                .`when`()
+                .patch("/api/v1/feeds/{feedId}", feedId)
+                .then()
+                .statusCode(200)
+        }
+
+        @Test
+        fun `피드를 찾을 수 없음`() {
+            val feedId = 999L
+
+            `when`(feedService.updateFeed(eq(feedId), any(), any()))
+                .thenThrow(FeedException(FeedErrorCode.FEED_NOT_FOUND))
+
+            val requestJson = """{
+                "title": "수정된 제목",
+                "content": null,
+                "boardId": null,
+                "tags": null,
+                "deleteImageIds": []
+            }"""
+
+            val documentFilter = document("feed/update", "FEED_NOT_FOUND")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .multiPart("request", requestJson, "application/json")
+                .`when`()
+                .patch("/api/v1/feeds/{feedId}", feedId)
+                .then()
+                .statusCode(404)
+        }
+
+        @Test
+        fun `권한 없음`() {
+            val feedId = 1L
+
+            `when`(feedService.updateFeed(eq(feedId), any(), any()))
+                .thenThrow(FeedException(FeedErrorCode.FEED_FORBIDDEN_ACCESS))
+
+            val requestJson = """{
+                "title": "수정된 제목",
+                "content": null,
+                "boardId": null,
+                "tags": null,
+                "deleteImageIds": []
+            }"""
+
+            val documentFilter = document("feed/update", "FEED_FORBIDDEN_ACCESS")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .multiPart("request", requestJson, "application/json")
+                .`when`()
+                .patch("/api/v1/feeds/{feedId}", feedId)
+                .then()
+                .statusCode(403)
+        }
+
+        @Test
+        fun `이미지 개수 초과`() {
+            val feedId = 1L
+
+            `when`(feedService.updateFeed(eq(feedId), any(), any()))
+                .thenThrow(FeedException(FeedErrorCode.FEED_IMAGE_LIMIT_EXCEEDED))
+
+            val requestJson = """{
+                "title": null,
+                "content": null,
+                "boardId": null,
+                "tags": null,
+                "deleteImageIds": []
+            }"""
+
+            val documentFilter = document("feed/update", "FEED_IMAGE_LIMIT_EXCEEDED")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .multiPart("request", requestJson, "application/json")
+                .`when`()
+                .patch("/api/v1/feeds/{feedId}", feedId)
+                .then()
+                .statusCode(400)
         }
     }
 

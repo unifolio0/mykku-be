@@ -17,6 +17,8 @@ class FeedException(
 
         fun feedImageLimitExceeded(): FeedException = FeedException(FeedErrorCode.FEED_IMAGE_LIMIT_EXCEEDED)
 
+        fun feedImageNotFound(): FeedException = FeedException(FeedErrorCode.FEED_IMAGE_NOT_FOUND)
+
         fun feedTagLimitExceeded(): FeedException = FeedException(FeedErrorCode.FEED_TAG_LIMIT_EXCEEDED)
 
         fun feedCommentNotFound(): FeedException = FeedException(FeedErrorCode.FEED_COMMENT_NOT_FOUND)

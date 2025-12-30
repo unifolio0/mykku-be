@@ -201,6 +201,7 @@ class FeedServiceTest : BaseServiceTest() {
 
         val feedImages = listOf(
             FeedImage(
+                id = 1L,
                 url = imageResult.url,
                 width = imageResult.width,
                 height = imageResult.height,
@@ -289,6 +290,7 @@ class FeedServiceTest : BaseServiceTest() {
         )
 
         val feedImage = FeedImage(
+            id = 1L,
             url = "https://s3.amazonaws.com/image.jpg",
             width = 1920,
             height = 1080,
@@ -304,10 +306,10 @@ class FeedServiceTest : BaseServiceTest() {
 
         whenever(memberReader.getFollowerByMemberId("member1")).thenReturn(listOf(follower))
         whenever(feedReader.getFeedsByFollower(listOf(follower))).thenReturn(listOf(feed))
-        
+
         // FeedDtoConverter mocking
         val feedResponse = com.example.mykku.feed.dto.FeedResponse(
-            feed, 
+            feed,
             com.example.mykku.feed.dto.AuthorResponse(member),
             true,
             false,
@@ -545,20 +547,21 @@ class FeedServiceTest : BaseServiceTest() {
         )
         
         val feedImage = FeedImage(
+            id = 1L,
             url = "https://s3.amazonaws.com/detail.jpg",
             width = 1920,
             height = 1080,
             feed = feed
         )
         val feedTag = FeedTag(title = "태그1", feed = feed)
-        
+
         whenever(feedReader.getFeedById(feedId)).thenReturn(feed)
         whenever(likeFeedReader.isLiked(memberId, feed)).thenReturn(true)
         whenever(saveFeedReader.isSaved(memberId, feed)).thenReturn(false)
         whenever(feedReader.getFeedImagesByFeed(feed)).thenReturn(listOf(feedImage))
         whenever(feedReader.getFeedTagsByFeed(feed)).thenReturn(listOf(feedTag))
         whenever(feedReader.getContestTagsByTitles(listOf("태그1"))).thenReturn(emptyList())
-        
+
         // when
         val result = feedService.getFeedDetail(feedId, memberId)
         
@@ -588,18 +591,19 @@ class FeedServiceTest : BaseServiceTest() {
         )
         
         val feedImage = FeedImage(
+            id = 1L,
             url = "https://s3.amazonaws.com/public.jpg",
             width = 1920,
             height = 1080,
             feed = feed
         )
         val feedTag = FeedTag(title = "공개태그", feed = feed)
-        
+
         whenever(feedReader.getFeedById(feedId)).thenReturn(feed)
         whenever(feedReader.getFeedImagesByFeed(feed)).thenReturn(listOf(feedImage))
         whenever(feedReader.getFeedTagsByFeed(feed)).thenReturn(listOf(feedTag))
         whenever(feedReader.getContestTagsByTitles(listOf("공개태그"))).thenReturn(emptyList())
-        
+
         // when
         val result = feedService.getFeedDetail(feedId, memberId)
         
@@ -766,5 +770,183 @@ class FeedServiceTest : BaseServiceTest() {
         verify(contestWinnerWriter).deleteAllByParticipations(emptyList())
         verify(contestParticipationWriter).deleteAllByFeed(feed)
         verify(feedWriter).deleteFeed(feed)
+    }
+
+    @Test
+    fun `updateFeed - 피드를 성공적으로 수정한다`() {
+        // given
+        val feedId = 1L
+        val feed = createTestFeed(id = feedId, member = member)
+        val request = com.example.mykku.feed.dto.UpdateFeedRequest(
+            title = "수정된 제목",
+            content = "수정된 내용",
+            boardId = null,
+            tags = listOf("새태그"),
+            deleteImageIds = emptyList(),
+            newImages = emptyList()
+        )
+
+        val updatedFeed = createTestFeed(id = feedId, title = "수정된 제목", content = "수정된 내용", member = member)
+        val updatedTags = listOf(FeedTag(title = "새태그", feed = updatedFeed))
+
+        whenever(feedReader.getFeedById(feedId)).thenReturn(feed)
+        whenever(feedReader.getFeedImagesByFeed(feed)).thenReturn(emptyList())
+        whenever(feedWriter.updateFeed(
+            feed = feed,
+            title = "수정된 제목",
+            content = "수정된 내용",
+            board = null,
+            deleteImageIds = emptyList(),
+            newImageResults = emptyList(),
+            tagTitles = listOf("새태그")
+        )).thenReturn(Triple(updatedFeed, emptyList(), updatedTags))
+        whenever(feedReader.getContestTagsByTitles(listOf("새태그"))).thenReturn(emptyList())
+        whenever(likeFeedReader.isLiked(member.id, updatedFeed)).thenReturn(false)
+        whenever(saveFeedReader.isSaved(member.id, updatedFeed)).thenReturn(false)
+
+        // when
+        val result = feedService.updateFeed(feedId, request, member)
+
+        // then
+        assertEquals("수정된 제목", result.title)
+        assertEquals("수정된 내용", result.content)
+        assertEquals(1, result.tags.size)
+        assertEquals("새태그", result.tags[0].title)
+    }
+
+    @Test
+    fun `updateFeed - 작성자가 아니면 예외 발생`() {
+        // given
+        val feedId = 1L
+        val otherMember = createTestMember(id = "other-member-id", nickname = "other", email = "other@test.com")
+        val feed = createTestFeed(id = feedId, member = otherMember)
+        val request = com.example.mykku.feed.dto.UpdateFeedRequest(
+            title = "수정된 제목",
+            content = null,
+            boardId = null,
+            tags = null,
+            deleteImageIds = emptyList(),
+            newImages = emptyList()
+        )
+
+        whenever(feedReader.getFeedById(feedId)).thenReturn(feed)
+
+        // when & then
+        val exception = assertThrows<FeedException> {
+            feedService.updateFeed(feedId, request, member)
+        }
+        assertEquals(FeedErrorCode.FEED_FORBIDDEN_ACCESS, exception.errorCode)
+    }
+
+    @Test
+    fun `updateFeed - 최종 이미지 개수가 초과하면 예외 발생`() {
+        // given
+        val feedId = 1L
+        val feed = createTestFeed(id = feedId, member = member)
+        val existingImages = List(10) {
+            FeedImage(id = it.toLong(), url = "image$it.jpg", width = 100, height = 100, feed = feed)
+        }
+        val newImage = mock<MultipartFile>()
+        val request = com.example.mykku.feed.dto.UpdateFeedRequest(
+            title = null,
+            content = null,
+            boardId = null,
+            tags = null,
+            deleteImageIds = emptyList(),
+            newImages = listOf(newImage)
+        )
+
+        whenever(feedReader.getFeedById(feedId)).thenReturn(feed)
+        whenever(feedReader.getFeedImagesByFeed(feed)).thenReturn(existingImages)
+
+        // when & then
+        val exception = assertThrows<FeedException> {
+            feedService.updateFeed(feedId, request, member)
+        }
+        assertEquals(FeedErrorCode.FEED_IMAGE_LIMIT_EXCEEDED, exception.errorCode)
+    }
+
+    @Test
+    fun `updateFeed - 이미지 삭제와 추가가 정상 동작한다`() {
+        // given
+        val feedId = 1L
+        val feed = createTestFeed(id = feedId, member = member)
+        val existingImage = FeedImage(id = 1L, url = "old.jpg", width = 100, height = 100, feed = feed)
+        val newImageFile = mock<MultipartFile>()
+        val request = com.example.mykku.feed.dto.UpdateFeedRequest(
+            title = null,
+            content = null,
+            boardId = null,
+            tags = null,
+            deleteImageIds = listOf(1L),
+            newImages = listOf(newImageFile)
+        )
+
+        val newImageResult = ImageUploadResult(url = "new.jpg", width = 200, height = 200)
+        val newFeedImage = FeedImage(id = 2L, url = "new.jpg", width = 200, height = 200, feed = feed)
+
+        whenever(feedReader.getFeedById(feedId)).thenReturn(feed)
+        whenever(feedReader.getFeedImagesByFeed(feed)).thenReturn(listOf(existingImage))
+        whenever(imageUploadService.uploadImages(listOf(newImageFile))).thenReturn(listOf(newImageResult))
+        whenever(feedWriter.updateFeed(
+            feed = feed,
+            title = null,
+            content = null,
+            board = null,
+            deleteImageIds = listOf(1L),
+            newImageResults = listOf(newImageResult),
+            tagTitles = null
+        )).thenReturn(Triple(feed, listOf(newFeedImage), emptyList()))
+        whenever(feedReader.getContestTagsByTitles(emptyList())).thenReturn(emptyList())
+        whenever(likeFeedReader.isLiked(member.id, feed)).thenReturn(false)
+        whenever(saveFeedReader.isSaved(member.id, feed)).thenReturn(false)
+
+        // when
+        val result = feedService.updateFeed(feedId, request, member)
+
+        // then
+        assertEquals(1, result.images.size)
+        assertEquals("new.jpg", result.images[0].url)
+    }
+
+    @Test
+    fun `updateFeed - 게시판을 변경한다`() {
+        // given
+        val feedId = 1L
+        val feed = createTestFeed(id = feedId, member = member)
+        val newBoard = createTestBoard(id = 2L, title = "새 게시판", logo = "https://example.com/new-logo.png")
+        val request = com.example.mykku.feed.dto.UpdateFeedRequest(
+            title = null,
+            content = null,
+            boardId = 2L,
+            tags = null,
+            deleteImageIds = emptyList(),
+            newImages = emptyList()
+        )
+
+        val updatedFeed = createTestFeed(id = feedId, board = newBoard, member = member)
+
+        whenever(feedReader.getFeedById(feedId)).thenReturn(feed)
+        whenever(feedReader.getFeedImagesByFeed(feed)).thenReturn(emptyList())
+        whenever(boardReader.getBoardById(2L)).thenReturn(newBoard)
+        whenever(feedWriter.updateFeed(
+            feed = feed,
+            title = null,
+            content = null,
+            board = newBoard,
+            deleteImageIds = emptyList(),
+            newImageResults = emptyList(),
+            tagTitles = null
+        )).thenReturn(Triple(updatedFeed, emptyList(), emptyList()))
+        whenever(feedReader.getContestTagsByTitles(emptyList())).thenReturn(emptyList())
+        whenever(likeFeedReader.isLiked(member.id, updatedFeed)).thenReturn(false)
+        whenever(saveFeedReader.isSaved(member.id, updatedFeed)).thenReturn(false)
+
+        // when
+        val result = feedService.updateFeed(feedId, request, member)
+
+        // then
+        assertEquals(2L, result.boardId)
+        assertEquals("새 게시판", result.boardTitle)
     }
 }

@@ -87,6 +87,20 @@ class Member(
     }
 
     init {
+        validateNickname(nickname)
+    }
+
+    fun updateProfile(newNickname: String?, newProfileImage: String?) {
+        newNickname?.let {
+            validateNickname(it)
+            this.nickname = it
+        }
+        newProfileImage?.let {
+            this.profileImage = it
+        }
+    }
+
+    private fun validateNickname(nickname: String) {
         if (nickname.length > NICKNAME_MAX_LENGTH) {
             throw MemberException.memberNicknameTooLong()
         }

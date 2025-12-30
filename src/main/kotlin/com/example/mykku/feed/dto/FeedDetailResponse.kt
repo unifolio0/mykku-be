@@ -40,6 +40,7 @@ data class FeedDetailResponse(
         content = feed.content,
         images = feedImages.map {
             FeedImageResponse(
+                id = it.id!!,
                 url = it.url,
                 width = it.width,
                 height = it.height

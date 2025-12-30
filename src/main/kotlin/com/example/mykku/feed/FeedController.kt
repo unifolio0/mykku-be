@@ -148,4 +148,22 @@ class FeedController(
             )
         )
     }
+
+    @PatchMapping("/feeds/{feedId}", consumes = ["multipart/form-data"])
+    fun updateFeed(
+        @PathVariable feedId: Long,
+        @RequestPart("request") @Valid requestDto: UpdateFeedRequestDto,
+        @RequestPart("images", required = false) images: List<MultipartFile>?,
+        @CurrentMember member: Member
+    ): ResponseEntity<ApiResponse<FeedDetailResponse>> {
+        val request = UpdateFeedRequest.from(requestDto, images)
+        val response = feedService.updateFeed(feedId, request, member)
+
+        return ResponseEntity.ok(
+            ApiResponse(
+                message = "피드가 성공적으로 수정되었습니다.",
+                data = response
+            )
+        )
+    }
 }

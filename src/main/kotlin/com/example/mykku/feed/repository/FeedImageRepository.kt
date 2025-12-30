@@ -11,4 +11,6 @@ interface FeedImageRepository : JpaRepository<FeedImage, Long> {
     fun findByFeedIn(feeds: List<Feed>): List<FeedImage>
 
     fun deleteAllByFeed(feed: Feed)
+    fun deleteAllByIdIn(ids: List<Long>)
+    fun findAllByIdInAndFeed(ids: List<Long>, feed: Feed): List<FeedImage>
 }
