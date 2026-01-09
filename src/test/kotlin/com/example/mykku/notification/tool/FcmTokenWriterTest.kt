@@ -3,14 +3,15 @@ package com.example.mykku.notification.tool
 import com.example.mykku.BaseToolTest
 import com.example.mykku.notification.domain.FcmToken
 import com.example.mykku.notification.repository.FcmTokenRepository
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.kotlin.any
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 
 class FcmTokenWriterTest : BaseToolTest() {
 
@@ -142,7 +143,7 @@ class FcmTokenWriterTest : BaseToolTest() {
 
         assertNotNull(result)
         assertEquals(token, result.token)
-        verify(fcmTokenRepository, org.mockito.kotlin.never()).deleteByToken(token)
+        verify(fcmTokenRepository, never()).deleteByToken(token)
         verify(fcmTokenRepository).save(any<FcmToken>())
     }
 }

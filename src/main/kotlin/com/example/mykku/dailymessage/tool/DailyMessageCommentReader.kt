@@ -34,6 +34,6 @@ class DailyMessageCommentReader(
         if (parentComments.isEmpty()) return emptyMap()
 
         val allReplies = dailyMessageCommentRepository.findByParentCommentIn(parentComments)
-        return allReplies.groupBy { it.parentComment?.id ?: 0L }
+        return allReplies.groupBy { it.parentComment?.id ?: error("Reply with id ${it.id} has a null parent comment id") }
     }
 }

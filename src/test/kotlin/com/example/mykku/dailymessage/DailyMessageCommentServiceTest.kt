@@ -5,21 +5,22 @@ import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.domain.DailyMessageComment
 import com.example.mykku.dailymessage.dto.CreateCommentRequest
 import com.example.mykku.dailymessage.dto.UpdateCommentRequest
+import com.example.mykku.dailymessage.exception.DailyMessageErrorCode
+import com.example.mykku.dailymessage.exception.DailyMessageException
 import com.example.mykku.dailymessage.tool.DailyMessageCommentReader
 import com.example.mykku.dailymessage.tool.DailyMessageCommentWriter
 import com.example.mykku.dailymessage.tool.DailyMessageReader
-import com.example.mykku.dailymessage.exception.DailyMessageException
-import com.example.mykku.dailymessage.exception.DailyMessageErrorCode
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.tool.MemberReader
+import java.time.LocalDate
+import java.time.LocalDateTime
+import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.InjectMocks
 import org.mockito.Mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.time.LocalDate
-import java.time.LocalDateTime
-import kotlin.test.assertEquals
 
 class DailyMessageCommentServiceTest : BaseServiceTest() {
 
@@ -67,11 +68,11 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
         val createdAtField = comment::class.java.superclass.getDeclaredField("createdAt")
         createdAtField.isAccessible = true
         createdAtField.set(comment, createdAt)
-        
+
         val updatedAtField = comment::class.java.superclass.getDeclaredField("updatedAt")
         updatedAtField.isAccessible = true
         updatedAtField.set(comment, updatedAt)
-        
+
         return comment
     }
 
@@ -89,12 +90,14 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
 
         whenever(dailyMessageReader.getDailyMessage(1L)).thenReturn(dailyMessage)
         whenever(memberReader.getMemberById("member1")).thenReturn(member)
-        whenever(dailyMessageCommentWriter.createComment(
-            content = request.content,
-            dailyMessage = dailyMessage,
-            member = member,
-            parentComment = null
-        )).thenReturn(comment)
+        whenever(
+            dailyMessageCommentWriter.createComment(
+                content = request.content,
+                dailyMessage = dailyMessage,
+                member = member,
+                parentComment = null
+            )
+        ).thenReturn(comment)
 
         // when
         val result = dailyMessageCommentService.createComment(1L, "member1", request)
@@ -116,7 +119,7 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
             member = member,
             dailyMessage = dailyMessage
         )
-        
+
         val request = CreateCommentRequest(content = "대댓글입니다", parentCommentId = 2L)
         val comment = createTestComment(
             id = 3L,
@@ -129,12 +132,14 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
         whenever(dailyMessageReader.getDailyMessage(1L)).thenReturn(dailyMessage)
         whenever(memberReader.getMemberById("member1")).thenReturn(member)
         whenever(dailyMessageCommentReader.getCommentByDailyMessageId(2L, 1L)).thenReturn(parentComment)
-        whenever(dailyMessageCommentWriter.createComment(
-            content = request.content,
-            dailyMessage = dailyMessage,
-            member = member,
-            parentComment = parentComment
-        )).thenReturn(comment)
+        whenever(
+            dailyMessageCommentWriter.createComment(
+                content = request.content,
+                dailyMessage = dailyMessage,
+                member = member,
+                parentComment = parentComment
+            )
+        ).thenReturn(comment)
 
         // when
         val result = dailyMessageCommentService.createComment(1L, "member1", request)
@@ -155,7 +160,7 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
             member = member,
             dailyMessage = dailyMessage
         )
-        
+
         val updatedComment = createTestComment(
             content = request.content,
             member = member,
@@ -163,10 +168,12 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
         )
 
         whenever(dailyMessageCommentReader.getComment(1L)).thenReturn(comment)
-        whenever(dailyMessageCommentWriter.updateComment(
-            comment = comment,
-            newContent = request.content
-        )).thenReturn(updatedComment)
+        whenever(
+            dailyMessageCommentWriter.updateComment(
+                comment = comment,
+                newContent = request.content
+            )
+        ).thenReturn(updatedComment)
 
         // when
         val result = dailyMessageCommentService.updateComment(1L, member.id, request)
@@ -215,7 +222,7 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
         dailyMessageCommentService.deleteComment(1L, member.id)
 
         // then
-        org.mockito.kotlin.verify(dailyMessageCommentWriter).deleteComment(comment)
+        verify(dailyMessageCommentWriter).deleteComment(comment)
     }
 
     @Test

@@ -4,11 +4,28 @@ import com.example.mykku.board.tool.BoardReader
 import com.example.mykku.dailymessage.tool.DailyMessageCommentReader
 import com.example.mykku.feed.tool.FeedCommentReader
 import com.example.mykku.feed.tool.FeedReader
-import com.example.mykku.like.dto.*
-import com.example.mykku.like.tool.*
+import com.example.mykku.like.dto.LikeBoardInfoResponse
+import com.example.mykku.like.dto.LikeBoardRequest
+import com.example.mykku.like.dto.LikeBoardResponse
+import com.example.mykku.like.dto.LikeDailyMessageCommentRequest
+import com.example.mykku.like.dto.LikeDailyMessageCommentResponse
+import com.example.mykku.like.dto.LikeFeedCommentRequest
+import com.example.mykku.like.dto.LikeFeedCommentResponse
+import com.example.mykku.like.dto.LikeFeedRequest
+import com.example.mykku.like.dto.LikeFeedResponse
+import com.example.mykku.like.tool.LikeBoardReader
+import com.example.mykku.like.tool.LikeBoardWriter
+import com.example.mykku.like.tool.LikeDailyMessageCommentReader
+import com.example.mykku.like.tool.LikeDailyMessageCommentWriter
+import com.example.mykku.like.tool.LikeFeedCommentReader
+import com.example.mykku.like.tool.LikeFeedCommentWriter
+import com.example.mykku.like.tool.LikeFeedReader
+import com.example.mykku.like.tool.LikeFeedWriter
 import com.example.mykku.member.tool.MemberReader
 import com.example.mykku.notification.event.FeedLikedEvent
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -35,7 +52,7 @@ class LikeService(
     private val eventPublisher: ApplicationEventPublisher
 ) {
     @Transactional(readOnly = true)
-    fun getLikedBoards(memberId: String, pageable: org.springframework.data.domain.Pageable): org.springframework.data.domain.Page<LikeBoardInfoResponse> {
+    fun getLikedBoards(memberId: String, pageable: Pageable): Page<LikeBoardInfoResponse> {
         return likeBoardReader.getLikedBoards(memberId = memberId, pageable = pageable)
             .map { LikeBoardInfoResponse(it) }
     }

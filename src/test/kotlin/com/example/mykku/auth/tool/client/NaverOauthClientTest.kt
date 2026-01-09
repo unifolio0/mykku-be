@@ -5,16 +5,17 @@ import com.example.mykku.auth.dto.NaverUserInfo
 import com.example.mykku.auth.dto.NaverUserResponse
 import com.example.mykku.auth.exception.AuthErrorCode
 import com.example.mykku.auth.exception.AuthException
+import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.kotlin.whenever
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.HttpServerErrorException
 import org.springframework.web.client.RestClient
-import kotlin.test.assertEquals
 
 class NaverOauthClientTest : BaseToolTest() {
 
@@ -107,7 +108,7 @@ class NaverOauthClientTest : BaseToolTest() {
     fun `verifyAndGetUserInfo는 401 에러 시 OAUTH_INVALID_TOKEN 예외를 발생시킨다`() {
         val accessToken = "invalid_token"
         val httpException = HttpClientErrorException.create(
-            org.springframework.http.HttpStatus.UNAUTHORIZED,
+            HttpStatus.UNAUTHORIZED,
             "Unauthorized",
             HttpHeaders.EMPTY,
             ByteArray(0),
@@ -132,7 +133,7 @@ class NaverOauthClientTest : BaseToolTest() {
     fun `verifyAndGetUserInfo는 403 에러 시 OAUTH_ACCESS_DENIED 예외를 발생시킨다`() {
         val accessToken = "forbidden_token"
         val httpException = HttpClientErrorException.create(
-            org.springframework.http.HttpStatus.FORBIDDEN,
+            HttpStatus.FORBIDDEN,
             "Forbidden",
             HttpHeaders.EMPTY,
             ByteArray(0),
@@ -157,7 +158,7 @@ class NaverOauthClientTest : BaseToolTest() {
     fun `verifyAndGetUserInfo는 서버 에러 시 OAUTH_SERVER_ERROR 예외를 발생시킨다`() {
         val accessToken = "server_error_token"
         val httpException = HttpServerErrorException.create(
-            org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR,
+            HttpStatus.INTERNAL_SERVER_ERROR,
             "Internal Server Error",
             HttpHeaders.EMPTY,
             ByteArray(0),

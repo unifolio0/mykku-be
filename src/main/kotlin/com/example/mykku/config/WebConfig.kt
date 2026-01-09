@@ -3,6 +3,7 @@ package com.example.mykku.config
 import com.example.mykku.auth.resolver.MemberArgumentResolver
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
@@ -26,7 +27,7 @@ class WebConfig(
         resolvers.add(memberArgumentResolver)
     }
 
-    override fun addInterceptors(registry: org.springframework.web.servlet.config.annotation.InterceptorRegistry) {
+    override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(loggingInterceptor)
     }
 }

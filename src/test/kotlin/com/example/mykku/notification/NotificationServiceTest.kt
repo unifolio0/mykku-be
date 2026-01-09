@@ -1,6 +1,7 @@
 package com.example.mykku.notification
 
 import com.example.mykku.BaseServiceTest
+import com.example.mykku.member.domain.Member
 import com.example.mykku.notification.domain.Notification
 import com.example.mykku.notification.domain.NotificationType
 import com.example.mykku.notification.exception.NotificationErrorCode
@@ -8,17 +9,17 @@ import com.example.mykku.notification.exception.NotificationException
 import com.example.mykku.notification.tool.NotificationReader
 import com.example.mykku.notification.tool.NotificationSettingReader
 import com.example.mykku.notification.tool.NotificationWriter
+import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
-import kotlin.test.assertEquals
 
 class NotificationServiceTest : BaseServiceTest() {
 
@@ -43,8 +44,8 @@ class NotificationServiceTest : BaseServiceTest() {
     private fun createTestNotification(
         id: Long = 1L,
         type: NotificationType = NotificationType.FEED_LIKE,
-        sender: com.example.mykku.member.domain.Member = this.sender,
-        receiver: com.example.mykku.member.domain.Member = this.receiver,
+        sender: Member = this.sender,
+        receiver: Member = this.receiver,
         content: String = "테스트 알림",
         isRead: Boolean = false
     ): Notification {
@@ -199,7 +200,7 @@ class NotificationServiceTest : BaseServiceTest() {
             content = "테스트 알림"
         )
 
-        verify(notificationWriter, org.mockito.kotlin.never()).createNotification(
+        verify(notificationWriter, never()).createNotification(
             any(),
             any(),
             any(),
@@ -207,6 +208,6 @@ class NotificationServiceTest : BaseServiceTest() {
             any(),
             any()
         )
-        verify(fcmService, org.mockito.kotlin.never()).sendNotificationToMember(any(), any(), any(), any())
+        verify(fcmService, never()).sendNotificationToMember(any(), any(), any(), any())
     }
 }

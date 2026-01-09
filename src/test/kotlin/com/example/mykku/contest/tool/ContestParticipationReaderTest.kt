@@ -2,7 +2,10 @@ package com.example.mykku.contest.tool
 
 import com.example.mykku.BaseServiceTest
 import com.example.mykku.contest.domain.Contest
+import com.example.mykku.contest.domain.ContestParticipation
 import com.example.mykku.contest.repository.ContestParticipationRepository
+import com.example.mykku.feed.domain.Feed
+import java.time.LocalDateTime
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -13,7 +16,6 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.whenever
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
-import java.time.LocalDateTime
 
 @DisplayName("ContestParticipationReader 테스트")
 class ContestParticipationReaderTest : BaseServiceTest() {
@@ -29,8 +31,18 @@ class ContestParticipationReaderTest : BaseServiceTest() {
     fun `회원이 참여한 콘테스트 목록을 조회한다`() {
         // given
         val member = createTestMember()
-        val contest1 = Contest(id = 1L, title = "콘테스트1", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
-        val contest2 = Contest(id = 2L, title = "콘테스트2", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
+        val contest1 = Contest(
+            id = 1L,
+            title = "콘테스트1",
+            startedAt = LocalDateTime.now(),
+            expiredAt = LocalDateTime.now().plusDays(7)
+        )
+        val contest2 = Contest(
+            id = 2L,
+            title = "콘테스트2",
+            startedAt = LocalDateTime.now(),
+            expiredAt = LocalDateTime.now().plusDays(7)
+        )
         val contests = listOf(contest1, contest2)
         val pageable = PageRequest.of(0, 20)
         val page = PageImpl(contests, pageable, contests.size.toLong())
@@ -71,9 +83,14 @@ class ContestParticipationReaderTest : BaseServiceTest() {
         // given
         val member = createTestMember()
         val board = createTestBoard()
-        val feed = com.example.mykku.feed.domain.Feed(id = 1L, title = "피드", content = "내용", board = board, member = member)
-        val contest = Contest(id = 1L, title = "콘테스트", startedAt = LocalDateTime.now(), expiredAt = LocalDateTime.now().plusDays(7))
-        val participation = com.example.mykku.contest.domain.ContestParticipation(id = 1L, contest = contest, member = member, feed = feed)
+        val feed = Feed(id = 1L, title = "피드", content = "내용", board = board, member = member)
+        val contest = Contest(
+            id = 1L,
+            title = "콘테스트",
+            startedAt = LocalDateTime.now(),
+            expiredAt = LocalDateTime.now().plusDays(7)
+        )
+        val participation = ContestParticipation(id = 1L, contest = contest, member = member, feed = feed)
 
         whenever(contestParticipationRepository.findByFeed(feed)).thenReturn(listOf(participation))
 
@@ -92,7 +109,7 @@ class ContestParticipationReaderTest : BaseServiceTest() {
         // given
         val member = createTestMember()
         val board = createTestBoard()
-        val feed = com.example.mykku.feed.domain.Feed(id = 1L, title = "피드", content = "내용", board = board, member = member)
+        val feed = Feed(id = 1L, title = "피드", content = "내용", board = board, member = member)
 
         whenever(contestParticipationRepository.findByFeed(feed)).thenReturn(emptyList())
 

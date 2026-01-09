@@ -1,9 +1,17 @@
 package com.example.mykku.docs
 
-import com.example.mykku.contest.dto.*
+import com.example.mykku.contest.domain.ContestStatusType
+import com.example.mykku.contest.dto.ContestDetailResponse
+import com.example.mykku.contest.dto.ContestImageRequest
+import com.example.mykku.contest.dto.ContestImageResponse
+import com.example.mykku.contest.dto.ContestListResponse
+import com.example.mykku.contest.dto.CreateContestRequest
+import com.example.mykku.contest.dto.CreateContestResponse
+import com.example.mykku.contest.dto.PagedContestsResponse
 import com.example.mykku.contest.exception.ContestErrorCode
 import com.example.mykku.contest.exception.ContestException
 import io.restassured.http.ContentType
+import java.time.LocalDateTime
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -13,7 +21,6 @@ import org.mockito.kotlin.anyOrNull
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
-import java.time.LocalDateTime
 
 class ContestDocumentTest : BaseDocumentTest() {
 
@@ -78,7 +85,8 @@ class ContestDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
                             fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("생성된 공모전 ID"),
                             fieldWithPath("data.title").type(JsonFieldType.STRING).description("공모전 제목"),
-                            fieldWithPath("data.description").type(JsonFieldType.STRING).description("공모전 설명").optional(),
+                            fieldWithPath("data.description").type(JsonFieldType.STRING).description("공모전 설명")
+                                .optional(),
                             fieldWithPath("data.expiredAt").type(JsonFieldType.STRING).description("공모전 만료일"),
                             fieldWithPath("data.images[]").type(JsonFieldType.ARRAY).description("공모전 이미지 목록"),
                             fieldWithPath("data.images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
@@ -240,7 +248,7 @@ class ContestDocumentTest : BaseDocumentTest() {
                     title = "첫 번째 공모전",
                     startedAt = LocalDateTime.now(),
                     expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
-                    status = com.example.mykku.contest.domain.ContestStatusType.ACTIVE,
+                    status = ContestStatusType.ACTIVE,
                     thumbnailUrl = "https://example.com/thumbnail1.jpg",
                     tags = listOf("디자인", "개발"),
                     isSaved = true
@@ -250,7 +258,7 @@ class ContestDocumentTest : BaseDocumentTest() {
                     title = "두 번째 공모전",
                     startedAt = LocalDateTime.now(),
                     expiredAt = LocalDateTime.of(2025, 11, 30, 23, 59, 59),
-                    status = com.example.mykku.contest.domain.ContestStatusType.ACTIVE,
+                    status = ContestStatusType.ACTIVE,
                     thumbnailUrl = "https://example.com/thumbnail2.jpg",
                     tags = listOf("기획"),
                     isSaved = false
@@ -328,7 +336,7 @@ class ContestDocumentTest : BaseDocumentTest() {
                 description = "공모전 상세 설명입니다.",
                 startedAt = LocalDateTime.now(),
                 expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
-                status = com.example.mykku.contest.domain.ContestStatusType.ACTIVE,
+                status = ContestStatusType.ACTIVE,
                 images = listOf(
                     ContestImageResponse(url = "https://example.com/image1.jpg", orderIndex = 0),
                     ContestImageResponse(url = "https://example.com/image2.jpg", orderIndex = 1)
@@ -349,7 +357,8 @@ class ContestDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
                             fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("공모전 ID"),
                             fieldWithPath("data.title").type(JsonFieldType.STRING).description("공모전 제목"),
-                            fieldWithPath("data.description").type(JsonFieldType.STRING).description("공모전 설명").optional(),
+                            fieldWithPath("data.description").type(JsonFieldType.STRING).description("공모전 설명")
+                                .optional(),
                             fieldWithPath("data.expiredAt").type(JsonFieldType.STRING).description("만료일"),
                             fieldWithPath("data.images[]").type(JsonFieldType.ARRAY).description("공모전 이미지 목록"),
                             fieldWithPath("data.images[].url").type(JsonFieldType.STRING).description("이미지 URL"),

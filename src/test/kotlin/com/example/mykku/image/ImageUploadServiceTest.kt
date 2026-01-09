@@ -2,21 +2,30 @@ package com.example.mykku.image
 
 import com.example.mykku.BaseServiceTest
 import com.example.mykku.config.S3Properties
-import com.example.mykku.image.exception.ImageException
 import com.example.mykku.image.exception.ImageErrorCode
+import com.example.mykku.image.exception.ImageException
+import java.awt.image.BufferedImage
+import java.io.ByteArrayOutputStream
+import java.net.URL
+import java.util.function.Consumer
+import javax.imageio.ImageIO
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.springframework.web.multipart.MultipartFile
+import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.S3Utilities
-import java.awt.image.BufferedImage
-import java.net.URL
-import javax.imageio.ImageIO
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
+import software.amazon.awssdk.services.s3.model.GetUrlRequest.Builder
+import software.amazon.awssdk.services.s3.model.PutObjectRequest
 
 class ImageUploadServiceTest : BaseServiceTest() {
 
@@ -46,11 +55,11 @@ class ImageUploadServiceTest : BaseServiceTest() {
         whenever(s3Properties.bucketName).thenReturn("test-bucket")
         whenever(s3Client.utilities()).thenReturn(s3Utilities)
         doReturn(url).whenever(s3Utilities)
-            .getUrl(any<java.util.function.Consumer<software.amazon.awssdk.services.s3.model.GetUrlRequest.Builder>>())
+            .getUrl(any<Consumer<Builder>>())
         whenever(
             s3Client.putObject(
-                any<software.amazon.awssdk.services.s3.model.PutObjectRequest>(),
-                any<software.amazon.awssdk.core.sync.RequestBody>()
+                any<PutObjectRequest>(),
+                any<RequestBody>()
             )
         ).thenReturn(mock())
 
@@ -63,8 +72,8 @@ class ImageUploadServiceTest : BaseServiceTest() {
         assertEquals(100, result.width)
         assertEquals(100, result.height)
         verify(s3Client).putObject(
-            any<software.amazon.awssdk.services.s3.model.PutObjectRequest>(),
-            any<software.amazon.awssdk.core.sync.RequestBody>()
+            any<PutObjectRequest>(),
+            any<RequestBody>()
         )
         verify(s3Client).utilities()
     }
@@ -139,11 +148,11 @@ class ImageUploadServiceTest : BaseServiceTest() {
         whenever(s3Properties.bucketName).thenReturn("test-bucket")
         whenever(s3Client.utilities()).thenReturn(s3Utilities)
         doReturn(url1, url2).whenever(s3Utilities)
-            .getUrl(any<java.util.function.Consumer<software.amazon.awssdk.services.s3.model.GetUrlRequest.Builder>>())
+            .getUrl(any<Consumer<Builder>>())
         whenever(
             s3Client.putObject(
-                any<software.amazon.awssdk.services.s3.model.PutObjectRequest>(),
-                any<software.amazon.awssdk.core.sync.RequestBody>()
+                any<PutObjectRequest>(),
+                any<RequestBody>()
             )
         ).thenReturn(mock())
 
@@ -158,7 +167,7 @@ class ImageUploadServiceTest : BaseServiceTest() {
 
     private fun createTestImageBytes(): ByteArray {
         val image = BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB)
-        val baos = java.io.ByteArrayOutputStream()
+        val baos = ByteArrayOutputStream()
         ImageIO.write(image, "jpg", baos)
         return baos.toByteArray()
     }

@@ -1,5 +1,6 @@
 package com.example.mykku.contest
 
+import com.example.mykku.contest.domain.ContestParticipation
 import com.example.mykku.contest.domain.ContestStatusType
 import com.example.mykku.contest.domain.ContestWinner
 import com.example.mykku.contest.dto.ContestWinnerDetailResponse
@@ -72,7 +73,7 @@ class ContestWinnerService(
     private fun fetchAndValidateParticipations(
         contestId: Long,
         winners: List<SetContestWinnersRequest.WinnerSelection>
-    ): Map<Long, com.example.mykku.contest.domain.ContestParticipation> {
+    ): Map<Long, ContestParticipation> {
         val participationIds = winners.map { it.participationId }
         val participationsMap = contestParticipationReader.getParticipationsByIds(participationIds)
 

@@ -2,6 +2,7 @@ package com.example.mykku.docs
 
 import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder
 import com.epages.restdocs.apispec.RestAssuredRestDocumentationWrapper.document
+import java.util.function.Function
 import org.springframework.http.HttpHeaders
 import org.springframework.restdocs.operation.preprocess.OperationRequestPreprocessor
 import org.springframework.restdocs.operation.preprocess.OperationResponsePreprocessor
@@ -34,7 +35,7 @@ class RestDocumentationFilterBuilder(
             resourceBuilder,
             REQUEST_PREPROCESSOR,
             RESPONSE_PREPROCESSOR,
-            java.util.function.Function.identity(),
+            Function.identity(),
             *snippets.toTypedArray()
         )
     }
