@@ -3,14 +3,25 @@ package com.example.mykku.notification
 import com.example.mykku.BaseServiceTest
 import com.example.mykku.notification.domain.FcmToken
 import com.example.mykku.notification.tool.FcmTokenReader
-import com.google.firebase.messaging.*
+import com.google.firebase.messaging.BatchResponse
+import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.FirebaseMessagingException
+import com.google.firebase.messaging.MulticastMessage
+import com.google.firebase.messaging.SendResponse
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.MockedStatic
 import org.mockito.Mockito.mockStatic
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class FcmServiceTest : BaseServiceTest() {
 
@@ -34,7 +45,7 @@ class FcmServiceTest : BaseServiceTest() {
             .thenReturn(firebaseMessaging)
     }
 
-    @org.junit.jupiter.api.AfterEach
+    @AfterEach
     fun tearDown() {
         firebaseMessagingStatic.close()
     }

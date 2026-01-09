@@ -7,6 +7,7 @@ import com.example.mykku.role.domain.Role
 import com.example.mykku.role.exception.RoleErrorCode
 import com.example.mykku.role.exception.RoleException
 import com.example.mykku.role.tool.MemberRoleReader
+import java.time.LocalDateTime
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -52,12 +53,12 @@ class RoleServiceTest {
         val memberRole1 = org.mockito.kotlin.mock<MemberRole>()
         whenever(memberRole1.id).thenReturn(1L)
         whenever(memberRole1.role).thenReturn(role1)
-        whenever(memberRole1.createdAt).thenReturn(java.time.LocalDateTime.now())
+        whenever(memberRole1.createdAt).thenReturn(LocalDateTime.now())
 
         val memberRole2 = org.mockito.kotlin.mock<MemberRole>()
         whenever(memberRole2.id).thenReturn(2L)
         whenever(memberRole2.role).thenReturn(role2)
-        whenever(memberRole2.createdAt).thenReturn(java.time.LocalDateTime.now())
+        whenever(memberRole2.createdAt).thenReturn(LocalDateTime.now())
 
         val memberRoles = listOf(memberRole1, memberRole2)
         whenever(memberRoleReader.getMemberRolesByMember(member)).thenReturn(memberRoles)

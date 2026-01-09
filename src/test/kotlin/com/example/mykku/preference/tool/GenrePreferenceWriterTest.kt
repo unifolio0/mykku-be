@@ -5,12 +5,10 @@ import com.example.mykku.preference.domain.GenreType
 import com.example.mykku.preference.domain.MemberGenrePreference
 import com.example.mykku.preference.repository.MemberGenrePreferenceRepository
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentCaptor
 import org.mockito.InjectMocks
 import org.mockito.Mock
+import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
-import kotlin.test.assertEquals
 
 class GenrePreferenceWriterTest : BaseToolTest() {
 
@@ -31,6 +29,6 @@ class GenrePreferenceWriterTest : BaseToolTest() {
 
         // then
         verify(memberGenrePreferenceRepository).deleteByMember(member)
-        verify(memberGenrePreferenceRepository).saveAll(org.mockito.kotlin.any<List<MemberGenrePreference>>())
+        verify(memberGenrePreferenceRepository).saveAll(any<List<MemberGenrePreference>>())
     }
 }

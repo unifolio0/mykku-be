@@ -6,8 +6,7 @@ data class DailyMessageResponse(
     val id: Long,
     val title: String,
     val content: String,
-    val createdAt: LocalDateTime,
-    val comments: List<CommentResponse>
+    val createdAt: LocalDateTime
 )
 
 data class CommentResponse(
@@ -27,4 +26,13 @@ data class ReplyResponse(
     val memberName: String,
     val profileImage: String,
     val createdAt: LocalDateTime
+)
+
+data class DailyMessageCommentsResponse(
+    val comments: List<CommentResponse>,
+    val totalElements: Long,
+    val totalPages: Int,
+    val currentPage: Int,
+    val pageSize: Int,
+    val hasNext: Boolean
 )

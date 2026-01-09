@@ -1,9 +1,11 @@
 package com.example.mykku.dailymessage
 
 import com.example.mykku.common.dto.ApiResponse
-import com.example.mykku.dailymessage.domain.SortDirection
+import com.example.mykku.common.util.PageableValidator
 import com.example.mykku.dailymessage.dto.DailyMessageResponse
 import com.example.mykku.dailymessage.dto.DailyMessageSummaryResponse
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Sort
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -19,10 +21,16 @@ class DailyMessageController(
     @GetMapping("/api/v1/daily-messages")
     fun getDailyMessages(
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) date: LocalDate,
-        @RequestParam(defaultValue = "10") limit: Int,
-        @RequestParam(defaultValue = "DESC") sort: SortDirection
-    ): ResponseEntity<ApiResponse<List<DailyMessageSummaryResponse>>> {
-        val dailyMessages = dailyMessageService.getDailyMessages(date, limit, sort)
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "20") size: Int
+    ): ResponseEntity<ApiResponse<Page<DailyMessageSummaryResponse>>> {
+        val pageable = PageableValidator.validateAndCreate(
+            page,
+            size,
+            "date",
+            Sort.Direction.DESC
+        )
+        val dailyMessages = dailyMessageService.getDailyMessages(date, pageable)
 
         return ResponseEntity.ok(
             ApiResponse(

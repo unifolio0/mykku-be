@@ -1,9 +1,17 @@
 package com.example.mykku.docs
 
-import com.example.mykku.event.dto.*
+import com.example.mykku.event.domain.EventStatusType
+import com.example.mykku.event.dto.CreateEventRequest
+import com.example.mykku.event.dto.CreateEventResponse
+import com.example.mykku.event.dto.EventDetailResponse
+import com.example.mykku.event.dto.EventImageRequest
+import com.example.mykku.event.dto.EventImageResponse
+import com.example.mykku.event.dto.EventListResponse
+import com.example.mykku.event.dto.PagedEventsResponse
 import com.example.mykku.event.exception.EventErrorCode
 import com.example.mykku.event.exception.EventException
 import io.restassured.http.ContentType
+import java.time.LocalDateTime
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -13,7 +21,6 @@ import org.mockito.kotlin.anyOrNull
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
-import java.time.LocalDateTime
 
 class EventDocumentTest : BaseDocumentTest() {
 
@@ -75,7 +82,8 @@ class EventDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
                             fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("생성된 이벤트 ID"),
                             fieldWithPath("data.title").type(JsonFieldType.STRING).description("이벤트 제목"),
-                            fieldWithPath("data.description").type(JsonFieldType.STRING).description("이벤트 설명").optional(),
+                            fieldWithPath("data.description").type(JsonFieldType.STRING).description("이벤트 설명")
+                                .optional(),
                             fieldWithPath("data.expiredAt").type(JsonFieldType.STRING).description("이벤트 만료일"),
                             fieldWithPath("data.startedAt").type(JsonFieldType.STRING).description("이벤트 시작일"),
                             fieldWithPath("data.images[]").type(JsonFieldType.ARRAY).description("이벤트 이미지 목록"),
@@ -151,7 +159,7 @@ class EventDocumentTest : BaseDocumentTest() {
                     title = "첫 번째 이벤트",
                     startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                     expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
-                    status = com.example.mykku.event.domain.EventStatusType.ACTIVE,
+                    status = EventStatusType.ACTIVE,
                     thumbnailUrl = "https://example.com/thumbnail1.jpg",
                     isSaved = true
                 ),
@@ -160,7 +168,7 @@ class EventDocumentTest : BaseDocumentTest() {
                     title = "두 번째 이벤트",
                     startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                     expiredAt = LocalDateTime.of(2025, 11, 30, 23, 59, 59),
-                    status = com.example.mykku.event.domain.EventStatusType.ACTIVE,
+                    status = EventStatusType.ACTIVE,
                     thumbnailUrl = "https://example.com/thumbnail2.jpg",
                     isSaved = false
                 )
@@ -236,7 +244,7 @@ class EventDocumentTest : BaseDocumentTest() {
                 description = "이벤트 상세 설명입니다.",
                 startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                 expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
-                status = com.example.mykku.event.domain.EventStatusType.ACTIVE,
+                status = EventStatusType.ACTIVE,
                 images = listOf(
                     EventImageResponse(url = "https://example.com/image1.jpg", orderIndex = 0),
                     EventImageResponse(url = "https://example.com/image2.jpg", orderIndex = 1)
@@ -256,7 +264,8 @@ class EventDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
                             fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("이벤트 ID"),
                             fieldWithPath("data.title").type(JsonFieldType.STRING).description("이벤트 제목"),
-                            fieldWithPath("data.description").type(JsonFieldType.STRING).description("이벤트 설명").optional(),
+                            fieldWithPath("data.description").type(JsonFieldType.STRING).description("이벤트 설명")
+                                .optional(),
                             fieldWithPath("data.expiredAt").type(JsonFieldType.STRING).description("만료일"),
                             fieldWithPath("data.images[]").type(JsonFieldType.ARRAY).description("이벤트 이미지 목록"),
                             fieldWithPath("data.images[].url").type(JsonFieldType.STRING).description("이미지 URL"),

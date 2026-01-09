@@ -1,12 +1,14 @@
 package com.example.mykku.fannote.tool
 
 import com.example.mykku.BaseToolTest
-import com.example.mykku.fannote.exception.FanNoteException
-import com.example.mykku.fannote.exception.FanNoteErrorCode
 import com.example.mykku.fannote.domain.FanNote
 import com.example.mykku.fannote.domain.FanNotePage
+import com.example.mykku.fannote.exception.FanNoteErrorCode
+import com.example.mykku.fannote.exception.FanNoteException
 import com.example.mykku.fannote.repository.FanNotePageRepository
 import com.example.mykku.fannote.repository.FanNoteRepository
+import java.time.LocalDate
+import java.util.Optional
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
@@ -17,7 +19,6 @@ import org.mockito.kotlin.verify
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
-import java.time.LocalDate
 
 class FanNoteReaderTest : BaseToolTest() {
 
@@ -60,7 +61,7 @@ class FanNoteReaderTest : BaseToolTest() {
         val fanNoteId = 1L
         val fanNote = createFanNote(fanNoteId, "덕질노트", LocalDate.of(2024, 1, 15))
 
-        given(fanNoteRepository.findById(fanNoteId)).willReturn(java.util.Optional.of(fanNote))
+        given(fanNoteRepository.findById(fanNoteId)).willReturn(Optional.of(fanNote))
 
         // when
         val result = fanNoteReader.findById(fanNoteId)
@@ -102,7 +103,7 @@ class FanNoteReaderTest : BaseToolTest() {
     fun `존재하지 않는 덕질노트 조회 시 예외를 발생시킨다`() {
         // given
         val fanNoteId = 999L
-        given(fanNoteRepository.findById(fanNoteId)).willReturn(java.util.Optional.empty())
+        given(fanNoteRepository.findById(fanNoteId)).willReturn(Optional.empty())
 
         // when & then
         assertThatThrownBy { fanNoteReader.findById(fanNoteId) }

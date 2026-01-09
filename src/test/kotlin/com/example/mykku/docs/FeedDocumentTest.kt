@@ -1,9 +1,21 @@
 package com.example.mykku.docs
 
-import com.example.mykku.feed.dto.*
+import com.example.mykku.feed.dto.AuthorResponse
+import com.example.mykku.feed.dto.CommentAuthorResponse
+import com.example.mykku.feed.dto.CommentPreviewResponse
+import com.example.mykku.feed.dto.CreateFeedResponse
+import com.example.mykku.feed.dto.FeedCommentReplyResponse
+import com.example.mykku.feed.dto.FeedCommentResponse
+import com.example.mykku.feed.dto.FeedCommentsResponse
+import com.example.mykku.feed.dto.FeedDetailResponse
+import com.example.mykku.feed.dto.FeedImageResponse
+import com.example.mykku.feed.dto.FeedResponse
+import com.example.mykku.feed.dto.PagedFeedsResponse
+import com.example.mykku.feed.dto.TagResponse
 import com.example.mykku.feed.exception.FeedErrorCode
 import com.example.mykku.feed.exception.FeedException
 import io.restassured.http.ContentType
+import java.time.LocalDateTime
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -14,8 +26,8 @@ import org.mockito.kotlin.eq
 import org.springframework.data.domain.Pageable
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
+import org.springframework.restdocs.request.RequestDocumentation
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
-import java.time.LocalDateTime
 
 class FeedDocumentTest : BaseDocumentTest() {
 
@@ -108,8 +120,10 @@ class FeedDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.feeds").type(JsonFieldType.ARRAY).description("피드 목록"),
                             fieldWithPath("data.feeds[].id").type(JsonFieldType.NUMBER).description("피드 ID"),
                             fieldWithPath("data.feeds[].author").type(JsonFieldType.OBJECT).description("작성자 정보"),
-                            fieldWithPath("data.feeds[].author.memberId").type(JsonFieldType.STRING).description("작성자 ID"),
-                            fieldWithPath("data.feeds[].author.nickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
+                            fieldWithPath("data.feeds[].author.memberId").type(JsonFieldType.STRING)
+                                .description("작성자 ID"),
+                            fieldWithPath("data.feeds[].author.nickname").type(JsonFieldType.STRING)
+                                .description("작성자 닉네임"),
                             fieldWithPath("data.feeds[].author.profileImage").type(JsonFieldType.STRING)
                                 .description("작성자 프로필 이미지 URL").optional(),
                             fieldWithPath("data.feeds[].author.role").type(JsonFieldType.STRING).description("작성자 칭호"),
@@ -131,13 +145,16 @@ class FeedDocumentTest : BaseDocumentTest() {
                                 .description("콘테스트 태그 여부"),
                             fieldWithPath("data.feeds[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                             fieldWithPath("data.feeds[].commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
-                            fieldWithPath("data.feeds[].isLiked").type(JsonFieldType.BOOLEAN).description("현재 사용자의 좋아요 여부"),
-                            fieldWithPath("data.feeds[].isSaved").type(JsonFieldType.BOOLEAN).description("현재 사용자의 저장 여부"),
+                            fieldWithPath("data.feeds[].isLiked").type(JsonFieldType.BOOLEAN)
+                                .description("현재 사용자의 좋아요 여부"),
+                            fieldWithPath("data.feeds[].isSaved").type(JsonFieldType.BOOLEAN)
+                                .description("현재 사용자의 저장 여부"),
                             fieldWithPath("data.feeds[].createdAt").type(JsonFieldType.STRING).description("작성 일시"),
                             fieldWithPath("data.feeds[].comment").type(JsonFieldType.OBJECT).description("첫 댓글 미리보기"),
                             fieldWithPath("data.feeds[].comment.profileImage").type(JsonFieldType.STRING)
                                 .description("댓글 작성자 프로필 이미지"),
-                            fieldWithPath("data.feeds[].comment.content").type(JsonFieldType.STRING).description("댓글 내용")
+                            fieldWithPath("data.feeds[].comment.content").type(JsonFieldType.STRING)
+                                .description("댓글 내용")
                         )
                 )
                 .build()
@@ -160,9 +177,9 @@ class FeedDocumentTest : BaseDocumentTest() {
             summary = "피드 작성",
             description = "새로운 피드를 작성합니다. 이미지는 최대 10개까지 첨부 가능합니다.",
             requestParts = listOf(
-                org.springframework.restdocs.request.RequestDocumentation.partWithName("request")
+                RequestDocumentation.partWithName("request")
                     .description("피드 생성 요청 정보 (JSON)"),
-                org.springframework.restdocs.request.RequestDocumentation.partWithName("images")
+                RequestDocumentation.partWithName("images")
                     .description("업로드할 이미지 파일들 (선택사항)").optional()
             )
         )
@@ -219,8 +236,10 @@ class FeedDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.images").type(JsonFieldType.ARRAY).description("이미지 목록"),
                             fieldWithPath("data.images[].id").type(JsonFieldType.NUMBER).description("이미지 ID"),
                             fieldWithPath("data.images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
-                            fieldWithPath("data.images[].width").type(JsonFieldType.NUMBER).description("이미지 가로 크기 (픽셀)"),
-                            fieldWithPath("data.images[].height").type(JsonFieldType.NUMBER).description("이미지 세로 크기 (픽셀)"),
+                            fieldWithPath("data.images[].width").type(JsonFieldType.NUMBER)
+                                .description("이미지 가로 크기 (픽셀)"),
+                            fieldWithPath("data.images[].height").type(JsonFieldType.NUMBER)
+                                .description("이미지 세로 크기 (픽셀)"),
                             fieldWithPath("data.tags").type(JsonFieldType.ARRAY).description("태그 목록"),
                             fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                             fieldWithPath("data.commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
@@ -440,11 +459,14 @@ class FeedDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.images").type(JsonFieldType.ARRAY).description("피드 이미지 목록"),
                             fieldWithPath("data.images[].id").type(JsonFieldType.NUMBER).description("이미지 ID"),
                             fieldWithPath("data.images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
-                            fieldWithPath("data.images[].width").type(JsonFieldType.NUMBER).description("이미지 가로 크기 (픽셀)"),
-                            fieldWithPath("data.images[].height").type(JsonFieldType.NUMBER).description("이미지 세로 크기 (픽셀)"),
+                            fieldWithPath("data.images[].width").type(JsonFieldType.NUMBER)
+                                .description("이미지 가로 크기 (픽셀)"),
+                            fieldWithPath("data.images[].height").type(JsonFieldType.NUMBER)
+                                .description("이미지 세로 크기 (픽셀)"),
                             fieldWithPath("data.tags").type(JsonFieldType.ARRAY).description("피드 태그 목록"),
                             fieldWithPath("data.tags[].title").type(JsonFieldType.STRING).description("태그 제목"),
-                            fieldWithPath("data.tags[].isContest").type(JsonFieldType.BOOLEAN).description("콘테스트 태그 여부"),
+                            fieldWithPath("data.tags[].isContest").type(JsonFieldType.BOOLEAN)
+                                .description("콘테스트 태그 여부"),
                             fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                             fieldWithPath("data.commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
                             fieldWithPath("data.isLiked").type(JsonFieldType.BOOLEAN).description("현재 사용자의 좋아요 여부"),
@@ -571,8 +593,10 @@ class FeedDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.feeds").type(JsonFieldType.ARRAY).description("피드 목록"),
                             fieldWithPath("data.feeds[].id").type(JsonFieldType.NUMBER).description("피드 ID"),
                             fieldWithPath("data.feeds[].author").type(JsonFieldType.OBJECT).description("작성자 정보"),
-                            fieldWithPath("data.feeds[].author.memberId").type(JsonFieldType.STRING).description("작성자 ID"),
-                            fieldWithPath("data.feeds[].author.nickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
+                            fieldWithPath("data.feeds[].author.memberId").type(JsonFieldType.STRING)
+                                .description("작성자 ID"),
+                            fieldWithPath("data.feeds[].author.nickname").type(JsonFieldType.STRING)
+                                .description("작성자 닉네임"),
                             fieldWithPath("data.feeds[].author.profileImage").type(JsonFieldType.STRING)
                                 .description("작성자 프로필 이미지 URL").optional(),
                             fieldWithPath("data.feeds[].author.role").type(JsonFieldType.STRING).description("작성자 칭호"),
@@ -594,13 +618,16 @@ class FeedDocumentTest : BaseDocumentTest() {
                                 .description("콘테스트 태그 여부"),
                             fieldWithPath("data.feeds[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                             fieldWithPath("data.feeds[].commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
-                            fieldWithPath("data.feeds[].isLiked").type(JsonFieldType.BOOLEAN).description("현재 사용자의 좋아요 여부"),
-                            fieldWithPath("data.feeds[].isSaved").type(JsonFieldType.BOOLEAN).description("현재 사용자의 저장 여부"),
+                            fieldWithPath("data.feeds[].isLiked").type(JsonFieldType.BOOLEAN)
+                                .description("현재 사용자의 좋아요 여부"),
+                            fieldWithPath("data.feeds[].isSaved").type(JsonFieldType.BOOLEAN)
+                                .description("현재 사용자의 저장 여부"),
                             fieldWithPath("data.feeds[].createdAt").type(JsonFieldType.STRING).description("작성 일시"),
                             fieldWithPath("data.feeds[].comment").type(JsonFieldType.OBJECT).description("첫 댓글 미리보기"),
                             fieldWithPath("data.feeds[].comment.profileImage").type(JsonFieldType.STRING)
                                 .description("댓글 작성자 프로필 이미지"),
-                            fieldWithPath("data.feeds[].comment.content").type(JsonFieldType.STRING).description("댓글 내용")
+                            fieldWithPath("data.feeds[].comment.content").type(JsonFieldType.STRING)
+                                .description("댓글 내용")
                         )
                 )
                 .build()
@@ -700,7 +727,8 @@ class FeedDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.comments[].isLiked").type(JsonFieldType.BOOLEAN)
                                 .description("현재 사용자의 좋아요 여부"),
                             fieldWithPath("data.comments[].replies").type(JsonFieldType.ARRAY).description("대댓글 목록"),
-                            fieldWithPath("data.comments[].replies[].id").type(JsonFieldType.NUMBER).description("대댓글 ID")
+                            fieldWithPath("data.comments[].replies[].id").type(JsonFieldType.NUMBER)
+                                .description("대댓글 ID")
                                 .optional(),
                             fieldWithPath("data.comments[].replies[].content").type(JsonFieldType.STRING)
                                 .description("대댓글 내용").optional(),
@@ -719,8 +747,10 @@ class FeedDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.comments[].replies[].updatedAt").type(JsonFieldType.STRING)
                                 .description("대댓글 수정 시간").optional(),
                             fieldWithPath("data.comments[].replyCount").type(JsonFieldType.NUMBER).description("대댓글 수"),
-                            fieldWithPath("data.comments[].createdAt").type(JsonFieldType.STRING).description("댓글 작성 시간"),
-                            fieldWithPath("data.comments[].updatedAt").type(JsonFieldType.STRING).description("댓글 수정 시간"),
+                            fieldWithPath("data.comments[].createdAt").type(JsonFieldType.STRING)
+                                .description("댓글 작성 시간"),
+                            fieldWithPath("data.comments[].updatedAt").type(JsonFieldType.STRING)
+                                .description("댓글 수정 시간"),
                             fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 댓글 수"),
                             fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
                             fieldWithPath("data.currentPage").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
@@ -771,9 +801,9 @@ class FeedDocumentTest : BaseDocumentTest() {
                 parameterWithName("feedId").description("수정할 피드의 ID")
             ),
             requestParts = listOf(
-                org.springframework.restdocs.request.RequestDocumentation.partWithName("request")
+                RequestDocumentation.partWithName("request")
                     .description("피드 수정 요청 정보 (JSON)"),
-                org.springframework.restdocs.request.RequestDocumentation.partWithName("images")
+                RequestDocumentation.partWithName("images")
                     .description("새로 추가할 이미지 파일들 (선택사항)").optional()
             )
         )
@@ -842,11 +872,14 @@ class FeedDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.images").type(JsonFieldType.ARRAY).description("피드 이미지 목록"),
                             fieldWithPath("data.images[].id").type(JsonFieldType.NUMBER).description("이미지 ID"),
                             fieldWithPath("data.images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
-                            fieldWithPath("data.images[].width").type(JsonFieldType.NUMBER).description("이미지 가로 크기 (픽셀)"),
-                            fieldWithPath("data.images[].height").type(JsonFieldType.NUMBER).description("이미지 세로 크기 (픽셀)"),
+                            fieldWithPath("data.images[].width").type(JsonFieldType.NUMBER)
+                                .description("이미지 가로 크기 (픽셀)"),
+                            fieldWithPath("data.images[].height").type(JsonFieldType.NUMBER)
+                                .description("이미지 세로 크기 (픽셀)"),
                             fieldWithPath("data.tags").type(JsonFieldType.ARRAY).description("피드 태그 목록"),
                             fieldWithPath("data.tags[].title").type(JsonFieldType.STRING).description("태그 제목"),
-                            fieldWithPath("data.tags[].isContest").type(JsonFieldType.BOOLEAN).description("콘테스트 태그 여부"),
+                            fieldWithPath("data.tags[].isContest").type(JsonFieldType.BOOLEAN)
+                                .description("콘테스트 태그 여부"),
                             fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                             fieldWithPath("data.commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
                             fieldWithPath("data.isLiked").type(JsonFieldType.BOOLEAN).description("현재 사용자의 좋아요 여부"),

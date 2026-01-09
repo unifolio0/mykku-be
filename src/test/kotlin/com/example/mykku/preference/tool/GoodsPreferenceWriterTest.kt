@@ -5,12 +5,10 @@ import com.example.mykku.preference.domain.GoodsType
 import com.example.mykku.preference.domain.MemberGoodsPreference
 import com.example.mykku.preference.repository.MemberGoodsPreferenceRepository
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentCaptor
 import org.mockito.InjectMocks
 import org.mockito.Mock
+import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
-import kotlin.test.assertEquals
 
 class GoodsPreferenceWriterTest : BaseToolTest() {
 
@@ -31,6 +29,6 @@ class GoodsPreferenceWriterTest : BaseToolTest() {
 
         // then
         verify(memberGoodsPreferenceRepository).deleteByMember(member)
-        verify(memberGoodsPreferenceRepository).saveAll(org.mockito.kotlin.any<List<MemberGoodsPreference>>())
+        verify(memberGoodsPreferenceRepository).saveAll(any<List<MemberGoodsPreference>>())
     }
 }

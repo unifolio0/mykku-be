@@ -5,12 +5,10 @@ import com.example.mykku.preference.domain.MemberMoodPreference
 import com.example.mykku.preference.domain.MoodType
 import com.example.mykku.preference.repository.MemberMoodPreferenceRepository
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentCaptor
 import org.mockito.InjectMocks
 import org.mockito.Mock
+import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
-import kotlin.test.assertEquals
 
 class MoodPreferenceWriterTest : BaseToolTest() {
 
@@ -31,6 +29,6 @@ class MoodPreferenceWriterTest : BaseToolTest() {
 
         // then
         verify(memberMoodPreferenceRepository).deleteByMember(member)
-        verify(memberMoodPreferenceRepository).saveAll(org.mockito.kotlin.any<List<MemberMoodPreference>>())
+        verify(memberMoodPreferenceRepository).saveAll(any<List<MemberMoodPreference>>())
     }
 }

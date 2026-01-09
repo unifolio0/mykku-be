@@ -1,6 +1,8 @@
 package com.example.mykku.like.repository
 
 import com.example.mykku.like.domain.LikeBoard
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
@@ -9,6 +11,9 @@ import org.springframework.stereotype.Repository
 interface LikeBoardRepository : JpaRepository<LikeBoard, Long> {
     @EntityGraph(attributePaths = ["member", "board"])
     fun findAllByMemberId(memberId: String): List<LikeBoard>
+
+    @EntityGraph(attributePaths = ["member", "board"])
+    fun findAllByMemberId(memberId: String, pageable: Pageable): Page<LikeBoard>
 
     fun existsByMemberIdAndBoardId(memberId: String, boardId: Long): Boolean
 

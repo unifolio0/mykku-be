@@ -14,6 +14,8 @@ import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.tool.MemberReader
 import com.example.mykku.member.tool.MemberWriter
 import com.example.mykku.role.domain.Role
+import com.example.mykku.role.tool.MemberRoleWriter
+import com.example.mykku.role.tool.RoleReader
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
@@ -46,10 +48,10 @@ class EmailAuthServiceTest : BaseServiceTest() {
     private lateinit var jwtTokenProvider: JwtTokenProvider
 
     @Mock
-    private lateinit var roleReader: com.example.mykku.role.tool.RoleReader
+    private lateinit var roleReader: RoleReader
 
     @Mock
-    private lateinit var memberRoleWriter: com.example.mykku.role.tool.MemberRoleWriter
+    private lateinit var memberRoleWriter: MemberRoleWriter
 
     @InjectMocks
     private lateinit var emailAuthService: EmailAuthService

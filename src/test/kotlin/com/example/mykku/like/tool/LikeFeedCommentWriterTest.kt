@@ -5,14 +5,15 @@ import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedComment
 import com.example.mykku.like.domain.LikeFeedComment
 import com.example.mykku.like.repository.LikeFeedCommentRepository
+import kotlin.test.assertEquals
+import kotlin.test.assertSame
 import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.kotlin.any
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import kotlin.test.assertEquals
-import kotlin.test.assertSame
 
 class LikeFeedCommentWriterTest : BaseToolTest() {
 
@@ -48,7 +49,7 @@ class LikeFeedCommentWriterTest : BaseToolTest() {
             member = member,
             feedComment = feedComment
         )
-        
+
         whenever(likeFeedCommentRepository.save(any<LikeFeedComment>()))
             .thenReturn(mockLikeFeedComment)
 
@@ -85,6 +86,6 @@ class LikeFeedCommentWriterTest : BaseToolTest() {
 
         likeFeedCommentWriter.deleteAllByFeedCommentIds(feedCommentIds)
 
-        verify(likeFeedCommentRepository, org.mockito.kotlin.never()).deleteAllByFeedCommentIdIn(any())
+        verify(likeFeedCommentRepository, never()).deleteAllByFeedCommentIdIn(any())
     }
 }
