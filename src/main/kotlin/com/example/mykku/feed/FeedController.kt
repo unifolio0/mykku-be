@@ -8,7 +8,6 @@ import com.example.mykku.feed.dto.CreateFeedRequestDto
 import com.example.mykku.feed.dto.CreateFeedResponse
 import com.example.mykku.feed.dto.FeedCommentsResponse
 import com.example.mykku.feed.dto.FeedDetailResponse
-import com.example.mykku.feed.dto.PagedFeedsResponse
 import com.example.mykku.feed.dto.UpdateFeedRequest
 import com.example.mykku.feed.dto.UpdateFeedRequestDto
 import com.example.mykku.feed.exception.FeedException
@@ -28,12 +27,12 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/feeds")
 class FeedController(
     private val feedService: FeedService,
     private val feedCommentService: FeedCommentService
 ) {
-    @PostMapping("/feeds", consumes = ["multipart/form-data"])
+    @PostMapping(consumes = ["multipart/form-data"])
     fun createFeed(
         @RequestPart("request") @Valid requestDto: CreateFeedRequestDto,
         @RequestPart("images", required = false) images: List<MultipartFile>?,
@@ -72,28 +71,7 @@ class FeedController(
         }
     }
 
-    @GetMapping("/boards/{boardId}/feeds")
-    fun getFeedsByBoard(
-        @PathVariable boardId: Long,
-        @RequestParam(defaultValue = "0") page: Int,
-        @RequestParam(defaultValue = "20") size: Int,
-        @CurrentMember(required = false) member: Member?
-    ): ResponseEntity<ApiResponse<PagedFeedsResponse>> {
-        val pageable = PageableValidator.validateAndCreate(page, size)
-        val feeds = feedService.getFeedsByBoard(
-            boardId = boardId,
-            memberId = member?.id,
-            pageable = pageable
-        )
-        return ResponseEntity.ok(
-            ApiResponse(
-                message = "보드별 피드 목록을 성공적으로 조회했습니다.",
-                data = feeds
-            )
-        )
-    }
-
-    @GetMapping("/feeds/{feedId}")
+    @GetMapping("/{feedId}")
     fun getFeedDetail(
         @PathVariable feedId: Long,
         @CurrentMember(required = false) member: Member?
@@ -107,7 +85,7 @@ class FeedController(
         )
     }
 
-    @GetMapping("/feeds/{feedId}/comments")
+    @GetMapping("/{feedId}/comments")
     fun getComments(
         @PathVariable feedId: Long,
         @RequestParam(defaultValue = "0") page: Int,
@@ -129,7 +107,7 @@ class FeedController(
         )
     }
 
-    @DeleteMapping("/feeds/{feedId}")
+    @DeleteMapping("/{feedId}")
     fun deleteFeed(
         @PathVariable feedId: Long,
         @CurrentMember member: Member
@@ -143,7 +121,7 @@ class FeedController(
         )
     }
 
-    @PatchMapping("/feeds/{feedId}", consumes = ["multipart/form-data"])
+    @PatchMapping("/{feedId}", consumes = ["multipart/form-data"])
     fun updateFeed(
         @PathVariable feedId: Long,
         @RequestPart("request") @Valid requestDto: UpdateFeedRequestDto,

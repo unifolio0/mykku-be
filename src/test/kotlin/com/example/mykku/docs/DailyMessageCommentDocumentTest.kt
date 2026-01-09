@@ -181,7 +181,7 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                 .contentType(ContentType.JSON)
                 .body(objectMapper.writeValueAsString(request))
                 .`when`()
-                .post("/api/v1/daily-messages/{dailyMessageId}/comment", dailyMessageId)
+                .post("/api/v1/daily-messages/{dailyMessageId}/comments", dailyMessageId)
                 .then()
                 .statusCode(200)
         }
@@ -207,7 +207,7 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                 .contentType(ContentType.JSON)
                 .body(objectMapper.writeValueAsString(request))
                 .`when`()
-                .post("/api/v1/daily-messages/{dailyMessageId}/comment", dailyMessageId)
+                .post("/api/v1/daily-messages/{dailyMessageId}/comments", dailyMessageId)
                 .then()
                 .statusCode(400)
         }
@@ -272,7 +272,7 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                 .contentType(ContentType.JSON)
                 .body(objectMapper.writeValueAsString(request))
                 .`when`()
-                .post("/api/v1/daily-messages/{dailyMessageId}/comment", dailyMessageId)
+                .post("/api/v1/daily-messages/{dailyMessageId}/comments", dailyMessageId)
                 .then()
                 .statusCode(200)
         }

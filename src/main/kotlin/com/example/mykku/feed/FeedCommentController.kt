@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/feeds")
 class FeedCommentController(
     private val feedCommentService: FeedCommentService,
 ) {
-    @PostMapping("/feeds/{feedId}/comments")
+    @PostMapping("/{feedId}/comments")
     fun createComment(
         @PathVariable feedId: Long,
         @RequestBody request: CreateFeedCommentRequest,
@@ -40,7 +40,7 @@ class FeedCommentController(
         )
     }
 
-    @PutMapping("/feeds/comments/{commentId}")
+    @PutMapping("/comments/{commentId}")
     fun updateComment(
         @PathVariable commentId: Long,
         @RequestBody request: UpdateFeedCommentRequest,
@@ -60,7 +60,7 @@ class FeedCommentController(
         )
     }
 
-    @DeleteMapping("/feeds/comments/{commentId}")
+    @DeleteMapping("/comments/{commentId}")
     fun deleteComment(
         @PathVariable commentId: Long,
         @CurrentMember member: Member

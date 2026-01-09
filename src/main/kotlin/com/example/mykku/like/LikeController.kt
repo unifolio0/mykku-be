@@ -4,13 +4,9 @@ import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.common.util.PageableValidator
 import com.example.mykku.like.dto.LikeBoardInfoResponse
-import com.example.mykku.like.dto.LikeBoardRequest
 import com.example.mykku.like.dto.LikeBoardResponse
-import com.example.mykku.like.dto.LikeDailyMessageCommentRequest
 import com.example.mykku.like.dto.LikeDailyMessageCommentResponse
-import com.example.mykku.like.dto.LikeFeedCommentRequest
 import com.example.mykku.like.dto.LikeFeedCommentResponse
-import com.example.mykku.like.dto.LikeFeedRequest
 import com.example.mykku.like.dto.LikeFeedResponse
 import com.example.mykku.member.domain.Member
 import org.springframework.data.domain.Page
@@ -20,15 +16,16 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@RequestMapping("/api/v1/likes")
 class LikeController(
     private val likeService: LikeService
 ) {
-    @GetMapping("/api/v1/boards/like")
+    @GetMapping("/boards")
     fun getLikedBoards(
         @CurrentMember member: Member,
         @RequestParam(defaultValue = "0") page: Int,
@@ -49,13 +46,13 @@ class LikeController(
         )
     }
 
-    @PostMapping("/api/v1/board/like")
+    @PostMapping("/boards/{boardId}")
     fun likeBoard(
-        @RequestBody request: LikeBoardRequest,
+        @PathVariable boardId: Long,
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<LikeBoardResponse>> {
         val response = likeService.likeBoard(
-            request = request,
+            boardId = boardId,
             memberId = member.id
         )
         return ResponseEntity.ok(
@@ -66,7 +63,7 @@ class LikeController(
         )
     }
 
-    @DeleteMapping("/api/v1/board/unlike/{boardId}")
+    @DeleteMapping("/boards/{boardId}")
     fun unlikeBoard(
         @PathVariable boardId: Long,
         @CurrentMember member: Member
@@ -80,14 +77,14 @@ class LikeController(
         )
     }
 
-    @PostMapping("/api/v1/feed/like")
+    @PostMapping("/feeds/{feedId}")
     fun likeFeed(
-        @RequestBody request: LikeFeedRequest,
+        @PathVariable feedId: Long,
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<LikeFeedResponse>> {
         val response = likeService.likeFeed(
             memberId = member.id,
-            request = request
+            feedId = feedId
         )
         return ResponseEntity.ok(
             ApiResponse(
@@ -97,7 +94,7 @@ class LikeController(
         )
     }
 
-    @DeleteMapping("/api/v1/feed/unlike/{feedId}")
+    @DeleteMapping("/feeds/{feedId}")
     fun unlikeFeed(
         @PathVariable feedId: Long,
         @CurrentMember member: Member
@@ -111,14 +108,14 @@ class LikeController(
         )
     }
 
-    @PostMapping("/api/v1/daily-message-comment/like")
+    @PostMapping("/daily-message-comments/{dailyMessageCommentId}")
     fun likeDailyMessageComment(
-        @RequestBody request: LikeDailyMessageCommentRequest,
+        @PathVariable dailyMessageCommentId: Long,
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<LikeDailyMessageCommentResponse>> {
         val response = likeService.likeDailyMessageComment(
             memberId = member.id,
-            request = request
+            dailyMessageCommentId = dailyMessageCommentId
         )
         return ResponseEntity.ok(
             ApiResponse(
@@ -128,7 +125,7 @@ class LikeController(
         )
     }
 
-    @DeleteMapping("/api/v1/daily-message-comment/unlike/{dailyMessageCommentId}")
+    @DeleteMapping("/daily-message-comments/{dailyMessageCommentId}")
     fun unlikeDailyMessageComment(
         @PathVariable dailyMessageCommentId: Long,
         @CurrentMember member: Member
@@ -142,14 +139,14 @@ class LikeController(
         )
     }
 
-    @PostMapping("/api/v1/comment/like")
+    @PostMapping("/feed-comments/{feedCommentId}")
     fun likeFeedComment(
-        @RequestBody request: LikeFeedCommentRequest,
+        @PathVariable feedCommentId: Long,
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<LikeFeedCommentResponse>> {
         val response = likeService.likeFeedComment(
             memberId = member.id,
-            request = request
+            feedCommentId = feedCommentId
         )
         return ResponseEntity.ok(
             ApiResponse(
@@ -159,7 +156,7 @@ class LikeController(
         )
     }
 
-    @DeleteMapping("/api/v1/comment/unlike/{feedCommentId}")
+    @DeleteMapping("/feed-comments/{feedCommentId}")
     fun unlikeFeedComment(
         @PathVariable feedCommentId: Long,
         @CurrentMember member: Member

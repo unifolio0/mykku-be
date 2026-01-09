@@ -58,7 +58,7 @@ class DailyMessageControllerTest : BaseControllerTest() {
         // when & then
         RestAssured.given()
             .`when`()
-            .get("/api/v1/daily-message/{id}", dailyMessage.id)
+            .get("/api/v1/daily-messages/{id}", dailyMessage.id)
             .then()
             .statusCode(200)
             .body("message", equalTo("하루 덕담 데이터 불러오기에 성공했습니다."))
@@ -71,7 +71,7 @@ class DailyMessageControllerTest : BaseControllerTest() {
         // when & then
         RestAssured.given()
             .`when`()
-            .get("/api/v1/daily-message/{id}", 999L)
+            .get("/api/v1/daily-messages/{id}", 999L)
             .then()
             .statusCode(404)
     }

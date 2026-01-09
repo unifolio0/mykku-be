@@ -16,14 +16,16 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@RequestMapping("/api/v1/daily-messages")
 class DailyMessageCommentController(
     private val dailyMessageCommentService: DailyMessageCommentService,
 ) {
-    @GetMapping("/api/v1/daily-messages/{dailyMessageId}/comments")
+    @GetMapping("/{dailyMessageId}/comments")
     fun getComments(
         @PathVariable dailyMessageId: Long,
         @RequestParam(defaultValue = "0") page: Int,
@@ -45,7 +47,7 @@ class DailyMessageCommentController(
         )
     }
 
-    @PostMapping("/api/v1/daily-messages/{dailyMessageId}/comment")
+    @PostMapping("/{dailyMessageId}/comments")
     fun createComment(
         @PathVariable dailyMessageId: Long,
         @RequestBody request: CreateCommentRequest,
@@ -65,7 +67,7 @@ class DailyMessageCommentController(
         )
     }
 
-    @PutMapping("/api/v1/daily-messages/comments/{commentId}")
+    @PutMapping("/comments/{commentId}")
     fun updateComment(
         @PathVariable commentId: Long,
         @RequestBody request: UpdateCommentRequest,
@@ -85,7 +87,7 @@ class DailyMessageCommentController(
         )
     }
 
-    @DeleteMapping("/api/v1/daily-messages/comments/{commentId}")
+    @DeleteMapping("/comments/{commentId}")
     fun deleteComment(
         @PathVariable commentId: Long,
         @CurrentMember member: Member

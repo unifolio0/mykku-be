@@ -185,59 +185,6 @@ class FeedControllerTest : BaseControllerTest() {
     }
 
     @Test
-    @DisplayName("보드별 피드 목록 조회 - 정상 케이스")
-    fun `getFeedsByBoard - 정상적으로 보드별 피드 목록을 조회한다`() {
-        // given
-        val member = memberRepository.save(
-            Member(
-                id = "member1",
-                socialId = "member1",
-                provider = SocialProvider.GOOGLE,
-                email = "member1@example.com",
-                nickname = "Member1",
-                role = null,
-                profileImage = ""
-            )
-        )
-        val board = boardRepository.save(
-            Board(
-                title = "테스트 게시판",
-                logo = "test_logo.png"
-            )
-        )
-        feedRepository.save(
-            Feed(
-                title = "보드 피드 1",
-                content = "보드 피드 내용 1",
-                member = member,
-                board = board
-            )
-        )
-        feedRepository.save(
-            Feed(
-                title = "보드 피드 2",
-                content = "보드 피드 내용 2",
-                member = member,
-                board = board
-            )
-        )
-
-        // when & then
-        RestAssured.given()
-            .queryParam("page", 0)
-            .queryParam("size", 10)
-            .`when`()
-            .get("/api/v1/boards/{boardId}/feeds", board.id)
-            .then()
-            .log().all()
-            .statusCode(200)
-            .body("message", equalTo("보드별 피드 목록을 성공적으로 조회했습니다."))
-            .body("data.feeds", notNullValue())
-            .body("data.currentPage", equalTo(0))
-            .body("data.size", equalTo(10))
-    }
-
-    @Test
     @DisplayName("피드 상세 조회 - 정상 케이스")
     fun `getFeedDetail - 정상적으로 피드 상세 정보를 조회한다`() {
         // given

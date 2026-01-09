@@ -13,10 +13,6 @@ import com.example.mykku.like.domain.LikeBoard
 import com.example.mykku.like.domain.LikeDailyMessageComment
 import com.example.mykku.like.domain.LikeFeed
 import com.example.mykku.like.domain.LikeFeedComment
-import com.example.mykku.like.dto.LikeBoardRequest
-import com.example.mykku.like.dto.LikeDailyMessageCommentRequest
-import com.example.mykku.like.dto.LikeFeedCommentRequest
-import com.example.mykku.like.dto.LikeFeedRequest
 import com.example.mykku.like.tool.LikeBoardReader
 import com.example.mykku.like.tool.LikeBoardWriter
 import com.example.mykku.like.tool.LikeDailyMessageCommentReader
@@ -107,15 +103,15 @@ class LikeServiceTest : BaseServiceTest() {
     @Test
     fun `likeBoard - 보드에 좋아요를 추가한다`() {
         // given
-        val request = LikeBoardRequest(boardId = 1L)
+        val boardId = 1L
         val likeBoard = LikeBoard(id = 1L, member = member, board = board)
 
         whenever(memberReader.getMemberById("member1")).thenReturn(member)
-        whenever(boardReader.getBoardById(1L)).thenReturn(board)
+        whenever(boardReader.getBoardById(boardId)).thenReturn(board)
         whenever(likeBoardWriter.createLikeBoard(board = board, member = member)).thenReturn(likeBoard)
 
         // when
-        val result = likeService.likeBoard(request, "member1")
+        val result = likeService.likeBoard(boardId, "member1")
 
         // then
         assertEquals(likeBoard.id, result.id)
@@ -139,15 +135,15 @@ class LikeServiceTest : BaseServiceTest() {
             board = board,
             member = member
         )
-        val request = LikeFeedRequest(feedId = 1L)
+        val feedId = 1L
         val likeFeed = LikeFeed(id = 1L, member = member, feed = feed)
 
         whenever(memberReader.getMemberById("member1")).thenReturn(member)
-        whenever(feedReader.getFeedById(1L)).thenReturn(feed)
+        whenever(feedReader.getFeedById(feedId)).thenReturn(feed)
         whenever(likeFeedWriter.createLikeFeed(feed = feed, member = member)).thenReturn(likeFeed)
 
         // when
-        val result = likeService.likeFeed("member1", request)
+        val result = likeService.likeFeed("member1", feedId)
 
         // then
         assertEquals(likeFeed.id, result.id)
@@ -177,7 +173,7 @@ class LikeServiceTest : BaseServiceTest() {
             member = member,
             parentComment = null
         )
-        val request = LikeDailyMessageCommentRequest(dailyMessageCommentId = 1L)
+        val dailyMessageCommentId = 1L
         val likeDailyMessageComment = LikeDailyMessageComment(
             id = 1L,
             member = member,
@@ -185,7 +181,7 @@ class LikeServiceTest : BaseServiceTest() {
         )
 
         whenever(memberReader.getMemberById("member1")).thenReturn(member)
-        whenever(dailyMessageCommentReader.getDailyMessageCommentById(1L)).thenReturn(dailyMessageComment)
+        whenever(dailyMessageCommentReader.getDailyMessageCommentById(dailyMessageCommentId)).thenReturn(dailyMessageComment)
         whenever(
             likeDailyMessageCommentWriter.createLikeDailyMessageComment(
                 dailyMessageComment = dailyMessageComment,
@@ -194,7 +190,7 @@ class LikeServiceTest : BaseServiceTest() {
         ).thenReturn(likeDailyMessageComment)
 
         // when
-        val result = likeService.likeDailyMessageComment("member1", request)
+        val result = likeService.likeDailyMessageComment("member1", dailyMessageCommentId)
 
         // then
         assertEquals(likeDailyMessageComment.id, result.id)
@@ -225,11 +221,11 @@ class LikeServiceTest : BaseServiceTest() {
             member = member,
             parentComment = null
         )
-        val request = LikeFeedCommentRequest(feedCommentId = 1L)
+        val feedCommentId = 1L
         val likeFeedComment = LikeFeedComment(id = 1L, member = member, feedComment = feedComment)
 
         whenever(memberReader.getMemberById("member1")).thenReturn(member)
-        whenever(feedCommentReader.getFeedCommentById(1L)).thenReturn(feedComment)
+        whenever(feedCommentReader.getFeedCommentById(feedCommentId)).thenReturn(feedComment)
         whenever(
             likeFeedCommentWriter.createLikeFeedComment(
                 feedComment = feedComment,
@@ -238,7 +234,7 @@ class LikeServiceTest : BaseServiceTest() {
         ).thenReturn(likeFeedComment)
 
         // when
-        val result = likeService.likeFeedComment("member1", request)
+        val result = likeService.likeFeedComment("member1", feedCommentId)
 
         // then
         assertEquals(likeFeedComment.id, result.id)

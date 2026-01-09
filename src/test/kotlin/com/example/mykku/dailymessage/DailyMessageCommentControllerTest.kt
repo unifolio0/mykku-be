@@ -59,7 +59,7 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
             .contentType(ContentType.JSON)
             .body(request)
             .`when`()
-            .post("/api/v1/daily-messages/{dailyMessageId}/comment", dailyMessage.id)
+            .post("/api/v1/daily-messages/{dailyMessageId}/comments", dailyMessage.id)
             .then()
             .statusCode(200)
             .body("message", equalTo("댓글이 성공적으로 등록되었습니다."))
@@ -84,7 +84,7 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
             .contentType(ContentType.JSON)
             .body(request)
             .`when`()
-            .post("/api/v1/daily-messages/{dailyMessageId}/comment", dailyMessage.id)
+            .post("/api/v1/daily-messages/{dailyMessageId}/comments", dailyMessage.id)
             .then()
             .statusCode(401)
     }

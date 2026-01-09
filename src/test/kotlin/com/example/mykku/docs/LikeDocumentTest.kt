@@ -1,13 +1,9 @@
 package com.example.mykku.docs
 
 import com.example.mykku.like.dto.LikeBoardInfoResponse
-import com.example.mykku.like.dto.LikeBoardRequest
 import com.example.mykku.like.dto.LikeBoardResponse
-import com.example.mykku.like.dto.LikeDailyMessageCommentRequest
 import com.example.mykku.like.dto.LikeDailyMessageCommentResponse
-import com.example.mykku.like.dto.LikeFeedCommentRequest
 import com.example.mykku.like.dto.LikeFeedCommentResponse
-import com.example.mykku.like.dto.LikeFeedRequest
 import com.example.mykku.like.dto.LikeFeedResponse
 import com.example.mykku.like.exception.LikeErrorCode
 import com.example.mykku.like.exception.LikeException
@@ -98,7 +94,7 @@ class LikeDocumentTest : BaseDocumentTest() {
                 .param("page", "0")
                 .param("size", "20")
                 .`when`()
-                .get("/api/v1/boards/like")
+                .get("/api/v1/likes/boards")
                 .then()
                 .statusCode(200)
         }
@@ -112,17 +108,17 @@ class LikeDocumentTest : BaseDocumentTest() {
             tag = Tag.LIKE_API,
             summary = "게시판 즐겨찾기",
             description = "게시판을 즐겨찾기에 추가합니다.",
-            requestBodyFields = listOf(
-                fieldWithPath("boardId").type(JsonFieldType.NUMBER).description("즐겨찾기할 게시판 ID")
+            pathParameters = listOf(
+                parameterWithName("boardId").description("즐겨찾기할 게시판 ID")
             )
         )
 
         @Test
         fun `성공`() {
-            val request = LikeBoardRequest(boardId = 1L)
-            val response = LikeBoardResponse(id = 1L, memberId = "member123", boardId = 1L)
+            val boardId = 1L
+            val response = LikeBoardResponse(id = 1L, memberId = "member123", boardId = boardId)
 
-            `when`(likeService.likeBoard(any(), any())).thenReturn(response)
+            `when`(likeService.likeBoard(eq(boardId), any())).thenReturn(response)
 
             val documentFilter = document("like/board-create", 200)
                 .request(request().applyConfig(apiConfig))
@@ -141,18 +137,17 @@ class LikeDocumentTest : BaseDocumentTest() {
             given(documentFilter)
                 .headers(AUTH_HEADER)
                 .contentType(ContentType.JSON)
-                .body(objectMapper.writeValueAsString(request))
                 .`when`()
-                .post("/api/v1/board/like")
+                .post("/api/v1/likes/boards/{boardId}", boardId)
                 .then()
                 .statusCode(200)
         }
 
         @Test
         fun `이미 즐겨찾기한 경우`() {
-            val request = LikeBoardRequest(boardId = 1L)
+            val boardId = 1L
 
-            `when`(likeService.likeBoard(any(), any()))
+            `when`(likeService.likeBoard(eq(boardId), any()))
                 .thenThrow(LikeException(LikeErrorCode.LIKE_BOARD_ALREADY_LIKED))
 
             val documentFilter = document("like/board-create", "LIKE_BOARD_ALREADY_LIKED")
@@ -163,9 +158,8 @@ class LikeDocumentTest : BaseDocumentTest() {
             given(documentFilter)
                 .headers(AUTH_HEADER)
                 .contentType(ContentType.JSON)
-                .body(objectMapper.writeValueAsString(request))
                 .`when`()
-                .post("/api/v1/board/like")
+                .post("/api/v1/likes/boards/{boardId}", boardId)
                 .then()
                 .statusCode(400)
         }
@@ -205,7 +199,7 @@ class LikeDocumentTest : BaseDocumentTest() {
                 .headers(AUTH_HEADER)
                 .contentType(ContentType.JSON)
                 .`when`()
-                .delete("/api/v1/board/unlike/{boardId}", boardId)
+                .delete("/api/v1/likes/boards/{boardId}", boardId)
                 .then()
                 .statusCode(200)
         }
@@ -226,7 +220,7 @@ class LikeDocumentTest : BaseDocumentTest() {
                 .headers(AUTH_HEADER)
                 .contentType(ContentType.JSON)
                 .`when`()
-                .delete("/api/v1/board/unlike/{boardId}", boardId)
+                .delete("/api/v1/likes/boards/{boardId}", boardId)
                 .then()
                 .statusCode(404)
         }
@@ -240,17 +234,17 @@ class LikeDocumentTest : BaseDocumentTest() {
             tag = Tag.LIKE_API,
             summary = "피드 좋아요",
             description = "피드에 좋아요를 누릅니다.",
-            requestBodyFields = listOf(
-                fieldWithPath("feedId").type(JsonFieldType.NUMBER).description("좋아요할 피드 ID")
+            pathParameters = listOf(
+                parameterWithName("feedId").description("좋아요할 피드 ID")
             )
         )
 
         @Test
         fun `성공`() {
-            val request = LikeFeedRequest(feedId = 10L)
-            val response = LikeFeedResponse(id = 1L, memberId = "member123", feedId = 10L)
+            val feedId = 10L
+            val response = LikeFeedResponse(id = 1L, memberId = "member123", feedId = feedId)
 
-            `when`(likeService.likeFeed(any(), any())).thenReturn(response)
+            `when`(likeService.likeFeed(any(), eq(feedId))).thenReturn(response)
 
             val documentFilter = document("like/feed-create", 200)
                 .request(request().applyConfig(apiConfig))
@@ -269,18 +263,17 @@ class LikeDocumentTest : BaseDocumentTest() {
             given(documentFilter)
                 .headers(AUTH_HEADER)
                 .contentType(ContentType.JSON)
-                .body(objectMapper.writeValueAsString(request))
                 .`when`()
-                .post("/api/v1/feed/like")
+                .post("/api/v1/likes/feeds/{feedId}", feedId)
                 .then()
                 .statusCode(200)
         }
 
         @Test
         fun `이미 좋아요한 경우`() {
-            val request = LikeFeedRequest(feedId = 10L)
+            val feedId = 10L
 
-            `when`(likeService.likeFeed(any(), any()))
+            `when`(likeService.likeFeed(any(), eq(feedId)))
                 .thenThrow(LikeException(LikeErrorCode.LIKE_FEED_ALREADY_LIKED))
 
             val documentFilter = document("like/feed-create", "LIKE_FEED_ALREADY_LIKED")
@@ -291,9 +284,8 @@ class LikeDocumentTest : BaseDocumentTest() {
             given(documentFilter)
                 .headers(AUTH_HEADER)
                 .contentType(ContentType.JSON)
-                .body(objectMapper.writeValueAsString(request))
                 .`when`()
-                .post("/api/v1/feed/like")
+                .post("/api/v1/likes/feeds/{feedId}", feedId)
                 .then()
                 .statusCode(400)
         }
@@ -333,7 +325,7 @@ class LikeDocumentTest : BaseDocumentTest() {
                 .headers(AUTH_HEADER)
                 .contentType(ContentType.JSON)
                 .`when`()
-                .delete("/api/v1/feed/unlike/{feedId}", feedId)
+                .delete("/api/v1/likes/feeds/{feedId}", feedId)
                 .then()
                 .statusCode(200)
         }
@@ -354,7 +346,7 @@ class LikeDocumentTest : BaseDocumentTest() {
                 .headers(AUTH_HEADER)
                 .contentType(ContentType.JSON)
                 .`when`()
-                .delete("/api/v1/feed/unlike/{feedId}", feedId)
+                .delete("/api/v1/likes/feeds/{feedId}", feedId)
                 .then()
                 .statusCode(404)
         }
@@ -368,17 +360,17 @@ class LikeDocumentTest : BaseDocumentTest() {
             tag = Tag.LIKE_API,
             summary = "댓글 좋아요",
             description = "댓글에 좋아요를 누릅니다.",
-            requestBodyFields = listOf(
-                fieldWithPath("feedCommentId").type(JsonFieldType.NUMBER).description("좋아요할 댓글 ID")
+            pathParameters = listOf(
+                parameterWithName("feedCommentId").description("좋아요할 댓글 ID")
             )
         )
 
         @Test
         fun `성공`() {
-            val request = LikeFeedCommentRequest(feedCommentId = 20L)
-            val response = LikeFeedCommentResponse(id = 1L, memberId = "member123", feedCommentId = 20L)
+            val feedCommentId = 20L
+            val response = LikeFeedCommentResponse(id = 1L, memberId = "member123", feedCommentId = feedCommentId)
 
-            `when`(likeService.likeFeedComment(any(), any())).thenReturn(response)
+            `when`(likeService.likeFeedComment(any(), eq(feedCommentId))).thenReturn(response)
 
             val documentFilter = document("like/comment-create", 200)
                 .request(request().applyConfig(apiConfig))
@@ -397,18 +389,17 @@ class LikeDocumentTest : BaseDocumentTest() {
             given(documentFilter)
                 .headers(AUTH_HEADER)
                 .contentType(ContentType.JSON)
-                .body(objectMapper.writeValueAsString(request))
                 .`when`()
-                .post("/api/v1/comment/like")
+                .post("/api/v1/likes/feed-comments/{feedCommentId}", feedCommentId)
                 .then()
                 .statusCode(200)
         }
 
         @Test
         fun `이미 좋아요한 경우`() {
-            val request = LikeFeedCommentRequest(feedCommentId = 20L)
+            val feedCommentId = 20L
 
-            `when`(likeService.likeFeedComment(any(), any()))
+            `when`(likeService.likeFeedComment(any(), eq(feedCommentId)))
                 .thenThrow(LikeException(LikeErrorCode.LIKE_FEED_COMMENT_ALREADY_LIKED))
 
             val documentFilter = document("like/comment-create", "LIKE_FEED_COMMENT_ALREADY_LIKED")
@@ -419,9 +410,8 @@ class LikeDocumentTest : BaseDocumentTest() {
             given(documentFilter)
                 .headers(AUTH_HEADER)
                 .contentType(ContentType.JSON)
-                .body(objectMapper.writeValueAsString(request))
                 .`when`()
-                .post("/api/v1/comment/like")
+                .post("/api/v1/likes/feed-comments/{feedCommentId}", feedCommentId)
                 .then()
                 .statusCode(400)
         }
@@ -461,7 +451,7 @@ class LikeDocumentTest : BaseDocumentTest() {
                 .headers(AUTH_HEADER)
                 .contentType(ContentType.JSON)
                 .`when`()
-                .delete("/api/v1/comment/unlike/{feedCommentId}", feedCommentId)
+                .delete("/api/v1/likes/feed-comments/{feedCommentId}", feedCommentId)
                 .then()
                 .statusCode(200)
         }
@@ -482,7 +472,7 @@ class LikeDocumentTest : BaseDocumentTest() {
                 .headers(AUTH_HEADER)
                 .contentType(ContentType.JSON)
                 .`when`()
-                .delete("/api/v1/comment/unlike/{feedCommentId}", feedCommentId)
+                .delete("/api/v1/likes/feed-comments/{feedCommentId}", feedCommentId)
                 .then()
                 .statusCode(404)
         }
@@ -496,17 +486,17 @@ class LikeDocumentTest : BaseDocumentTest() {
             tag = Tag.LIKE_API,
             summary = "하루 덕담 댓글 좋아요",
             description = "하루 덕담 댓글에 좋아요를 누릅니다.",
-            requestBodyFields = listOf(
-                fieldWithPath("dailyMessageCommentId").type(JsonFieldType.NUMBER).description("좋아요할 하루 덕담 댓글 ID")
+            pathParameters = listOf(
+                parameterWithName("id").description("좋아요할 하루 덕담 댓글 ID")
             )
         )
 
         @Test
         fun `성공`() {
-            val request = LikeDailyMessageCommentRequest(dailyMessageCommentId = 30L)
-            val response = LikeDailyMessageCommentResponse(id = 1L, memberId = "member123", dailyMessageCommentId = 30L)
+            val dailyMessageCommentId = 30L
+            val response = LikeDailyMessageCommentResponse(id = 1L, memberId = "member123", dailyMessageCommentId = dailyMessageCommentId)
 
-            `when`(likeService.likeDailyMessageComment(any(), any())).thenReturn(response)
+            `when`(likeService.likeDailyMessageComment(any(), eq(dailyMessageCommentId))).thenReturn(response)
 
             val documentFilter = document("like/daily-message-comment-create", 200)
                 .request(request().applyConfig(apiConfig))
@@ -526,18 +516,17 @@ class LikeDocumentTest : BaseDocumentTest() {
             given(documentFilter)
                 .headers(AUTH_HEADER)
                 .contentType(ContentType.JSON)
-                .body(objectMapper.writeValueAsString(request))
                 .`when`()
-                .post("/api/v1/daily-message-comment/like")
+                .post("/api/v1/likes/daily-message-comments/{id}", dailyMessageCommentId)
                 .then()
                 .statusCode(200)
         }
 
         @Test
         fun `이미 좋아요한 경우`() {
-            val request = LikeDailyMessageCommentRequest(dailyMessageCommentId = 30L)
+            val dailyMessageCommentId = 30L
 
-            `when`(likeService.likeDailyMessageComment(any(), any()))
+            `when`(likeService.likeDailyMessageComment(any(), eq(dailyMessageCommentId)))
                 .thenThrow(LikeException(LikeErrorCode.LIKE_DAILY_MESSAGE_COMMENT_ALREADY_LIKED))
 
             val documentFilter =
@@ -549,9 +538,8 @@ class LikeDocumentTest : BaseDocumentTest() {
             given(documentFilter)
                 .headers(AUTH_HEADER)
                 .contentType(ContentType.JSON)
-                .body(objectMapper.writeValueAsString(request))
                 .`when`()
-                .post("/api/v1/daily-message-comment/like")
+                .post("/api/v1/likes/daily-message-comments/{id}", dailyMessageCommentId)
                 .then()
                 .statusCode(400)
         }
@@ -566,7 +554,7 @@ class LikeDocumentTest : BaseDocumentTest() {
             summary = "하루 덕담 댓글 좋아요 취소",
             description = "하루 덕담 댓글 좋아요를 취소합니다.",
             pathParameters = listOf(
-                parameterWithName("dailyMessageCommentId").description("좋아요 취소할 하루 덕담 댓글 ID")
+                parameterWithName("id").description("좋아요 취소할 하루 덕담 댓글 ID")
             )
         )
 
@@ -591,7 +579,7 @@ class LikeDocumentTest : BaseDocumentTest() {
                 .headers(AUTH_HEADER)
                 .contentType(ContentType.JSON)
                 .`when`()
-                .delete("/api/v1/daily-message-comment/unlike/{dailyMessageCommentId}", dailyMessageCommentId)
+                .delete("/api/v1/likes/daily-message-comments/{id}", dailyMessageCommentId)
                 .then()
                 .statusCode(200)
         }
@@ -612,7 +600,7 @@ class LikeDocumentTest : BaseDocumentTest() {
                 .headers(AUTH_HEADER)
                 .contentType(ContentType.JSON)
                 .`when`()
-                .delete("/api/v1/daily-message-comment/unlike/{dailyMessageCommentId}", dailyMessageCommentId)
+                .delete("/api/v1/likes/daily-message-comments/{id}", dailyMessageCommentId)
                 .then()
                 .statusCode(404)
         }
