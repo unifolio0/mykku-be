@@ -4,6 +4,7 @@ import com.example.mykku.role.domain.Role
 import com.example.mykku.role.exception.RoleErrorCode
 import com.example.mykku.role.exception.RoleException
 import com.example.mykku.role.repository.RoleRepository
+import java.util.Optional
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -12,7 +13,6 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
-import java.util.*
 
 @ExtendWith(MockitoExtension::class)
 class RoleReaderTest {

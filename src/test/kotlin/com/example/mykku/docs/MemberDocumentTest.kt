@@ -111,8 +111,6 @@ class MemberDocumentTest : BaseDocumentTest() {
                 role = "일반 덕후",
                 provider = "GOOGLE",
                 emailVerified = true,
-                followerCount = 10,
-                followingCount = 5,
                 createdAt = LocalDateTime.now()
             )
 
@@ -131,8 +129,6 @@ class MemberDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.role").type(JsonFieldType.STRING).description("역할/칭호").optional(),
                             fieldWithPath("data.provider").type(JsonFieldType.STRING).description("가입 경로 (GOOGLE, KAKAO, EMAIL 등)").optional(),
                             fieldWithPath("data.emailVerified").type(JsonFieldType.BOOLEAN).description("이메일 인증 여부"),
-                            fieldWithPath("data.followerCount").type(JsonFieldType.NUMBER).description("팔로워 수"),
-                            fieldWithPath("data.followingCount").type(JsonFieldType.NUMBER).description("팔로잉 수"),
                             fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("가입일시")
                         )
                 )
@@ -177,8 +173,6 @@ class MemberDocumentTest : BaseDocumentTest() {
                 role = "일반 덕후",
                 provider = "GOOGLE",
                 emailVerified = true,
-                followerCount = 10,
-                followingCount = 5,
                 createdAt = LocalDateTime.now()
             )
 
@@ -197,8 +191,6 @@ class MemberDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.role").type(JsonFieldType.STRING).description("역할/칭호").optional(),
                             fieldWithPath("data.provider").type(JsonFieldType.STRING).description("가입 경로").optional(),
                             fieldWithPath("data.emailVerified").type(JsonFieldType.BOOLEAN).description("이메일 인증 여부"),
-                            fieldWithPath("data.followerCount").type(JsonFieldType.NUMBER).description("팔로워 수"),
-                            fieldWithPath("data.followingCount").type(JsonFieldType.NUMBER).description("팔로잉 수"),
                             fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("가입일시")
                         )
                 )

@@ -3,22 +3,36 @@ package com.example.mykku.feed
 import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.common.util.PageableValidator
+import com.example.mykku.feed.dto.CreateFeedRequest
+import com.example.mykku.feed.dto.CreateFeedRequestDto
+import com.example.mykku.feed.dto.CreateFeedResponse
+import com.example.mykku.feed.dto.FeedCommentsResponse
+import com.example.mykku.feed.dto.FeedDetailResponse
+import com.example.mykku.feed.dto.UpdateFeedRequest
+import com.example.mykku.feed.dto.UpdateFeedRequestDto
 import com.example.mykku.feed.exception.FeedException
-import com.example.mykku.feed.dto.*
 import com.example.mykku.member.domain.Member
 import jakarta.validation.Valid
 import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RequestPart
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/feeds")
 class FeedController(
     private val feedService: FeedService,
     private val feedCommentService: FeedCommentService
 ) {
-    @PostMapping("/feeds", consumes = ["multipart/form-data"])
+    @PostMapping(consumes = ["multipart/form-data"])
     fun createFeed(
         @RequestPart("request") @Valid requestDto: CreateFeedRequestDto,
         @RequestPart("images", required = false) images: List<MultipartFile>?,
@@ -57,49 +71,7 @@ class FeedController(
         }
     }
 
-    @GetMapping("/{memberId}/feeds")
-    fun getFeeds(
-        @PathVariable memberId: String,
-        @RequestParam(defaultValue = "0") page: Int,
-        @RequestParam(defaultValue = "20") size: Int,
-        @RequestParam(defaultValue = "10") minCommonFollowers: Long
-    ): ResponseEntity<ApiResponse<PagedFeedsResponse>> {
-        val pageable = PageableValidator.validateAndCreate(page, size)
-        val feeds = feedService.getFeedsByMemberWithRecommendations(
-            memberId = memberId,
-            pageable = pageable,
-            minCommonFollowers = minCommonFollowers
-        )
-        return ResponseEntity.ok(
-            ApiResponse(
-                message = "피드 목록 불러오기에 성공했습니다.",
-                data = feeds
-            )
-        )
-    }
-
-    @GetMapping("/boards/{boardId}/feeds")
-    fun getFeedsByBoard(
-        @PathVariable boardId: Long,
-        @RequestParam(defaultValue = "0") page: Int,
-        @RequestParam(defaultValue = "20") size: Int,
-        @CurrentMember(required = false) member: Member?
-    ): ResponseEntity<ApiResponse<PagedFeedsResponse>> {
-        val pageable = PageableValidator.validateAndCreate(page, size)
-        val feeds = feedService.getFeedsByBoard(
-            boardId = boardId,
-            memberId = member?.id,
-            pageable = pageable
-        )
-        return ResponseEntity.ok(
-            ApiResponse(
-                message = "보드별 피드 목록을 성공적으로 조회했습니다.",
-                data = feeds
-            )
-        )
-    }
-
-    @GetMapping("/feeds/{feedId}")
+    @GetMapping("/{feedId}")
     fun getFeedDetail(
         @PathVariable feedId: Long,
         @CurrentMember(required = false) member: Member?
@@ -113,7 +85,7 @@ class FeedController(
         )
     }
 
-    @GetMapping("/feeds/{feedId}/comments")
+    @GetMapping("/{feedId}/comments")
     fun getComments(
         @PathVariable feedId: Long,
         @RequestParam(defaultValue = "0") page: Int,
@@ -135,7 +107,7 @@ class FeedController(
         )
     }
 
-    @DeleteMapping("/feeds/{feedId}")
+    @DeleteMapping("/{feedId}")
     fun deleteFeed(
         @PathVariable feedId: Long,
         @CurrentMember member: Member
@@ -149,7 +121,7 @@ class FeedController(
         )
     }
 
-    @PatchMapping("/feeds/{feedId}", consumes = ["multipart/form-data"])
+    @PatchMapping("/{feedId}", consumes = ["multipart/form-data"])
     fun updateFeed(
         @PathVariable feedId: Long,
         @RequestPart("request") @Valid requestDto: UpdateFeedRequestDto,

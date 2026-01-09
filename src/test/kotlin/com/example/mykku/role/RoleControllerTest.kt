@@ -6,7 +6,9 @@ import com.example.mykku.role.domain.Role
 import com.example.mykku.role.repository.MemberRoleRepository
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.hasSize
+import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -42,16 +44,16 @@ class RoleControllerTest : BaseControllerTest() {
         // when & then
         RestAssured
             .given()
-                .contentType(ContentType.JSON)
-                .headers(createAuthHeaders(member.id))
+            .contentType(ContentType.JSON)
+            .headers(createAuthHeaders(member.id))
             .`when`()
-                .get("/api/v1/roles/me")
+            .get("/api/v1/roles/me")
             .then()
-                .statusCode(200)
-                .body("message", equalTo("내 칭호 목록 조회 성공"))
-                .body("data", hasSize<Any>(2))
-                .body("data[0].role.name", notNullValue())
-                .body("data[0].isRepresentative", notNullValue())
+            .statusCode(200)
+            .body("message", equalTo("내 칭호 목록 조회 성공"))
+            .body("data", hasSize<Any>(2))
+            .body("data[0].role.name", notNullValue())
+            .body("data[0].isRepresentative", notNullValue())
     }
 
     @Test
@@ -69,12 +71,12 @@ class RoleControllerTest : BaseControllerTest() {
         // when & then
         RestAssured
             .given()
-                .contentType(ContentType.JSON)
-                .headers(createAuthHeaders(member.id))
+            .contentType(ContentType.JSON)
+            .headers(createAuthHeaders(member.id))
             .`when`()
-                .patch("/api/v1/roles/${memberRole2.id}/representative")
+            .patch("/api/v1/roles/${memberRole2.id}/representative")
             .then()
-                .statusCode(200)
-                .body("message", equalTo("대표 칭호 변경 성공"))
+            .statusCode(200)
+            .body("message", equalTo("대표 칭호 변경 성공"))
     }
 }

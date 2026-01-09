@@ -9,7 +9,9 @@ import com.example.mykku.preference.dto.UpdateGoodsPreferenceRequest
 import com.example.mykku.preference.dto.UpdateMoodPreferenceRequest
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.hasItems
+import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
@@ -31,9 +33,9 @@ class PreferenceControllerTest : BaseControllerTest() {
             .header("Authorization", authHeader)
             .contentType(ContentType.JSON)
             .body(request)
-        .`when`()
+            .`when`()
             .post("/api/v1/preferences/genre")
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("장르 취향이 성공적으로 저장되었습니다."))
     }
@@ -58,9 +60,9 @@ class PreferenceControllerTest : BaseControllerTest() {
         // when & then
         RestAssured.given()
             .header("Authorization", authHeader)
-        .`when`()
+            .`when`()
             .get("/api/v1/preferences/genre")
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("장르 취향을 성공적으로 조회했습니다."))
             .body("data.genreTypes", hasSize<Any>(2))
@@ -82,9 +84,9 @@ class PreferenceControllerTest : BaseControllerTest() {
             .header("Authorization", authHeader)
             .contentType(ContentType.JSON)
             .body(request)
-        .`when`()
+            .`when`()
             .post("/api/v1/preferences/goods")
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("굿즈 취향이 성공적으로 저장되었습니다."))
     }
@@ -109,9 +111,9 @@ class PreferenceControllerTest : BaseControllerTest() {
         // when & then
         RestAssured.given()
             .header("Authorization", authHeader)
-        .`when`()
+            .`when`()
             .get("/api/v1/preferences/goods")
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("굿즈 취향을 성공적으로 조회했습니다."))
             .body("data.goodsTypes", hasSize<Any>(2))
@@ -133,9 +135,9 @@ class PreferenceControllerTest : BaseControllerTest() {
             .header("Authorization", authHeader)
             .contentType(ContentType.JSON)
             .body(request)
-        .`when`()
+            .`when`()
             .post("/api/v1/preferences/mood")
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("분위기 취향이 성공적으로 저장되었습니다."))
     }
@@ -160,9 +162,9 @@ class PreferenceControllerTest : BaseControllerTest() {
         // when & then
         RestAssured.given()
             .header("Authorization", authHeader)
-        .`when`()
+            .`when`()
             .get("/api/v1/preferences/mood")
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("분위기 취향을 성공적으로 조회했습니다."))
             .body("data.moodTypes", hasSize<Any>(2))
@@ -181,9 +183,9 @@ class PreferenceControllerTest : BaseControllerTest() {
         RestAssured.given()
             .contentType(ContentType.JSON)
             .body(request)
-        .`when`()
+            .`when`()
             .post("/api/v1/preferences/genre")
-        .then()
+            .then()
             .statusCode(401)
     }
 }

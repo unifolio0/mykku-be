@@ -150,7 +150,7 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
             given(documentFilter)
                 .contentType(ContentType.JSON)
                 .`when`()
-                .get("/api/v1/daily-message/{id}", dailyMessageId)
+                .get("/api/v1/daily-messages/{id}", dailyMessageId)
                 .then()
                 .statusCode(200)
         }
@@ -170,7 +170,7 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
             given(documentFilter)
                 .contentType(ContentType.JSON)
                 .`when`()
-                .get("/api/v1/daily-message/{id}", dailyMessageId)
+                .get("/api/v1/daily-messages/{id}", dailyMessageId)
                 .then()
                 .statusCode(404)
         }

@@ -1,14 +1,24 @@
 package com.example.mykku.preference
 
 import com.example.mykku.BaseServiceTest
-import com.example.mykku.preference.domain.*
-import com.example.mykku.preference.tool.*
+import com.example.mykku.preference.domain.GenreType
+import com.example.mykku.preference.domain.GoodsType
+import com.example.mykku.preference.domain.MemberGenrePreference
+import com.example.mykku.preference.domain.MemberGoodsPreference
+import com.example.mykku.preference.domain.MemberMoodPreference
+import com.example.mykku.preference.domain.MoodType
+import com.example.mykku.preference.tool.GenrePreferenceReader
+import com.example.mykku.preference.tool.GenrePreferenceWriter
+import com.example.mykku.preference.tool.GoodsPreferenceReader
+import com.example.mykku.preference.tool.GoodsPreferenceWriter
+import com.example.mykku.preference.tool.MoodPreferenceReader
+import com.example.mykku.preference.tool.MoodPreferenceWriter
+import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import kotlin.test.assertEquals
 
 class PreferenceServiceTest : BaseServiceTest() {
 

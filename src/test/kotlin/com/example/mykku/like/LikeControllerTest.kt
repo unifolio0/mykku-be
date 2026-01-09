@@ -2,13 +2,13 @@ package com.example.mykku.like
 
 import com.example.mykku.BaseControllerTest
 import com.example.mykku.board.domain.Board
-import com.example.mykku.like.dto.*
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.util.TestTokenGenerator
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
@@ -35,9 +35,9 @@ class LikeControllerTest : BaseControllerTest() {
         // when & then
         RestAssured.given()
             .header("Authorization", authHeader)
-        .`when`()
-            .get("/api/v1/boards/like")
-        .then()
+            .`when`()
+            .get("/api/v1/likes/boards")
+            .then()
             .statusCode(200)
             .body("message", equalTo("즐겨찾기한 게시판 목록을 성공적으로 조회하였습니다."))
             .body("data", notNullValue())
@@ -48,9 +48,9 @@ class LikeControllerTest : BaseControllerTest() {
     fun `getLikedBoards - 인증되지 않은 사용자는 조회할 수 없다`() {
         // when & then
         RestAssured.given()
-        .`when`()
-            .get("/api/v1/boards/like")
-        .then()
+            .`when`()
+            .get("/api/v1/likes/boards")
+            .then()
             .statusCode(401)
     }
 
@@ -76,16 +76,14 @@ class LikeControllerTest : BaseControllerTest() {
             )
         )
         val authHeader = TestTokenGenerator.getBearerToken("member1")
-        val request = LikeBoardRequest(boardId = board.id!!)
 
         // when & then
         RestAssured.given()
             .header("Authorization", authHeader)
             .contentType(ContentType.JSON)
-            .body(request)
-        .`when`()
-            .post("/api/v1/board/like")
-        .then()
+            .`when`()
+            .post("/api/v1/likes/boards/{boardId}", board.id!!)
+            .then()
             .statusCode(200)
             .body("message", equalTo("게시판 즐겨찾기가 성공적으로 처리되었습니다."))
             .body("data.memberId", equalTo("member1"))
@@ -95,16 +93,12 @@ class LikeControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("게시판 좋아요 - 인증되지 않은 사용자")
     fun `likeBoard - 인증되지 않은 사용자는 좋아요할 수 없다`() {
-        // given
-        val request = LikeBoardRequest(boardId = 1L)
-
         // when & then
         RestAssured.given()
             .contentType(ContentType.JSON)
-            .body(request)
-        .`when`()
-            .post("/api/v1/board/like")
-        .then()
+            .`when`()
+            .post("/api/v1/likes/boards/{boardId}", 1L)
+            .then()
             .statusCode(401)
     }
 }

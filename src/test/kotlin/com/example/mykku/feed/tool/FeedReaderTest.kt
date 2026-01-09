@@ -1,24 +1,22 @@
 package com.example.mykku.feed.tool
 
 import com.example.mykku.BaseToolTest
-import com.example.mykku.feed.exception.FeedException
-import com.example.mykku.feed.exception.FeedErrorCode
-import com.example.mykku.feed.domain.Feed
 import com.example.mykku.contest.repository.ContestTagRepository
+import com.example.mykku.feed.domain.Feed
+import com.example.mykku.feed.exception.FeedErrorCode
+import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.feed.repository.FeedCommentRepository
 import com.example.mykku.feed.repository.FeedImageRepository
 import com.example.mykku.feed.repository.FeedRepository
 import com.example.mykku.feed.repository.FeedTagRepository
-import com.example.mykku.member.domain.Member
-import com.example.mykku.member.domain.SocialProvider
+import java.util.Optional
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.kotlin.whenever
-import java.util.*
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class FeedReaderTest : BaseToolTest() {
 
@@ -87,36 +85,6 @@ class FeedReaderTest : BaseToolTest() {
         assertEquals(5, result.size)
         assertEquals(1L, result[0].id)
         assertEquals(5L, result[4].id)
-    }
-
-    @Test
-    fun `getFeedsByFollower는 팔로우한 멤버들의 피드 목록을 반환한다`() {
-        val member1 = createMockMember("member123", "테스트유저")
-        val member2 = createMockMember("member456", "테스트유저2")
-        val members = listOf(member1, member2)
-        
-        val feed1 = createMockFeed(1L)
-        val feed2 = createMockFeed(2L)
-        val feeds = listOf(feed1, feed2)
-
-        whenever(feedRepository.findAllByMemberIn(members)).thenReturn(feeds)
-
-        val result = feedReader.getFeedsByFollower(members)
-
-        assertEquals(2, result.size)
-        assertEquals(feed1, result[0])
-        assertEquals(feed2, result[1])
-    }
-
-    @Test
-    fun `getFeedsByFollower는 팔로우한 멤버가 없을 때 빈 목록을 반환한다`() {
-        val emptyMembers = emptyList<Member>()
-
-        whenever(feedRepository.findAllByMemberIn(emptyMembers)).thenReturn(emptyList())
-
-        val result = feedReader.getFeedsByFollower(emptyMembers)
-
-        assertTrue(result.isEmpty())
     }
 
     @Test

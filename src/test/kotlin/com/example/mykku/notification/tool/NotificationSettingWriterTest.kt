@@ -85,7 +85,7 @@ class NotificationSettingWriterTest : BaseToolTest() {
 
         val result = notificationSettingWriter.createDefaultSettings(member)
 
-        assertEquals(5, result.size)
+        assertEquals(3, result.size)
         assertTrue(result.all { it.isEnabled })
         verify(notificationSettingRepository).saveAll(any<List<NotificationSetting>>())
     }
@@ -94,7 +94,7 @@ class NotificationSettingWriterTest : BaseToolTest() {
     fun `updateSetting은 설정의 활성화 상태를 변경한다`() {
         val setting = NotificationSetting.create(
             member,
-            NotificationType.FOLLOW,
+            NotificationType.SYSTEM_NOTICE,
             true
         )
 

@@ -4,15 +4,15 @@ import com.example.mykku.BaseToolTest
 import com.example.mykku.notification.domain.NotificationSetting
 import com.example.mykku.notification.domain.NotificationType
 import com.example.mykku.notification.repository.NotificationSettingRepository
-import org.junit.jupiter.api.Test
-import org.mockito.InjectMocks
-import org.mockito.Mock
-import org.mockito.kotlin.whenever
-import java.util.*
+import java.util.Optional
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import org.junit.jupiter.api.Test
+import org.mockito.InjectMocks
+import org.mockito.Mock
+import org.mockito.kotlin.whenever
 
 class NotificationSettingReaderTest : BaseToolTest() {
 
@@ -59,10 +59,12 @@ class NotificationSettingReaderTest : BaseToolTest() {
             true
         )
 
-        whenever(notificationSettingRepository.findByMemberAndNotificationType(
-            member,
-            NotificationType.FEED_LIKE
-        )).thenReturn(Optional.of(setting))
+        whenever(
+            notificationSettingRepository.findByMemberAndNotificationType(
+                member,
+                NotificationType.FEED_LIKE
+            )
+        ).thenReturn(Optional.of(setting))
 
         val result = notificationSettingReader.getSettingByMemberAndType(
             member,
@@ -75,10 +77,12 @@ class NotificationSettingReaderTest : BaseToolTest() {
 
     @Test
     fun `getSettingByMemberAndType은 설정이 없으면 null을 반환한다`() {
-        whenever(notificationSettingRepository.findByMemberAndNotificationType(
-            member,
-            NotificationType.FEED_LIKE
-        )).thenReturn(Optional.empty())
+        whenever(
+            notificationSettingRepository.findByMemberAndNotificationType(
+                member,
+                NotificationType.FEED_LIKE
+            )
+        ).thenReturn(Optional.empty())
 
         val result = notificationSettingReader.getSettingByMemberAndType(
             member,
@@ -96,10 +100,12 @@ class NotificationSettingReaderTest : BaseToolTest() {
             true
         )
 
-        whenever(notificationSettingRepository.findByMemberAndNotificationType(
-            member,
-            NotificationType.FEED_LIKE
-        )).thenReturn(Optional.of(setting))
+        whenever(
+            notificationSettingRepository.findByMemberAndNotificationType(
+                member,
+                NotificationType.FEED_LIKE
+            )
+        ).thenReturn(Optional.of(setting))
 
         val result = notificationSettingReader.isNotificationEnabled(
             member,
@@ -117,10 +123,12 @@ class NotificationSettingReaderTest : BaseToolTest() {
             false
         )
 
-        whenever(notificationSettingRepository.findByMemberAndNotificationType(
-            member,
-            NotificationType.FEED_COMMENT
-        )).thenReturn(Optional.of(setting))
+        whenever(
+            notificationSettingRepository.findByMemberAndNotificationType(
+                member,
+                NotificationType.FEED_COMMENT
+            )
+        ).thenReturn(Optional.of(setting))
 
         val result = notificationSettingReader.isNotificationEnabled(
             member,
@@ -132,14 +140,16 @@ class NotificationSettingReaderTest : BaseToolTest() {
 
     @Test
     fun `isNotificationEnabled는 설정이 없으면 true를 반환한다`() {
-        whenever(notificationSettingRepository.findByMemberAndNotificationType(
-            member,
-            NotificationType.FOLLOW
-        )).thenReturn(Optional.empty())
+        whenever(
+            notificationSettingRepository.findByMemberAndNotificationType(
+                member,
+                NotificationType.SYSTEM_NOTICE
+            )
+        ).thenReturn(Optional.empty())
 
         val result = notificationSettingReader.isNotificationEnabled(
             member,
-            NotificationType.FOLLOW
+            NotificationType.SYSTEM_NOTICE
         )
 
         assertTrue(result)
@@ -147,10 +157,12 @@ class NotificationSettingReaderTest : BaseToolTest() {
 
     @Test
     fun `existsByMemberAndType은 설정이 존재하면 true를 반환한다`() {
-        whenever(notificationSettingRepository.existsByMemberAndNotificationType(
-            member,
-            NotificationType.FEED_LIKE
-        )).thenReturn(true)
+        whenever(
+            notificationSettingRepository.existsByMemberAndNotificationType(
+                member,
+                NotificationType.FEED_LIKE
+            )
+        ).thenReturn(true)
 
         val result = notificationSettingReader.existsByMemberAndType(
             member,
@@ -162,10 +174,12 @@ class NotificationSettingReaderTest : BaseToolTest() {
 
     @Test
     fun `existsByMemberAndType은 설정이 없으면 false를 반환한다`() {
-        whenever(notificationSettingRepository.existsByMemberAndNotificationType(
-            member,
-            NotificationType.FEED_LIKE
-        )).thenReturn(false)
+        whenever(
+            notificationSettingRepository.existsByMemberAndNotificationType(
+                member,
+                NotificationType.FEED_LIKE
+            )
+        ).thenReturn(false)
 
         val result = notificationSettingReader.existsByMemberAndType(
             member,

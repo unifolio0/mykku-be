@@ -8,7 +8,8 @@ import com.example.mykku.notification.repository.NotificationSettingRepository
 import com.example.mykku.util.TestTokenGenerator
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -43,9 +44,9 @@ class NotificationSettingControllerTest : BaseControllerTest() {
 
         RestAssured.given()
             .header("Authorization", authHeader)
-        .`when`()
+            .`when`()
             .get("/api/v1/notification-settings")
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("알림 설정을 성공적으로 조회했습니다."))
             .body("data", hasSize<Any>(2))
@@ -60,21 +61,21 @@ class NotificationSettingControllerTest : BaseControllerTest() {
 
         RestAssured.given()
             .header("Authorization", authHeader)
-        .`when`()
+            .`when`()
             .get("/api/v1/notification-settings")
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("알림 설정을 성공적으로 조회했습니다."))
-            .body("data", hasSize<Any>(5))
+            .body("data", hasSize<Any>(3))
     }
 
     @Test
     @DisplayName("알림 설정 목록 조회 - 인증되지 않은 사용자")
     fun `getSettings - 인증되지 않은 사용자는 조회할 수 없다`() {
         RestAssured.given()
-        .`when`()
+            .`when`()
             .get("/api/v1/notification-settings")
-        .then()
+            .then()
             .statusCode(401)
     }
 
@@ -102,9 +103,9 @@ class NotificationSettingControllerTest : BaseControllerTest() {
             .header("Authorization", authHeader)
             .contentType(ContentType.JSON)
             .body(request)
-        .`when`()
+            .`when`()
             .patch("/api/v1/notification-settings")
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("알림 설정이 성공적으로 변경되었습니다."))
             .body("data.notificationType", equalTo("FEED_LIKE"))
@@ -117,7 +118,7 @@ class NotificationSettingControllerTest : BaseControllerTest() {
         createAndSaveMember(id = "user1")
 
         val request = UpdateNotificationSettingRequest(
-            notificationType = NotificationType.FOLLOW,
+            notificationType = NotificationType.SYSTEM_NOTICE,
             isEnabled = false
         )
 
@@ -127,12 +128,12 @@ class NotificationSettingControllerTest : BaseControllerTest() {
             .header("Authorization", authHeader)
             .contentType(ContentType.JSON)
             .body(request)
-        .`when`()
+            .`when`()
             .patch("/api/v1/notification-settings")
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("알림 설정이 성공적으로 변경되었습니다."))
-            .body("data.notificationType", equalTo("FOLLOW"))
+            .body("data.notificationType", equalTo("SYSTEM_NOTICE"))
             .body("data.isEnabled", equalTo(false))
     }
 
@@ -147,9 +148,9 @@ class NotificationSettingControllerTest : BaseControllerTest() {
         RestAssured.given()
             .contentType(ContentType.JSON)
             .body(request)
-        .`when`()
+            .`when`()
             .patch("/api/v1/notification-settings")
-        .then()
+            .then()
             .statusCode(401)
     }
 
@@ -164,9 +165,9 @@ class NotificationSettingControllerTest : BaseControllerTest() {
             .header("Authorization", authHeader)
             .contentType(ContentType.JSON)
             .body("{}")
-        .`when`()
+            .`when`()
             .patch("/api/v1/notification-settings")
-        .then()
+            .then()
             .statusCode(400)
     }
 }

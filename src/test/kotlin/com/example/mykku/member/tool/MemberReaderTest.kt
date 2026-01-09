@@ -1,70 +1,26 @@
 package com.example.mykku.member.tool
 
 import com.example.mykku.BaseToolTest
-import com.example.mykku.member.exception.MemberException
 import com.example.mykku.member.exception.MemberErrorCode
-import com.example.mykku.member.domain.Follow
-import com.example.mykku.member.domain.Member
-import com.example.mykku.member.repository.FollowRepository
+import com.example.mykku.member.exception.MemberException
 import com.example.mykku.member.repository.MemberRepository
+import java.util.Optional
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.kotlin.whenever
-import java.util.*
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 class MemberReaderTest : BaseToolTest() {
-
-    @Mock
-    private lateinit var followRepository: FollowRepository
 
     @Mock
     private lateinit var memberRepository: MemberRepository
 
     @InjectMocks
     private lateinit var memberReader: MemberReader
-
-    @Test
-    fun `getFollowerByMemberId는 팔로워 목록을 반환한다`() {
-        val followerId = "follower123"
-        val following1 = createMockMember("following1", "팔로잉1")
-        val following2 = createMockMember("following2", "팔로잉2")
-        
-        val follow1 = Follow(
-            id = 1L,
-            follower = createMockMember(followerId, "팔로워"),
-            following = following1
-        )
-        val follow2 = Follow(
-            id = 2L,
-            follower = createMockMember(followerId, "팔로워"),
-            following = following2
-        )
-        val follows = listOf(follow1, follow2)
-
-        whenever(followRepository.findByFollowerId(followerId)).thenReturn(follows)
-
-        val result = memberReader.getFollowerByMemberId(followerId)
-
-        assertEquals(2, result.size)
-        assertEquals(following1, result[0])
-        assertEquals(following2, result[1])
-    }
-
-    @Test
-    fun `getFollowerByMemberId는 팔로워가 없을 때 빈 목록을 반환한다`() {
-        val memberId = "member123"
-
-        whenever(followRepository.findByFollowerId(memberId)).thenReturn(emptyList())
-
-        val result = memberReader.getFollowerByMemberId(memberId)
-
-        assertTrue(result.isEmpty())
-    }
 
     @Test
     fun `getMemberById는 유효한 memberId로 멤버를 반환한다`() {

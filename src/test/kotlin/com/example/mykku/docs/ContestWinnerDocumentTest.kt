@@ -1,6 +1,11 @@
 package com.example.mykku.docs
 
-import com.example.mykku.contest.dto.*
+import com.example.mykku.contest.dto.ContestWinnerDetailResponse
+import com.example.mykku.contest.dto.ContestWinnersListResponse
+import com.example.mykku.contest.dto.SetContestWinnersRequest
+import com.example.mykku.contest.dto.SetContestWinnersResponse
+import com.example.mykku.contest.dto.UpdateAcceptanceSpeechRequest
+import com.example.mykku.contest.dto.UpdateAcceptanceSpeechResponse
 import com.example.mykku.contest.exception.ContestErrorCode
 import com.example.mykku.contest.exception.ContestException
 import io.restassured.http.ContentType
@@ -40,9 +45,21 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
             val contestId = 1L
             val request = SetContestWinnersRequest(
                 winners = listOf(
-                    SetContestWinnersRequest.WinnerSelection(participationId = 1L, winnerRank = 1, description = "1등 설명"),
-                    SetContestWinnersRequest.WinnerSelection(participationId = 2L, winnerRank = 2, description = "2등 설명"),
-                    SetContestWinnersRequest.WinnerSelection(participationId = 3L, winnerRank = 3, description = "3등 설명")
+                    SetContestWinnersRequest.WinnerSelection(
+                        participationId = 1L,
+                        winnerRank = 1,
+                        description = "1등 설명"
+                    ),
+                    SetContestWinnersRequest.WinnerSelection(
+                        participationId = 2L,
+                        winnerRank = 2,
+                        description = "2등 설명"
+                    ),
+                    SetContestWinnersRequest.WinnerSelection(
+                        participationId = 3L,
+                        winnerRank = 3,
+                        description = "3등 설명"
+                    )
                 )
             )
 
@@ -50,9 +67,27 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                 contestId = contestId,
                 contestTitle = "테스트 콘테스트",
                 winners = listOf(
-                    SetContestWinnersResponse.WinnerInfo(winnerId = 1L, winnerRank = 1, feedId = 10L, feedTitle = "1등 피드", authorNickname = "user1"),
-                    SetContestWinnersResponse.WinnerInfo(winnerId = 2L, winnerRank = 2, feedId = 20L, feedTitle = "2등 피드", authorNickname = "user2"),
-                    SetContestWinnersResponse.WinnerInfo(winnerId = 3L, winnerRank = 3, feedId = 30L, feedTitle = "3등 피드", authorNickname = "user3")
+                    SetContestWinnersResponse.WinnerInfo(
+                        winnerId = 1L,
+                        winnerRank = 1,
+                        feedId = 10L,
+                        feedTitle = "1등 피드",
+                        authorNickname = "user1"
+                    ),
+                    SetContestWinnersResponse.WinnerInfo(
+                        winnerId = 2L,
+                        winnerRank = 2,
+                        feedId = 20L,
+                        feedTitle = "2등 피드",
+                        authorNickname = "user2"
+                    ),
+                    SetContestWinnersResponse.WinnerInfo(
+                        winnerId = 3L,
+                        winnerRank = 3,
+                        feedId = 30L,
+                        feedTitle = "3등 피드",
+                        authorNickname = "user3"
+                    )
                 )
             )
 
@@ -72,7 +107,8 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.winners[].winnerRank").type(JsonFieldType.NUMBER).description("순위"),
                             fieldWithPath("data.winners[].feedId").type(JsonFieldType.NUMBER).description("피드 ID"),
                             fieldWithPath("data.winners[].feedTitle").type(JsonFieldType.STRING).description("피드 제목"),
-                            fieldWithPath("data.winners[].authorNickname").type(JsonFieldType.STRING).description("작성자 닉네임")
+                            fieldWithPath("data.winners[].authorNickname").type(JsonFieldType.STRING)
+                                .description("작성자 닉네임")
                         )
                 )
                 .build()
@@ -158,16 +194,32 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                         contestId = 1L,
                         contestTitle = "첫 번째 콘테스트",
                         winners = listOf(
-                            ContestWinnersListResponse.WinnerThumbnail(winnerId = 1L, winnerRank = 1, feedImageUrl = "https://example.com/image1.jpg"),
-                            ContestWinnersListResponse.WinnerThumbnail(winnerId = 2L, winnerRank = 2, feedImageUrl = "https://example.com/image2.jpg"),
-                            ContestWinnersListResponse.WinnerThumbnail(winnerId = 3L, winnerRank = 3, feedImageUrl = null)
+                            ContestWinnersListResponse.WinnerThumbnail(
+                                winnerId = 1L,
+                                winnerRank = 1,
+                                feedImageUrl = "https://example.com/image1.jpg"
+                            ),
+                            ContestWinnersListResponse.WinnerThumbnail(
+                                winnerId = 2L,
+                                winnerRank = 2,
+                                feedImageUrl = "https://example.com/image2.jpg"
+                            ),
+                            ContestWinnersListResponse.WinnerThumbnail(
+                                winnerId = 3L,
+                                winnerRank = 3,
+                                feedImageUrl = null
+                            )
                         )
                     ),
                     ContestWinnersListResponse.ContestWinnerPreview(
                         contestId = 2L,
                         contestTitle = "두 번째 콘테스트",
                         winners = listOf(
-                            ContestWinnersListResponse.WinnerThumbnail(winnerId = 4L, winnerRank = 1, feedImageUrl = "https://example.com/image4.jpg")
+                            ContestWinnersListResponse.WinnerThumbnail(
+                                winnerId = 4L,
+                                winnerRank = 1,
+                                feedImageUrl = "https://example.com/image4.jpg"
+                            )
                         )
                     )
                 )
@@ -183,12 +235,17 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
                             fieldWithPath("data.contests[]").type(JsonFieldType.ARRAY).description("콘테스트 목록"),
-                            fieldWithPath("data.contests[].contestId").type(JsonFieldType.NUMBER).description("콘테스트 ID"),
-                            fieldWithPath("data.contests[].contestTitle").type(JsonFieldType.STRING).description("콘테스트 제목"),
+                            fieldWithPath("data.contests[].contestId").type(JsonFieldType.NUMBER)
+                                .description("콘테스트 ID"),
+                            fieldWithPath("data.contests[].contestTitle").type(JsonFieldType.STRING)
+                                .description("콘테스트 제목"),
                             fieldWithPath("data.contests[].winners[]").type(JsonFieldType.ARRAY).description("수상자 목록"),
-                            fieldWithPath("data.contests[].winners[].winnerId").type(JsonFieldType.NUMBER).description("수상자 ID"),
-                            fieldWithPath("data.contests[].winners[].winnerRank").type(JsonFieldType.NUMBER).description("순위"),
-                            fieldWithPath("data.contests[].winners[].feedImageUrl").type(JsonFieldType.STRING).description("피드 이미지 URL").optional()
+                            fieldWithPath("data.contests[].winners[].winnerId").type(JsonFieldType.NUMBER)
+                                .description("수상자 ID"),
+                            fieldWithPath("data.contests[].winners[].winnerRank").type(JsonFieldType.NUMBER)
+                                .description("순위"),
+                            fieldWithPath("data.contests[].winners[].feedImageUrl").type(JsonFieldType.STRING)
+                                .description("피드 이미지 URL").optional()
                         )
                 )
                 .build()
@@ -263,11 +320,15 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.winners[].winnerRank").type(JsonFieldType.NUMBER).description("순위"),
                             fieldWithPath("data.winners[].feedId").type(JsonFieldType.NUMBER).description("피드 ID"),
                             fieldWithPath("data.winners[].feedTitle").type(JsonFieldType.STRING).description("피드 제목"),
-                            fieldWithPath("data.winners[].feedImageUrl").type(JsonFieldType.STRING).description("피드 이미지 URL").optional(),
-                            fieldWithPath("data.winners[].authorNickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
-                            fieldWithPath("data.winners[].authorProfileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지").optional(),
+                            fieldWithPath("data.winners[].feedImageUrl").type(JsonFieldType.STRING)
+                                .description("피드 이미지 URL").optional(),
+                            fieldWithPath("data.winners[].authorNickname").type(JsonFieldType.STRING)
+                                .description("작성자 닉네임"),
+                            fieldWithPath("data.winners[].authorProfileImage").type(JsonFieldType.STRING)
+                                .description("작성자 프로필 이미지").optional(),
                             fieldWithPath("data.winners[].description").type(JsonFieldType.STRING).description("수상 설명"),
-                            fieldWithPath("data.winners[].acceptanceSpeech").type(JsonFieldType.STRING).description("수상 소감")
+                            fieldWithPath("data.winners[].acceptanceSpeech").type(JsonFieldType.STRING)
+                                .description("수상 소감")
                         )
                 )
                 .build()
@@ -321,7 +382,8 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
         fun `성공`() {
             val winnerId = 1L
             val request = UpdateAcceptanceSpeechRequest(acceptanceSpeech = "정말 감사합니다. 이 영광을 가족에게 돌립니다.")
-            val response = UpdateAcceptanceSpeechResponse(winnerId = winnerId, acceptanceSpeech = request.acceptanceSpeech)
+            val response =
+                UpdateAcceptanceSpeechResponse(winnerId = winnerId, acceptanceSpeech = request.acceptanceSpeech)
 
             `when`(contestWinnerService.updateAcceptanceSpeech(eq(winnerId), any(), any())).thenReturn(response)
 

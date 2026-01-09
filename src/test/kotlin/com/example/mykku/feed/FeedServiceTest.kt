@@ -8,7 +8,6 @@ import com.example.mykku.contest.tool.ContestParticipationWriter
 import com.example.mykku.contest.tool.ContestReader
 import com.example.mykku.contest.tool.ContestWinnerWriter
 import com.example.mykku.feed.domain.Feed
-import com.example.mykku.feed.domain.FeedComment
 import com.example.mykku.feed.domain.FeedImage
 import com.example.mykku.feed.domain.FeedTag
 import com.example.mykku.feed.dto.AuthorResponse
@@ -29,9 +28,6 @@ import com.example.mykku.like.tool.LikeFeedCommentWriter
 import com.example.mykku.like.tool.LikeFeedReader
 import com.example.mykku.like.tool.LikeFeedWriter
 import com.example.mykku.member.domain.Member
-import com.example.mykku.member.domain.SocialProvider
-import com.example.mykku.member.tool.MemberReader
-import com.example.mykku.role.domain.Role
 import com.example.mykku.scrap.tool.SaveFeedReader
 import com.example.mykku.scrap.tool.SaveFeedWriter
 import kotlin.test.assertEquals
@@ -42,8 +38,6 @@ import org.junit.jupiter.api.assertThrows
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
-import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -65,9 +59,6 @@ class FeedServiceTest : BaseServiceTest() {
 
     @Mock
     private lateinit var boardReader: BoardReader
-
-    @Mock
-    private lateinit var memberReader: MemberReader
 
     @Mock
     private lateinit var likeFeedReader: LikeFeedReader
@@ -247,7 +238,6 @@ class FeedServiceTest : BaseServiceTest() {
             feedWriter = feedWriter,
             feedDtoConverter = feedDtoConverter,
             boardReader = boardReader,
-            memberReader = memberReader,
             likeFeedReader = likeFeedReader,
             saveFeedReader = saveFeedReader,
             imageUploadService = noOpImageUploadService,
@@ -277,149 +267,6 @@ class FeedServiceTest : BaseServiceTest() {
             feedServiceWithoutImageUpload.createFeed(request, member)
         }
         assertEquals(ImageErrorCode.IMAGE_UPLOAD_SERVICE_UNAVAILABLE, exception.errorCode)
-    }
-
-    @Test
-    fun `getFeeds - 팔로워의 피드 목록을 반환한다`() {
-        // given
-        val follower = member
-        val feed = createTestFeed(
-            id = 1L,
-            title = "피드 제목",
-            content = "피드 내용",
-            board = board,
-            member = member
-        )
-
-        val feedImage = FeedImage(
-            id = 1L,
-            url = "https://s3.amazonaws.com/image.jpg",
-            width = 1920,
-            height = 1080,
-            feed = feed
-        )
-        val feedTag = FeedTag(title = "태그1", feed = feed)
-        val feedComment = FeedComment(
-            content = "댓글",
-            feed = feed,
-            member = member,
-            parentComment = null
-        )
-
-        whenever(memberReader.getFollowerByMemberId("member1")).thenReturn(listOf(follower))
-        whenever(feedReader.getFeedsByFollower(listOf(follower))).thenReturn(listOf(feed))
-
-        // FeedDtoConverter mocking
-        val feedResponse = FeedResponse(
-            feed,
-            AuthorResponse(member),
-            true,
-            false,
-            emptySet(),
-            listOf(feedImage),
-            listOf(feedTag),
-            listOf(feedComment)
-        )
-        whenever(feedDtoConverter.convertToFeedResponse(eq("member1"), eq(feed), isNull(), isNull(), isNull()))
-            .thenReturn(feedResponse)
-
-        // when
-        val result = feedService.getFeeds("member1")
-
-        // then
-        assertEquals(1, result.feeds.size)
-        assertEquals(feed.title, result.feeds[0].title)
-        assertEquals(feed.content, result.feeds[0].content)
-        assertEquals(true, result.feeds[0].isLiked)
-        assertEquals(false, result.feeds[0].isSaved)
-        assertEquals(1, result.feeds[0].images.size)
-        assertEquals(1, result.feeds[0].tags.size)
-    }
-
-    @Test
-    fun `getFeedsByMemberWithRecommendations - 팔로우와 추천 사용자의 피드를 페이지네이션으로 반환한다`() {
-        // given
-        val memberId = "member1"
-        val followingMember = Member(
-            id = "member2",
-            nickname = "following",
-            role = Role(name = "일반 덕후", description = "테스트용 칭호"),
-            profileImage = "",
-            provider = SocialProvider.GOOGLE,
-            socialId = "456",
-            email = "following@test.com"
-        )
-        val recommendedMember = Member(
-            id = "member3",
-            nickname = "recommend",
-            role = Role(name = "일반 덕후", description = "테스트용 칭호"),
-            profileImage = "",
-            provider = SocialProvider.GOOGLE,
-            socialId = "789",
-            email = "recommended@test.com"
-        )
-
-        val feed1 = createTestFeed(
-            id = 1L,
-            title = "Following Feed",
-            content = "Content from following",
-            board = board,
-            member = followingMember
-        )
-        val feed2 = createTestFeed(
-            id = 2L,
-            title = "Recommended Feed",
-            content = "Content from recommended",
-            board = board,
-            member = recommendedMember
-        )
-
-        val pageable = PageRequest.of(0, 10)
-        val feedPage = PageImpl(listOf(feed1, feed2), pageable, 2)
-
-        whenever(memberReader.getFollowerByMemberId(memberId)).thenReturn(listOf(followingMember))
-        whenever(memberReader.getRecommendedMembersByCommonFollowers(memberId, 10L))
-            .thenReturn(listOf(recommendedMember))
-        whenever(feedReader.getFeedsByMembersWithPagination(any(), eq(pageable)))
-            .thenReturn(feedPage)
-
-        // Mock for FeedDtoConverter
-        val feedResponse1 = FeedResponse(
-            feed1,
-            AuthorResponse(followingMember),
-            true,
-            false,
-            emptySet(),
-            emptyList(),
-            emptyList(),
-            emptyList()
-        )
-        val feedResponse2 = FeedResponse(
-            feed2,
-            AuthorResponse(recommendedMember),
-            false,
-            true,
-            emptySet(),
-            emptyList(),
-            emptyList(),
-            emptyList()
-        )
-        whenever(feedDtoConverter.convertToFeedResponsesBatch(memberId, listOf(feed1, feed2)))
-            .thenReturn(listOf(feedResponse1, feedResponse2))
-
-        // when
-        val result = feedService.getFeedsByMemberWithRecommendations(memberId, pageable, 10L)
-
-        // then
-        assertEquals(2, result.feeds.size)
-        assertEquals(0, result.currentPage)
-        assertEquals(1, result.totalPages)
-        assertEquals(2, result.totalElements)
-        assertEquals(10, result.size)
-        assertFalse(result.hasNext)
-        assertFalse(result.hasPrevious)
-        assertEquals("Following Feed", result.feeds[0].title)
-        assertEquals("Recommended Feed", result.feeds[1].title)
     }
 
     @Test
@@ -616,82 +463,6 @@ class FeedServiceTest : BaseServiceTest() {
         assertFalse(result.isSaved)  // 비로그인 사용자는 저장 상태가 false
         assertEquals(1, result.images.size)
         assertEquals(1, result.tags.size)
-    }
-
-    @Test
-    fun `getFeedsByMemberWithRecommendations - 팔로우한 사람이 없어도 추천 피드를 반환한다`() {
-        // given
-        val memberId = "member1"
-        val recommendedMember = Member(
-            id = "member2",
-            nickname = "recommend",
-            role = Role(name = "일반 덕후", description = "테스트용 칭호"),
-            profileImage = "",
-            provider = SocialProvider.GOOGLE,
-            socialId = "789",
-            email = "recommended@test.com"
-        )
-
-        val feed = createTestFeed(
-            id = 1L,
-            title = "Recommended Feed Only",
-            content = "Only from recommendations",
-            board = board,
-            member = recommendedMember
-        )
-
-        val pageable = PageRequest.of(0, 10)
-        val feedPage = PageImpl(listOf(feed), pageable, 1)
-
-        whenever(memberReader.getFollowerByMemberId(memberId)).thenReturn(emptyList())
-        whenever(memberReader.getRecommendedMembersByCommonFollowers(memberId, 10L))
-            .thenReturn(listOf(recommendedMember))
-        whenever(feedReader.getFeedsByMembersWithPagination(listOf(recommendedMember), pageable))
-            .thenReturn(feedPage)
-
-        val feedResponse = FeedResponse(
-            feed,
-            AuthorResponse(recommendedMember),
-            false,
-            false,
-            emptySet(),
-            emptyList(),
-            emptyList(),
-            emptyList()
-        )
-        whenever(feedDtoConverter.convertToFeedResponsesBatch(memberId, listOf(feed)))
-            .thenReturn(listOf(feedResponse))
-
-        // when
-        val result = feedService.getFeedsByMemberWithRecommendations(memberId, pageable, 10L)
-
-        // then
-        assertEquals(1, result.feeds.size)
-        assertEquals("Recommended Feed Only", result.feeds[0].title)
-    }
-
-    @Test
-    fun `getFeedsByMemberWithRecommendations - minCommonFollowers 파라미터가 올바르게 전달된다`() {
-        // given
-        val memberId = "member1"
-        val minCommonFollowers = 5L
-        val pageable = PageRequest.of(0, 10)
-        val feedPage = PageImpl<Feed>(emptyList(), pageable, 0)
-
-        whenever(memberReader.getFollowerByMemberId(memberId)).thenReturn(emptyList())
-        whenever(memberReader.getRecommendedMembersByCommonFollowers(memberId, minCommonFollowers))
-            .thenReturn(emptyList())
-        whenever(feedReader.getFeedsByMembersWithPagination(emptyList(), pageable))
-            .thenReturn(feedPage)
-        whenever(feedDtoConverter.convertToFeedResponsesBatch(memberId, emptyList()))
-            .thenReturn(emptyList())
-
-        // when
-        val result = feedService.getFeedsByMemberWithRecommendations(memberId, pageable, minCommonFollowers)
-
-        // then
-        assertEquals(0, result.feeds.size)
-        // minCommonFollowers가 올바르게 전달되었는지는 mock verify로 확인됨
     }
 
     @Test

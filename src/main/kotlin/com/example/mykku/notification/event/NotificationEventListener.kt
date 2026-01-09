@@ -50,36 +50,4 @@ class NotificationEventListener(
             relatedResourceType = "FEED"
         )
     }
-
-    @EventListener
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    fun handleFollowedEvent(event: FollowedEvent) {
-        notificationService.createAndSendNotification(
-            type = NotificationType.FOLLOW,
-            sender = event.follower,
-            receiver = event.following,
-            content = "${event.follower.nickname}님이 회원님을 팔로우했습니다.",
-            relatedResourceId = null,
-            relatedResourceType = "MEMBER"
-        )
-    }
-
-    @EventListener
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    fun handleFeedCreatedByFollowingEvent(event: FeedCreatedByFollowingEvent) {
-        event.followers.forEach { follower ->
-            notificationService.createAndSendNotification(
-                type = NotificationType.FOLLOWING_POST,
-                sender = event.author,
-                receiver = follower,
-                content = NotificationContentUtil.buildContent(
-                    "%s님이 새 게시글을 작성했습니다: ",
-                    event.feedTitle,
-                    event.author.nickname
-                ),
-                relatedResourceId = event.feedId,
-                relatedResourceType = "FEED"
-            )
-        }
-    }
 }

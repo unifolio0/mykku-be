@@ -39,16 +39,6 @@ class NotificationSettingDocumentTest : BaseDocumentTest() {
                 ),
                 NotificationSettingResponse(
                     id = 3L,
-                    notificationType = NotificationType.FOLLOW,
-                    isEnabled = true
-                ),
-                NotificationSettingResponse(
-                    id = 4L,
-                    notificationType = NotificationType.FOLLOWING_POST,
-                    isEnabled = true
-                ),
-                NotificationSettingResponse(
-                    id = 5L,
                     notificationType = NotificationType.SYSTEM_NOTICE,
                     isEnabled = true
                 )
@@ -65,7 +55,7 @@ class NotificationSettingDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data[]").type(JsonFieldType.ARRAY).description("알림 설정 목록"),
                             fieldWithPath("data[].id").type(JsonFieldType.NUMBER).description("설정 ID"),
                             fieldWithPath("data[].notificationType").type(JsonFieldType.STRING)
-                                .description("알림 타입 (FEED_LIKE, FEED_COMMENT, FOLLOW, FOLLOWING_POST, SYSTEM_NOTICE)"),
+                                .description("알림 타입 (FEED_LIKE, FEED_COMMENT, SYSTEM_NOTICE)"),
                             fieldWithPath("data[].isEnabled").type(JsonFieldType.BOOLEAN).description("알림 활성화 여부")
                         )
                 )
@@ -91,7 +81,7 @@ class NotificationSettingDocumentTest : BaseDocumentTest() {
             description = "알림 설정을 변경합니다.",
             requestBodyFields = listOf(
                 fieldWithPath("notificationType").type(JsonFieldType.STRING)
-                    .description("변경할 알림 타입 (FEED_LIKE, FEED_COMMENT, FOLLOW, FOLLOWING_POST, SYSTEM_NOTICE)"),
+                    .description("변경할 알림 타입 (FEED_LIKE, FEED_COMMENT, SYSTEM_NOTICE)"),
                 fieldWithPath("isEnabled").type(JsonFieldType.BOOLEAN).description("활성화 여부")
             )
         )

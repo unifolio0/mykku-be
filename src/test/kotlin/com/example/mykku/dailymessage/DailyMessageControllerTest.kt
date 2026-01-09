@@ -4,11 +4,12 @@ import com.example.mykku.BaseControllerTest
 import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.repository.DailyMessageRepository
 import io.restassured.RestAssured
-import org.hamcrest.Matchers.*
+import java.time.LocalDate
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.time.LocalDate
 
 @DisplayName("DailyMessageController 통합 테스트")
 class DailyMessageControllerTest : BaseControllerTest() {
@@ -34,9 +35,9 @@ class DailyMessageControllerTest : BaseControllerTest() {
             .queryParam("date", date.toString())
             .queryParam("limit", 10)
             .queryParam("sort", "DESC")
-        .`when`()
+            .`when`()
             .get("/api/v1/daily-messages")
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("하루 덕담 리스트 불러오기에 성공했습니다."))
             .body("data", notNullValue())
@@ -56,9 +57,9 @@ class DailyMessageControllerTest : BaseControllerTest() {
 
         // when & then
         RestAssured.given()
-        .`when`()
-            .get("/api/v1/daily-message/{id}", dailyMessage.id)
-        .then()
+            .`when`()
+            .get("/api/v1/daily-messages/{id}", dailyMessage.id)
+            .then()
             .statusCode(200)
             .body("message", equalTo("하루 덕담 데이터 불러오기에 성공했습니다."))
             .body("data", notNullValue())
@@ -69,9 +70,9 @@ class DailyMessageControllerTest : BaseControllerTest() {
     fun `getDailyMessage - 존재하지 않는 ID로 조회시 실패한다`() {
         // when & then
         RestAssured.given()
-        .`when`()
-            .get("/api/v1/daily-message/{id}", 999L)
-        .then()
+            .`when`()
+            .get("/api/v1/daily-messages/{id}", 999L)
+            .then()
             .statusCode(404)
     }
 }

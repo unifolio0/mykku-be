@@ -13,7 +13,6 @@ import com.example.mykku.event.EventService
 import com.example.mykku.fannote.FanNoteService
 import com.example.mykku.feed.FeedCommentService
 import com.example.mykku.feed.FeedService
-import com.example.mykku.home.HomeService
 import com.example.mykku.like.LikeService
 import com.example.mykku.member.MemberService
 import com.example.mykku.member.domain.Member
@@ -93,9 +92,6 @@ abstract class BaseDocumentTest {
 
     @MockitoBean
     protected lateinit var likeService: LikeService
-
-    @MockitoBean
-    protected lateinit var homeService: HomeService
 
     @MockitoBean
     protected lateinit var folderService: FolderService

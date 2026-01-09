@@ -6,7 +6,8 @@ import com.example.mykku.scrap.dto.UpdateFolderRequest
 import com.example.mykku.scrap.repository.FolderRepository
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -33,9 +34,9 @@ class FolderControllerTest : BaseControllerTest() {
             .header("Authorization", authHeader)
             .contentType(ContentType.JSON)
             .body(request)
-        .`when`()
+            .`when`()
             .post("/api/v1/folders")
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("폴더가 성공적으로 생성되었습니다."))
             .body("data.id", notNullValue())
@@ -56,9 +57,9 @@ class FolderControllerTest : BaseControllerTest() {
         RestAssured.given()
             .contentType(ContentType.JSON)
             .body(request)
-        .`when`()
+            .`when`()
             .post("/api/v1/folders")
-        .then()
+            .then()
             .statusCode(401)
     }
 
@@ -72,9 +73,9 @@ class FolderControllerTest : BaseControllerTest() {
         // when & then
         RestAssured.given()
             .header("Authorization", authHeader)
-        .`when`()
+            .`when`()
             .get("/api/v1/folders")
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("폴더 목록을 성공적으로 조회했습니다."))
             .body("data.folders", notNullValue())
@@ -93,9 +94,9 @@ class FolderControllerTest : BaseControllerTest() {
             .header("Authorization", authHeader)
             .contentType(ContentType.JSON)
             .body(createRequest)
-        .`when`()
+            .`when`()
             .post("/api/v1/folders")
-        .then()
+            .then()
             .statusCode(200)
             .extract()
             .path<Int>("data.id")
@@ -111,9 +112,9 @@ class FolderControllerTest : BaseControllerTest() {
             .header("Authorization", authHeader)
             .contentType(ContentType.JSON)
             .body(updateRequest)
-        .`when`()
+            .`when`()
             .put("/api/v1/folders/$folderId")
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("폴더가 성공적으로 수정되었습니다."))
             .body("data.name", equalTo(updateRequest.name))
@@ -133,9 +134,9 @@ class FolderControllerTest : BaseControllerTest() {
             .header("Authorization", authHeader)
             .contentType(ContentType.JSON)
             .body(createRequest)
-        .`when`()
+            .`when`()
             .post("/api/v1/folders")
-        .then()
+            .then()
             .statusCode(200)
             .extract()
             .path<Int>("data.id")
@@ -144,9 +145,9 @@ class FolderControllerTest : BaseControllerTest() {
         // when & then
         RestAssured.given()
             .header("Authorization", authHeader)
-        .`when`()
+            .`when`()
             .delete("/api/v1/folders/$folderId")
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("폴더가 성공적으로 삭제되었습니다."))
     }

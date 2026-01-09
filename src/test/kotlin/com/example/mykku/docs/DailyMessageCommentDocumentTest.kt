@@ -2,6 +2,8 @@ package com.example.mykku.docs
 
 import com.example.mykku.dailymessage.dto.CommentResponse
 import com.example.mykku.dailymessage.dto.CreateCommentRequest
+import com.example.mykku.dailymessage.dto.DailyMessageCommentsResponse
+import com.example.mykku.dailymessage.dto.ReplyResponse
 import com.example.mykku.dailymessage.dto.UpdateCommentRequest
 import com.example.mykku.dailymessage.exception.DailyMessageErrorCode
 import com.example.mykku.dailymessage.exception.DailyMessageException
@@ -18,6 +20,106 @@ import org.springframework.restdocs.request.RequestDocumentation.parameterWithNa
 import java.time.LocalDateTime
 
 class DailyMessageCommentDocumentTest : BaseDocumentTest() {
+
+    @Nested
+    @DisplayName("하루 덕담 댓글 목록 조회")
+    inner class GetComments {
+
+        private val apiConfig = ApiRequestConfig(
+            tag = Tag.DAILY_MESSAGE_COMMENT_API,
+            summary = "하루 덕담 댓글 목록 조회",
+            description = "하루 덕담의 댓글 목록을 페이지네이션으로 조회합니다.",
+            pathParameters = listOf(
+                parameterWithName("dailyMessageId").description("조회할 하루 덕담 ID")
+            ),
+            queryParameters = listOf(
+                parameterWithName("page").description("페이지 번호 (기본값: 0)").optional(),
+                parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
+            )
+        )
+
+        @Test
+        fun `성공`() {
+            val dailyMessageId = 1L
+            val response = DailyMessageCommentsResponse(
+                comments = listOf(
+                    CommentResponse(
+                        id = 1L,
+                        content = "좋은 덕담이네요!",
+                        likeCount = 5,
+                        memberName = "홍길동",
+                        profileImage = "https://example.com/profile1.jpg",
+                        createdAt = LocalDateTime.now(),
+                        replies = listOf(
+                            ReplyResponse(
+                                id = 2L,
+                                content = "저도 동감합니다!",
+                                likeCount = 2,
+                                memberName = "김철수",
+                                profileImage = "https://example.com/profile2.jpg",
+                                createdAt = LocalDateTime.now()
+                            )
+                        )
+                    ),
+                    CommentResponse(
+                        id = 3L,
+                        content = "오늘 하루도 힘내세요!",
+                        likeCount = 3,
+                        memberName = "이영희",
+                        profileImage = "https://example.com/profile3.jpg",
+                        createdAt = LocalDateTime.now(),
+                        replies = emptyList()
+                    )
+                ),
+                totalElements = 2,
+                totalPages = 1,
+                currentPage = 0,
+                pageSize = 20,
+                hasNext = false
+            )
+
+            `when`(dailyMessageCommentService.getComments(eq(dailyMessageId), any())).thenReturn(response)
+
+            val documentFilter = document("daily-message-comment/list", 200)
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("댓글 목록 응답 데이터"),
+                            fieldWithPath("data.comments[]").type(JsonFieldType.ARRAY).description("댓글 목록"),
+                            fieldWithPath("data.comments[].id").type(JsonFieldType.NUMBER).description("댓글 ID"),
+                            fieldWithPath("data.comments[].content").type(JsonFieldType.STRING).description("댓글 내용"),
+                            fieldWithPath("data.comments[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
+                            fieldWithPath("data.comments[].memberName").type(JsonFieldType.STRING).description("작성자 이름"),
+                            fieldWithPath("data.comments[].profileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지 URL"),
+                            fieldWithPath("data.comments[].createdAt").type(JsonFieldType.STRING).description("작성 일시"),
+                            fieldWithPath("data.comments[].replies[]").type(JsonFieldType.ARRAY).description("답글 목록"),
+                            fieldWithPath("data.comments[].replies[].id").type(JsonFieldType.NUMBER).description("답글 ID"),
+                            fieldWithPath("data.comments[].replies[].content").type(JsonFieldType.STRING).description("답글 내용"),
+                            fieldWithPath("data.comments[].replies[].likeCount").type(JsonFieldType.NUMBER).description("답글 좋아요 수"),
+                            fieldWithPath("data.comments[].replies[].memberName").type(JsonFieldType.STRING).description("답글 작성자 이름"),
+                            fieldWithPath("data.comments[].replies[].profileImage").type(JsonFieldType.STRING).description("답글 작성자 프로필 이미지 URL"),
+                            fieldWithPath("data.comments[].replies[].createdAt").type(JsonFieldType.STRING).description("답글 작성 일시"),
+                            fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 댓글 수"),
+                            fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
+                            fieldWithPath("data.currentPage").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
+                            fieldWithPath("data.pageSize").type(JsonFieldType.NUMBER).description("페이지 크기"),
+                            fieldWithPath("data.hasNext").type(JsonFieldType.BOOLEAN).description("다음 페이지 존재 여부")
+                        )
+                )
+                .build()
+
+            given(documentFilter)
+                .contentType(ContentType.JSON)
+                .param("page", "0")
+                .param("size", "20")
+                .`when`()
+                .get("/api/v1/daily-messages/{dailyMessageId}/comments", dailyMessageId)
+                .then()
+                .statusCode(200)
+        }
+    }
 
     @Nested
     @DisplayName("하루 덕담 댓글 생성")
@@ -79,7 +181,7 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                 .contentType(ContentType.JSON)
                 .body(objectMapper.writeValueAsString(request))
                 .`when`()
-                .post("/api/v1/daily-messages/{dailyMessageId}/comment", dailyMessageId)
+                .post("/api/v1/daily-messages/{dailyMessageId}/comments", dailyMessageId)
                 .then()
                 .statusCode(200)
         }
@@ -105,7 +207,7 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                 .contentType(ContentType.JSON)
                 .body(objectMapper.writeValueAsString(request))
                 .`when`()
-                .post("/api/v1/daily-messages/{dailyMessageId}/comment", dailyMessageId)
+                .post("/api/v1/daily-messages/{dailyMessageId}/comments", dailyMessageId)
                 .then()
                 .statusCode(400)
         }
@@ -170,7 +272,7 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                 .contentType(ContentType.JSON)
                 .body(objectMapper.writeValueAsString(request))
                 .`when`()
-                .post("/api/v1/daily-messages/{dailyMessageId}/comment", dailyMessageId)
+                .post("/api/v1/daily-messages/{dailyMessageId}/comments", dailyMessageId)
                 .then()
                 .statusCode(200)
         }

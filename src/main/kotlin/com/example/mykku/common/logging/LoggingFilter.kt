@@ -3,10 +3,10 @@ package com.example.mykku.common.logging
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import java.util.UUID
 import org.slf4j.MDC
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
-import java.util.*
 
 @Component
 class LoggingFilter : OncePerRequestFilter() {

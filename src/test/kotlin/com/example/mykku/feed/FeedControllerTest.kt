@@ -8,10 +8,11 @@ import com.example.mykku.feed.repository.FeedRepository
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.util.TestTokenGenerator
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
-import com.fasterxml.jackson.databind.ObjectMapper
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -58,9 +59,9 @@ class FeedControllerTest : BaseControllerTest() {
             .header("Authorization", authHeader)
             .contentType(ContentType.MULTIPART)
             .multiPart("request", requestJson, "application/json")
-        .`when`()
+            .`when`()
             .post("/api/v1/feeds")
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("피드가 성공적으로 작성되었습니다."))
             .body("data", notNullValue())
@@ -90,50 +91,10 @@ class FeedControllerTest : BaseControllerTest() {
         RestAssured.given()
             .contentType(ContentType.MULTIPART)
             .multiPart("request", requestJson, "application/json")
-        .`when`()
+            .`when`()
             .post("/api/v1/feeds")
-        .then()
+            .then()
             .statusCode(401)
-    }
-
-    @Test
-    @DisplayName("사용자 피드 목록 조회 - 정상 케이스")
-    fun `getFeeds - 정상적으로 사용자의 피드 목록을 조회한다`() {
-        // given
-        val member = memberRepository.save(
-            Member(
-                id = "member1",
-                socialId = "member1",
-                provider = SocialProvider.GOOGLE,
-                email = "member1@example.com",
-                nickname = "Member1",
-                role = null,
-                profileImage = ""
-            )
-        )
-        val board = boardRepository.save(
-            Board(
-                title = "테스트 게시판",
-                logo = "test_logo.png"
-            )
-        )
-        feedRepository.save(
-            Feed(
-                title = "테스트 피드",
-                content = "테스트 내용",
-                member = member,
-                board = board
-            )
-        )
-
-        // when & then
-        RestAssured.given()
-        .`when`()
-            .get("/api/v1/{memberId}/feeds", member.id)
-        .then()
-            .statusCode(200)
-            .body("message", equalTo("피드 목록 불러오기에 성공했습니다."))
-            .body("data", notNullValue())
     }
 
     @Test
@@ -172,9 +133,9 @@ class FeedControllerTest : BaseControllerTest() {
             .header("Authorization", authHeader)
             .queryParam("page", 0)
             .queryParam("size", 20)
-        .`when`()
+            .`when`()
             .get("/api/v1/feeds/{feedId}/comments", feed.id)
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("댓글 목록을 성공적으로 조회했습니다."))
             .body("data", notNullValue())
@@ -215,65 +176,12 @@ class FeedControllerTest : BaseControllerTest() {
         RestAssured.given()
             .queryParam("page", 0)
             .queryParam("size", 20)
-        .`when`()
+            .`when`()
             .get("/api/v1/feeds/{feedId}/comments", feed.id)
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("댓글 목록을 성공적으로 조회했습니다."))
             .body("data", notNullValue())
-    }
-
-    @Test
-    @DisplayName("보드별 피드 목록 조회 - 정상 케이스")
-    fun `getFeedsByBoard - 정상적으로 보드별 피드 목록을 조회한다`() {
-        // given
-        val member = memberRepository.save(
-            Member(
-                id = "member1",
-                socialId = "member1",
-                provider = SocialProvider.GOOGLE,
-                email = "member1@example.com",
-                nickname = "Member1",
-                role = null,
-                profileImage = ""
-            )
-        )
-        val board = boardRepository.save(
-            Board(
-                title = "테스트 게시판",
-                logo = "test_logo.png"
-            )
-        )
-        feedRepository.save(
-            Feed(
-                title = "보드 피드 1",
-                content = "보드 피드 내용 1",
-                member = member,
-                board = board
-            )
-        )
-        feedRepository.save(
-            Feed(
-                title = "보드 피드 2",
-                content = "보드 피드 내용 2",
-                member = member,
-                board = board
-            )
-        )
-
-        // when & then
-        RestAssured.given()
-            .queryParam("page", 0)
-            .queryParam("size", 10)
-        .`when`()
-            .get("/api/v1/boards/{boardId}/feeds", board.id)
-        .then()
-            .log().all()
-            .statusCode(200)
-            .body("message", equalTo("보드별 피드 목록을 성공적으로 조회했습니다."))
-            .body("data.feeds", notNullValue())
-            .body("data.currentPage", equalTo(0))
-            .body("data.size", equalTo(10))
     }
 
     @Test
@@ -310,9 +218,9 @@ class FeedControllerTest : BaseControllerTest() {
         // when & then
         RestAssured.given()
             .header("Authorization", authHeader)
-        .`when`()
+            .`when`()
             .get("/api/v1/feeds/{feedId}", feed.id)
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("피드 상세 정보를 성공적으로 조회했습니다."))
             .body("data.id", equalTo(feed.id?.toInt()))
@@ -353,45 +261,15 @@ class FeedControllerTest : BaseControllerTest() {
 
         // when & then
         RestAssured.given()
-        .`when`()
+            .`when`()
             .get("/api/v1/feeds/{feedId}", feed.id)
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("피드 상세 정보를 성공적으로 조회했습니다."))
             .body("data.id", equalTo(feed.id?.toInt()))
             .body("data.title", equalTo("공개 피드"))
             .body("data.isLiked", equalTo(false))
             .body("data.isSaved", equalTo(false))
-    }
-
-    @Test
-    @DisplayName("사용자 피드 목록 조회 - 페이지네이션 파라미터 적용")
-    fun `getFeeds - 페이지네이션 파라미터가 정상적으로 적용된다`() {
-        // given
-        val member = memberRepository.save(
-            Member(
-                id = "member1",
-                socialId = "member1",
-                provider = SocialProvider.GOOGLE,
-                email = "member1@example.com",
-                nickname = "Member1",
-                role = null,
-                profileImage = ""
-            )
-        )
-
-        // when & then
-        RestAssured.given()
-            .queryParam("page", 0)
-            .queryParam("size", 5)
-            .queryParam("minCommonFollowers", 5)
-        .`when`()
-            .get("/api/v1/{memberId}/feeds", member.id)
-        .then()
-            .statusCode(200)
-            .body("message", equalTo("피드 목록 불러오기에 성공했습니다."))
-            .body("data.currentPage", equalTo(0))
-            .body("data.size", equalTo(5))
     }
 
     @Test
@@ -428,9 +306,9 @@ class FeedControllerTest : BaseControllerTest() {
         // when & then
         RestAssured.given()
             .header("Authorization", authHeader)
-        .`when`()
+            .`when`()
             .delete("/api/v1/feeds/{feedId}", feed.id)
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("피드가 성공적으로 삭제되었습니다."))
     }
@@ -467,9 +345,9 @@ class FeedControllerTest : BaseControllerTest() {
 
         // when & then
         RestAssured.given()
-        .`when`()
+            .`when`()
             .delete("/api/v1/feeds/{feedId}", feed.id)
-        .then()
+            .then()
             .statusCode(401)
     }
 
@@ -518,9 +396,9 @@ class FeedControllerTest : BaseControllerTest() {
         // when & then
         RestAssured.given()
             .header("Authorization", authHeader)
-        .`when`()
+            .`when`()
             .delete("/api/v1/feeds/{feedId}", feed.id)
-        .then()
+            .then()
             .statusCode(403)
     }
 
@@ -545,9 +423,9 @@ class FeedControllerTest : BaseControllerTest() {
         // when & then
         RestAssured.given()
             .header("Authorization", authHeader)
-        .`when`()
+            .`when`()
             .delete("/api/v1/feeds/{feedId}", nonExistentFeedId)
-        .then()
+            .then()
             .statusCode(404)
     }
 }

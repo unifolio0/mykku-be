@@ -1,14 +1,13 @@
 package com.example.mykku.notification
 
 import com.example.mykku.BaseControllerTest
-import com.example.mykku.member.domain.Member
-import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.notification.domain.FcmToken
 import com.example.mykku.notification.repository.FcmTokenRepository
 import com.example.mykku.util.TestTokenGenerator
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -39,9 +38,9 @@ class FcmTokenControllerTest : BaseControllerTest() {
             .header("Authorization", authHeader)
             .contentType(ContentType.JSON)
             .body(request)
-        .`when`()
+            .`when`()
             .post("/api/v1/fcm-tokens")
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("FCM 토큰이 성공적으로 등록되었습니다."))
             .body("data.deviceId", equalTo("device_001"))
@@ -76,9 +75,9 @@ class FcmTokenControllerTest : BaseControllerTest() {
             .header("Authorization", authHeader)
             .contentType(ContentType.JSON)
             .body(request)
-        .`when`()
+            .`when`()
             .post("/api/v1/fcm-tokens")
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("FCM 토큰이 성공적으로 등록되었습니다."))
 
@@ -97,9 +96,9 @@ class FcmTokenControllerTest : BaseControllerTest() {
         RestAssured.given()
             .contentType(ContentType.JSON)
             .body(request)
-        .`when`()
+            .`when`()
             .post("/api/v1/fcm-tokens")
-        .then()
+            .then()
             .statusCode(401)
     }
 
@@ -117,9 +116,9 @@ class FcmTokenControllerTest : BaseControllerTest() {
             .header("Authorization", authHeader)
             .contentType(ContentType.JSON)
             .body(request)
-        .`when`()
+            .`when`()
             .post("/api/v1/fcm-tokens")
-        .then()
+            .then()
             .statusCode(400)
     }
 
@@ -147,9 +146,9 @@ class FcmTokenControllerTest : BaseControllerTest() {
 
         RestAssured.given()
             .header("Authorization", authHeader)
-        .`when`()
+            .`when`()
             .get("/api/v1/fcm-tokens")
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("FCM 토큰 목록을 성공적으로 조회했습니다."))
             .body("data", hasSize<Any>(2))
@@ -159,9 +158,9 @@ class FcmTokenControllerTest : BaseControllerTest() {
     @DisplayName("FCM 토큰 목록 조회 - 인증되지 않은 사용자")
     fun `getTokens - 인증되지 않은 사용자는 조회할 수 없다`() {
         RestAssured.given()
-        .`when`()
+            .`when`()
             .get("/api/v1/fcm-tokens")
-        .then()
+            .then()
             .statusCode(401)
     }
 
@@ -180,9 +179,9 @@ class FcmTokenControllerTest : BaseControllerTest() {
 
         RestAssured.given()
             .header("Authorization", authHeader)
-        .`when`()
+            .`when`()
             .delete("/api/v1/fcm-tokens/device_001")
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("FCM 토큰이 삭제되었습니다."))
 
@@ -193,9 +192,9 @@ class FcmTokenControllerTest : BaseControllerTest() {
     @DisplayName("FCM 토큰 삭제 - 인증되지 않은 사용자")
     fun `deleteToken - 인증되지 않은 사용자는 삭제할 수 없다`() {
         RestAssured.given()
-        .`when`()
+            .`when`()
             .delete("/api/v1/fcm-tokens/device_001")
-        .then()
+            .then()
             .statusCode(401)
     }
 }

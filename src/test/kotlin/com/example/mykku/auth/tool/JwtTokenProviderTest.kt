@@ -3,10 +3,13 @@ package com.example.mykku.auth.tool
 import com.example.mykku.auth.config.JwtProperties
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
-import org.junit.jupiter.api.Assertions.*
+import com.example.mykku.role.domain.Role
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import com.example.mykku.role.domain.Role
 
 class JwtTokenProviderTest {
 
