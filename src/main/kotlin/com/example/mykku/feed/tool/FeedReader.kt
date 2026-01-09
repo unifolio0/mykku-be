@@ -3,12 +3,12 @@ package com.example.mykku.feed.tool
 import com.example.mykku.board.domain.Board
 import com.example.mykku.contest.domain.ContestTag
 import com.example.mykku.contest.repository.ContestTagRepository
-import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedComment
 import com.example.mykku.feed.domain.FeedImage
 import com.example.mykku.feed.domain.FeedTag
 import com.example.mykku.feed.dto.FeedPreviewResponse
+import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.feed.repository.FeedCommentRepository
 import com.example.mykku.feed.repository.FeedImageRepository
 import com.example.mykku.feed.repository.FeedRepository
@@ -40,7 +40,7 @@ class FeedReader(
         return feedRepository.findById(feedId)
             .orElseThrow { FeedException.feedNotFound() }
     }
-    
+
     fun getFeedsByMembersWithPagination(members: List<Member>, pageable: Pageable): Page<Feed> {
         return if (members.isNotEmpty()) {
             feedRepository.findAllByMemberInOrderByCreatedAtDesc(members, pageable)
@@ -48,23 +48,23 @@ class FeedReader(
             Page.empty(pageable)
         }
     }
-    
+
     fun getFeedsByBoardWithPagination(board: Board, pageable: Pageable): Page<Feed> {
         return feedRepository.findAllByBoardOrderByCreatedAtDesc(board, pageable)
     }
-    
+
     fun getFeedImagesByFeed(feed: Feed): List<FeedImage> {
         return feedImageRepository.findByFeed(feed)
     }
-    
+
     fun getFeedTagsByFeed(feed: Feed): List<FeedTag> {
         return feedTagRepository.findByFeed(feed)
     }
-    
+
     fun getFeedCommentsByFeed(feed: Feed, pageable: Pageable): Page<FeedComment> {
         return feedCommentRepository.findByFeedAndParentCommentIsNull(feed, pageable)
     }
-    
+
     fun getContestTagsByTitles(titles: List<String>): List<ContestTag> {
         return contestTagRepository.findAllByTitleIn(titles)
     }
@@ -73,28 +73,16 @@ class FeedReader(
         val images = feedImageRepository.findByFeedIn(feeds)
         return images.groupBy { it.feed.id!! }
     }
-    
+
     fun getFeedTagsByFeeds(feeds: List<Feed>): Map<Long, List<FeedTag>> {
         val tags = feedTagRepository.findByFeedIn(feeds)
         return tags.groupBy { it.feed.id!! }
     }
-    
-    fun getFeedCommentsByFeeds(feeds: List<Feed>, pageable: Pageable): Map<Long, Page<FeedComment>> {
-        val result = mutableMapOf<Long, Page<FeedComment>>()
-        feeds.forEach { feed ->
-            result[feed.id!!] = feedCommentRepository.findByFeedAndParentCommentIsNull(feed, pageable)
-        }
-        return result
-    }
-    
+
     fun getContestTagsByFeedTags(feedTags: List<FeedTag>): Map<String, ContestTag> {
         val titles = feedTags.map { it.title }.distinct()
         val contestTags = contestTagRepository.findAllByTitleIn(titles)
         return contestTags.associateBy { it.title }
-    }
-
-    fun getAllCommentsByFeed(feed: Feed): List<FeedComment> {
-        return feedCommentRepository.findAllByFeed(feed)
     }
 
     fun getCommentIdsByFeed(feed: Feed): List<Long> {
