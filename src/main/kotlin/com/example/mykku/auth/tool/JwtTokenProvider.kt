@@ -7,9 +7,9 @@ import com.example.mykku.member.domain.Member
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
+import java.util.Date
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import java.util.*
 
 @Component
 class JwtTokenProvider(

@@ -8,7 +8,11 @@ import com.example.mykku.board.dto.UpdateBoardResponse
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.member.domain.Member
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class BoardController(

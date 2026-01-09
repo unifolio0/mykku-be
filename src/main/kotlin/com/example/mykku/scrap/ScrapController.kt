@@ -4,11 +4,24 @@ import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.common.util.PageableValidator
 import com.example.mykku.member.domain.Member
-import com.example.mykku.scrap.dto.*
+import com.example.mykku.scrap.dto.SaveDailyMessageResponse
+import com.example.mykku.scrap.dto.SaveEventResponse
+import com.example.mykku.scrap.dto.SaveFanNoteResponse
+import com.example.mykku.scrap.dto.SaveFeedRequest
+import com.example.mykku.scrap.dto.SaveFeedResponse
+import com.example.mykku.scrap.dto.UpdateSaveFeedFolderRequest
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/v1/scraps")

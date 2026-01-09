@@ -4,18 +4,19 @@ import com.example.mykku.auth.dto.AppleUserInfo
 import com.example.mykku.auth.exception.AuthException
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.jsonwebtoken.Jwts
-import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Component
-import org.springframework.web.client.HttpClientErrorException
-import org.springframework.web.client.RestClient
 import java.math.BigInteger
 import java.security.KeyFactory
 import java.security.PublicKey
 import java.security.interfaces.RSAPublicKey
 import java.security.spec.RSAPublicKeySpec
 import java.time.LocalDateTime
-import java.util.*
+import java.util.Base64
+import java.util.Date
 import java.util.concurrent.ConcurrentHashMap
+import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Component
+import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.client.RestClient
 
 @Component
 class AppleOauthClient(

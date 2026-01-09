@@ -1,9 +1,12 @@
 package com.example.mykku.auth
 
-import com.example.mykku.auth.dto.*
+import com.example.mykku.auth.dto.LoginResponse
+import com.example.mykku.auth.dto.MobileLoginRequest
+import com.example.mykku.auth.dto.RefreshTokenRequest
+import com.example.mykku.auth.dto.RefreshTokenResponse
+import com.example.mykku.auth.exception.AuthException
 import com.example.mykku.auth.tool.JwtTokenProvider
 import com.example.mykku.auth.tool.OAuthLoginStrategy
-import com.example.mykku.auth.exception.AuthException
 import com.example.mykku.member.tool.MemberReader
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -33,7 +36,7 @@ class AuthService(
             ?: throw AuthException.oauthUserInfoFailed()
 
         val token = request.accessToken ?: request.idToken
-            ?: throw AuthException.oauthInvalidToken()
+        ?: throw AuthException.oauthInvalidToken()
 
         return strategy.login(token)
     }

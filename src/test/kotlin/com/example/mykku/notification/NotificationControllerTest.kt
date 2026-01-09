@@ -34,10 +34,10 @@ class NotificationControllerTest : BaseControllerTest() {
         )
         notificationRepository.save(
             Notification.create(
-                type = NotificationType.FOLLOW,
+                type = NotificationType.FEED_COMMENT,
                 sender = sender,
                 receiver = receiver,
-                content = "sender1님이 회원님을 팔로우하기 시작했습니다"
+                content = "sender1님이 회원님의 피드에 댓글을 남겼습니다"
             )
         )
 

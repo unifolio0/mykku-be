@@ -3,7 +3,14 @@ package com.example.mykku.member.domain
 import com.example.mykku.common.domain.BaseEntity
 import com.example.mykku.member.exception.MemberException
 import com.example.mykku.role.domain.Role
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import jakarta.persistence.FetchType
+import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
 
 @Entity
 class Member(
@@ -35,12 +42,6 @@ class Member(
 
     @Column(name = "email_verified")
     var emailVerified: Boolean = false,
-
-    @Column(name = "follower_count")
-    var followerCount: Int = 0,
-
-    @Column(name = "following_count")
-    var followingCount: Int = 0,
 ) : BaseEntity() {
     companion object {
         const val NICKNAME_MAX_LENGTH = 10

@@ -2,9 +2,9 @@ package com.example.mykku.notification.repository
 
 import com.example.mykku.member.domain.Member
 import com.example.mykku.notification.domain.FcmToken
+import java.util.Optional
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
-import java.util.*
 
 @Repository
 interface FcmTokenRepository : JpaRepository<FcmToken, Long> {

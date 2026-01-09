@@ -12,10 +12,10 @@ import com.example.mykku.member.tool.MemberReader
 import com.example.mykku.member.tool.MemberWriter
 import com.example.mykku.role.tool.MemberRoleWriter
 import com.example.mykku.role.tool.RoleReader
+import java.util.UUID
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
 
 @Service
 class EmailAuthService(

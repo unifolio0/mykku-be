@@ -4,7 +4,12 @@ import com.example.mykku.member.domain.Member
 import com.example.mykku.preference.domain.GenreType
 import com.example.mykku.preference.domain.GoodsType
 import com.example.mykku.preference.domain.MoodType
-import com.example.mykku.preference.tool.*
+import com.example.mykku.preference.tool.GenrePreferenceReader
+import com.example.mykku.preference.tool.GenrePreferenceWriter
+import com.example.mykku.preference.tool.GoodsPreferenceReader
+import com.example.mykku.preference.tool.GoodsPreferenceWriter
+import com.example.mykku.preference.tool.MoodPreferenceReader
+import com.example.mykku.preference.tool.MoodPreferenceWriter
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

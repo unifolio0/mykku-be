@@ -8,10 +8,11 @@ import com.example.mykku.feed.repository.FeedRepository
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.util.TestTokenGenerator
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
-import com.fasterxml.jackson.databind.ObjectMapper
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -58,9 +59,9 @@ class FeedControllerTest : BaseControllerTest() {
             .header("Authorization", authHeader)
             .contentType(ContentType.MULTIPART)
             .multiPart("request", requestJson, "application/json")
-        .`when`()
+            .`when`()
             .post("/api/v1/feeds")
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("피드가 성공적으로 작성되었습니다."))
             .body("data", notNullValue())
@@ -90,9 +91,9 @@ class FeedControllerTest : BaseControllerTest() {
         RestAssured.given()
             .contentType(ContentType.MULTIPART)
             .multiPart("request", requestJson, "application/json")
-        .`when`()
+            .`when`()
             .post("/api/v1/feeds")
-        .then()
+            .then()
             .statusCode(401)
     }
 
@@ -128,9 +129,9 @@ class FeedControllerTest : BaseControllerTest() {
 
         // when & then
         RestAssured.given()
-        .`when`()
+            .`when`()
             .get("/api/v1/{memberId}/feeds", member.id)
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("피드 목록 불러오기에 성공했습니다."))
             .body("data", notNullValue())
@@ -172,9 +173,9 @@ class FeedControllerTest : BaseControllerTest() {
             .header("Authorization", authHeader)
             .queryParam("page", 0)
             .queryParam("size", 20)
-        .`when`()
+            .`when`()
             .get("/api/v1/feeds/{feedId}/comments", feed.id)
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("댓글 목록을 성공적으로 조회했습니다."))
             .body("data", notNullValue())
@@ -215,9 +216,9 @@ class FeedControllerTest : BaseControllerTest() {
         RestAssured.given()
             .queryParam("page", 0)
             .queryParam("size", 20)
-        .`when`()
+            .`when`()
             .get("/api/v1/feeds/{feedId}/comments", feed.id)
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("댓글 목록을 성공적으로 조회했습니다."))
             .body("data", notNullValue())
@@ -265,9 +266,9 @@ class FeedControllerTest : BaseControllerTest() {
         RestAssured.given()
             .queryParam("page", 0)
             .queryParam("size", 10)
-        .`when`()
+            .`when`()
             .get("/api/v1/boards/{boardId}/feeds", board.id)
-        .then()
+            .then()
             .log().all()
             .statusCode(200)
             .body("message", equalTo("보드별 피드 목록을 성공적으로 조회했습니다."))
@@ -310,9 +311,9 @@ class FeedControllerTest : BaseControllerTest() {
         // when & then
         RestAssured.given()
             .header("Authorization", authHeader)
-        .`when`()
+            .`when`()
             .get("/api/v1/feeds/{feedId}", feed.id)
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("피드 상세 정보를 성공적으로 조회했습니다."))
             .body("data.id", equalTo(feed.id?.toInt()))
@@ -353,9 +354,9 @@ class FeedControllerTest : BaseControllerTest() {
 
         // when & then
         RestAssured.given()
-        .`when`()
+            .`when`()
             .get("/api/v1/feeds/{feedId}", feed.id)
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("피드 상세 정보를 성공적으로 조회했습니다."))
             .body("data.id", equalTo(feed.id?.toInt()))
@@ -385,9 +386,9 @@ class FeedControllerTest : BaseControllerTest() {
             .queryParam("page", 0)
             .queryParam("size", 5)
             .queryParam("minCommonFollowers", 5)
-        .`when`()
+            .`when`()
             .get("/api/v1/{memberId}/feeds", member.id)
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("피드 목록 불러오기에 성공했습니다."))
             .body("data.currentPage", equalTo(0))
@@ -428,9 +429,9 @@ class FeedControllerTest : BaseControllerTest() {
         // when & then
         RestAssured.given()
             .header("Authorization", authHeader)
-        .`when`()
+            .`when`()
             .delete("/api/v1/feeds/{feedId}", feed.id)
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("피드가 성공적으로 삭제되었습니다."))
     }
@@ -467,9 +468,9 @@ class FeedControllerTest : BaseControllerTest() {
 
         // when & then
         RestAssured.given()
-        .`when`()
+            .`when`()
             .delete("/api/v1/feeds/{feedId}", feed.id)
-        .then()
+            .then()
             .statusCode(401)
     }
 
@@ -518,9 +519,9 @@ class FeedControllerTest : BaseControllerTest() {
         // when & then
         RestAssured.given()
             .header("Authorization", authHeader)
-        .`when`()
+            .`when`()
             .delete("/api/v1/feeds/{feedId}", feed.id)
-        .then()
+            .then()
             .statusCode(403)
     }
 
@@ -545,9 +546,9 @@ class FeedControllerTest : BaseControllerTest() {
         // when & then
         RestAssured.given()
             .header("Authorization", authHeader)
-        .`when`()
+            .`when`()
             .delete("/api/v1/feeds/{feedId}", nonExistentFeedId)
-        .then()
+            .then()
             .statusCode(404)
     }
 }

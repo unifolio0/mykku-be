@@ -3,10 +3,10 @@ package com.example.mykku.scrap
 import com.example.mykku.BaseServiceTest
 import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.tool.DailyMessageReader
-import com.example.mykku.fannote.domain.FanNote
-import com.example.mykku.fannote.tool.FanNoteReader
 import com.example.mykku.event.domain.Event
 import com.example.mykku.event.tool.EventReader
+import com.example.mykku.fannote.domain.FanNote
+import com.example.mykku.fannote.tool.FanNoteReader
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.tool.FeedReader
 import com.example.mykku.scrap.domain.Folder
@@ -16,7 +16,18 @@ import com.example.mykku.scrap.domain.SaveFanNote
 import com.example.mykku.scrap.domain.SaveFeed
 import com.example.mykku.scrap.dto.SaveFeedRequest
 import com.example.mykku.scrap.dto.UpdateSaveFeedFolderRequest
-import com.example.mykku.scrap.tool.*
+import com.example.mykku.scrap.tool.FolderReader
+import com.example.mykku.scrap.tool.SaveDailyMessageReader
+import com.example.mykku.scrap.tool.SaveDailyMessageWriter
+import com.example.mykku.scrap.tool.SaveEventReader
+import com.example.mykku.scrap.tool.SaveEventWriter
+import com.example.mykku.scrap.tool.SaveFanNoteReader
+import com.example.mykku.scrap.tool.SaveFanNoteWriter
+import com.example.mykku.scrap.tool.SaveFeedReader
+import com.example.mykku.scrap.tool.SaveFeedWriter
+import java.time.LocalDate
+import java.time.LocalDateTime
+import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
@@ -24,9 +35,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
-import java.time.LocalDate
-import java.time.LocalDateTime
-import kotlin.test.assertEquals
 
 class ScrapServiceTest : BaseServiceTest() {
 

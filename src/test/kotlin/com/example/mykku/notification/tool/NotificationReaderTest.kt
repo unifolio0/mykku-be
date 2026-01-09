@@ -3,9 +3,12 @@ package com.example.mykku.notification.tool
 import com.example.mykku.BaseToolTest
 import com.example.mykku.notification.domain.Notification
 import com.example.mykku.notification.domain.NotificationType
-import com.example.mykku.notification.exception.NotificationException
 import com.example.mykku.notification.exception.NotificationErrorCode
+import com.example.mykku.notification.exception.NotificationException
 import com.example.mykku.notification.repository.NotificationRepository
+import java.util.Optional
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.InjectMocks
@@ -13,9 +16,6 @@ import org.mockito.Mock
 import org.mockito.kotlin.whenever
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
-import java.util.*
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 
 class NotificationReaderTest : BaseToolTest() {
 
@@ -92,7 +92,7 @@ class NotificationReaderTest : BaseToolTest() {
     fun `getUnreadNotifications는 읽지 않은 알림만 조회한다`() {
         val pageable = PageRequest.of(0, 10)
         val unreadNotification = Notification.create(
-            type = NotificationType.FOLLOW,
+            type = NotificationType.SYSTEM_NOTICE,
             sender = sender,
             receiver = receiver,
             content = "읽지 않은 알림"
@@ -119,11 +119,13 @@ class NotificationReaderTest : BaseToolTest() {
         )
         val page = PageImpl(listOf(notification), pageable, 1)
 
-        whenever(notificationRepository.findAllByReceiverAndTypeOrderByCreatedAtDesc(
-            receiver,
-            NotificationType.FEED_LIKE,
-            pageable
-        )).thenReturn(page)
+        whenever(
+            notificationRepository.findAllByReceiverAndTypeOrderByCreatedAtDesc(
+                receiver,
+                NotificationType.FEED_LIKE,
+                pageable
+            )
+        ).thenReturn(page)
 
         val result = notificationReader.getNotificationsByType(receiver, NotificationType.FEED_LIKE, pageable)
 

@@ -11,8 +11,6 @@ data class MemberProfileResponse(
     val role: String?,
     val provider: String?,
     val emailVerified: Boolean,
-    val followerCount: Int,
-    val followingCount: Int,
     val createdAt: LocalDateTime
 ) {
     companion object {
@@ -25,8 +23,6 @@ data class MemberProfileResponse(
                 role = member.role?.name,
                 provider = member.provider?.name,
                 emailVerified = member.emailVerified,
-                followerCount = member.followerCount,
-                followingCount = member.followingCount,
                 createdAt = member.createdAt
             )
         }

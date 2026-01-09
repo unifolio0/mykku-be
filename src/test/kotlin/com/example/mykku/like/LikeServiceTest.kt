@@ -17,8 +17,17 @@ import com.example.mykku.like.dto.LikeBoardRequest
 import com.example.mykku.like.dto.LikeDailyMessageCommentRequest
 import com.example.mykku.like.dto.LikeFeedCommentRequest
 import com.example.mykku.like.dto.LikeFeedRequest
-import com.example.mykku.like.tool.*
+import com.example.mykku.like.tool.LikeBoardReader
+import com.example.mykku.like.tool.LikeBoardWriter
+import com.example.mykku.like.tool.LikeDailyMessageCommentReader
+import com.example.mykku.like.tool.LikeDailyMessageCommentWriter
+import com.example.mykku.like.tool.LikeFeedCommentReader
+import com.example.mykku.like.tool.LikeFeedCommentWriter
+import com.example.mykku.like.tool.LikeFeedReader
+import com.example.mykku.like.tool.LikeFeedWriter
 import com.example.mykku.member.tool.MemberReader
+import java.time.LocalDate
+import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
@@ -27,8 +36,6 @@ import org.mockito.kotlin.whenever
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
-import java.time.LocalDate
-import kotlin.test.assertEquals
 
 class LikeServiceTest : BaseServiceTest() {
 

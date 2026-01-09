@@ -3,18 +3,18 @@ package com.example.mykku.dailymessage.tool
 import com.example.mykku.BaseToolTest
 import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.domain.DailyMessageComment
-import com.example.mykku.dailymessage.repository.DailyMessageCommentRepository
-import com.example.mykku.dailymessage.exception.DailyMessageException
 import com.example.mykku.dailymessage.exception.DailyMessageErrorCode
+import com.example.mykku.dailymessage.exception.DailyMessageException
+import com.example.mykku.dailymessage.repository.DailyMessageCommentRepository
+import java.time.LocalDate
+import java.util.Optional
+import kotlin.test.assertEquals
+import kotlin.test.assertSame
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.kotlin.whenever
-import java.time.LocalDate
-import java.util.*
-import kotlin.test.assertEquals
-import kotlin.test.assertSame
 
 class DailyMessageCommentReaderTest : BaseToolTest() {
 
@@ -45,7 +45,7 @@ class DailyMessageCommentReaderTest : BaseToolTest() {
     @Test
     fun `getComment는 존재하지 않는 댓글 ID로 조회하면 예외를 발생시킨다`() {
         val commentId = 999L
-        
+
         whenever(dailyMessageCommentRepository.findById(commentId))
             .thenReturn(Optional.empty())
 
@@ -60,7 +60,7 @@ class DailyMessageCommentReaderTest : BaseToolTest() {
     fun `getComment는 존재하는 댓글 ID로 조회하면 댓글을 반환한다`() {
         val commentId = 1L
         val mockComment = createMockComment(commentId)
-        
+
         whenever(dailyMessageCommentRepository.findById(commentId))
             .thenReturn(Optional.of(mockComment))
 
@@ -73,7 +73,7 @@ class DailyMessageCommentReaderTest : BaseToolTest() {
     fun `getCommentByDailyMessageId는 존재하지 않는 댓글이면 예외를 발생시킨다`() {
         val commentId = 1L
         val dailyMessageId = 1L
-        
+
         whenever(dailyMessageCommentRepository.findByIdAndDailyMessageId(commentId, dailyMessageId))
             .thenReturn(null)
 
@@ -89,7 +89,7 @@ class DailyMessageCommentReaderTest : BaseToolTest() {
         val commentId = 1L
         val dailyMessageId = 1L
         val mockComment = createMockComment(commentId)
-        
+
         whenever(dailyMessageCommentRepository.findByIdAndDailyMessageId(commentId, dailyMessageId))
             .thenReturn(mockComment)
 
@@ -101,7 +101,7 @@ class DailyMessageCommentReaderTest : BaseToolTest() {
     @Test
     fun `getDailyMessageCommentById는 존재하지 않는 댓글 ID로 조회하면 예외를 발생시킨다`() {
         val commentId = 999L
-        
+
         whenever(dailyMessageCommentRepository.findById(commentId))
             .thenReturn(Optional.empty())
 
@@ -116,7 +116,7 @@ class DailyMessageCommentReaderTest : BaseToolTest() {
     fun `getDailyMessageCommentById는 존재하는 댓글 ID로 조회하면 댓글을 반환한다`() {
         val commentId = 1L
         val mockComment = createMockComment(commentId)
-        
+
         whenever(dailyMessageCommentRepository.findById(commentId))
             .thenReturn(Optional.of(mockComment))
 

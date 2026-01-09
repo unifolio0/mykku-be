@@ -9,7 +9,13 @@ import com.example.mykku.contest.tool.ContestWinnerWriter
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedImage
 import com.example.mykku.feed.domain.FeedTag
-import com.example.mykku.feed.dto.*
+import com.example.mykku.feed.dto.AuthorResponse
+import com.example.mykku.feed.dto.CreateFeedRequest
+import com.example.mykku.feed.dto.CreateFeedResponse
+import com.example.mykku.feed.dto.FeedDetailResponse
+import com.example.mykku.feed.dto.FeedImageResponse
+import com.example.mykku.feed.dto.PagedFeedsResponse
+import com.example.mykku.feed.dto.UpdateFeedRequest
 import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.feed.tool.FeedCommentWriter
 import com.example.mykku.feed.tool.FeedDtoConverter
@@ -21,7 +27,6 @@ import com.example.mykku.like.tool.LikeFeedCommentWriter
 import com.example.mykku.like.tool.LikeFeedReader
 import com.example.mykku.like.tool.LikeFeedWriter
 import com.example.mykku.member.domain.Member
-import com.example.mykku.member.tool.MemberReader
 import com.example.mykku.scrap.tool.SaveFeedReader
 import com.example.mykku.scrap.tool.SaveFeedWriter
 import org.springframework.data.domain.Page
@@ -36,7 +41,6 @@ class FeedService(
     private val feedWriter: FeedWriter,
     private val feedDtoConverter: FeedDtoConverter,
     private val boardReader: BoardReader,
-    private val memberReader: MemberReader,
     private val likeFeedReader: LikeFeedReader,
     private val saveFeedReader: SaveFeedReader,
     private val imageUploadService: ImageUploadService,
@@ -127,34 +131,6 @@ class FeedService(
                 height = it.height
             )
         }
-    }
-
-    @Transactional(readOnly = true)
-    fun getFeeds(memberId: String): FeedsResponse {
-        val follower = memberReader.getFollowerByMemberId(memberId)
-        val feeds = feedReader.getFeedsByFollower(follower)
-        return FeedsResponse(
-            feeds = feeds.map { feed -> feedDtoConverter.convertToFeedResponse(memberId, feed) }
-        )
-    }
-
-    @Transactional(readOnly = true)
-    fun getFeedsByMemberWithRecommendations(
-        memberId: String,
-        pageable: Pageable,
-        minCommonFollowers: Long = 10
-    ): PagedFeedsResponse {
-        val allMembers = collectMembers(memberId, minCommonFollowers)
-        val feedPage = feedReader.getFeedsByMembersWithPagination(allMembers, pageable)
-        return createPagedResponse(memberId, feedPage)
-    }
-
-    private fun collectMembers(memberId: String, minCommonFollowers: Long): List<Member> {
-        val followingMembers = memberReader.getFollowerByMemberId(memberId)
-        val recommendedMembers = memberReader.getRecommendedMembersByCommonFollowers(
-            memberId, minCommonFollowers
-        )
-        return (followingMembers + recommendedMembers).distinct()
     }
 
     private fun createPagedResponse(

@@ -7,7 +7,9 @@ import com.example.mykku.role.dto.UpdateRoleRequest
 import com.example.mykku.role.repository.MemberRoleRepository
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.greaterThanOrEqualTo
+import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -36,14 +38,14 @@ class AdminRoleApiControllerTest : BaseControllerTest() {
         // when & then
         RestAssured
             .given()
-                .sessionId(adminSessionId)
-                .contentType(ContentType.JSON)
+            .sessionId(adminSessionId)
+            .contentType(ContentType.JSON)
             .`when`()
-                .get("/admin/api/v1/roles")
+            .get("/admin/api/v1/roles")
             .then()
-                .statusCode(200)
-                .body("message", equalTo("칭호 목록 조회 성공"))
-                .body("data", hasSize<Any>(greaterThanOrEqualTo(2)))
+            .statusCode(200)
+            .body("message", equalTo("칭호 목록 조회 성공"))
+            .body("data", hasSize<Any>(greaterThanOrEqualTo(2)))
     }
 
     @Test
@@ -55,16 +57,16 @@ class AdminRoleApiControllerTest : BaseControllerTest() {
         // when & then
         RestAssured
             .given()
-                .sessionId(adminSessionId)
-                .contentType(ContentType.JSON)
-                .body(request)
+            .sessionId(adminSessionId)
+            .contentType(ContentType.JSON)
+            .body(request)
             .`when`()
-                .post("/admin/api/v1/roles")
+            .post("/admin/api/v1/roles")
             .then()
-                .statusCode(201)
-                .body("message", equalTo("칭호 생성 성공"))
-                .body("data.name", equalTo("새로운칭호"))
-                .body("data.description", equalTo("새로운 설명"))
+            .statusCode(201)
+            .body("message", equalTo("칭호 생성 성공"))
+            .body("data.name", equalTo("새로운칭호"))
+            .body("data.description", equalTo("새로운 설명"))
     }
 
     @Test
@@ -76,15 +78,15 @@ class AdminRoleApiControllerTest : BaseControllerTest() {
         // when & then
         RestAssured
             .given()
-                .sessionId(adminSessionId)
-                .contentType(ContentType.JSON)
-                .body(request)
+            .sessionId(adminSessionId)
+            .contentType(ContentType.JSON)
+            .body(request)
             .`when`()
-                .put("/admin/api/v1/roles/${role1.id}")
+            .put("/admin/api/v1/roles/${role1.id}")
             .then()
-                .statusCode(200)
-                .body("message", equalTo("칭호 수정 성공"))
-                .body("data.name", equalTo("수정된칭호"))
+            .statusCode(200)
+            .body("message", equalTo("칭호 수정 성공"))
+            .body("data.name", equalTo("수정된칭호"))
     }
 
     @Test
@@ -96,13 +98,13 @@ class AdminRoleApiControllerTest : BaseControllerTest() {
         // when & then
         RestAssured
             .given()
-                .sessionId(adminSessionId)
-                .contentType(ContentType.JSON)
+            .sessionId(adminSessionId)
+            .contentType(ContentType.JSON)
             .`when`()
-                .delete("/admin/api/v1/roles/${roleToDelete.id}")
+            .delete("/admin/api/v1/roles/${roleToDelete.id}")
             .then()
-                .statusCode(200)
-                .body("message", equalTo("칭호 삭제 성공"))
+            .statusCode(200)
+            .body("message", equalTo("칭호 삭제 성공"))
     }
 
     @Test
@@ -118,13 +120,13 @@ class AdminRoleApiControllerTest : BaseControllerTest() {
         // when & then
         RestAssured
             .given()
-                .sessionId(adminSessionId)
-                .contentType(ContentType.JSON)
+            .sessionId(adminSessionId)
+            .contentType(ContentType.JSON)
             .`when`()
-                .post("/admin/api/v1/roles/${role2.id}/members/${member.id}")
+            .post("/admin/api/v1/roles/${role2.id}/members/${member.id}")
             .then()
-                .statusCode(201)
-                .body("message", equalTo("칭호 부여 성공"))
-                .body("data.role.name", equalTo(role2.name))
+            .statusCode(201)
+            .body("message", equalTo("칭호 부여 성공"))
+            .body("data.role.name", equalTo(role2.name))
     }
 }

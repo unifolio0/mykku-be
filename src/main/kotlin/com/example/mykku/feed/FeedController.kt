@@ -3,13 +3,28 @@ package com.example.mykku.feed
 import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.common.util.PageableValidator
+import com.example.mykku.feed.dto.CreateFeedRequest
+import com.example.mykku.feed.dto.CreateFeedRequestDto
+import com.example.mykku.feed.dto.CreateFeedResponse
+import com.example.mykku.feed.dto.FeedCommentsResponse
+import com.example.mykku.feed.dto.FeedDetailResponse
+import com.example.mykku.feed.dto.PagedFeedsResponse
+import com.example.mykku.feed.dto.UpdateFeedRequest
+import com.example.mykku.feed.dto.UpdateFeedRequestDto
 import com.example.mykku.feed.exception.FeedException
-import com.example.mykku.feed.dto.*
 import com.example.mykku.member.domain.Member
 import jakarta.validation.Valid
 import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RequestPart
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 
 @RestController
@@ -55,27 +70,6 @@ class FeedController(
         if (imageCount > CreateFeedRequest.MAX_IMAGE_COUNT) {
             throw FeedException.feedImageLimitExceeded()
         }
-    }
-
-    @GetMapping("/{memberId}/feeds")
-    fun getFeeds(
-        @PathVariable memberId: String,
-        @RequestParam(defaultValue = "0") page: Int,
-        @RequestParam(defaultValue = "20") size: Int,
-        @RequestParam(defaultValue = "10") minCommonFollowers: Long
-    ): ResponseEntity<ApiResponse<PagedFeedsResponse>> {
-        val pageable = PageableValidator.validateAndCreate(page, size)
-        val feeds = feedService.getFeedsByMemberWithRecommendations(
-            memberId = memberId,
-            pageable = pageable,
-            minCommonFollowers = minCommonFollowers
-        )
-        return ResponseEntity.ok(
-            ApiResponse(
-                message = "피드 목록 불러오기에 성공했습니다.",
-                data = feeds
-            )
-        )
     }
 
     @GetMapping("/boards/{boardId}/feeds")

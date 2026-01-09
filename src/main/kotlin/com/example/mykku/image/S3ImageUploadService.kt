@@ -4,19 +4,19 @@ import com.example.mykku.config.S3Properties
 import com.example.mykku.image.dto.FanNoteImagesUploadResult
 import com.example.mykku.image.dto.ImageUploadResult
 import com.example.mykku.image.exception.ImageException
+import java.awt.image.BufferedImage
+import java.io.ByteArrayInputStream
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.UUID
+import javax.imageio.ImageIO
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
-import java.awt.image.BufferedImage
-import java.io.ByteArrayInputStream
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.*
-import javax.imageio.ImageIO
 
 @Service
 @ConditionalOnProperty(name = ["aws.s3.enabled"], havingValue = "true")
@@ -118,7 +118,7 @@ class S3ImageUploadService(
 
             Pair(bufferedImage.width, bufferedImage.height)
         } catch (e: ImageException) {
-            
+
             throw e
         } catch (e: Exception) {
             throw ImageException.imageSizeExtractionFailed()

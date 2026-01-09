@@ -4,7 +4,8 @@ import com.example.mykku.BaseControllerTest
 import com.example.mykku.board.dto.CreateBoardRequest
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
@@ -28,9 +29,9 @@ class BoardControllerTest : BaseControllerTest() {
             .header("Authorization", authHeader)
             .contentType(ContentType.JSON)
             .body(request)
-        .`when`()
+            .`when`()
             .post("/api/v1/board")
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("게시판이 성공적으로 생성되었습니다."))
             .body("data.id", notNullValue())
@@ -51,9 +52,9 @@ class BoardControllerTest : BaseControllerTest() {
         RestAssured.given()
             .contentType(ContentType.JSON)
             .body(request)
-        .`when`()
+            .`when`()
             .post("/api/v1/board")
-        .then()
+            .then()
             .statusCode(401)
     }
 }

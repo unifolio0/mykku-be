@@ -2,13 +2,14 @@ package com.example.mykku.like
 
 import com.example.mykku.BaseControllerTest
 import com.example.mykku.board.domain.Board
-import com.example.mykku.like.dto.*
+import com.example.mykku.like.dto.LikeBoardRequest
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.util.TestTokenGenerator
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
@@ -35,9 +36,9 @@ class LikeControllerTest : BaseControllerTest() {
         // when & then
         RestAssured.given()
             .header("Authorization", authHeader)
-        .`when`()
+            .`when`()
             .get("/api/v1/boards/like")
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("즐겨찾기한 게시판 목록을 성공적으로 조회하였습니다."))
             .body("data", notNullValue())
@@ -48,9 +49,9 @@ class LikeControllerTest : BaseControllerTest() {
     fun `getLikedBoards - 인증되지 않은 사용자는 조회할 수 없다`() {
         // when & then
         RestAssured.given()
-        .`when`()
+            .`when`()
             .get("/api/v1/boards/like")
-        .then()
+            .then()
             .statusCode(401)
     }
 
@@ -83,9 +84,9 @@ class LikeControllerTest : BaseControllerTest() {
             .header("Authorization", authHeader)
             .contentType(ContentType.JSON)
             .body(request)
-        .`when`()
+            .`when`()
             .post("/api/v1/board/like")
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("게시판 즐겨찾기가 성공적으로 처리되었습니다."))
             .body("data.memberId", equalTo("member1"))
@@ -102,9 +103,9 @@ class LikeControllerTest : BaseControllerTest() {
         RestAssured.given()
             .contentType(ContentType.JSON)
             .body(request)
-        .`when`()
+            .`when`()
             .post("/api/v1/board/like")
-        .then()
+            .then()
             .statusCode(401)
     }
 }

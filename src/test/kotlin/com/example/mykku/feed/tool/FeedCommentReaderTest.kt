@@ -1,11 +1,15 @@
 package com.example.mykku.feed.tool
 
 import com.example.mykku.BaseToolTest
-import com.example.mykku.feed.exception.FeedException
-import com.example.mykku.feed.exception.FeedErrorCode
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.domain.FeedComment
+import com.example.mykku.feed.exception.FeedErrorCode
+import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.feed.repository.FeedCommentRepository
+import java.util.Optional
+import kotlin.test.assertEquals
+import kotlin.test.assertSame
+import kotlin.test.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.InjectMocks
@@ -13,10 +17,6 @@ import org.mockito.Mock
 import org.mockito.kotlin.whenever
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
-import java.util.*
-import kotlin.test.assertEquals
-import kotlin.test.assertSame
-import kotlin.test.assertTrue
 
 class FeedCommentReaderTest : BaseToolTest() {
 

@@ -71,7 +71,7 @@ class NotificationSettingRepositoryTest : BaseRepositoryTest() {
 
         val setting = notificationSettingRepository.findByMemberAndNotificationType(
             member,
-            NotificationType.FOLLOW
+            NotificationType.SYSTEM_NOTICE
         )
 
         assertFalse(setting.isPresent)
@@ -91,7 +91,7 @@ class NotificationSettingRepositoryTest : BaseRepositoryTest() {
         )
         val notExists = notificationSettingRepository.existsByMemberAndNotificationType(
             member,
-            NotificationType.FOLLOW
+            NotificationType.SYSTEM_NOTICE
         )
 
         assertTrue(exists)
@@ -110,7 +110,7 @@ class NotificationSettingRepositoryTest : BaseRepositoryTest() {
             NotificationSetting.create(member1, NotificationType.FEED_COMMENT, false)
         )
         notificationSettingRepository.save(
-            NotificationSetting.create(member2, NotificationType.FOLLOW, true)
+            NotificationSetting.create(member2, NotificationType.SYSTEM_NOTICE, true)
         )
 
         notificationSettingRepository.deleteAllByMember(member1)

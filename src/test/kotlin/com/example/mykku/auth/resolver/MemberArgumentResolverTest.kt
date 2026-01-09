@@ -1,14 +1,19 @@
 package com.example.mykku.auth.resolver
 
 import com.example.mykku.auth.config.CurrentMember
-import com.example.mykku.auth.tool.JwtTokenProvider
-import com.example.mykku.auth.exception.AuthException
 import com.example.mykku.auth.exception.AuthErrorCode
+import com.example.mykku.auth.exception.AuthException
+import com.example.mykku.auth.tool.JwtTokenProvider
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.repository.MemberRepository
+import com.example.mykku.role.domain.Role
 import jakarta.servlet.http.HttpServletRequest
-import org.junit.jupiter.api.Assertions.*
+import java.util.Optional
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -16,8 +21,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.springframework.core.MethodParameter
 import org.springframework.web.context.request.NativeWebRequest
-import java.util.*
-import com.example.mykku.role.domain.Role
 
 class MemberArgumentResolverTest {
 
@@ -261,7 +264,7 @@ class MemberArgumentResolverTest {
         val annotation = mock<CurrentMember>()
         whenever(annotation.required).thenReturn(false)
         whenever(parameter.getParameterAnnotation(CurrentMember::class.java)).thenReturn(annotation)
-        
+
         // "bearer" 소문자로 시작
         whenever(request.getHeader("Authorization")).thenReturn("bearer valid-token")
 

@@ -3,12 +3,26 @@ package com.example.mykku.like
 import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.common.util.PageableValidator
-import com.example.mykku.like.dto.*
+import com.example.mykku.like.dto.LikeBoardInfoResponse
+import com.example.mykku.like.dto.LikeBoardRequest
+import com.example.mykku.like.dto.LikeBoardResponse
+import com.example.mykku.like.dto.LikeDailyMessageCommentRequest
+import com.example.mykku.like.dto.LikeDailyMessageCommentResponse
+import com.example.mykku.like.dto.LikeFeedCommentRequest
+import com.example.mykku.like.dto.LikeFeedCommentResponse
+import com.example.mykku.like.dto.LikeFeedRequest
+import com.example.mykku.like.dto.LikeFeedResponse
 import com.example.mykku.member.domain.Member
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class LikeController(

@@ -1,8 +1,12 @@
 package com.example.mykku.board.domain
 
-import com.example.mykku.common.domain.BaseEntity
 import com.example.mykku.board.exception.BoardException
-import jakarta.persistence.*
+import com.example.mykku.common.domain.BaseEntity
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
 
 @Entity
 class Board(

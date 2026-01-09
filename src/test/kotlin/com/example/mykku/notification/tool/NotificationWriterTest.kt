@@ -81,7 +81,7 @@ class NotificationWriterTest : BaseToolTest() {
     @Test
     fun `markAsRead는 알림을 읽음 처리한다`() {
         val notification = Notification.create(
-            type = NotificationType.FOLLOW,
+            type = NotificationType.FEED_COMMENT,
             sender = sender,
             receiver = receiver,
             content = "팔로우 알림"

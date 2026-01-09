@@ -1,6 +1,14 @@
 package com.example.mykku.docs
 
-import com.example.mykku.like.dto.*
+import com.example.mykku.like.dto.LikeBoardInfoResponse
+import com.example.mykku.like.dto.LikeBoardRequest
+import com.example.mykku.like.dto.LikeBoardResponse
+import com.example.mykku.like.dto.LikeDailyMessageCommentRequest
+import com.example.mykku.like.dto.LikeDailyMessageCommentResponse
+import com.example.mykku.like.dto.LikeFeedCommentRequest
+import com.example.mykku.like.dto.LikeFeedCommentResponse
+import com.example.mykku.like.dto.LikeFeedRequest
+import com.example.mykku.like.dto.LikeFeedResponse
 import com.example.mykku.like.exception.LikeErrorCode
 import com.example.mykku.like.exception.LikeException
 import io.restassured.http.ContentType
@@ -55,12 +63,15 @@ class LikeDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.content[].title").type(JsonFieldType.STRING).description("게시판 제목"),
                             fieldWithPath("data.content[].logo").type(JsonFieldType.STRING).description("게시판 로고 URL"),
                             fieldWithPath("data.pageable").type(JsonFieldType.OBJECT).description("페이지 정보"),
-                            fieldWithPath("data.pageable.pageNumber").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
+                            fieldWithPath("data.pageable.pageNumber").type(JsonFieldType.NUMBER)
+                                .description("현재 페이지 번호"),
                             fieldWithPath("data.pageable.pageSize").type(JsonFieldType.NUMBER).description("페이지 크기"),
                             fieldWithPath("data.pageable.sort").type(JsonFieldType.OBJECT).description("정렬 정보"),
-                            fieldWithPath("data.pageable.sort.empty").type(JsonFieldType.BOOLEAN).description("정렬 정보 비어있음"),
+                            fieldWithPath("data.pageable.sort.empty").type(JsonFieldType.BOOLEAN)
+                                .description("정렬 정보 비어있음"),
                             fieldWithPath("data.pageable.sort.sorted").type(JsonFieldType.BOOLEAN).description("정렬됨"),
-                            fieldWithPath("data.pageable.sort.unsorted").type(JsonFieldType.BOOLEAN).description("정렬되지 않음"),
+                            fieldWithPath("data.pageable.sort.unsorted").type(JsonFieldType.BOOLEAN)
+                                .description("정렬되지 않음"),
                             fieldWithPath("data.pageable.offset").type(JsonFieldType.NUMBER).description("오프셋"),
                             fieldWithPath("data.pageable.paged").type(JsonFieldType.BOOLEAN).description("페이지네이션 여부"),
                             fieldWithPath("data.pageable.unpaged").type(JsonFieldType.BOOLEAN).description("페이지네이션 아님"),
@@ -74,7 +85,8 @@ class LikeDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.sort.unsorted").type(JsonFieldType.BOOLEAN).description("정렬되지 않음"),
                             fieldWithPath("data.first").type(JsonFieldType.BOOLEAN).description("첫 페이지 여부"),
                             fieldWithPath("data.last").type(JsonFieldType.BOOLEAN).description("마지막 페이지 여부"),
-                            fieldWithPath("data.numberOfElements").type(JsonFieldType.NUMBER).description("현재 페이지 요소 수"),
+                            fieldWithPath("data.numberOfElements").type(JsonFieldType.NUMBER)
+                                .description("현재 페이지 요소 수"),
                             fieldWithPath("data.empty").type(JsonFieldType.BOOLEAN).description("빈 페이지 여부")
                         )
                 )
@@ -505,7 +517,8 @@ class LikeDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("좋아요 정보"),
                             fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("좋아요 ID"),
                             fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("회원 ID"),
-                            fieldWithPath("data.dailyMessageCommentId").type(JsonFieldType.NUMBER).description("하루 덕담 댓글 ID")
+                            fieldWithPath("data.dailyMessageCommentId").type(JsonFieldType.NUMBER)
+                                .description("하루 덕담 댓글 ID")
                         )
                 )
                 .build()
@@ -527,10 +540,11 @@ class LikeDocumentTest : BaseDocumentTest() {
             `when`(likeService.likeDailyMessageComment(any(), any()))
                 .thenThrow(LikeException(LikeErrorCode.LIKE_DAILY_MESSAGE_COMMENT_ALREADY_LIKED))
 
-            val documentFilter = document("like/daily-message-comment-create", "LIKE_DAILY_MESSAGE_COMMENT_ALREADY_LIKED")
-                .request(request().applyConfig(apiConfig))
-                .response(RestDocumentationResponse.ERROR_RESPONSE)
-                .build()
+            val documentFilter =
+                document("like/daily-message-comment-create", "LIKE_DAILY_MESSAGE_COMMENT_ALREADY_LIKED")
+                    .request(request().applyConfig(apiConfig))
+                    .response(RestDocumentationResponse.ERROR_RESPONSE)
+                    .build()
 
             given(documentFilter)
                 .headers(AUTH_HEADER)

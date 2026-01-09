@@ -2,7 +2,11 @@ package com.example.mykku.email
 
 import com.example.mykku.BaseControllerTest
 import com.example.mykku.email.domain.VerificationPurpose
-import com.example.mykku.email.dto.*
+import com.example.mykku.email.dto.EmailLoginRequest
+import com.example.mykku.email.dto.ResetPasswordRequest
+import com.example.mykku.email.dto.SendVerificationCodeRequest
+import com.example.mykku.email.dto.SignupRequest
+import com.example.mykku.email.dto.VerifyCodeRequest
 import com.example.mykku.email.tool.RedisVerificationCodeManager
 import com.example.mykku.member.domain.Member
 import com.example.mykku.role.domain.Role

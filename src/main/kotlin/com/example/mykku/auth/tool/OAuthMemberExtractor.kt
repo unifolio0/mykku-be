@@ -1,6 +1,9 @@
 package com.example.mykku.auth.tool
 
-import com.example.mykku.auth.dto.*
+import com.example.mykku.auth.dto.AppleUserInfo
+import com.example.mykku.auth.dto.GoogleUserInfo
+import com.example.mykku.auth.dto.KakaoUserInfo
+import com.example.mykku.auth.dto.NaverUserInfo
 import com.example.mykku.member.domain.SocialProvider
 import org.springframework.stereotype.Component
 

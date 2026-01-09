@@ -71,7 +71,7 @@ class NotificationRepositoryTest : BaseRepositoryTest() {
 
         notificationRepository.save(
             Notification.create(
-                type = NotificationType.FOLLOW,
+                type = NotificationType.SYSTEM_NOTICE,
                 sender = sender,
                 receiver = receiver,
                 content = "읽지 않은 알림 2"
@@ -157,7 +157,7 @@ class NotificationRepositoryTest : BaseRepositoryTest() {
 
         val readNotification = notificationRepository.save(
             Notification.create(
-                type = NotificationType.FOLLOW,
+                type = NotificationType.SYSTEM_NOTICE,
                 sender = sender,
                 receiver = receiver,
                 content = "읽은 알림"
@@ -199,7 +199,7 @@ class NotificationRepositoryTest : BaseRepositoryTest() {
 
         notificationRepository.save(
             Notification.create(
-                type = NotificationType.FOLLOW,
+                type = NotificationType.SYSTEM_NOTICE,
                 sender = sender,
                 receiver = receiver2,
                 content = "receiver2 알림"

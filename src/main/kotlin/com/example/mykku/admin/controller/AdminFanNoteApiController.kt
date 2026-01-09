@@ -6,14 +6,19 @@ import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.fannote.dto.FanNoteDetailResponse
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.ModelAttribute
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/admin/fannote/api")
 class AdminFanNoteApiController(
     private val adminFanNoteService: AdminFanNoteService
 ) {
-    
+
     @PostMapping(consumes = ["multipart/form-data"])
     fun create(
         @Valid @ModelAttribute request: FanNoteCreateRequest

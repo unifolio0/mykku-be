@@ -60,7 +60,7 @@ class NotificationSettingServiceTest : BaseServiceTest() {
 
         val result = notificationSettingService.getOrCreateSettings(member)
 
-        assertEquals(5, result.size)
+        assertEquals(3, result.size)
         verify(notificationSettingWriter).createDefaultSettings(member)
     }
 
@@ -95,13 +95,13 @@ class NotificationSettingServiceTest : BaseServiceTest() {
     @Test
     fun `updateSetting은 새 설정을 생성한다`() {
         val request = UpdateNotificationSettingRequest(
-            notificationType = NotificationType.FOLLOW,
+            notificationType = NotificationType.SYSTEM_NOTICE,
             isEnabled = true
         )
 
         val setting = NotificationSetting.create(
             member = member,
-            notificationType = NotificationType.FOLLOW,
+            notificationType = NotificationType.SYSTEM_NOTICE,
             isEnabled = true
         )
         initializeBaseEntityFields(setting, id = 2L)
@@ -111,7 +111,7 @@ class NotificationSettingServiceTest : BaseServiceTest() {
 
         val result = notificationSettingService.updateSetting(member, request)
 
-        assertEquals(NotificationType.FOLLOW, result.notificationType)
+        assertEquals(NotificationType.SYSTEM_NOTICE, result.notificationType)
         assertEquals(true, result.isEnabled)
     }
 }

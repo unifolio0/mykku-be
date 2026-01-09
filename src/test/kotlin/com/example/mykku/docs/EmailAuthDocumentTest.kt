@@ -3,7 +3,12 @@ package com.example.mykku.docs
 import com.example.mykku.auth.dto.LoginResponse
 import com.example.mykku.auth.dto.MemberInfo
 import com.example.mykku.email.domain.VerificationPurpose
-import com.example.mykku.email.dto.*
+import com.example.mykku.email.dto.EmailLoginRequest
+import com.example.mykku.email.dto.ResetPasswordRequest
+import com.example.mykku.email.dto.SendTemporaryPasswordRequest
+import com.example.mykku.email.dto.SendVerificationCodeRequest
+import com.example.mykku.email.dto.SignupRequest
+import com.example.mykku.email.dto.VerifyCodeRequest
 import com.example.mykku.email.exception.EmailAuthErrorCode
 import com.example.mykku.email.exception.EmailAuthException
 import io.restassured.http.ContentType
@@ -242,7 +247,8 @@ class EmailAuthDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.member.id").type(JsonFieldType.STRING).description("회원 ID"),
                             fieldWithPath("data.member.email").type(JsonFieldType.STRING).description("회원 이메일"),
                             fieldWithPath("data.member.nickname").type(JsonFieldType.STRING).description("회원 닉네임"),
-                            fieldWithPath("data.member.profileImage").type(JsonFieldType.STRING).description("프로필 이미지 URL")
+                            fieldWithPath("data.member.profileImage").type(JsonFieldType.STRING)
+                                .description("프로필 이미지 URL")
                                 .optional(),
                             fieldWithPath("data.isExistingUser").type(JsonFieldType.BOOLEAN).description("기존 가입자 여부")
                         )
@@ -339,7 +345,8 @@ class EmailAuthDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.member.id").type(JsonFieldType.STRING).description("회원 ID"),
                             fieldWithPath("data.member.email").type(JsonFieldType.STRING).description("회원 이메일"),
                             fieldWithPath("data.member.nickname").type(JsonFieldType.STRING).description("회원 닉네임"),
-                            fieldWithPath("data.member.profileImage").type(JsonFieldType.STRING).description("프로필 이미지 URL")
+                            fieldWithPath("data.member.profileImage").type(JsonFieldType.STRING)
+                                .description("프로필 이미지 URL")
                                 .optional(),
                             fieldWithPath("data.isExistingUser").type(JsonFieldType.BOOLEAN).description("기존 가입자 여부")
                         )

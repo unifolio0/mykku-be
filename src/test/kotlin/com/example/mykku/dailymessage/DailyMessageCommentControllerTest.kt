@@ -12,11 +12,12 @@ import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.util.TestTokenGenerator
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
-import org.hamcrest.Matchers.*
+import java.time.LocalDate
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.time.LocalDate
 
 @DisplayName("DailyMessageCommentController 통합 테스트")
 class DailyMessageCommentControllerTest : BaseControllerTest() {
@@ -57,9 +58,9 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
             .header("Authorization", authHeader)
             .contentType(ContentType.JSON)
             .body(request)
-        .`when`()
+            .`when`()
             .post("/api/v1/daily-messages/{dailyMessageId}/comment", dailyMessage.id)
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("댓글이 성공적으로 등록되었습니다."))
             .body("data", notNullValue())
@@ -82,9 +83,9 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
         RestAssured.given()
             .contentType(ContentType.JSON)
             .body(request)
-        .`when`()
+            .`when`()
             .post("/api/v1/daily-messages/{dailyMessageId}/comment", dailyMessage.id)
-        .then()
+            .then()
             .statusCode(401)
     }
 
@@ -125,9 +126,9 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
             .header("Authorization", authHeader)
             .contentType(ContentType.JSON)
             .body(request)
-        .`when`()
+            .`when`()
             .put("/api/v1/daily-messages/comments/{commentId}", comment.id)
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("댓글이 성공적으로 수정되었습니다."))
             .body("data", notNullValue())
@@ -143,9 +144,9 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
         RestAssured.given()
             .contentType(ContentType.JSON)
             .body(request)
-        .`when`()
+            .`when`()
             .put("/api/v1/daily-messages/comments/{commentId}", 1L)
-        .then()
+            .then()
             .statusCode(401)
     }
 
@@ -183,9 +184,9 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
         // when & then
         RestAssured.given()
             .header("Authorization", authHeader)
-        .`when`()
+            .`when`()
             .delete("/api/v1/daily-messages/comments/{commentId}", comment.id)
-        .then()
+            .then()
             .statusCode(200)
             .body("message", equalTo("댓글이 성공적으로 삭제되었습니다."))
     }
@@ -235,9 +236,9 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
         // when & then
         RestAssured.given()
             .header("Authorization", authHeader)
-        .`when`()
+            .`when`()
             .delete("/api/v1/daily-messages/comments/{commentId}", comment.id)
-        .then()
+            .then()
             .statusCode(403)
     }
 
@@ -246,9 +247,9 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
     fun `deleteComment - 인증되지 않은 사용자는 댓글을 삭제할 수 없다`() {
         // when & then
         RestAssured.given()
-        .`when`()
+            .`when`()
             .delete("/api/v1/daily-messages/comments/{commentId}", 1L)
-        .then()
+            .then()
             .statusCode(401)
     }
 }

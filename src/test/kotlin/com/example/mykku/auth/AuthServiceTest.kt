@@ -1,17 +1,18 @@
 package com.example.mykku.auth
 
-import com.example.mykku.auth.dto.*
+import com.example.mykku.BaseServiceTest
+import com.example.mykku.auth.dto.LoginResponse
+import com.example.mykku.auth.dto.MemberInfo
+import com.example.mykku.auth.dto.MobileLoginRequest
 import com.example.mykku.auth.tool.JwtTokenProvider
 import com.example.mykku.auth.tool.OAuthLoginStrategy
-import com.example.mykku.auth.exception.AuthException
 import com.example.mykku.member.domain.SocialProvider
 import com.example.mykku.member.tool.MemberReader
-import com.example.mykku.BaseServiceTest
+import kotlin.test.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mock
 import org.mockito.kotlin.whenever
-import kotlin.test.assertEquals
 
 class AuthServiceTest : BaseServiceTest() {
 

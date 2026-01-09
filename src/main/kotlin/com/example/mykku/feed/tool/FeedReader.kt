@@ -13,7 +13,6 @@ import com.example.mykku.feed.repository.FeedCommentRepository
 import com.example.mykku.feed.repository.FeedImageRepository
 import com.example.mykku.feed.repository.FeedRepository
 import com.example.mykku.feed.repository.FeedTagRepository
-import com.example.mykku.member.domain.Member
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Component
@@ -32,21 +31,9 @@ class FeedReader(
             .take(5)
     }
 
-    fun getFeedsByFollower(members: List<Member>): List<Feed> {
-        return feedRepository.findAllByMemberIn(members)
-    }
-
     fun getFeedById(feedId: Long): Feed {
         return feedRepository.findById(feedId)
             .orElseThrow { FeedException.feedNotFound() }
-    }
-
-    fun getFeedsByMembersWithPagination(members: List<Member>, pageable: Pageable): Page<Feed> {
-        return if (members.isNotEmpty()) {
-            feedRepository.findAllByMemberInOrderByCreatedAtDesc(members, pageable)
-        } else {
-            Page.empty(pageable)
-        }
     }
 
     fun getFeedsByBoardWithPagination(board: Board, pageable: Pageable): Page<Feed> {
