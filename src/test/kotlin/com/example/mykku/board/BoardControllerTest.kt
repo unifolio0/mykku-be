@@ -2,13 +2,11 @@ package com.example.mykku.board
 
 import com.example.mykku.BaseControllerTest
 import com.example.mykku.board.domain.Board
-import com.example.mykku.board.dto.CreateBoardRequest
 import com.example.mykku.feed.domain.Feed
 import com.example.mykku.feed.repository.FeedRepository
 import com.example.mykku.member.domain.Member
 import com.example.mykku.member.domain.SocialProvider
 import io.restassured.RestAssured
-import io.restassured.http.ContentType
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.DisplayName
@@ -22,47 +20,34 @@ class BoardControllerTest : BaseControllerTest() {
     private lateinit var feedRepository: FeedRepository
 
     @Test
-    @DisplayName("게시판 생성 - 정상 케이스")
-    fun `createBoard - 정상적으로 게시판을 생성한다`() {
+    @DisplayName("게시판 목록 조회 - 정상 케이스")
+    fun `getBoards - 정상적으로 게시판 목록을 조회한다`() {
         // given
-        val member = createAndSaveMember(id = "member1", nickname = "Member1", email = "member1@example.com")
-        val authHeader = getBearerToken("member1")
-        val request = CreateBoardRequest(
-            title = "테스트 게시판",
-            logo = "test_logo.png"
-        )
-
-        RestAssured.given()
-            .header("Authorization", authHeader)
-            .contentType(ContentType.JSON)
-            .body(request)
-            .`when`()
-            .post("/api/v1/boards")
-            .then()
-            .statusCode(200)
-            .body("message", equalTo("게시판이 성공적으로 생성되었습니다."))
-            .body("data.id", notNullValue())
-            .body("data.title", equalTo(request.title))
-            .body("data.logo", equalTo(request.logo))
-    }
-
-    @Test
-    @DisplayName("게시판 생성 - 인증되지 않은 사용자")
-    fun `createBoard - 인증되지 않은 사용자는 게시판을 생성할 수 없다`() {
-        // given
-        val request = CreateBoardRequest(
-            title = "테스트 게시판",
-            logo = "test_logo.png"
-        )
+        boardRepository.save(Board(title = "자유게시판", logo = "logo1.png"))
+        boardRepository.save(Board(title = "정보게시판", logo = "logo2.png"))
 
         // when & then
         RestAssured.given()
-            .contentType(ContentType.JSON)
-            .body(request)
             .`when`()
-            .post("/api/v1/boards")
+            .get("/api/v1/boards")
             .then()
-            .statusCode(401)
+            .statusCode(200)
+            .body("message", equalTo("게시판 목록을 성공적으로 조회했습니다."))
+            .body("data.boards", notNullValue())
+            .body("data.boards.size()", equalTo(2))
+    }
+
+    @Test
+    @DisplayName("게시판 목록 조회 - 빈 목록")
+    fun `getBoards - 게시판이 없으면 빈 목록을 반환한다`() {
+        // when & then
+        RestAssured.given()
+            .`when`()
+            .get("/api/v1/boards")
+            .then()
+            .statusCode(200)
+            .body("message", equalTo("게시판 목록을 성공적으로 조회했습니다."))
+            .body("data.boards.size()", equalTo(0))
     }
 
     @Test
