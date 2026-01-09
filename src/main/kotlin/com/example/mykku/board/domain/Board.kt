@@ -1,6 +1,5 @@
 package com.example.mykku.board.domain
 
-import com.example.mykku.board.exception.BoardException
 import com.example.mykku.common.domain.BaseEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -19,14 +18,4 @@ class Board(
 
     @Column(name = "logo")
     var logo: String,
-) : BaseEntity() {
-    companion object {
-        const val TITLE_MAX_LENGTH = 16
-    }
-
-    init {
-        if (title.length > TITLE_MAX_LENGTH) {
-            throw BoardException.boardTitleTooLong()
-        }
-    }
-}
+) : BaseEntity()

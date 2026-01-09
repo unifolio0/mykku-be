@@ -9,15 +9,13 @@ import org.springframework.stereotype.Component
 class BoardReader(
     private val boardRepository: BoardRepository
 ) {
-    fun validateDuplicateTitle(title: String) {
-        if (boardRepository.existsByTitle(title)) {
-            throw BoardException.boardDuplicateTitle()
-        }
-    }
-
     fun getBoardById(id: Long): Board {
         return boardRepository.findById(id).orElseThrow {
             BoardException.boardNotFound()
         }
+    }
+
+    fun getAllBoards(): List<Board> {
+        return boardRepository.findAll()
     }
 }

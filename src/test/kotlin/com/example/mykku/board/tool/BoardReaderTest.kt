@@ -8,6 +8,7 @@ import com.example.mykku.board.repository.BoardRepository
 import java.util.Optional
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
+import kotlin.test.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.InjectMocks
@@ -21,30 +22,6 @@ class BoardReaderTest : BaseToolTest() {
 
     @InjectMocks
     private lateinit var boardReader: BoardReader
-
-    @Test
-    fun `validateDuplicateTitle은 중복된 제목이 존재하면 예외를 발생시킨다`() {
-        val title = "중복된 제목"
-
-        whenever(boardRepository.existsByTitle(title))
-            .thenReturn(true)
-
-        val exception = assertThrows<BoardException> {
-            boardReader.validateDuplicateTitle(title)
-        }
-
-        assertEquals(BoardErrorCode.BOARD_DUPLICATE_TITLE, exception.errorCode)
-    }
-
-    @Test
-    fun `validateDuplicateTitle은 중복된 제목이 존재하지 않으면 정상 처리된다`() {
-        val title = "고유한 제목"
-
-        whenever(boardRepository.existsByTitle(title))
-            .thenReturn(false)
-
-        boardReader.validateDuplicateTitle(title)
-    }
 
     @Test
     fun `getBoardById는 존재하지 않는 보드 ID로 조회하면 예외를 발생시킨다`() {
@@ -75,5 +52,30 @@ class BoardReaderTest : BaseToolTest() {
         val result = boardReader.getBoardById(boardId)
 
         assertSame(mockBoard, result)
+    }
+
+    @Test
+    fun `getAllBoards는 모든 보드 목록을 반환한다`() {
+        val boards = listOf(
+            Board(id = 1L, title = "게시판1", logo = "logo1.png"),
+            Board(id = 2L, title = "게시판2", logo = "logo2.png")
+        )
+
+        whenever(boardRepository.findAll()).thenReturn(boards)
+
+        val result = boardReader.getAllBoards()
+
+        assertEquals(2, result.size)
+        assertEquals("게시판1", result[0].title)
+        assertEquals("게시판2", result[1].title)
+    }
+
+    @Test
+    fun `getAllBoards는 보드가 없으면 빈 리스트를 반환한다`() {
+        whenever(boardRepository.findAll()).thenReturn(emptyList())
+
+        val result = boardReader.getAllBoards()
+
+        assertTrue(result.isEmpty())
     }
 }

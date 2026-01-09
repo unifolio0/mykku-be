@@ -2,121 +2,54 @@ package com.example.mykku.board
 
 import com.example.mykku.BaseServiceTest
 import com.example.mykku.board.domain.Board
-import com.example.mykku.board.dto.CreateBoardRequest
-import com.example.mykku.board.dto.UpdateBoardRequest
 import com.example.mykku.board.tool.BoardReader
-import com.example.mykku.board.tool.BoardWriter
-import com.example.mykku.like.domain.LikeBoard
-import com.example.mykku.like.tool.LikeBoardWriter
-import com.example.mykku.member.domain.Member
-import com.example.mykku.member.tool.MemberReader
 import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class BoardServiceTest : BaseServiceTest() {
 
     @Mock
     private lateinit var boardReader: BoardReader
 
-    @Mock
-    private lateinit var boardWriter: BoardWriter
-
-    @Mock
-    private lateinit var memberReader: MemberReader
-
-    @Mock
-    private lateinit var likeBoardWriter: LikeBoardWriter
-
     @InjectMocks
     private lateinit var boardService: BoardService
 
-    private val member = createTestMember(id = "member1", nickname = "testUser", email = "test@test.com")
-
     @Test
-    fun `createBoard - 보드를 정상적으로 생성한다`() {
+    fun `getBoards - 게시판 목록을 정상적으로 조회한다`() {
         // given
-        val request = CreateBoardRequest(title = "새 보드", logo = "logo.png")
-        val board = Board(id = 1L, title = request.title, logo = request.logo)
-        val likeBoard = LikeBoard(member = member, board = board)
+        val boards = listOf(
+            Board(id = 1L, title = "자유게시판", logo = "logo1.png"),
+            Board(id = 2L, title = "정보게시판", logo = "logo2.png")
+        )
 
-        whenever(boardWriter.createBoard(title = request.title, logo = request.logo)).thenReturn(board)
-        whenever(memberReader.getMemberById("member1")).thenReturn(member)
-        whenever(likeBoardWriter.createLikeBoard(member = member, board = board)).thenReturn(likeBoard)
+        whenever(boardReader.getAllBoards()).thenReturn(boards)
 
         // when
-        val result = boardService.createBoard(request, "member1")
+        val result = boardService.getBoards()
 
         // then
-        assertEquals(board.id, result.id)
-        assertEquals(board.title, result.title)
-        assertEquals(board.logo, result.logo)
+        assertEquals(2, result.boards.size)
+        assertEquals(1L, result.boards[0].id)
+        assertEquals("자유게시판", result.boards[0].title)
+        assertEquals("logo1.png", result.boards[0].logo)
+        assertEquals(2L, result.boards[1].id)
+        assertEquals("정보게시판", result.boards[1].title)
+        assertEquals("logo2.png", result.boards[1].logo)
     }
 
     @Test
-    fun `updateBoard - 보드를 정상적으로 수정한다`() {
+    fun `getBoards - 게시판이 없으면 빈 목록을 반환한다`() {
         // given
-        val request = UpdateBoardRequest(title = "수정된 보드", logo = "new_logo.png")
-        val beforeBoard = Board(id = 1L, title = "원본 보드", logo = "old_logo.png")
-        val afterBoard = Board(id = 1L, title = request.title, logo = request.logo)
-
-        whenever(boardReader.getBoardById(1L)).thenReturn(beforeBoard)
-        whenever(boardWriter.updateBoard(
-            board = beforeBoard,
-            title = request.title,
-            logo = request.logo
-        )).thenReturn(afterBoard)
+        whenever(boardReader.getAllBoards()).thenReturn(emptyList())
 
         // when
-        val result = boardService.updateBoard(request, 1L, "member1")
+        val result = boardService.getBoards()
 
         // then
-        assertEquals(afterBoard.id, result.id)
-        assertEquals(afterBoard.title, result.title)
-        assertEquals(afterBoard.logo, result.logo)
-    }
-
-    @Test
-    fun `updateBoard - 제목이 변경되지 않은 경우 중복 검사를 하지 않는다`() {
-        // given
-        val request = UpdateBoardRequest(title = "같은 제목", logo = "new_logo.png")
-        val beforeBoard = Board(id = 1L, title = "같은 제목", logo = "old_logo.png")
-        val afterBoard = Board(id = 1L, title = request.title, logo = request.logo)
-
-        whenever(boardReader.getBoardById(1L)).thenReturn(beforeBoard)
-        whenever(boardWriter.updateBoard(
-            board = beforeBoard,
-            title = request.title,
-            logo = request.logo
-        )).thenReturn(afterBoard)
-
-        // when
-        val result = boardService.updateBoard(request, 1L, "member1")
-
-        // then
-        assertEquals(afterBoard.title, result.title)
-    }
-
-    @Test
-    fun `updateBoard - 제목이 변경된 경우 중복 검사를 한다`() {
-        // given
-        val request = UpdateBoardRequest(title = "새로운 제목", logo = "new_logo.png")
-        val beforeBoard = Board(id = 1L, title = "원본 제목", logo = "old_logo.png")
-        val afterBoard = Board(id = 1L, title = request.title, logo = request.logo)
-
-        whenever(boardReader.getBoardById(1L)).thenReturn(beforeBoard)
-        whenever(boardWriter.updateBoard(
-            board = beforeBoard,
-            title = request.title,
-            logo = request.logo
-        )).thenReturn(afterBoard)
-
-        // when
-        val result = boardService.updateBoard(request, 1L, "member1")
-
-        // then
-        assertEquals(afterBoard.title, result.title)
+        assertTrue(result.boards.isEmpty())
     }
 }
