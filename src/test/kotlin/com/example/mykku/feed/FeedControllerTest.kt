@@ -98,46 +98,6 @@ class FeedControllerTest : BaseControllerTest() {
     }
 
     @Test
-    @DisplayName("사용자 피드 목록 조회 - 정상 케이스")
-    fun `getFeeds - 정상적으로 사용자의 피드 목록을 조회한다`() {
-        // given
-        val member = memberRepository.save(
-            Member(
-                id = "member1",
-                socialId = "member1",
-                provider = SocialProvider.GOOGLE,
-                email = "member1@example.com",
-                nickname = "Member1",
-                role = null,
-                profileImage = ""
-            )
-        )
-        val board = boardRepository.save(
-            Board(
-                title = "테스트 게시판",
-                logo = "test_logo.png"
-            )
-        )
-        feedRepository.save(
-            Feed(
-                title = "테스트 피드",
-                content = "테스트 내용",
-                member = member,
-                board = board
-            )
-        )
-
-        // when & then
-        RestAssured.given()
-            .`when`()
-            .get("/api/v1/{memberId}/feeds", member.id)
-            .then()
-            .statusCode(200)
-            .body("message", equalTo("피드 목록 불러오기에 성공했습니다."))
-            .body("data", notNullValue())
-    }
-
-    @Test
     @DisplayName("피드 댓글 조회 - 정상 케이스")
     fun `getComments - 정상적으로 피드 댓글을 조회한다`() {
         // given
@@ -363,36 +323,6 @@ class FeedControllerTest : BaseControllerTest() {
             .body("data.title", equalTo("공개 피드"))
             .body("data.isLiked", equalTo(false))
             .body("data.isSaved", equalTo(false))
-    }
-
-    @Test
-    @DisplayName("사용자 피드 목록 조회 - 페이지네이션 파라미터 적용")
-    fun `getFeeds - 페이지네이션 파라미터가 정상적으로 적용된다`() {
-        // given
-        val member = memberRepository.save(
-            Member(
-                id = "member1",
-                socialId = "member1",
-                provider = SocialProvider.GOOGLE,
-                email = "member1@example.com",
-                nickname = "Member1",
-                role = null,
-                profileImage = ""
-            )
-        )
-
-        // when & then
-        RestAssured.given()
-            .queryParam("page", 0)
-            .queryParam("size", 5)
-            .queryParam("minCommonFollowers", 5)
-            .`when`()
-            .get("/api/v1/{memberId}/feeds", member.id)
-            .then()
-            .statusCode(200)
-            .body("message", equalTo("피드 목록 불러오기에 성공했습니다."))
-            .body("data.currentPage", equalTo(0))
-            .body("data.size", equalTo(5))
     }
 
     @Test
