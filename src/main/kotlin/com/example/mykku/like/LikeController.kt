@@ -2,8 +2,11 @@ package com.example.mykku.like
 
 import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
+import com.example.mykku.common.util.PageableValidator
 import com.example.mykku.like.dto.*
 import com.example.mykku.member.domain.Member
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -13,9 +16,17 @@ class LikeController(
 ) {
     @GetMapping("/api/v1/boards/like")
     fun getLikedBoards(
-        @CurrentMember member: Member
-    ): ResponseEntity<ApiResponse<List<LikeBoardInfoResponse>>> {
-        val response = likeService.getLikedBoards(memberId = member.id)
+        @CurrentMember member: Member,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "20") size: Int
+    ): ResponseEntity<ApiResponse<Page<LikeBoardInfoResponse>>> {
+        val pageable = PageableValidator.validateAndCreate(
+            page,
+            size,
+            "createdAt",
+            Sort.Direction.DESC
+        )
+        val response = likeService.getLikedBoards(memberId = member.id, pageable = pageable)
         return ResponseEntity.ok(
             ApiResponse(
                 message = "즐겨찾기한 게시판 목록을 성공적으로 조회하였습니다.",

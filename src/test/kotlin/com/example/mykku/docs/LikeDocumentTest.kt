@@ -11,6 +11,8 @@ import org.mockito.Mockito.doNothing
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
@@ -24,7 +26,11 @@ class LikeDocumentTest : BaseDocumentTest() {
         private val apiConfig = ApiRequestConfig(
             tag = Tag.LIKE_API,
             summary = "즐겨찾기한 게시판 목록 조회",
-            description = "사용자가 즐겨찾기한 게시판 목록을 조회합니다."
+            description = "사용자가 즐겨찾기한 게시판 목록을 조회합니다.",
+            queryParameters = listOf(
+                parameterWithName("page").description("페이지 번호 (기본값: 0)").optional(),
+                parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
+            )
         )
 
         @Test
@@ -33,8 +39,10 @@ class LikeDocumentTest : BaseDocumentTest() {
                 LikeBoardInfoResponse(id = 1L, title = "자유게시판", logo = "https://example.com/logo1.png"),
                 LikeBoardInfoResponse(id = 2L, title = "질문게시판", logo = "https://example.com/logo2.png")
             )
+            val pageable = PageRequest.of(0, 20)
+            val page = PageImpl(likedBoards, pageable, 2)
 
-            `when`(likeService.getLikedBoards(any())).thenReturn(likedBoards)
+            `when`(likeService.getLikedBoards(any(), any())).thenReturn(page)
 
             val documentFilter = document("like/board-list", 200)
                 .request(request().applyConfig(apiConfig))
@@ -42,10 +50,32 @@ class LikeDocumentTest : BaseDocumentTest() {
                     response()
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data[]").type(JsonFieldType.ARRAY).description("즐겨찾기한 게시판 목록"),
-                            fieldWithPath("data[].id").type(JsonFieldType.NUMBER).description("게시판 ID"),
-                            fieldWithPath("data[].title").type(JsonFieldType.STRING).description("게시판 제목"),
-                            fieldWithPath("data[].logo").type(JsonFieldType.STRING).description("게시판 로고 URL")
+                            fieldWithPath("data.content[]").type(JsonFieldType.ARRAY).description("즐겨찾기한 게시판 목록"),
+                            fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("게시판 ID"),
+                            fieldWithPath("data.content[].title").type(JsonFieldType.STRING).description("게시판 제목"),
+                            fieldWithPath("data.content[].logo").type(JsonFieldType.STRING).description("게시판 로고 URL"),
+                            fieldWithPath("data.pageable").type(JsonFieldType.OBJECT).description("페이지 정보"),
+                            fieldWithPath("data.pageable.pageNumber").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
+                            fieldWithPath("data.pageable.pageSize").type(JsonFieldType.NUMBER).description("페이지 크기"),
+                            fieldWithPath("data.pageable.sort").type(JsonFieldType.OBJECT).description("정렬 정보"),
+                            fieldWithPath("data.pageable.sort.empty").type(JsonFieldType.BOOLEAN).description("정렬 정보 비어있음"),
+                            fieldWithPath("data.pageable.sort.sorted").type(JsonFieldType.BOOLEAN).description("정렬됨"),
+                            fieldWithPath("data.pageable.sort.unsorted").type(JsonFieldType.BOOLEAN).description("정렬되지 않음"),
+                            fieldWithPath("data.pageable.offset").type(JsonFieldType.NUMBER).description("오프셋"),
+                            fieldWithPath("data.pageable.paged").type(JsonFieldType.BOOLEAN).description("페이지네이션 여부"),
+                            fieldWithPath("data.pageable.unpaged").type(JsonFieldType.BOOLEAN).description("페이지네이션 아님"),
+                            fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 요소 수"),
+                            fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
+                            fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
+                            fieldWithPath("data.number").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
+                            fieldWithPath("data.sort").type(JsonFieldType.OBJECT).description("정렬 정보"),
+                            fieldWithPath("data.sort.empty").type(JsonFieldType.BOOLEAN).description("정렬 정보 비어있음"),
+                            fieldWithPath("data.sort.sorted").type(JsonFieldType.BOOLEAN).description("정렬됨"),
+                            fieldWithPath("data.sort.unsorted").type(JsonFieldType.BOOLEAN).description("정렬되지 않음"),
+                            fieldWithPath("data.first").type(JsonFieldType.BOOLEAN).description("첫 페이지 여부"),
+                            fieldWithPath("data.last").type(JsonFieldType.BOOLEAN).description("마지막 페이지 여부"),
+                            fieldWithPath("data.numberOfElements").type(JsonFieldType.NUMBER).description("현재 페이지 요소 수"),
+                            fieldWithPath("data.empty").type(JsonFieldType.BOOLEAN).description("빈 페이지 여부")
                         )
                 )
                 .build()
@@ -53,6 +83,8 @@ class LikeDocumentTest : BaseDocumentTest() {
             given(documentFilter)
                 .headers(AUTH_HEADER)
                 .contentType(ContentType.JSON)
+                .param("page", "0")
+                .param("size", "20")
                 .`when`()
                 .get("/api/v1/boards/like")
                 .then()

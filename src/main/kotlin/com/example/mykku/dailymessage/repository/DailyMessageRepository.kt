@@ -11,10 +11,16 @@ import java.time.LocalDate
 @Repository
 interface DailyMessageRepository : JpaRepository<DailyMessage, Long> {
     fun findByDate(date: LocalDate): DailyMessage?
-    
+
     @Query("SELECT dm FROM DailyMessage dm WHERE dm.date <= :date ORDER BY dm.date DESC")
     fun findByDateBeforeOrEqualOrderByDateDesc(@Param("date") date: LocalDate, pageable: Pageable): List<DailyMessage>
-    
+
     @Query("SELECT dm FROM DailyMessage dm WHERE dm.date <= :date ORDER BY dm.date ASC")
     fun findByDateBeforeOrEqualOrderByDateAsc(@Param("date") date: LocalDate, pageable: Pageable): List<DailyMessage>
+
+    @Query(
+        value = "SELECT dm FROM DailyMessage dm WHERE dm.date <= :date",
+        countQuery = "SELECT COUNT(dm) FROM DailyMessage dm WHERE dm.date <= :date"
+    )
+    fun findByDateBeforeOrEqual(@Param("date") date: LocalDate, pageable: Pageable): org.springframework.data.domain.Page<DailyMessage>
 }

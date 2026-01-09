@@ -1,9 +1,7 @@
 package com.example.mykku.docs
 
-import com.example.mykku.dailymessage.dto.CommentResponse
 import com.example.mykku.dailymessage.dto.DailyMessageResponse
 import com.example.mykku.dailymessage.dto.DailyMessageSummaryResponse
-import com.example.mykku.dailymessage.dto.ReplyResponse
 import com.example.mykku.dailymessage.exception.DailyMessageErrorCode
 import com.example.mykku.dailymessage.exception.DailyMessageException
 import io.restassured.http.ContentType
@@ -13,6 +11,8 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
@@ -31,8 +31,8 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
             description = "특정 날짜 이전의 하루 덕담 목록을 조회합니다.",
             queryParameters = listOf(
                 parameterWithName("date").description("기준 날짜 (YYYY-MM-DD 형식)"),
-                parameterWithName("limit").description("조회할 개수 (기본값: 10)").optional(),
-                parameterWithName("sort").description("정렬 방향 (ASC/DESC, 기본값: DESC)").optional()
+                parameterWithName("page").description("페이지 번호 (기본값: 0)").optional(),
+                parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
             )
         )
 
@@ -53,8 +53,10 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
                     date = date
                 )
             )
+            val pageable = PageRequest.of(0, 20)
+            val page = PageImpl(dailyMessages, pageable, 2)
 
-            `when`(dailyMessageService.getDailyMessages(any(), any(), any())).thenReturn(dailyMessages)
+            `when`(dailyMessageService.getDailyMessages(any(), any())).thenReturn(page)
 
             val documentFilter = document("daily-message/list", 200)
                 .request(request().applyConfig(apiConfig))
@@ -62,11 +64,33 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
                     response()
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data[]").type(JsonFieldType.ARRAY).description("하루 덕담 목록"),
-                            fieldWithPath("data[].id").type(JsonFieldType.NUMBER).description("덕담 ID"),
-                            fieldWithPath("data[].title").type(JsonFieldType.STRING).description("덕담 제목"),
-                            fieldWithPath("data[].content").type(JsonFieldType.STRING).description("덕담 내용"),
-                            fieldWithPath("data[].date").type(JsonFieldType.STRING).description("덕담 날짜")
+                            fieldWithPath("data.content[]").type(JsonFieldType.ARRAY).description("하루 덕담 목록"),
+                            fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("덕담 ID"),
+                            fieldWithPath("data.content[].title").type(JsonFieldType.STRING).description("덕담 제목"),
+                            fieldWithPath("data.content[].content").type(JsonFieldType.STRING).description("덕담 내용"),
+                            fieldWithPath("data.content[].date").type(JsonFieldType.STRING).description("덕담 날짜"),
+                            fieldWithPath("data.pageable").type(JsonFieldType.OBJECT).description("페이지 정보"),
+                            fieldWithPath("data.pageable.pageNumber").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
+                            fieldWithPath("data.pageable.pageSize").type(JsonFieldType.NUMBER).description("페이지 크기"),
+                            fieldWithPath("data.pageable.sort").type(JsonFieldType.OBJECT).description("정렬 정보"),
+                            fieldWithPath("data.pageable.sort.empty").type(JsonFieldType.BOOLEAN).description("정렬 정보 비어있음"),
+                            fieldWithPath("data.pageable.sort.sorted").type(JsonFieldType.BOOLEAN).description("정렬됨"),
+                            fieldWithPath("data.pageable.sort.unsorted").type(JsonFieldType.BOOLEAN).description("정렬되지 않음"),
+                            fieldWithPath("data.pageable.offset").type(JsonFieldType.NUMBER).description("오프셋"),
+                            fieldWithPath("data.pageable.paged").type(JsonFieldType.BOOLEAN).description("페이지네이션 여부"),
+                            fieldWithPath("data.pageable.unpaged").type(JsonFieldType.BOOLEAN).description("페이지네이션 아님"),
+                            fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 요소 수"),
+                            fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
+                            fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
+                            fieldWithPath("data.number").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
+                            fieldWithPath("data.sort").type(JsonFieldType.OBJECT).description("정렬 정보"),
+                            fieldWithPath("data.sort.empty").type(JsonFieldType.BOOLEAN).description("정렬 정보 비어있음"),
+                            fieldWithPath("data.sort.sorted").type(JsonFieldType.BOOLEAN).description("정렬됨"),
+                            fieldWithPath("data.sort.unsorted").type(JsonFieldType.BOOLEAN).description("정렬되지 않음"),
+                            fieldWithPath("data.first").type(JsonFieldType.BOOLEAN).description("첫 페이지 여부"),
+                            fieldWithPath("data.last").type(JsonFieldType.BOOLEAN).description("마지막 페이지 여부"),
+                            fieldWithPath("data.numberOfElements").type(JsonFieldType.NUMBER).description("현재 페이지 요소 수"),
+                            fieldWithPath("data.empty").type(JsonFieldType.BOOLEAN).description("빈 페이지 여부")
                         )
                 )
                 .build()
@@ -74,8 +98,8 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
             given(documentFilter)
                 .contentType(ContentType.JSON)
                 .param("date", date.toString())
-                .param("limit", "10")
-                .param("sort", "DESC")
+                .param("page", "0")
+                .param("size", "20")
                 .`when`()
                 .get("/api/v1/daily-messages")
                 .then()
@@ -103,27 +127,7 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
                 id = dailyMessageId,
                 title = "오늘의 덕담",
                 content = "좋은 하루 되세요! 올 한해도 건강하시길 바랍니다.",
-                createdAt = LocalDateTime.now(),
-                comments = listOf(
-                    CommentResponse(
-                        id = 1L,
-                        content = "감사합니다!",
-                        likeCount = 5,
-                        memberName = "사용자1",
-                        profileImage = "https://example.com/profile1.jpg",
-                        createdAt = LocalDateTime.now(),
-                        replies = listOf(
-                            ReplyResponse(
-                                id = 1L,
-                                content = "함께해요!",
-                                likeCount = 2,
-                                memberName = "사용자2",
-                                profileImage = "https://example.com/profile2.jpg",
-                                createdAt = LocalDateTime.now()
-                            )
-                        )
-                    )
-                )
+                createdAt = LocalDateTime.now()
             )
 
             `when`(dailyMessageService.getDailyMessage(eq(dailyMessageId))).thenReturn(dailyMessage)
@@ -138,26 +142,7 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("덕담 ID"),
                             fieldWithPath("data.title").type(JsonFieldType.STRING).description("덕담 제목"),
                             fieldWithPath("data.content").type(JsonFieldType.STRING).description("덕담 내용"),
-                            fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성 일시"),
-                            fieldWithPath("data.comments[]").type(JsonFieldType.ARRAY).description("댓글 목록"),
-                            fieldWithPath("data.comments[].id").type(JsonFieldType.NUMBER).description("댓글 ID"),
-                            fieldWithPath("data.comments[].content").type(JsonFieldType.STRING).description("댓글 내용"),
-                            fieldWithPath("data.comments[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
-                            fieldWithPath("data.comments[].memberName").type(JsonFieldType.STRING).description("작성자 이름"),
-                            fieldWithPath("data.comments[].createdAt").type(JsonFieldType.STRING).description("작성 일시"),
-                            fieldWithPath("data.comments[].profileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지 URL"),
-                            fieldWithPath("data.comments[].replies[]").type(JsonFieldType.ARRAY).description("답글 목록"),
-                            fieldWithPath("data.comments[].replies[].id").type(JsonFieldType.NUMBER).description("답글 ID"),
-                            fieldWithPath("data.comments[].replies[].content").type(JsonFieldType.STRING)
-                                .description("답글 내용"),
-                            fieldWithPath("data.comments[].replies[].likeCount").type(JsonFieldType.NUMBER)
-                                .description("좋아요 수"),
-                            fieldWithPath("data.comments[].replies[].memberName").type(JsonFieldType.STRING)
-                                .description("작성자 이름"),
-                            fieldWithPath("data.comments[].replies[].profileImage").type(JsonFieldType.STRING)
-                                .description("작성자 프로필 이미지 URL"),
-                            fieldWithPath("data.comments[].replies[].createdAt").type(JsonFieldType.STRING)
-                                .description("작성 일시")
+                            fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성 일시")
                         )
                 )
                 .build()

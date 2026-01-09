@@ -35,8 +35,8 @@ class LikeService(
     private val eventPublisher: ApplicationEventPublisher
 ) {
     @Transactional(readOnly = true)
-    fun getLikedBoards(memberId: String): List<LikeBoardInfoResponse> {
-        return likeBoardReader.getLikedBoards(memberId = memberId)
+    fun getLikedBoards(memberId: String, pageable: org.springframework.data.domain.Pageable): org.springframework.data.domain.Page<LikeBoardInfoResponse> {
+        return likeBoardReader.getLikedBoards(memberId = memberId, pageable = pageable)
             .map { LikeBoardInfoResponse(it) }
     }
 

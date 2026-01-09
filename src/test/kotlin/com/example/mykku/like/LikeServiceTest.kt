@@ -22,8 +22,11 @@ import com.example.mykku.member.tool.MemberReader
 import org.junit.jupiter.api.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
+import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import java.time.LocalDate
 import kotlin.test.assertEquals
 
@@ -82,14 +85,16 @@ class LikeServiceTest : BaseServiceTest() {
         // given
         val likeBoard = LikeBoard(id = 1L, member = member, board = board)
         val likedBoards = listOf(likeBoard)
+        val pageable = PageRequest.of(0, 20)
+        val page = PageImpl(likedBoards, pageable, 1)
 
-        whenever(likeBoardReader.getLikedBoards(memberId = "member1")).thenReturn(likedBoards)
+        whenever(likeBoardReader.getLikedBoards(any(), any())).thenReturn(page)
 
         // when
-        val result = likeService.getLikedBoards("member1")
+        val result = likeService.getLikedBoards("member1", pageable)
 
         // then
-        assertEquals(1, result.size)
+        assertEquals(1, result.totalElements)
     }
 
     @Test

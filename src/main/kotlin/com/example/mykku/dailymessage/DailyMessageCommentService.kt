@@ -2,12 +2,15 @@ package com.example.mykku.dailymessage
 
 import com.example.mykku.dailymessage.dto.CommentResponse
 import com.example.mykku.dailymessage.dto.CreateCommentRequest
+import com.example.mykku.dailymessage.dto.DailyMessageCommentsResponse
+import com.example.mykku.dailymessage.dto.ReplyResponse
 import com.example.mykku.dailymessage.dto.UpdateCommentRequest
+import com.example.mykku.dailymessage.exception.DailyMessageException
 import com.example.mykku.dailymessage.tool.DailyMessageCommentReader
 import com.example.mykku.dailymessage.tool.DailyMessageCommentWriter
 import com.example.mykku.dailymessage.tool.DailyMessageReader
-import com.example.mykku.dailymessage.exception.DailyMessageException
 import com.example.mykku.member.tool.MemberReader
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -18,6 +21,47 @@ class DailyMessageCommentService(
     private val dailyMessageCommentWriter: DailyMessageCommentWriter,
     private val memberReader: MemberReader,
 ) {
+    @Transactional(readOnly = true)
+    fun getComments(dailyMessageId: Long, pageable: Pageable): DailyMessageCommentsResponse {
+        dailyMessageReader.getDailyMessage(dailyMessageId)
+
+        val commentsPage = dailyMessageCommentReader.getCommentsByDailyMessageId(dailyMessageId, pageable)
+        val repliesMap = dailyMessageCommentReader.getRepliesByParentComments(commentsPage.content)
+
+        val commentResponses = commentsPage.content.map { comment ->
+            val replies = repliesMap[comment.id] ?: emptyList()
+            val replyResponses = replies.map { reply ->
+                ReplyResponse(
+                    id = reply.id!!,
+                    content = reply.content,
+                    likeCount = reply.likeCount,
+                    memberName = reply.member.nickname,
+                    profileImage = reply.member.profileImage,
+                    createdAt = reply.createdAt
+                )
+            }
+
+            CommentResponse(
+                id = comment.id!!,
+                content = comment.content,
+                likeCount = comment.likeCount,
+                memberName = comment.member.nickname,
+                profileImage = comment.member.profileImage,
+                createdAt = comment.createdAt,
+                replies = replyResponses
+            )
+        }
+
+        return DailyMessageCommentsResponse(
+            comments = commentResponses,
+            totalElements = commentsPage.totalElements,
+            totalPages = commentsPage.totalPages,
+            currentPage = commentsPage.number,
+            pageSize = commentsPage.size,
+            hasNext = commentsPage.hasNext()
+        )
+    }
+
     @Transactional
     fun createComment(
         dailyMessageId: Long,

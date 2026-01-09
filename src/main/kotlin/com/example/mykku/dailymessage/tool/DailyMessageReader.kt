@@ -28,6 +28,10 @@ class DailyMessageReader(
         }
     }
 
+    fun getDailyMessagesWithPagination(date: LocalDate, pageable: Pageable): Page<DailyMessage> {
+        return dailyMessageRepository.findByDateBeforeOrEqual(date, pageable)
+    }
+
     fun getDailyMessage(id: Long): DailyMessage {
         return dailyMessageRepository.findById(id)
             .orElseThrow { DailyMessageException.dailyMessageNotFound() }

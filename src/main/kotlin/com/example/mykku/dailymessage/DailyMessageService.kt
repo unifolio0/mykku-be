@@ -1,28 +1,24 @@
 package com.example.mykku.dailymessage
 
 import com.example.mykku.dailymessage.domain.DailyMessage
-import com.example.mykku.dailymessage.domain.DailyMessageComment
-import com.example.mykku.dailymessage.domain.SortDirection
-import com.example.mykku.dailymessage.dto.CommentResponse
 import com.example.mykku.dailymessage.dto.DailyMessageResponse
 import com.example.mykku.dailymessage.dto.DailyMessageSummaryResponse
-import com.example.mykku.dailymessage.dto.ReplyResponse
-import com.example.mykku.dailymessage.repository.DailyMessageCommentRepository
 import com.example.mykku.dailymessage.tool.DailyMessageReader
 import java.time.LocalDate
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class DailyMessageService(
     private val dailyMessageReader: DailyMessageReader,
-    private val dailyMessageCommentRepository: DailyMessageCommentRepository
 ) {
     @Transactional(readOnly = true)
-    fun getDailyMessages(date: LocalDate, limit: Int, sort: SortDirection): List<DailyMessageSummaryResponse> {
-        val dailyMessages = dailyMessageReader.getDailyMessages(date, limit, sort)
+    fun getDailyMessages(date: LocalDate, pageable: Pageable): Page<DailyMessageSummaryResponse> {
+        val dailyMessagesPage = dailyMessageReader.getDailyMessagesWithPagination(date, pageable)
 
-        return dailyMessages.map { it.toResponse() }
+        return dailyMessagesPage.map { it.toResponse() }
     }
 
     private fun DailyMessage.toResponse(): DailyMessageSummaryResponse {
@@ -37,55 +33,12 @@ class DailyMessageService(
     @Transactional(readOnly = true)
     fun getDailyMessage(id: Long): DailyMessageResponse {
         val dailyMessage = dailyMessageReader.getDailyMessage(id)
-        val allComments = dailyMessageCommentRepository.findByDailyMessage(dailyMessage)
-        val repliesByParentId = getReplies(allComments)
-        val comments = getCommentResponses(allComments, repliesByParentId)
 
         return DailyMessageResponse(
             id = dailyMessage.id!!,
             title = dailyMessage.title,
             content = dailyMessage.content,
-            createdAt = dailyMessage.createdAt,
-            comments = comments
+            createdAt = dailyMessage.createdAt
         )
-    }
-
-    private fun getReplies(allComments: List<DailyMessageComment>): Map<Long?, List<ReplyResponse>> {
-        val repliesByParentId = allComments
-            .filter { it.parentComment != null }
-            .groupBy { it.parentComment!!.id }
-            .mapValues { (_, replies) ->
-                replies.map { reply ->
-                    ReplyResponse(
-                        id = reply.id!!,
-                        content = reply.content,
-                        likeCount = reply.likeCount,
-                        memberName = reply.member.nickname,
-                        profileImage = reply.member.profileImage,
-                        createdAt = reply.createdAt
-                    )
-                }
-            }
-        return repliesByParentId
-    }
-
-    private fun getCommentResponses(
-        allComments: List<DailyMessageComment>,
-        repliesByParentId: Map<Long?, List<ReplyResponse>>
-    ): List<CommentResponse> {
-        val comments = allComments
-            .filter { it.parentComment == null }
-            .map { comment ->
-                CommentResponse(
-                    id = comment.id!!,
-                    content = comment.content,
-                    likeCount = comment.likeCount,
-                    memberName = comment.member.nickname,
-                    profileImage = comment.member.profileImage,
-                    createdAt = comment.createdAt,
-                    replies = repliesByParentId[comment.id] ?: emptyList()
-                )
-            }
-        return comments
     }
 }
