@@ -55,9 +55,10 @@ class BoardController(
 
     @GetMapping("/{boardId}/feeds/popular")
     fun getPopularFeedsByBoard(
-        @PathVariable boardId: Long
+        @PathVariable boardId: Long,
+        @CurrentMember(required = false) member: Member?
     ): ResponseEntity<ApiResponse<PopularFeedsResponse>> {
-        val response = feedService.getPopularFeedsByBoard(boardId)
+        val response = feedService.getPopularFeedsByBoard(boardId, member?.id)
         return ResponseEntity.ok(
             ApiResponse(
                 message = "인기 피드 목록을 성공적으로 조회했습니다.",

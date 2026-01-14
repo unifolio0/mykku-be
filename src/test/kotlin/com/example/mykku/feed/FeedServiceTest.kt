@@ -1,6 +1,7 @@
 package com.example.mykku.feed
 
 import com.example.mykku.BaseServiceTest
+import com.example.mykku.block.tool.BlockFilterHelper
 import com.example.mykku.board.domain.Board
 import com.example.mykku.board.tool.BoardReader
 import com.example.mykku.contest.tool.ContestParticipationReader
@@ -33,11 +34,17 @@ import com.example.mykku.scrap.tool.SaveFeedWriter
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.InjectMocks
 import org.mockito.Mock
+import org.mockito.Mockito
+import org.mockito.junit.jupiter.MockitoSettings
+import org.mockito.quality.Strictness
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -46,6 +53,7 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.web.multipart.MultipartFile
 
+@MockitoSettings(strictness = Strictness.LENIENT)
 class FeedServiceTest : BaseServiceTest() {
 
     @Mock
@@ -93,6 +101,9 @@ class FeedServiceTest : BaseServiceTest() {
     @Mock
     private lateinit var contestWinnerWriter: ContestWinnerWriter
 
+    @Mock
+    private lateinit var blockFilterHelper: BlockFilterHelper
+
     @InjectMocks
     private lateinit var feedService: FeedService
 
@@ -115,6 +126,15 @@ class FeedServiceTest : BaseServiceTest() {
         )
         initializeBaseEntityFieldsFromSuperclass(feed)
         return feed
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    @BeforeEach
+    fun setUp() {
+        Mockito.doAnswer { invocation ->
+            val items = invocation.arguments[0] as? List<Feed> ?: emptyList()
+            items
+        }.`when`(blockFilterHelper).filterContent<Feed>(any(), anyOrNull(), any(), any())
     }
 
     @Test
@@ -248,7 +268,8 @@ class FeedServiceTest : BaseServiceTest() {
             likeFeedWriter = likeFeedWriter,
             likeFeedCommentWriter = likeFeedCommentWriter,
             saveFeedWriter = saveFeedWriter,
-            contestWinnerWriter = contestWinnerWriter
+            contestWinnerWriter = contestWinnerWriter,
+            blockFilterHelper = blockFilterHelper
         )
 
         val imageFile = mock<MultipartFile>()
@@ -753,7 +774,7 @@ class FeedServiceTest : BaseServiceTest() {
         whenever(feedReader.getPopularFeedsByBoard(board)).thenReturn(listOf(feed1, feed2))
 
         // when
-        val result = feedService.getPopularFeedsByBoard(boardId)
+        val result = feedService.getPopularFeedsByBoard(boardId, null)
 
         // then
         assertEquals(2, result.feeds.size)
@@ -775,7 +796,7 @@ class FeedServiceTest : BaseServiceTest() {
         whenever(feedReader.getPopularFeedsByBoard(board)).thenReturn(emptyList())
 
         // when
-        val result = feedService.getPopularFeedsByBoard(boardId)
+        val result = feedService.getPopularFeedsByBoard(boardId, null)
 
         // then
         assertTrue(result.feeds.isEmpty())

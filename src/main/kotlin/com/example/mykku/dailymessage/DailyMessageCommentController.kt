@@ -29,7 +29,8 @@ class DailyMessageCommentController(
     fun getComments(
         @PathVariable dailyMessageId: Long,
         @RequestParam(defaultValue = "0") page: Int,
-        @RequestParam(defaultValue = "20") size: Int
+        @RequestParam(defaultValue = "20") size: Int,
+        @CurrentMember(required = false) member: Member?
     ): ResponseEntity<ApiResponse<DailyMessageCommentsResponse>> {
         val pageable = PageableValidator.validateAndCreate(
             page,
@@ -37,7 +38,7 @@ class DailyMessageCommentController(
             "createdAt",
             Sort.Direction.DESC
         )
-        val comments = dailyMessageCommentService.getComments(dailyMessageId, pageable)
+        val comments = dailyMessageCommentService.getComments(dailyMessageId, member?.id, pageable)
 
         return ResponseEntity.ok(
             ApiResponse(

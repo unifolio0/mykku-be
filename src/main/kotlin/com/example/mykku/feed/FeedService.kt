@@ -1,5 +1,6 @@
 package com.example.mykku.feed
 
+import com.example.mykku.block.tool.BlockFilterHelper
 import com.example.mykku.board.domain.Board
 import com.example.mykku.board.tool.BoardReader
 import com.example.mykku.contest.tool.ContestParticipationReader
@@ -52,7 +53,8 @@ class FeedService(
     private val likeFeedWriter: LikeFeedWriter,
     private val likeFeedCommentWriter: LikeFeedCommentWriter,
     private val saveFeedWriter: SaveFeedWriter,
-    private val contestWinnerWriter: ContestWinnerWriter
+    private val contestWinnerWriter: ContestWinnerWriter,
+    private val blockFilterHelper: BlockFilterHelper
 ) {
     @Transactional
     fun createFeed(request: CreateFeedRequest, member: Member): CreateFeedResponse {
@@ -134,15 +136,21 @@ class FeedService(
         }
     }
 
-    private fun createPagedResponse(
+    private fun createFilteredPagedResponse(
         memberId: String,
-        feedPage: Page<Feed>
+        feedPage: Page<Feed>,
+        filteredFeeds: List<Feed>
     ): PagedFeedsResponse {
-        val feedResponses = feedDtoConverter.convertToFeedResponsesBatch(memberId, feedPage.content)
-        val responsePage = feedPage.map { feed ->
-            feedResponses.find { it.id == feed.id }!!
-        }
-        return PagedFeedsResponse.from(responsePage)
+        val feedResponses = feedDtoConverter.convertToFeedResponsesBatch(memberId, filteredFeeds)
+        return PagedFeedsResponse(
+            feeds = feedResponses,
+            currentPage = feedPage.number,
+            totalPages = feedPage.totalPages,
+            totalElements = feedPage.totalElements,
+            size = feedPage.size,
+            hasNext = feedPage.hasNext(),
+            hasPrevious = feedPage.hasPrevious()
+        )
     }
 
     @Transactional(readOnly = true)
@@ -153,14 +161,30 @@ class FeedService(
     ): PagedFeedsResponse {
         val board = boardReader.getBoardById(boardId)
         val feedPage = feedReader.getFeedsByBoardWithPagination(board, pageable)
-        return createPagedResponse(memberId ?: "", feedPage)
+
+        val filteredFeeds = blockFilterHelper.filterContent(
+            items = feedPage.content,
+            memberId = memberId,
+            memberIdExtractor = { it.member.id },
+            contentExtractors = listOf({ it.title }, { it.content })
+        )
+
+        return createFilteredPagedResponse(memberId ?: "", feedPage, filteredFeeds)
     }
 
     @Transactional(readOnly = true)
-    fun getPopularFeedsByBoard(boardId: Long): PopularFeedsResponse {
+    fun getPopularFeedsByBoard(boardId: Long, memberId: String?): PopularFeedsResponse {
         val board = boardReader.getBoardById(boardId)
         val popularFeeds = feedReader.getPopularFeedsByBoard(board)
-        return PopularFeedsResponse.from(popularFeeds)
+
+        val filteredFeeds = blockFilterHelper.filterContent(
+            items = popularFeeds,
+            memberId = memberId,
+            memberIdExtractor = { it.member.id },
+            contentExtractors = listOf({ it.title }, { it.content })
+        )
+
+        return PopularFeedsResponse.from(filteredFeeds)
     }
 
     @Transactional(readOnly = true)

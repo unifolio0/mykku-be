@@ -229,7 +229,7 @@ class BoardDocumentTest : BaseDocumentTest() {
                 )
             )
 
-            `when`(feedService.getPopularFeedsByBoard(eq(boardId))).thenReturn(response)
+            `when`(feedService.getPopularFeedsByBoard(eq(boardId), anyOrNull())).thenReturn(response)
 
             val documentFilter = document("board/popular-feeds", 200)
                 .request(request().applyConfig(apiConfig))

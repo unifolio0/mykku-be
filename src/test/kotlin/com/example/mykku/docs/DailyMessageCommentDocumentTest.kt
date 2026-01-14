@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
@@ -78,7 +79,7 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                 hasNext = false
             )
 
-            `when`(dailyMessageCommentService.getComments(eq(dailyMessageId), any())).thenReturn(response)
+            `when`(dailyMessageCommentService.getComments(eq(dailyMessageId), anyOrNull(), any())).thenReturn(response)
 
             val documentFilter = document("daily-message-comment/list", 200)
                 .request(request().applyConfig(apiConfig))

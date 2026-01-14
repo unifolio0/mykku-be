@@ -1,6 +1,7 @@
 package com.example.mykku.dailymessage
 
 import com.example.mykku.BaseServiceTest
+import com.example.mykku.block.tool.BlockFilterHelper
 import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.domain.DailyMessageComment
 import com.example.mykku.dailymessage.dto.CreateCommentRequest
@@ -35,6 +36,9 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
 
     @Mock
     private lateinit var memberReader: MemberReader
+
+    @Mock
+    private lateinit var blockFilterHelper: BlockFilterHelper
 
     @InjectMocks
     private lateinit var dailyMessageCommentService: DailyMessageCommentService
