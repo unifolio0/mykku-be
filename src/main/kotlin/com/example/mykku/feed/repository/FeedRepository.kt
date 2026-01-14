@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
+import java.time.LocalDateTime
 
 @Repository
 interface FeedRepository : JpaRepository<Feed, Long> {
@@ -25,12 +26,24 @@ interface FeedRepository : JpaRepository<Feed, Long> {
     ): Page<Feed>
     
     @Query("""
-        SELECT f FROM Feed f 
-        WHERE f.board = :board 
+        SELECT f FROM Feed f
+        WHERE f.board = :board
         ORDER BY f.createdAt DESC
     """)
     fun findAllByBoardOrderByCreatedAtDesc(
         @Param("board") board: Board,
         pageable: Pageable
     ): Page<Feed>
+
+    @Query("""
+        SELECT f FROM Feed f
+        WHERE f.board = :board
+        AND f.createdAt >= :since
+        ORDER BY f.likeCount DESC
+    """)
+    fun findPopularFeedsByBoardSince(
+        @Param("board") board: Board,
+        @Param("since") since: LocalDateTime,
+        pageable: Pageable
+    ): List<Feed>
 }

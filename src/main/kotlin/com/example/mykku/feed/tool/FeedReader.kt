@@ -14,8 +14,10 @@ import com.example.mykku.feed.repository.FeedImageRepository
 import com.example.mykku.feed.repository.FeedRepository
 import com.example.mykku.feed.repository.FeedTagRepository
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Component
+import java.time.LocalDateTime
 
 @Component
 class FeedReader(
@@ -25,6 +27,10 @@ class FeedReader(
     private val feedCommentRepository: FeedCommentRepository,
     private val contestTagRepository: ContestTagRepository
 ) {
+    companion object {
+        const val DEFAULT_POPULAR_FEEDS_LIMIT = 3
+        const val DEFAULT_POPULAR_FEEDS_DAYS_AGO = 7
+    }
     fun getFeedPreviews(): List<FeedPreviewResponse> {
         return feedRepository.findAll()
             .map { feed -> FeedPreviewResponse(feed) }
@@ -74,5 +80,15 @@ class FeedReader(
 
     fun getCommentIdsByFeed(feed: Feed): List<Long> {
         return feedCommentRepository.findIdsByFeed(feed)
+    }
+
+    fun getPopularFeedsByBoard(
+        board: Board,
+        limit: Int = DEFAULT_POPULAR_FEEDS_LIMIT,
+        daysAgo: Int = DEFAULT_POPULAR_FEEDS_DAYS_AGO
+    ): List<Feed> {
+        val since = LocalDateTime.now().minusDays(daysAgo.toLong())
+        val pageable = PageRequest.of(0, limit)
+        return feedRepository.findPopularFeedsByBoardSince(board, since, pageable)
     }
 }

@@ -6,6 +6,7 @@ import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.common.util.PageableValidator
 import com.example.mykku.feed.FeedService
 import com.example.mykku.feed.dto.PagedFeedsResponse
+import com.example.mykku.feed.dto.PopularFeedsResponse
 import com.example.mykku.member.domain.Member
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -48,6 +49,19 @@ class BoardController(
             ApiResponse(
                 message = "보드별 피드 목록을 성공적으로 조회했습니다.",
                 data = feeds
+            )
+        )
+    }
+
+    @GetMapping("/{boardId}/feeds/popular")
+    fun getPopularFeedsByBoard(
+        @PathVariable boardId: Long
+    ): ResponseEntity<ApiResponse<PopularFeedsResponse>> {
+        val response = feedService.getPopularFeedsByBoard(boardId)
+        return ResponseEntity.ok(
+            ApiResponse(
+                message = "인기 피드 목록을 성공적으로 조회했습니다.",
+                data = response
             )
         )
     }

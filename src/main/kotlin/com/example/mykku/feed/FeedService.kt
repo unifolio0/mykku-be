@@ -15,6 +15,7 @@ import com.example.mykku.feed.dto.CreateFeedResponse
 import com.example.mykku.feed.dto.FeedDetailResponse
 import com.example.mykku.feed.dto.FeedImageResponse
 import com.example.mykku.feed.dto.PagedFeedsResponse
+import com.example.mykku.feed.dto.PopularFeedsResponse
 import com.example.mykku.feed.dto.UpdateFeedRequest
 import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.feed.tool.FeedCommentWriter
@@ -153,6 +154,13 @@ class FeedService(
         val board = boardReader.getBoardById(boardId)
         val feedPage = feedReader.getFeedsByBoardWithPagination(board, pageable)
         return createPagedResponse(memberId ?: "", feedPage)
+    }
+
+    @Transactional(readOnly = true)
+    fun getPopularFeedsByBoard(boardId: Long): PopularFeedsResponse {
+        val board = boardReader.getBoardById(boardId)
+        val popularFeeds = feedReader.getPopularFeedsByBoard(board)
+        return PopularFeedsResponse.from(popularFeeds)
     }
 
     @Transactional(readOnly = true)

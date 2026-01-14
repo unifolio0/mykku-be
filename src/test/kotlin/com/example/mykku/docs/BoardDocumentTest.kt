@@ -7,6 +7,8 @@ import com.example.mykku.feed.dto.CommentPreviewResponse
 import com.example.mykku.feed.dto.FeedImageResponse
 import com.example.mykku.feed.dto.FeedResponse
 import com.example.mykku.feed.dto.PagedFeedsResponse
+import com.example.mykku.feed.dto.PopularFeedResponse
+import com.example.mykku.feed.dto.PopularFeedsResponse
 import com.example.mykku.feed.dto.TagResponse
 import io.restassured.http.ContentType
 import java.time.LocalDateTime
@@ -198,6 +200,57 @@ class BoardDocumentTest : BaseDocumentTest() {
                 .contentType(ContentType.JSON)
                 .`when`()
                 .get("/api/v1/boards/{boardId}/feeds", boardId)
+                .then()
+                .statusCode(200)
+        }
+    }
+
+    @Nested
+    @DisplayName("보드별 인기 피드 목록 조회")
+    inner class GetPopularFeedsByBoard {
+
+        private val apiConfig = ApiRequestConfig(
+            tag = Tag.BOARD_API,
+            summary = "보드별 인기 피드 목록 조회",
+            description = "특정 게시판의 인기 피드 목록(최근 7일, 좋아요 순 상위 3개)을 조회합니다.",
+            pathParameters = listOf(
+                parameterWithName("boardId").description("조회할 게시판의 ID")
+            )
+        )
+
+        @Test
+        fun `성공`() {
+            val boardId = 1L
+            val response = PopularFeedsResponse(
+                feeds = listOf(
+                    PopularFeedResponse(id = 1L, rank = 1, title = "인기 피드 1", content = "인기 피드 내용 1"),
+                    PopularFeedResponse(id = 2L, rank = 2, title = "인기 피드 2", content = "인기 피드 내용 2"),
+                    PopularFeedResponse(id = 3L, rank = 3, title = "인기 피드 3", content = "인기 피드 내용 3")
+                )
+            )
+
+            `when`(feedService.getPopularFeedsByBoard(eq(boardId))).thenReturn(response)
+
+            val documentFilter = document("board/popular-feeds", 200)
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
+                            fieldWithPath("data.feeds").type(JsonFieldType.ARRAY).description("인기 피드 목록 (최대 3개)"),
+                            fieldWithPath("data.feeds[].id").type(JsonFieldType.NUMBER).description("피드 ID"),
+                            fieldWithPath("data.feeds[].rank").type(JsonFieldType.NUMBER).description("순위"),
+                            fieldWithPath("data.feeds[].title").type(JsonFieldType.STRING).description("피드 제목"),
+                            fieldWithPath("data.feeds[].content").type(JsonFieldType.STRING).description("피드 내용")
+                        )
+                )
+                .build()
+
+            given(documentFilter)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .get("/api/v1/boards/{boardId}/feeds/popular", boardId)
                 .then()
                 .statusCode(200)
         }

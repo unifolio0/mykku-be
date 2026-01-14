@@ -728,4 +728,56 @@ class FeedServiceTest : BaseServiceTest() {
         assertEquals(2L, result.boardId)
         assertEquals("새 게시판", result.boardTitle)
     }
+
+    @Test
+    fun `getPopularFeedsByBoard - 인기 피드 목록을 반환한다`() {
+        // given
+        val boardId = 1L
+
+        val feed1 = createTestFeed(
+            id = 1L,
+            title = "인기 피드 1",
+            content = "Content 1",
+            board = board,
+            member = member
+        )
+        val feed2 = createTestFeed(
+            id = 2L,
+            title = "인기 피드 2",
+            content = "Content 2",
+            board = board,
+            member = member
+        )
+
+        whenever(boardReader.getBoardById(boardId)).thenReturn(board)
+        whenever(feedReader.getPopularFeedsByBoard(board)).thenReturn(listOf(feed1, feed2))
+
+        // when
+        val result = feedService.getPopularFeedsByBoard(boardId)
+
+        // then
+        assertEquals(2, result.feeds.size)
+        assertEquals(1L, result.feeds[0].id)
+        assertEquals(1, result.feeds[0].rank)
+        assertEquals("인기 피드 1", result.feeds[0].title)
+        assertEquals("Content 1", result.feeds[0].content)
+        assertEquals(2L, result.feeds[1].id)
+        assertEquals(2, result.feeds[1].rank)
+        assertEquals("인기 피드 2", result.feeds[1].title)
+    }
+
+    @Test
+    fun `getPopularFeedsByBoard - 인기 피드가 없으면 빈 목록을 반환한다`() {
+        // given
+        val boardId = 1L
+
+        whenever(boardReader.getBoardById(boardId)).thenReturn(board)
+        whenever(feedReader.getPopularFeedsByBoard(board)).thenReturn(emptyList())
+
+        // when
+        val result = feedService.getPopularFeedsByBoard(boardId)
+
+        // then
+        assertTrue(result.feeds.isEmpty())
+    }
 }
