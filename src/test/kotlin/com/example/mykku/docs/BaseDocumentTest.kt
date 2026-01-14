@@ -182,6 +182,7 @@ abstract class BaseDocumentTest {
         testMember = memberRepository.save(
             Member(
                 id = TEST_MEMBER_ID,
+                memberId = "testmemberid",
                 nickname = "testuser",
                 role = null,
                 profileImage = "https://example.com/profile.jpg",

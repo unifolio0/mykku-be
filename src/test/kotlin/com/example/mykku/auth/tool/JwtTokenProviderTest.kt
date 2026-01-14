@@ -142,6 +142,7 @@ class JwtTokenProviderTest {
         // given
         val member = Member(
             id = "google_123456",
+            memberId = "testmemberid",
             nickname = "testuser",
             role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "https://example.com/profile.jpg",
@@ -159,7 +160,7 @@ class JwtTokenProviderTest {
         assertNotNull(loginResponse.refreshToken)
         assertEquals(86400000, loginResponse.accessTokenExpiresIn)
         assertEquals(1209600000, loginResponse.refreshTokenExpiresIn)
-        assertEquals(member.id, loginResponse.member.id)
+        assertEquals(member.memberId, loginResponse.member.memberId)
         assertEquals(userEmail, loginResponse.member.email)
         assertEquals(member.nickname, loginResponse.member.nickname)
         assertEquals(member.profileImage, loginResponse.member.profileImage)

@@ -17,7 +17,7 @@ import com.example.mykku.like.tool.LikeFeedCommentReader
 import com.example.mykku.like.tool.LikeFeedCommentWriter
 import com.example.mykku.like.tool.LikeFeedReader
 import com.example.mykku.like.tool.LikeFeedWriter
-import com.example.mykku.member.tool.MemberReader
+import com.example.mykku.member.domain.Member
 import com.example.mykku.notification.event.FeedLikedEvent
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Page
@@ -27,8 +27,6 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class LikeService(
-    private val memberReader: MemberReader,
-
     private val boardReader: BoardReader,
     private val likeBoardWriter: LikeBoardWriter,
     private val likeBoardReader: LikeBoardReader,
@@ -48,30 +46,28 @@ class LikeService(
     private val eventPublisher: ApplicationEventPublisher
 ) {
     @Transactional(readOnly = true)
-    fun getLikedBoards(memberId: String, pageable: Pageable): Page<LikeBoardInfoResponse> {
-        return likeBoardReader.getLikedBoards(memberId = memberId, pageable = pageable)
+    fun getLikedBoards(member: Member, pageable: Pageable): Page<LikeBoardInfoResponse> {
+        return likeBoardReader.getLikedBoards(memberId = member.id, pageable = pageable)
             .map { LikeBoardInfoResponse(it) }
     }
 
     @Transactional
-    fun likeBoard(boardId: Long, memberId: String): LikeBoardResponse {
-        likeBoardReader.validateLikeBoardNotExists(memberId = memberId, boardId = boardId)
-        val member = memberReader.getMemberById(memberId)
+    fun likeBoard(boardId: Long, member: Member): LikeBoardResponse {
+        likeBoardReader.validateLikeBoardNotExists(memberId = member.id, boardId = boardId)
         val board = boardReader.getBoardById(boardId)
         val likeBoard = likeBoardWriter.createLikeBoard(board = board, member = member)
         return LikeBoardResponse(likeBoard)
     }
 
     @Transactional
-    fun unlikeBoard(memberId: String, boardId: Long) {
-        likeBoardReader.validateLikeBoardExists(memberId = memberId, boardId = boardId)
-        likeBoardWriter.deleteLikeBoard(memberId = memberId, boardId = boardId)
+    fun unlikeBoard(member: Member, boardId: Long) {
+        likeBoardReader.validateLikeBoardExists(memberId = member.id, boardId = boardId)
+        likeBoardWriter.deleteLikeBoard(memberId = member.id, boardId = boardId)
     }
 
     @Transactional
-    fun likeFeed(memberId: String, feedId: Long): LikeFeedResponse {
-        likeFeedReader.validateLikeFeedNotExists(memberId = memberId, feedId = feedId)
-        val member = memberReader.getMemberById(memberId)
+    fun likeFeed(member: Member, feedId: Long): LikeFeedResponse {
+        likeFeedReader.validateLikeFeedNotExists(memberId = member.id, feedId = feedId)
         val feed = feedReader.getFeedById(feedId)
         val likeFeed = likeFeedWriter.createLikeFeed(feed = feed, member = member)
 
@@ -87,21 +83,20 @@ class LikeService(
     }
 
     @Transactional
-    fun unlikeFeed(memberId: String, feedId: Long) {
-        likeFeedReader.validateLikeFeedExists(memberId = memberId, feedId = feedId)
-        likeFeedWriter.deleteLikeFeed(memberId = memberId, feedId = feedId)
+    fun unlikeFeed(member: Member, feedId: Long) {
+        likeFeedReader.validateLikeFeedExists(memberId = member.id, feedId = feedId)
+        likeFeedWriter.deleteLikeFeed(memberId = member.id, feedId = feedId)
     }
 
     @Transactional
     fun likeDailyMessageComment(
-        memberId: String,
+        member: Member,
         dailyMessageCommentId: Long
     ): LikeDailyMessageCommentResponse {
         likeDailyMessageCommentReader.validateLikeDailyMessageCommentNotExists(
-            memberId = memberId,
+            memberId = member.id,
             dailyMessageCommentId = dailyMessageCommentId
         )
-        val member = memberReader.getMemberById(memberId)
         val dailyMessageComment = dailyMessageCommentReader.getDailyMessageCommentById(dailyMessageCommentId)
         val likeDailyMessageComment = likeDailyMessageCommentWriter.createLikeDailyMessageComment(
             dailyMessageComment = dailyMessageComment,
@@ -111,24 +106,23 @@ class LikeService(
     }
 
     @Transactional
-    fun unlikeDailyMessageComment(memberId: String, dailyMessageCommentId: Long) {
+    fun unlikeDailyMessageComment(member: Member, dailyMessageCommentId: Long) {
         likeDailyMessageCommentReader.validateLikeDailyMessageCommentExists(
-            memberId = memberId,
+            memberId = member.id,
             dailyMessageCommentId = dailyMessageCommentId
         )
         likeDailyMessageCommentWriter.deleteLikeDailyMessageComment(
-            memberId = memberId,
+            memberId = member.id,
             dailyMessageCommentId = dailyMessageCommentId
         )
     }
 
     @Transactional
-    fun likeFeedComment(memberId: String, feedCommentId: Long): LikeFeedCommentResponse {
+    fun likeFeedComment(member: Member, feedCommentId: Long): LikeFeedCommentResponse {
         likeFeedCommentReader.validateLikeFeedCommentNotExists(
-            memberId = memberId,
+            memberId = member.id,
             feedCommentId = feedCommentId
         )
-        val member = memberReader.getMemberById(memberId)
         val feedComment = feedCommentReader.getFeedCommentById(feedCommentId)
         val likeFeedComment = likeFeedCommentWriter.createLikeFeedComment(
             feedComment = feedComment,
@@ -138,11 +132,11 @@ class LikeService(
     }
 
     @Transactional
-    fun unlikeFeedComment(memberId: String, feedCommentId: Long) {
+    fun unlikeFeedComment(member: Member, feedCommentId: Long) {
         likeFeedCommentReader.validateLikeFeedCommentExists(
-            memberId = memberId,
+            memberId = member.id,
             feedCommentId = feedCommentId
         )
-        likeFeedCommentWriter.deleteLikeFeedComment(memberId = memberId, feedCommentId = feedCommentId)
+        likeFeedCommentWriter.deleteLikeFeedComment(memberId = member.id, feedCommentId = feedCommentId)
     }
 }

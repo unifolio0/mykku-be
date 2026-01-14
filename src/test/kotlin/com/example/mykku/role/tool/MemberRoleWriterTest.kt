@@ -35,6 +35,7 @@ class MemberRoleWriterTest {
         role = Role(id = 1L, name = "테스트 칭호", description = "설명")
         member = Member.createEmailMember(
             id = "test-id",
+            memberId = "testmemberid",
             email = "test@example.com",
             password = "password",
             nickname = "테스터",

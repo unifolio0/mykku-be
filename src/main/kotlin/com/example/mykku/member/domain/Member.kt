@@ -17,6 +17,9 @@ class Member(
     @Id
     val id: String,
 
+    @Column(name = "member_id", unique = true, nullable = false, length = 16)
+    val memberId: String,
+
     @Column(name = "nickname")
     var nickname: String,
 
@@ -47,15 +50,33 @@ class Member(
         const val NICKNAME_MAX_LENGTH = 10
         val VALID_NICKNAME_PATTERN = Regex("^[가-힣a-zA-Z0-9\\s]+$")
 
+        const val MEMBER_ID_MAX_LENGTH = 16
+        val VALID_MEMBER_ID_PATTERN = Regex("^[a-zA-Z0-9]+$")
+
+        fun validateMemberId(memberId: String) {
+            if (memberId.isBlank()) {
+                throw MemberException.memberIdEmpty()
+            }
+            if (memberId.length > MEMBER_ID_MAX_LENGTH) {
+                throw MemberException.memberIdTooLong()
+            }
+            if (!VALID_MEMBER_ID_PATTERN.matches(memberId)) {
+                throw MemberException.memberIdInvalidFormat()
+            }
+        }
+
         fun createEmailMember(
             id: String,
+            memberId: String,
             email: String,
             password: String,
             nickname: String,
             profileImage: String = ""
         ): Member {
+            validateMemberId(memberId)
             return Member(
                 id = id,
+                memberId = memberId,
                 nickname = nickname,
                 profileImage = profileImage,
                 provider = SocialProvider.EMAIL,
@@ -68,14 +89,17 @@ class Member(
 
         fun createSocialMember(
             id: String,
+            memberId: String,
             nickname: String,
             profileImage: String,
             provider: SocialProvider,
             socialId: String,
             email: String
         ): Member {
+            validateMemberId(memberId)
             return Member(
                 id = id,
+                memberId = memberId,
                 nickname = nickname,
                 profileImage = profileImage,
                 provider = provider,

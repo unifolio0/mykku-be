@@ -149,9 +149,11 @@ class EmailAuthServiceTest : BaseServiceTest() {
         val email = "test@example.com"
         val password = "password123!"
         val nickname = "테스트"
+        val userMemberId = "testmemberid"
         val encodedPassword = "encodedPassword"
         val member = Member.createEmailMember(
             id = "memberId",
+            memberId = userMemberId,
             email = email,
             password = encodedPassword,
             nickname = nickname
@@ -162,7 +164,7 @@ class EmailAuthServiceTest : BaseServiceTest() {
             accessTokenExpiresIn = 86400000,
             refreshTokenExpiresIn = 1209600000,
             member = MemberInfo(
-                id = member.id,
+                memberId = member.id,
                 email = email,
                 nickname = nickname,
                 profileImage = ""
@@ -171,15 +173,17 @@ class EmailAuthServiceTest : BaseServiceTest() {
         )
 
         whenever(memberReader.existsByEmail(email)).thenReturn(false)
+        whenever(memberReader.existsByMemberId(userMemberId)).thenReturn(false)
         whenever(passwordEncoder.encode(password)).thenReturn(encodedPassword)
         whenever(memberWriter.save(any())).thenReturn(member)
         whenever(jwtTokenProvider.createLoginResponse(any(), any(), any())).thenReturn(loginResponse)
 
-        val result = emailAuthService.signup(email, password, nickname)
+        val result = emailAuthService.signup(email, password, nickname, userMemberId)
 
         assertNotNull(result)
         assertEquals(loginResponse.accessToken, result.accessToken)
         verify(memberReader).existsByEmail(email)
+        verify(memberReader).existsByMemberId(userMemberId)
         verify(passwordEncoder).encode(password)
         verify(memberWriter).save(any())
         verify(jwtTokenProvider).createLoginResponse(any(), any(), any())
@@ -190,11 +194,29 @@ class EmailAuthServiceTest : BaseServiceTest() {
         val email = "existing@example.com"
         val password = "password123!"
         val nickname = "테스트"
+        val userMemberId = "testmemberid"
 
         whenever(memberReader.existsByEmail(email)).thenReturn(true)
 
         val exception = assertThrows<EmailAuthException> {
-            emailAuthService.signup(email, password, nickname)
+            emailAuthService.signup(email, password, nickname, userMemberId)
+        }
+
+        assertEquals(EmailAuthErrorCode.EMAIL_ALREADY_EXISTS, exception.errorCode)
+    }
+
+    @Test
+    fun `이미 존재하는 아이디로 회원가입 시 예외 발생`() {
+        val email = "test@example.com"
+        val password = "password123!"
+        val nickname = "테스트"
+        val userMemberId = "existingmemberid"
+
+        whenever(memberReader.existsByEmail(email)).thenReturn(false)
+        whenever(memberReader.existsByMemberId(userMemberId)).thenReturn(true)
+
+        val exception = assertThrows<EmailAuthException> {
+            emailAuthService.signup(email, password, nickname, userMemberId)
         }
 
         assertEquals(EmailAuthErrorCode.EMAIL_ALREADY_EXISTS, exception.errorCode)
@@ -208,6 +230,7 @@ class EmailAuthServiceTest : BaseServiceTest() {
         val role = Role(name = "일반 덕후", description = "테스트용 칭호")
         val member = Member(
             id = "memberId",
+            memberId = "testmemberid",
             nickname = "테스트",
             role = role,
             profileImage = "",
@@ -222,7 +245,7 @@ class EmailAuthServiceTest : BaseServiceTest() {
             accessTokenExpiresIn = 86400000,
             refreshTokenExpiresIn = 1209600000,
             member = MemberInfo(
-                id = member.id,
+                memberId = member.id,
                 email = email,
                 nickname = member.nickname,
                 profileImage = member.profileImage
@@ -264,6 +287,7 @@ class EmailAuthServiceTest : BaseServiceTest() {
         val encodedPassword = "encodedPassword"
         val member = Member(
             id = "memberId",
+            memberId = "testmemberid",
             nickname = "테스트",
             role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "",
@@ -291,6 +315,7 @@ class EmailAuthServiceTest : BaseServiceTest() {
         val encodedPassword = "encodedNewPassword"
         val member = Member(
             id = "memberId",
+            memberId = "testmemberid",
             nickname = "테스트",
             role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "",
@@ -355,6 +380,7 @@ class EmailAuthServiceTest : BaseServiceTest() {
         val encodedPassword = "encodedTemporaryPassword"
         val member = Member(
             id = "memberId",
+            memberId = "testmemberid",
             nickname = "테스트",
             role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "",
@@ -394,6 +420,7 @@ class EmailAuthServiceTest : BaseServiceTest() {
         val email = "test@example.com"
         val member = Member(
             id = "memberId",
+            memberId = "testmemberid",
             nickname = "테스트",
             role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "",
@@ -412,5 +439,29 @@ class EmailAuthServiceTest : BaseServiceTest() {
         }
 
         assertEquals(EmailAuthErrorCode.EMAIL_SEND_FAILED, exception.errorCode)
+    }
+
+    @Test
+    fun `아이디 중복 확인 - 사용 가능`() {
+        val memberId = "newuser123"
+
+        whenever(memberReader.existsByMemberId(memberId)).thenReturn(false)
+
+        val result = emailAuthService.checkMemberIdAvailability(memberId)
+
+        assertEquals(true, result)
+        verify(memberReader).existsByMemberId(memberId)
+    }
+
+    @Test
+    fun `아이디 중복 확인 - 이미 사용 중`() {
+        val memberId = "existinguser"
+
+        whenever(memberReader.existsByMemberId(memberId)).thenReturn(true)
+
+        val result = emailAuthService.checkMemberIdAvailability(memberId)
+
+        assertEquals(false, result)
+        verify(memberReader).existsByMemberId(memberId)
     }
 }

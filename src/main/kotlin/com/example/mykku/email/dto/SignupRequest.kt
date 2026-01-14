@@ -6,6 +6,14 @@ import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 
 data class SignupRequest(
+    @field:NotBlank(message = "아이디는 필수입니다")
+    @field:Size(max = 16, message = "아이디는 최대 16자까지 가능합니다")
+    @field:Pattern(
+        regexp = "^[a-zA-Z0-9]+$",
+        message = "아이디는 영문과 숫자만 사용 가능합니다"
+    )
+    val memberId: String,
+
     @field:NotBlank(message = "이메일은 필수입니다")
     @field:Email(message = "올바른 이메일 형식이 아닙니다")
     val email: String,

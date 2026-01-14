@@ -56,6 +56,7 @@ class BoardControllerTest : BaseControllerTest() {
         val member = memberRepository.save(
             Member(
                 id = "member1",
+                memberId = "testmemberid1",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
@@ -107,6 +108,7 @@ class BoardControllerTest : BaseControllerTest() {
         val member = memberRepository.save(
             Member(
                 id = "member1",
+                memberId = "testmemberid2",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",

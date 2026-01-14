@@ -10,7 +10,7 @@ import com.example.mykku.dailymessage.exception.DailyMessageException
 import com.example.mykku.dailymessage.tool.DailyMessageCommentReader
 import com.example.mykku.dailymessage.tool.DailyMessageCommentWriter
 import com.example.mykku.dailymessage.tool.DailyMessageReader
-import com.example.mykku.member.tool.MemberReader
+import com.example.mykku.member.domain.Member
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -20,7 +20,6 @@ class DailyMessageCommentService(
     private val dailyMessageReader: DailyMessageReader,
     private val dailyMessageCommentReader: DailyMessageCommentReader,
     private val dailyMessageCommentWriter: DailyMessageCommentWriter,
-    private val memberReader: MemberReader,
     private val blockFilterHelper: BlockFilterHelper
 ) {
     @Transactional(readOnly = true)
@@ -83,11 +82,10 @@ class DailyMessageCommentService(
     @Transactional
     fun createComment(
         dailyMessageId: Long,
-        memberId: String,
+        member: Member,
         request: CreateCommentRequest,
     ): CommentResponse {
         val dailyMessage = dailyMessageReader.getDailyMessage(dailyMessageId)
-        val member = memberReader.getMemberById(memberId)
 
         val parentComment = request.parentCommentId?.let { parentId ->
             dailyMessageCommentReader.getCommentByDailyMessageId(parentId, dailyMessageId)
@@ -114,12 +112,12 @@ class DailyMessageCommentService(
     @Transactional
     fun updateComment(
         commentId: Long,
-        memberId: String,
+        member: Member,
         request: UpdateCommentRequest,
     ): CommentResponse {
         val comment = dailyMessageCommentReader.getComment(commentId)
 
-        if (comment.member.id != memberId) {
+        if (comment.member.id != member.id) {
             throw DailyMessageException.commentForbiddenAccess()
         }
 
@@ -140,10 +138,10 @@ class DailyMessageCommentService(
     }
 
     @Transactional
-    fun deleteComment(commentId: Long, memberId: String) {
+    fun deleteComment(commentId: Long, member: Member) {
         val comment = dailyMessageCommentReader.getComment(commentId)
 
-        if (comment.member.id != memberId) {
+        if (comment.member.id != member.id) {
             throw DailyMessageException.commentForbiddenAccess()
         }
 

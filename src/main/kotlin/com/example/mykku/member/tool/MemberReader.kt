@@ -35,4 +35,17 @@ class MemberReader(
     fun existsByRole(role: Role): Boolean {
         return memberRepository.existsByRole(role)
     }
+
+    fun existsByMemberId(memberId: String): Boolean {
+        return memberRepository.existsByMemberId(memberId)
+    }
+
+    fun findByMemberId(memberId: String): Member? {
+        return memberRepository.findByMemberId(memberId)
+    }
+
+    fun getMemberByMemberId(memberId: String): Member {
+        return memberRepository.findByMemberId(memberId)
+            ?: throw MemberException.memberNotFound()
+    }
 }

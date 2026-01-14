@@ -114,7 +114,7 @@ class FeedService(
             content = feed.content,
             boardId = board.id!!,
             boardTitle = board.title,
-            authorId = member.id,
+            authorId = member.memberId,
             authorNickname = member.nickname,
             authorProfileUrl = member.profileImage,
             images = mapFeedImages(feedImages),

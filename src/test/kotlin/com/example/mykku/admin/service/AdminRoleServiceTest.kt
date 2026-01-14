@@ -134,6 +134,7 @@ class AdminRoleServiceTest {
     fun `회원에게 칭호를 부여할 수 있다`() {
         val member = Member.createEmailMember(
             id = "test-id",
+            memberId = "testmemberid",
             email = "test@example.com",
             password = "password",
             nickname = "테스터",

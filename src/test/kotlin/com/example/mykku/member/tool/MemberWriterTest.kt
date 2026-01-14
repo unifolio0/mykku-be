@@ -25,6 +25,7 @@ class MemberWriterTest : BaseToolTest() {
     fun `save는 멤버를 저장하고 저장된 결과를 반환한다`() {
         val member = Member(
             id = "member123",
+            memberId = "member123id",
             nickname = "테스트유저",
             role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "profile.jpg",
@@ -34,6 +35,7 @@ class MemberWriterTest : BaseToolTest() {
         )
         val savedMember = Member(
             id = "member123",
+            memberId = "member123id",
             nickname = "테스트유저",
             role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "profile.jpg",
@@ -57,6 +59,7 @@ class MemberWriterTest : BaseToolTest() {
     fun `save는 기존 멤버를 업데이트하고 저장된 결과를 반환한다`() {
         val existingMember = Member(
             id = "member123",
+            memberId = "existingid",
             nickname = "기존닉네임",
             role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "old_profile.jpg",
@@ -66,6 +69,7 @@ class MemberWriterTest : BaseToolTest() {
         )
         val updatedMember = Member(
             id = "member123",
+            memberId = "existingid",
             nickname = "새로운닉네임",
             role = Role(name = "관리자", description = "테스트용 칭호"),
             profileImage = "new_profile.jpg",

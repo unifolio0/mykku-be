@@ -107,7 +107,7 @@ class FeedServiceTest : BaseServiceTest() {
     @InjectMocks
     private lateinit var feedService: FeedService
 
-    private val member = createTestMember(id = "member1", nickname = "test", email = "test@test.com")
+    private val member = createTestMember(id = "member1", memberId = "member1", nickname = "test", email = "test@test.com")
     private val board = createTestBoard(id = 1L, title = "보드1", logo = "https://example.com/logo.png")
 
     private fun createTestFeed(

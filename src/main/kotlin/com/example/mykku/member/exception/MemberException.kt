@@ -18,5 +18,13 @@ class MemberException(
         fun nicknameAlreadyExists(): MemberException = MemberException(MemberErrorCode.NICKNAME_ALREADY_EXISTS)
 
         fun invalidCurrentPassword(): MemberException = MemberException(MemberErrorCode.INVALID_CURRENT_PASSWORD)
+
+        fun memberIdAlreadyExists(): MemberException = MemberException(MemberErrorCode.MEMBER_ID_ALREADY_EXISTS)
+
+        fun memberIdTooLong(): MemberException = MemberException(MemberErrorCode.MEMBER_ID_TOO_LONG)
+
+        fun memberIdInvalidFormat(): MemberException = MemberException(MemberErrorCode.MEMBER_ID_INVALID_FORMAT)
+
+        fun memberIdEmpty(): MemberException = MemberException(MemberErrorCode.MEMBER_ID_EMPTY)
     }
 }

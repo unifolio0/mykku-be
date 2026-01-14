@@ -22,6 +22,7 @@ class LikeControllerTest : BaseControllerTest() {
         val member = memberRepository.save(
             Member(
                 id = "member1",
+                memberId = "testmemberid1",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
@@ -61,6 +62,7 @@ class LikeControllerTest : BaseControllerTest() {
         val member = memberRepository.save(
             Member(
                 id = "member1",
+                memberId = "member1",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",

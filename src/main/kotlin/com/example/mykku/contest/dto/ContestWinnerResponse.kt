@@ -27,7 +27,7 @@ data class ContestWinnerResponse(
                 feedId = feed.id!!,
                 feedTitle = feed.title,
                 feedImageUrl = feedImage?.url,
-                authorId = member.id,
+                authorId = member.memberId,
                 authorNickname = member.nickname,
                 authorProfileImage = member.profileImage
             )

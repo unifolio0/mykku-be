@@ -42,6 +42,7 @@ class MemberServiceTest : BaseServiceTest() {
         val encodedNewPassword = "encodedNewPassword"
         val member = Member(
             id = "memberId",
+            memberId = "testmemberid",
             nickname = "테스트",
             role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "",
@@ -69,6 +70,7 @@ class MemberServiceTest : BaseServiceTest() {
         val encodedCurrentPassword = "encodedOldPassword"
         val member = Member(
             id = "memberId",
+            memberId = "testmemberid",
             nickname = "테스트",
             role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "",
@@ -93,6 +95,7 @@ class MemberServiceTest : BaseServiceTest() {
         val newPassword = "newPassword123!"
         val member = Member(
             id = "memberId",
+            memberId = "testmemberid",
             nickname = "테스트",
             role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "",
@@ -113,6 +116,7 @@ class MemberServiceTest : BaseServiceTest() {
     fun `프로필 조회 성공`() {
         val member = Member(
             id = "memberId",
+            memberId = "testmemberid",
             nickname = "테스트유저",
             role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "https://example.com/profile.jpg",
@@ -124,7 +128,7 @@ class MemberServiceTest : BaseServiceTest() {
 
         val response = memberService.getMyProfile(member)
 
-        assertEquals("memberId", response.id)
+        assertEquals("testmemberid", response.memberId)
         assertEquals("테스트유저", response.nickname)
         assertEquals("https://example.com/profile.jpg", response.profileImage)
         assertEquals("test@example.com", response.email)
@@ -135,6 +139,7 @@ class MemberServiceTest : BaseServiceTest() {
     fun `프로필 수정 성공 - 닉네임과 프로필 이미지 변경`() {
         val member = Member(
             id = "memberId",
+            memberId = "testmemberid",
             nickname = "기존닉네임",
             role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "https://example.com/old.jpg",
@@ -161,6 +166,7 @@ class MemberServiceTest : BaseServiceTest() {
     fun `프로필 수정 - 동일한 닉네임으로 변경 시 중복 체크 안함`() {
         val member = Member(
             id = "memberId",
+            memberId = "testmemberid",
             nickname = "테스트유저",
             role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "https://example.com/old.jpg",
@@ -185,6 +191,7 @@ class MemberServiceTest : BaseServiceTest() {
     fun `프로필 수정 실패 - 닉네임 중복`() {
         val member = Member(
             id = "memberId",
+            memberId = "testmemberid",
             nickname = "기존닉네임",
             role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "https://example.com/old.jpg",
@@ -210,6 +217,7 @@ class MemberServiceTest : BaseServiceTest() {
     fun `프로필 수정 실패 - 닉네임 길이 초과`() {
         val member = Member(
             id = "memberId",
+            memberId = "testmemberid",
             nickname = "기존닉네임",
             role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "https://example.com/old.jpg",
@@ -235,6 +243,7 @@ class MemberServiceTest : BaseServiceTest() {
     fun `프로필 수정 실패 - 닉네임 형식 오류`() {
         val member = Member(
             id = "memberId",
+            memberId = "testmemberid",
             nickname = "기존닉네임",
             role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "https://example.com/old.jpg",

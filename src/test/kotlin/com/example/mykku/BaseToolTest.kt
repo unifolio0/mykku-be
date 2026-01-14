@@ -17,6 +17,7 @@ abstract class BaseToolTest {
      */
     protected fun createMockMember(
         id: String = "testMember",
+        memberId: String = "testmemberid",
         nickname: String = "테스트유저",
         email: String = "test@example.com",
         socialId: String = "12345",
@@ -26,6 +27,7 @@ abstract class BaseToolTest {
     ): Member {
         return Member(
             id = id,
+            memberId = memberId,
             nickname = nickname,
             email = email,
             socialId = socialId,

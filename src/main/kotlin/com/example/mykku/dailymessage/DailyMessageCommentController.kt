@@ -56,7 +56,7 @@ class DailyMessageCommentController(
     ): ResponseEntity<ApiResponse<CommentResponse>> {
         val comment = dailyMessageCommentService.createComment(
             dailyMessageId = dailyMessageId,
-            memberId = member.id,
+            member = member,
             request = request,
         )
 
@@ -76,7 +76,7 @@ class DailyMessageCommentController(
     ): ResponseEntity<ApiResponse<CommentResponse>> {
         val comment = dailyMessageCommentService.updateComment(
             commentId = commentId,
-            memberId = member.id,
+            member = member,
             request = request,
         )
 
@@ -95,7 +95,7 @@ class DailyMessageCommentController(
     ): ResponseEntity<ApiResponse<Unit>> {
         dailyMessageCommentService.deleteComment(
             commentId = commentId,
-            memberId = member.id,
+            member = member,
         )
 
         return ResponseEntity.ok(

@@ -39,6 +39,7 @@ class MemberRoleRepositoryTest : BaseRepositoryTest() {
 
         member = Member.createEmailMember(
             id = "test-member-id",
+            memberId = "testmemberid",
             email = "test@example.com",
             password = "encodedPassword",
             nickname = "테스터",

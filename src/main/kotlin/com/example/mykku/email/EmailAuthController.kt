@@ -2,6 +2,8 @@ package com.example.mykku.email
 
 import com.example.mykku.auth.dto.LoginResponse
 import com.example.mykku.common.dto.ApiResponse
+import com.example.mykku.email.dto.CheckMemberIdRequest
+import com.example.mykku.email.dto.CheckMemberIdResponse
 import com.example.mykku.email.dto.EmailLoginRequest
 import com.example.mykku.email.dto.ResetPasswordRequest
 import com.example.mykku.email.dto.SendTemporaryPasswordRequest
@@ -44,7 +46,8 @@ class EmailAuthController(
         val loginResponse = emailAuthService.signup(
             email = request.email,
             password = request.password,
-            nickname = request.nickname
+            nickname = request.nickname,
+            userMemberId = request.memberId
         )
         return ResponseEntity.ok(ApiResponse("회원가입이 완료되었습니다", loginResponse))
     }
@@ -78,5 +81,17 @@ class EmailAuthController(
     ): ResponseEntity<ApiResponse<Unit>> {
         emailAuthService.sendTemporaryPassword(request.email)
         return ResponseEntity.ok(ApiResponse("임시 비밀번호가 발송되었습니다", Unit))
+    }
+
+    @PostMapping("/check-member-id")
+    fun checkMemberId(
+        @Valid @RequestBody request: CheckMemberIdRequest
+    ): ResponseEntity<ApiResponse<CheckMemberIdResponse>> {
+        val available = emailAuthService.checkMemberIdAvailability(request.memberId)
+        val response = CheckMemberIdResponse(
+            memberId = request.memberId,
+            available = available
+        )
+        return ResponseEntity.ok(ApiResponse("아이디 중복 확인 완료", response))
     }
 }

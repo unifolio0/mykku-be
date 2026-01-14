@@ -28,7 +28,7 @@ class FeedCommentController(
     ): ResponseEntity<ApiResponse<SingleFeedCommentResponse>> {
         val comment = feedCommentService.createComment(
             feedId = feedId,
-            memberId = member.id,
+            member = member,
             request = request,
         )
 
@@ -48,7 +48,7 @@ class FeedCommentController(
     ): ResponseEntity<ApiResponse<SingleFeedCommentResponse>> {
         val comment = feedCommentService.updateComment(
             commentId = commentId,
-            memberId = member.id,
+            member = member,
             request = request,
         )
 
@@ -67,7 +67,7 @@ class FeedCommentController(
     ): ResponseEntity<ApiResponse<Unit>> {
         feedCommentService.deleteComment(
             commentId = commentId,
-            memberId = member.id,
+            member = member,
         )
 
         return ResponseEntity.ok(

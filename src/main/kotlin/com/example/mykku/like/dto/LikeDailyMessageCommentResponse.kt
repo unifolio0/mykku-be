@@ -9,7 +9,7 @@ data class LikeDailyMessageCommentResponse(
 ) {
     constructor(likeDailyMessageComment: LikeDailyMessageComment) : this(
         id = likeDailyMessageComment.id!!,
-        memberId = likeDailyMessageComment.member.id,
+        memberId = likeDailyMessageComment.member.memberId,
         dailyMessageCommentId = likeDailyMessageComment.dailyMessageComment.id!!
     )
 }

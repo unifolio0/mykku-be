@@ -48,6 +48,7 @@ abstract class BaseControllerTest {
      */
     protected fun createAndSaveMember(
         id: String = "testMember",
+        memberId: String? = null,
         nickname: String = "테스트유저",
         email: String = "test@example.com",
         socialId: String = "12345",
@@ -57,6 +58,7 @@ abstract class BaseControllerTest {
     ): Member {
         val member = Member(
             id = id,
+            memberId = memberId ?: id,
             nickname = nickname,
             email = email,
             socialId = socialId,

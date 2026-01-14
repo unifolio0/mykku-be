@@ -61,16 +61,20 @@ class EmailAuthService(
     }
 
     @Transactional
-    fun signup(email: String, password: String, nickname: String): LoginResponse {
+    fun signup(email: String, password: String, nickname: String, userMemberId: String): LoginResponse {
         if (memberReader.existsByEmail(email)) {
+            throw EmailAuthException.emailAlreadyExists()
+        }
+        if (memberReader.existsByMemberId(userMemberId)) {
             throw EmailAuthException.emailAlreadyExists()
         }
 
         val encodedPassword = passwordEncoder.encode(password)
-        val memberId = UUID.randomUUID().toString()
+        val id = UUID.randomUUID().toString()
 
         val member = Member.createEmailMember(
-            id = memberId,
+            id = id,
+            memberId = userMemberId,
             email = email,
             password = encodedPassword,
             nickname = nickname
@@ -124,5 +128,10 @@ class EmailAuthService(
         } catch (e: Exception) {
             throw EmailAuthException.emailSendFailed(e)
         }
+    }
+
+    @Transactional(readOnly = true)
+    fun checkMemberIdAvailability(memberId: String): Boolean {
+        return !memberReader.existsByMemberId(memberId)
     }
 }

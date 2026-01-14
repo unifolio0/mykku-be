@@ -30,6 +30,7 @@ class FeedControllerTest : BaseControllerTest() {
         val member = memberRepository.save(
             Member(
                 id = "member1",
+                memberId = "testmemberid1",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
@@ -104,6 +105,7 @@ class FeedControllerTest : BaseControllerTest() {
         val member = memberRepository.save(
             Member(
                 id = "member1",
+                memberId = "testmemberid2",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
@@ -149,6 +151,7 @@ class FeedControllerTest : BaseControllerTest() {
         val member = memberRepository.save(
             Member(
                 id = "member1",
+                memberId = "testmemberid3",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
@@ -191,6 +194,7 @@ class FeedControllerTest : BaseControllerTest() {
         val member = memberRepository.save(
             Member(
                 id = "member1",
+                memberId = "testmemberid4",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
@@ -236,6 +240,7 @@ class FeedControllerTest : BaseControllerTest() {
         val member = memberRepository.save(
             Member(
                 id = "member1",
+                memberId = "testmemberid5",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
@@ -279,6 +284,7 @@ class FeedControllerTest : BaseControllerTest() {
         val member = memberRepository.save(
             Member(
                 id = "member1",
+                memberId = "testmemberid6",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
@@ -320,6 +326,7 @@ class FeedControllerTest : BaseControllerTest() {
         val member = memberRepository.save(
             Member(
                 id = "member1",
+                memberId = "testmemberid7",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
@@ -358,6 +365,7 @@ class FeedControllerTest : BaseControllerTest() {
         val owner = memberRepository.save(
             Member(
                 id = "owner-id",
+                memberId = "testmemberid8",
                 socialId = "owner-social",
                 provider = SocialProvider.GOOGLE,
                 email = "owner@example.com",
@@ -369,6 +377,7 @@ class FeedControllerTest : BaseControllerTest() {
         memberRepository.save(
             Member(
                 id = "other-member",
+                memberId = "testmemberid9",
                 socialId = "other-social",
                 provider = SocialProvider.GOOGLE,
                 email = "other@example.com",
@@ -409,6 +418,7 @@ class FeedControllerTest : BaseControllerTest() {
         memberRepository.save(
             Member(
                 id = "member1",
+                memberId = "testmemberid10",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",

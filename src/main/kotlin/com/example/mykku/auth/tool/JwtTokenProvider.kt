@@ -55,7 +55,7 @@ class JwtTokenProvider(
             accessTokenExpiresIn = jwtProperties.accessTokenExpiration,
             refreshTokenExpiresIn = jwtProperties.refreshTokenExpiration,
             member = MemberInfo(
-                id = member.id,
+                memberId = member.memberId,
                 email = userEmail,
                 nickname = member.nickname,
                 profileImage = member.profileImage
