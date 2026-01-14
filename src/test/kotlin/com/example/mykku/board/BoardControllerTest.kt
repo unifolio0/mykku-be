@@ -100,4 +100,75 @@ class BoardControllerTest : BaseControllerTest() {
             .body("data.currentPage", equalTo(0))
             .body("data.size", equalTo(10))
     }
+
+    @Test
+    @DisplayName("보드별 인기 피드 목록 조회 - 정상 케이스")
+    fun `getPopularFeedsByBoard - 정상적으로 인기 피드 목록을 조회한다`() {
+        val member = memberRepository.save(
+            Member(
+                id = "member1",
+                socialId = "member1",
+                provider = SocialProvider.GOOGLE,
+                email = "member1@example.com",
+                nickname = "Member1",
+                role = null,
+                profileImage = ""
+            )
+        )
+        val board = boardRepository.save(
+            Board(
+                title = "테스트 게시판",
+                logo = "test_logo.png"
+            )
+        )
+        feedRepository.save(
+            Feed(
+                title = "인기 피드 1",
+                content = "인기 피드 내용 1",
+                member = member,
+                board = board,
+                likeCount = 100
+            )
+        )
+        feedRepository.save(
+            Feed(
+                title = "인기 피드 2",
+                content = "인기 피드 내용 2",
+                member = member,
+                board = board,
+                likeCount = 50
+            )
+        )
+
+        RestAssured.given()
+            .`when`()
+            .get("/api/v1/boards/{boardId}/feeds/popular", board.id)
+            .then()
+            .log().all()
+            .statusCode(200)
+            .body("message", equalTo("인기 피드 목록을 성공적으로 조회했습니다."))
+            .body("data.feeds", notNullValue())
+            .body("data.feeds[0].rank", equalTo(1))
+            .body("data.feeds[0].title", notNullValue())
+            .body("data.feeds[0].content", notNullValue())
+    }
+
+    @Test
+    @DisplayName("보드별 인기 피드 목록 조회 - 빈 목록")
+    fun `getPopularFeedsByBoard - 인기 피드가 없으면 빈 목록을 반환한다`() {
+        val board = boardRepository.save(
+            Board(
+                title = "테스트 게시판",
+                logo = "test_logo.png"
+            )
+        )
+
+        RestAssured.given()
+            .`when`()
+            .get("/api/v1/boards/{boardId}/feeds/popular", board.id)
+            .then()
+            .statusCode(200)
+            .body("message", equalTo("인기 피드 목록을 성공적으로 조회했습니다."))
+            .body("data.feeds.size()", equalTo(0))
+    }
 }

@@ -9,6 +9,7 @@ import com.example.mykku.feed.repository.FeedCommentRepository
 import com.example.mykku.feed.repository.FeedImageRepository
 import com.example.mykku.feed.repository.FeedRepository
 import com.example.mykku.feed.repository.FeedTagRepository
+import java.time.LocalDateTime
 import java.util.Optional
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -16,6 +17,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.InjectMocks
 import org.mockito.Mock
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.whenever
 
 class FeedReaderTest : BaseToolTest() {
@@ -111,5 +114,33 @@ class FeedReaderTest : BaseToolTest() {
         }
 
         assertEquals(FeedErrorCode.FEED_NOT_FOUND, exception.errorCode)
+    }
+
+    @Test
+    fun `getPopularFeedsByBoard는 인기 피드 목록을 반환한다`() {
+        val board = createMockBoard()
+        val feed1 = createMockFeed(1L)
+        val feed2 = createMockFeed(2L)
+
+        whenever(feedRepository.findPopularFeedsByBoardSince(eq(board), any<LocalDateTime>(), any()))
+            .thenReturn(listOf(feed1, feed2))
+
+        val result = feedReader.getPopularFeedsByBoard(board)
+
+        assertEquals(2, result.size)
+        assertEquals(feed1.id, result[0].id)
+        assertEquals(feed2.id, result[1].id)
+    }
+
+    @Test
+    fun `getPopularFeedsByBoard는 인기 피드가 없으면 빈 목록을 반환한다`() {
+        val board = createMockBoard()
+
+        whenever(feedRepository.findPopularFeedsByBoardSince(eq(board), any<LocalDateTime>(), any()))
+            .thenReturn(emptyList())
+
+        val result = feedReader.getPopularFeedsByBoard(board)
+
+        assertTrue(result.isEmpty())
     }
 }
