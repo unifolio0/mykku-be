@@ -147,10 +147,13 @@ class BoardControllerTest : BaseControllerTest() {
             .log().all()
             .statusCode(200)
             .body("message", equalTo("인기 피드 목록을 성공적으로 조회했습니다."))
-            .body("data.feeds", notNullValue())
+            .body("data.feeds.size()", equalTo(2))
             .body("data.feeds[0].rank", equalTo(1))
-            .body("data.feeds[0].title", notNullValue())
-            .body("data.feeds[0].content", notNullValue())
+            .body("data.feeds[0].title", equalTo("인기 피드 1"))
+            .body("data.feeds[0].content", equalTo("인기 피드 내용 1"))
+            .body("data.feeds[1].rank", equalTo(2))
+            .body("data.feeds[1].title", equalTo("인기 피드 2"))
+            .body("data.feeds[1].content", equalTo("인기 피드 내용 2"))
     }
 
     @Test

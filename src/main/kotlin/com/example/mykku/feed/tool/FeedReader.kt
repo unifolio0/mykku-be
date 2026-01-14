@@ -27,6 +27,10 @@ class FeedReader(
     private val feedCommentRepository: FeedCommentRepository,
     private val contestTagRepository: ContestTagRepository
 ) {
+    companion object {
+        const val DEFAULT_POPULAR_FEEDS_LIMIT = 3
+        const val DEFAULT_POPULAR_FEEDS_DAYS_AGO = 7
+    }
     fun getFeedPreviews(): List<FeedPreviewResponse> {
         return feedRepository.findAll()
             .map { feed -> FeedPreviewResponse(feed) }
@@ -78,7 +82,11 @@ class FeedReader(
         return feedCommentRepository.findIdsByFeed(feed)
     }
 
-    fun getPopularFeedsByBoard(board: Board, limit: Int = 3, daysAgo: Int = 7): List<Feed> {
+    fun getPopularFeedsByBoard(
+        board: Board,
+        limit: Int = DEFAULT_POPULAR_FEEDS_LIMIT,
+        daysAgo: Int = DEFAULT_POPULAR_FEEDS_DAYS_AGO
+    ): List<Feed> {
         val since = LocalDateTime.now().minusDays(daysAgo.toLong())
         val pageable = PageRequest.of(0, limit)
         return feedRepository.findPopularFeedsByBoardSince(board, since, pageable)

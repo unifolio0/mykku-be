@@ -223,9 +223,9 @@ class BoardDocumentTest : BaseDocumentTest() {
             val boardId = 1L
             val response = PopularFeedsResponse(
                 feeds = listOf(
-                    PopularFeedResponse(rank = 1, title = "인기 피드 1", content = "인기 피드 내용 1"),
-                    PopularFeedResponse(rank = 2, title = "인기 피드 2", content = "인기 피드 내용 2"),
-                    PopularFeedResponse(rank = 3, title = "인기 피드 3", content = "인기 피드 내용 3")
+                    PopularFeedResponse(id = 1L, rank = 1, title = "인기 피드 1", content = "인기 피드 내용 1"),
+                    PopularFeedResponse(id = 2L, rank = 2, title = "인기 피드 2", content = "인기 피드 내용 2"),
+                    PopularFeedResponse(id = 3L, rank = 3, title = "인기 피드 3", content = "인기 피드 내용 3")
                 )
             )
 
@@ -239,6 +239,7 @@ class BoardDocumentTest : BaseDocumentTest() {
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
                             fieldWithPath("data.feeds").type(JsonFieldType.ARRAY).description("인기 피드 목록 (최대 3개)"),
+                            fieldWithPath("data.feeds[].id").type(JsonFieldType.NUMBER).description("피드 ID"),
                             fieldWithPath("data.feeds[].rank").type(JsonFieldType.NUMBER).description("순위"),
                             fieldWithPath("data.feeds[].title").type(JsonFieldType.STRING).description("피드 제목"),
                             fieldWithPath("data.feeds[].content").type(JsonFieldType.STRING).description("피드 내용")

@@ -757,9 +757,11 @@ class FeedServiceTest : BaseServiceTest() {
 
         // then
         assertEquals(2, result.feeds.size)
+        assertEquals(1L, result.feeds[0].id)
         assertEquals(1, result.feeds[0].rank)
         assertEquals("인기 피드 1", result.feeds[0].title)
         assertEquals("Content 1", result.feeds[0].content)
+        assertEquals(2L, result.feeds[1].id)
         assertEquals(2, result.feeds[1].rank)
         assertEquals("인기 피드 2", result.feeds[1].title)
     }
