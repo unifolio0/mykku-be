@@ -13,5 +13,6 @@ data class ApiRequestConfig(
     val queryParameters: List<ParameterDescriptor> = emptyList(),
     val requestBodyFields: List<FieldDescriptor> = emptyList(),
     val requestParts: List<RequestPartDescriptor> = emptyList(),
+    val requestPartFields: Map<String, List<FieldDescriptor>> = emptyMap(),
     val headerDescriptors: List<HeaderDescriptor> = emptyList()
 )

@@ -5,11 +5,15 @@ on:
     branches:
       - "develop"
 
+env:
+  DOCKER_IMAGE: ${{ secrets.DOCKER_USERNAME }}/mykku-be
+  IMAGE_TAG: ${{ github.sha }}
+
 jobs:
   test:
     uses: ./.github/workflows/Dev_CI.yml
 
-  build:
+  build-and-push:
     needs: test
     runs-on: ubuntu-latest
 
@@ -62,25 +66,38 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Build with Gradle
+      - name: Build with Gradle (includes tests and OpenAPI generation)
         run: ./gradlew clean build --info
 
-      - name: Change artifact file name
+      - name: Prepare JAR for Docker
         run: |
-          # Find the built jar file (excluding plain jar)
           JAR_FILE=$(find build/libs -name "*.jar" -not -name "*-plain.jar" | head -1)
           if [ -z "$JAR_FILE" ]; then
             echo "No JAR file found!"
             exit 1
           fi
-          mv "$JAR_FILE" build/libs/app.jar
+          cp "$JAR_FILE" ./app.jar
 
-      - name: Upload artifact file
-        uses: actions/upload-artifact@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
-          name: app-artifact
-          path: ./build/libs/app.jar
-          if-no-files-found: error
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_IMAGE }}:${{ env.IMAGE_TAG }}
+            ${{ env.DOCKER_IMAGE }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Upload deploy scripts
         uses: actions/upload-artifact@v4
@@ -89,22 +106,50 @@ jobs:
           path: ./scripts/dev/
           if-no-files-found: error
 
+      - name: Upload docker-compose file
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-compose
+          path: ./docker-compose.dev.yml
+          if-no-files-found: error
+
+      - name: Upload nginx config
+        uses: actions/upload-artifact@v4
+        with:
+          name: nginx-config
+          path: ./nginx/
+          if-no-files-found: error
+
   deploy:
-    needs: build
+    needs: build-and-push
     runs-on: dev
 
     steps:
-      - name: Download artifact file
-        uses: actions/download-artifact@v4
-        with:
-          name: app-artifact
-          path: ~/app
-
       - name: Download deploy scripts
         uses: actions/download-artifact@v4
         with:
           name: deploy-scripts
           path: ~/app/scripts
 
-      - name: Replace application to latest
-        run: sudo sh ~/app/scripts/replace-new-version.sh
+      - name: Download docker-compose file
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-compose
+          path: ~/app
+
+      - name: Download nginx config
+        uses: actions/download-artifact@v4
+        with:
+          name: nginx-config
+          path: ~/app/nginx
+
+      - name: Deploy with Docker Compose
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          IMAGE_TAG: ${{ github.sha }}
+          LETSENCRYPT_EMAIL: ${{ secrets.LETSENCRYPT_EMAIL }}
+        run: |
+          export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
+          export IMAGE_TAG=${{ github.sha }}
+          export LETSENCRYPT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }}
+          sudo -E sh ~/app/scripts/replace-new-version.sh

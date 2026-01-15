@@ -1,0 +1,17 @@
+.git
+.github
+.gradle
+.idea
+build
+out
+*.log
+*.tmp
+.claude
+.serena
+.gemini
+claudedocs
+docs
+CLAUDE.md
+GEMINI.md
+docker-compose.yml
+docker-compose.dev.yml

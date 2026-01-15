@@ -1,0 +1,88 @@
+services:
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy:1.4
+    container_name: nginx-proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - nginx-certs:/etc/nginx/certs:ro
+      - nginx-vhost:/etc/nginx/vhost.d
+      - nginx-html:/usr/share/nginx/html
+      - /home/ubuntu/app/nginx/vhost.d/default:/etc/nginx/vhost.d/default:ro
+      - /home/ubuntu/app/nginx/vhost.d/api.dev.mykku.kr_location:/etc/nginx/vhost.d/api.dev.mykku.kr_location:ro
+    environment:
+      - TZ=Asia/Seoul
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "3"
+    networks:
+      - proxy-network
+
+  letsencrypt:
+    image: nginxproxy/acme-companion:2.2
+    container_name: letsencrypt
+    restart: unless-stopped
+    depends_on:
+      - nginx-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - nginx-certs:/etc/nginx/certs:rw
+      - nginx-vhost:/etc/nginx/vhost.d
+      - nginx-html:/usr/share/nginx/html
+      - letsencrypt-acme:/etc/acme.sh
+    environment:
+      - DEFAULT_EMAIL=${LETSENCRYPT_EMAIL:-admin@mykku.kr}
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+      - TZ=Asia/Seoul
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "3"
+    networks:
+      - proxy-network
+
+  mykku-app:
+    image: ${DOCKER_USERNAME}/mykku-be:${IMAGE_TAG:-latest}
+    container_name: mykku-app
+    restart: unless-stopped
+    expose:
+      - "8080"
+    environment:
+      - TZ=Asia/Seoul
+      - VIRTUAL_HOST=api.dev.mykku.kr
+      - VIRTUAL_PORT=8080
+      - LETSENCRYPT_HOST=api.dev.mykku.kr
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL:-admin@mykku.kr}
+    volumes:
+      - /home/ubuntu/app/logs:/app/logs
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/actuator/health/liveness"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "5"
+    networks:
+      - proxy-network
+    depends_on:
+      - nginx-proxy
+
+volumes:
+  nginx-certs:
+  nginx-vhost:
+  nginx-html:
+  letsencrypt-acme:
+
+networks:
+  proxy-network:
+    driver: bridge

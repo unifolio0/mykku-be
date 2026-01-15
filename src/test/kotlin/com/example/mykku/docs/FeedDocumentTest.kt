@@ -38,12 +38,44 @@ class FeedDocumentTest : BaseDocumentTest() {
         private val apiConfig = ApiRequestConfig(
             tag = Tag.FEED_API,
             summary = "피드 작성",
-            description = "새로운 피드를 작성합니다. 이미지는 최대 10개까지 첨부 가능합니다.",
+            description = """
+                |새로운 피드를 작성합니다. 이미지는 최대 10개까지 첨부 가능합니다.
+                |
+                |## Request Parts (multipart/form-data)
+                |
+                |### request (application/json, 필수)
+                |```json
+                |{
+                |  "title": "피드 제목",
+                |  "content": "피드 내용 (최대 1000자)",
+                |  "boardId": 1,
+                |  "tags": ["태그1", "태그2"]
+                |}
+                |```
+                |
+                || 필드 | 타입 | 필수 | 설명 |
+                ||------|------|------|------|
+                || title | string | O | 피드 제목 |
+                || content | string | O | 피드 내용 (최대 1000자) |
+                || boardId | number | O | 게시판 ID |
+                || tags | array | X | 태그 목록 (최대 7개) |
+                |
+                |### images (multipart/form-data, 선택)
+                |업로드할 이미지 파일들 (최대 10개)
+            """.trimMargin(),
             requestParts = listOf(
                 RequestDocumentation.partWithName("request")
                     .description("피드 생성 요청 정보 (JSON)"),
                 RequestDocumentation.partWithName("images")
                     .description("업로드할 이미지 파일들 (선택사항)").optional()
+            ),
+            requestPartFields = mapOf(
+                "request" to listOf(
+                    fieldWithPath("title").type(JsonFieldType.STRING).description("피드 제목 (필수)"),
+                    fieldWithPath("content").type(JsonFieldType.STRING).description("피드 내용 (필수, 최대 1000자)"),
+                    fieldWithPath("boardId").type(JsonFieldType.NUMBER).description("게시판 ID (필수)"),
+                    fieldWithPath("tags").type(JsonFieldType.ARRAY).description("태그 목록 (최대 7개)").optional()
+                )
             )
         )
 
@@ -524,7 +556,33 @@ class FeedDocumentTest : BaseDocumentTest() {
         private val apiConfig = ApiRequestConfig(
             tag = Tag.FEED_API,
             summary = "피드 수정",
-            description = "기존 피드를 수정합니다. 제목, 내용, 게시판, 태그, 이미지를 수정할 수 있습니다.",
+            description = """
+                |기존 피드를 수정합니다. 제목, 내용, 게시판, 태그, 이미지를 수정할 수 있습니다.
+                |
+                |## Request Parts (multipart/form-data)
+                |
+                |### request (application/json, 필수)
+                |```json
+                |{
+                |  "title": "수정된 피드 제목",
+                |  "content": "수정된 피드 내용",
+                |  "boardId": 2,
+                |  "tags": ["수정된태그1", "수정된태그2"],
+                |  "deleteImageIds": [1, 2]
+                |}
+                |```
+                |
+                || 필드 | 타입 | 필수 | 설명 |
+                ||------|------|------|------|
+                || title | string | X | 피드 제목 (미입력시 기존 유지) |
+                || content | string | X | 피드 내용 (최대 1000자, 미입력시 기존 유지) |
+                || boardId | number | X | 게시판 ID (미입력시 기존 유지) |
+                || tags | array | X | 태그 목록 (최대 7개, 미입력시 기존 유지) |
+                || deleteImageIds | array | X | 삭제할 이미지 ID 목록 |
+                |
+                |### images (multipart/form-data, 선택)
+                |새로 추가할 이미지 파일들 (기존 이미지 + 새 이미지 합계 최대 10개)
+            """.trimMargin(),
             pathParameters = listOf(
                 parameterWithName("feedId").description("수정할 피드의 ID")
             ),
@@ -533,6 +591,15 @@ class FeedDocumentTest : BaseDocumentTest() {
                     .description("피드 수정 요청 정보 (JSON)"),
                 RequestDocumentation.partWithName("images")
                     .description("새로 추가할 이미지 파일들 (선택사항)").optional()
+            ),
+            requestPartFields = mapOf(
+                "request" to listOf(
+                    fieldWithPath("title").type(JsonFieldType.STRING).description("피드 제목").optional(),
+                    fieldWithPath("content").type(JsonFieldType.STRING).description("피드 내용 (최대 1000자)").optional(),
+                    fieldWithPath("boardId").type(JsonFieldType.NUMBER).description("게시판 ID").optional(),
+                    fieldWithPath("tags").type(JsonFieldType.ARRAY).description("태그 목록 (최대 7개)").optional(),
+                    fieldWithPath("deleteImageIds").type(JsonFieldType.ARRAY).description("삭제할 이미지 ID 목록").optional()
+                )
             )
         )
 
