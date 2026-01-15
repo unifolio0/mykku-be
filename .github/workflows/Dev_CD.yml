@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - "develop"
-      - "chore/#124"
 
 env:
   DOCKER_IMAGE: ${{ secrets.DOCKER_USERNAME }}/mykku-be
