@@ -46,7 +46,7 @@ class BlockServiceTest : BaseServiceTest() {
         val memberBlock = MemberBlock(id = 1L, blocker = blocker, blocked = blocked)
             .also { initializeBaseEntityFields(it) }
 
-        whenever(memberReader.getMemberById("blocked")).thenReturn(blocked)
+        whenever(memberReader.getMemberByMemberId("blocked")).thenReturn(blocked)
         doNothing().whenever(blockReader).validateMemberBlockNotExists(blocker, blocked)
         whenever(blockWriter.createMemberBlock(blocker, blocked)).thenReturn(memberBlock)
 
@@ -77,14 +77,13 @@ class BlockServiceTest : BaseServiceTest() {
         val blocker = createTestMember(id = "blocker")
         val request = BlockMemberRequest(memberId = "nonexistent")
 
-        whenever(memberReader.getMemberById("nonexistent"))
+        whenever(memberReader.getMemberByMemberId("nonexistent"))
             .thenThrow(MemberException.memberNotFound())
 
         // when & then
-        val exception = assertThrows<BlockException> {
+        assertThrows<MemberException> {
             blockService.blockMember(blocker, request)
         }
-        assertEquals(BlockErrorCode.MEMBER_TO_BLOCK_NOT_FOUND, exception.errorCode)
     }
 
     @Test
@@ -93,7 +92,7 @@ class BlockServiceTest : BaseServiceTest() {
         val blocker = createTestMember(id = "blocker")
         val blocked = createTestMember(id = "blocked")
 
-        whenever(memberReader.getMemberById("blocked")).thenReturn(blocked)
+        whenever(memberReader.getMemberByMemberId("blocked")).thenReturn(blocked)
         doNothing().whenever(blockReader).validateMemberBlockExists(blocker, blocked)
         doNothing().whenever(blockWriter).deleteMemberBlock(blocker, blocked)
 

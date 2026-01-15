@@ -14,7 +14,7 @@ data class MemberBlockResponse(
         fun from(memberBlock: MemberBlock): MemberBlockResponse {
             return MemberBlockResponse(
                 id = memberBlock.id!!,
-                blockedMemberId = memberBlock.blocked.id,
+                blockedMemberId = memberBlock.blocked.memberId,
                 blockedMemberNickname = memberBlock.blocked.nickname,
                 blockedMemberProfileImage = memberBlock.blocked.profileImage,
                 blockedAt = memberBlock.createdAt

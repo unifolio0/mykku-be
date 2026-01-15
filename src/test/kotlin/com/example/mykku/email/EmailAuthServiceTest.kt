@@ -7,6 +7,8 @@ import com.example.mykku.auth.tool.JwtTokenProvider
 import com.example.mykku.email.domain.VerificationPurpose
 import com.example.mykku.email.exception.EmailAuthErrorCode
 import com.example.mykku.email.exception.EmailAuthException
+import com.example.mykku.member.exception.MemberErrorCode
+import com.example.mykku.member.exception.MemberException
 import com.example.mykku.email.tool.EmailSender
 import com.example.mykku.email.tool.RedisVerificationCodeManager
 import com.example.mykku.member.domain.Member
@@ -215,11 +217,11 @@ class EmailAuthServiceTest : BaseServiceTest() {
         whenever(memberReader.existsByEmail(email)).thenReturn(false)
         whenever(memberReader.existsByMemberId(userMemberId)).thenReturn(true)
 
-        val exception = assertThrows<EmailAuthException> {
+        val exception = assertThrows<MemberException> {
             emailAuthService.signup(email, password, nickname, userMemberId)
         }
 
-        assertEquals(EmailAuthErrorCode.EMAIL_ALREADY_EXISTS, exception.errorCode)
+        assertEquals(MemberErrorCode.MEMBER_ID_ALREADY_EXISTS, exception.errorCode)
     }
 
     @Test

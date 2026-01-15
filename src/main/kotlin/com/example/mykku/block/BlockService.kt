@@ -11,7 +11,6 @@ import com.example.mykku.block.exception.BlockException
 import com.example.mykku.block.tool.BlockReader
 import com.example.mykku.block.tool.BlockWriter
 import com.example.mykku.member.domain.Member
-import com.example.mykku.member.exception.MemberException
 import com.example.mykku.member.tool.MemberReader
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -28,11 +27,7 @@ class BlockService(
     fun blockMember(blocker: Member, request: BlockMemberRequest): MemberBlockResponse {
         validateNotSelf(blocker, request.memberId)
 
-        val blocked = try {
-            memberReader.getMemberById(request.memberId)
-        } catch (e: MemberException) {
-            throw BlockException.memberToBlockNotFound()
-        }
+        val blocked = memberReader.getMemberByMemberId(request.memberId)
 
         blockReader.validateMemberBlockNotExists(blocker, blocked)
 
@@ -42,11 +37,7 @@ class BlockService(
 
     @Transactional
     fun unblockMember(blocker: Member, blockedMemberId: String) {
-        val blocked = try {
-            memberReader.getMemberById(blockedMemberId)
-        } catch (e: MemberException) {
-            throw BlockException.memberBlockNotFound()
-        }
+        val blocked = memberReader.getMemberByMemberId(blockedMemberId)
 
         blockReader.validateMemberBlockExists(blocker, blocked)
         blockWriter.deleteMemberBlock(blocker, blocked)
@@ -84,7 +75,7 @@ class BlockService(
     }
 
     private fun validateNotSelf(blocker: Member, blockedMemberId: String) {
-        if (blocker.id == blockedMemberId) {
+        if (blocker.memberId == blockedMemberId) {
             throw BlockException.cannotBlockSelf()
         }
     }

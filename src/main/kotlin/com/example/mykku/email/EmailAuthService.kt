@@ -4,6 +4,7 @@ import com.example.mykku.auth.dto.LoginResponse
 import com.example.mykku.auth.tool.JwtTokenProvider
 import com.example.mykku.email.domain.VerificationPurpose
 import com.example.mykku.email.exception.EmailAuthException
+import com.example.mykku.member.exception.MemberException
 import com.example.mykku.email.tool.EmailSender
 import com.example.mykku.email.tool.RedisVerificationCodeManager
 import com.example.mykku.email.util.TemporaryPasswordGenerator
@@ -66,7 +67,7 @@ class EmailAuthService(
             throw EmailAuthException.emailAlreadyExists()
         }
         if (memberReader.existsByMemberId(userMemberId)) {
-            throw EmailAuthException.emailAlreadyExists()
+            throw MemberException.memberIdAlreadyExists()
         }
 
         val encodedPassword = passwordEncoder.encode(password)
