@@ -15,6 +15,7 @@ class FeedTagTest {
     private fun createTestFeed(): Feed {
         val member = Member(
             id = "test_member",
+            memberId = "testmemberid",
             nickname = "테스트유저",
             role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "profile.jpg",

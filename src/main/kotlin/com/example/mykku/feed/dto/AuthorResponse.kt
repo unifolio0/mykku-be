@@ -9,7 +9,7 @@ data class AuthorResponse(
     val role: String,
 ) {
     constructor(member: Member) : this(
-        memberId = member.id,
+        memberId = member.memberId,
         nickname = member.nickname,
         profileImage = member.profileImage,
         role = member.role?.name ?: "",

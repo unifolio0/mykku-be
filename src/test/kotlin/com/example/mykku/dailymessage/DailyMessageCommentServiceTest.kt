@@ -1,6 +1,7 @@
 package com.example.mykku.dailymessage
 
 import com.example.mykku.BaseServiceTest
+import com.example.mykku.block.tool.BlockFilterHelper
 import com.example.mykku.dailymessage.domain.DailyMessage
 import com.example.mykku.dailymessage.domain.DailyMessageComment
 import com.example.mykku.dailymessage.dto.CreateCommentRequest
@@ -11,7 +12,6 @@ import com.example.mykku.dailymessage.tool.DailyMessageCommentReader
 import com.example.mykku.dailymessage.tool.DailyMessageCommentWriter
 import com.example.mykku.dailymessage.tool.DailyMessageReader
 import com.example.mykku.member.domain.Member
-import com.example.mykku.member.tool.MemberReader
 import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
@@ -34,7 +34,7 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
     private lateinit var dailyMessageCommentWriter: DailyMessageCommentWriter
 
     @Mock
-    private lateinit var memberReader: MemberReader
+    private lateinit var blockFilterHelper: BlockFilterHelper
 
     @InjectMocks
     private lateinit var dailyMessageCommentService: DailyMessageCommentService
@@ -89,7 +89,6 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
         )
 
         whenever(dailyMessageReader.getDailyMessage(1L)).thenReturn(dailyMessage)
-        whenever(memberReader.getMemberById("member1")).thenReturn(member)
         whenever(
             dailyMessageCommentWriter.createComment(
                 content = request.content,
@@ -100,7 +99,7 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
         ).thenReturn(comment)
 
         // when
-        val result = dailyMessageCommentService.createComment(1L, "member1", request)
+        val result = dailyMessageCommentService.createComment(1L, member, request)
 
         // then
         assertEquals(comment.id, result.id)
@@ -130,7 +129,6 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
         )
 
         whenever(dailyMessageReader.getDailyMessage(1L)).thenReturn(dailyMessage)
-        whenever(memberReader.getMemberById("member1")).thenReturn(member)
         whenever(dailyMessageCommentReader.getCommentByDailyMessageId(2L, 1L)).thenReturn(parentComment)
         whenever(
             dailyMessageCommentWriter.createComment(
@@ -142,7 +140,7 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
         ).thenReturn(comment)
 
         // when
-        val result = dailyMessageCommentService.createComment(1L, "member1", request)
+        val result = dailyMessageCommentService.createComment(1L, member, request)
 
         // then
         assertEquals(comment.id, result.id)
@@ -176,7 +174,7 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
         ).thenReturn(updatedComment)
 
         // when
-        val result = dailyMessageCommentService.updateComment(1L, member.id, request)
+        val result = dailyMessageCommentService.updateComment(1L, member, request)
 
         // then
         assertEquals(updatedComment.content, result.content)
@@ -200,7 +198,7 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
 
         // when & then
         val exception = assertThrows<DailyMessageException> {
-            dailyMessageCommentService.updateComment(1L, member.id, request)
+            dailyMessageCommentService.updateComment(1L, member, request)
         }
         assertEquals(DailyMessageErrorCode.COMMENT_FORBIDDEN_ACCESS, exception.errorCode)
     }
@@ -219,7 +217,7 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
         whenever(dailyMessageCommentReader.getComment(1L)).thenReturn(comment)
 
         // when
-        dailyMessageCommentService.deleteComment(1L, member.id)
+        dailyMessageCommentService.deleteComment(1L, member)
 
         // then
         verify(dailyMessageCommentWriter).deleteComment(comment)
@@ -241,7 +239,7 @@ class DailyMessageCommentServiceTest : BaseServiceTest() {
 
         // when & then
         val exception = assertThrows<DailyMessageException> {
-            dailyMessageCommentService.deleteComment(1L, member.id)
+            dailyMessageCommentService.deleteComment(1L, member)
         }
         assertEquals(DailyMessageErrorCode.COMMENT_FORBIDDEN_ACCESS, exception.errorCode)
     }

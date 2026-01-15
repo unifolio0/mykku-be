@@ -21,7 +21,6 @@ import com.example.mykku.like.tool.LikeFeedCommentReader
 import com.example.mykku.like.tool.LikeFeedCommentWriter
 import com.example.mykku.like.tool.LikeFeedReader
 import com.example.mykku.like.tool.LikeFeedWriter
-import com.example.mykku.member.tool.MemberReader
 import java.time.LocalDate
 import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
@@ -34,9 +33,6 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 
 class LikeServiceTest : BaseServiceTest() {
-
-    @Mock
-    private lateinit var memberReader: MemberReader
 
     @Mock
     private lateinit var boardReader: BoardReader
@@ -80,7 +76,7 @@ class LikeServiceTest : BaseServiceTest() {
     @InjectMocks
     private lateinit var likeService: LikeService
 
-    private val member = createTestMember(id = "member1", nickname = "testUser", email = "test@test.com")
+    private val member = createTestMember(id = "member1", memberId = "member1", nickname = "testUser", email = "test@test.com")
     private val board = createTestBoard(id = 1L, title = "테스트 보드", logo = "")
 
     @Test
@@ -94,7 +90,7 @@ class LikeServiceTest : BaseServiceTest() {
         whenever(likeBoardReader.getLikedBoards(any(), any())).thenReturn(page)
 
         // when
-        val result = likeService.getLikedBoards("member1", pageable)
+        val result = likeService.getLikedBoards(member, pageable)
 
         // then
         assertEquals(1, result.totalElements)
@@ -106,12 +102,11 @@ class LikeServiceTest : BaseServiceTest() {
         val boardId = 1L
         val likeBoard = LikeBoard(id = 1L, member = member, board = board)
 
-        whenever(memberReader.getMemberById("member1")).thenReturn(member)
         whenever(boardReader.getBoardById(boardId)).thenReturn(board)
         whenever(likeBoardWriter.createLikeBoard(board = board, member = member)).thenReturn(likeBoard)
 
         // when
-        val result = likeService.likeBoard(boardId, "member1")
+        val result = likeService.likeBoard(boardId, member)
 
         // then
         assertEquals(likeBoard.id, result.id)
@@ -120,7 +115,7 @@ class LikeServiceTest : BaseServiceTest() {
     @Test
     fun `unlikeBoard - 보드 좋아요를 취소한다`() {
         // when
-        likeService.unlikeBoard("member1", 1L)
+        likeService.unlikeBoard(member, 1L)
 
         // then - 예외가 발생하지 않으면 성공
     }
@@ -138,12 +133,11 @@ class LikeServiceTest : BaseServiceTest() {
         val feedId = 1L
         val likeFeed = LikeFeed(id = 1L, member = member, feed = feed)
 
-        whenever(memberReader.getMemberById("member1")).thenReturn(member)
         whenever(feedReader.getFeedById(feedId)).thenReturn(feed)
         whenever(likeFeedWriter.createLikeFeed(feed = feed, member = member)).thenReturn(likeFeed)
 
         // when
-        val result = likeService.likeFeed("member1", feedId)
+        val result = likeService.likeFeed(member, feedId)
 
         // then
         assertEquals(likeFeed.id, result.id)
@@ -152,7 +146,7 @@ class LikeServiceTest : BaseServiceTest() {
     @Test
     fun `unlikeFeed - 피드 좋아요를 취소한다`() {
         // when
-        likeService.unlikeFeed("member1", 1L)
+        likeService.unlikeFeed(member, 1L)
 
         // then - 예외가 발생하지 않으면 성공
     }
@@ -180,7 +174,6 @@ class LikeServiceTest : BaseServiceTest() {
             dailyMessageComment = dailyMessageComment
         )
 
-        whenever(memberReader.getMemberById("member1")).thenReturn(member)
         whenever(dailyMessageCommentReader.getDailyMessageCommentById(dailyMessageCommentId)).thenReturn(dailyMessageComment)
         whenever(
             likeDailyMessageCommentWriter.createLikeDailyMessageComment(
@@ -190,7 +183,7 @@ class LikeServiceTest : BaseServiceTest() {
         ).thenReturn(likeDailyMessageComment)
 
         // when
-        val result = likeService.likeDailyMessageComment("member1", dailyMessageCommentId)
+        val result = likeService.likeDailyMessageComment(member, dailyMessageCommentId)
 
         // then
         assertEquals(likeDailyMessageComment.id, result.id)
@@ -199,7 +192,7 @@ class LikeServiceTest : BaseServiceTest() {
     @Test
     fun `unlikeDailyMessageComment - 일일 메시지 댓글 좋아요를 취소한다`() {
         // when
-        likeService.unlikeDailyMessageComment("member1", 1L)
+        likeService.unlikeDailyMessageComment(member, 1L)
 
         // then - 예외가 발생하지 않으면 성공
     }
@@ -224,7 +217,6 @@ class LikeServiceTest : BaseServiceTest() {
         val feedCommentId = 1L
         val likeFeedComment = LikeFeedComment(id = 1L, member = member, feedComment = feedComment)
 
-        whenever(memberReader.getMemberById("member1")).thenReturn(member)
         whenever(feedCommentReader.getFeedCommentById(feedCommentId)).thenReturn(feedComment)
         whenever(
             likeFeedCommentWriter.createLikeFeedComment(
@@ -234,7 +226,7 @@ class LikeServiceTest : BaseServiceTest() {
         ).thenReturn(likeFeedComment)
 
         // when
-        val result = likeService.likeFeedComment("member1", feedCommentId)
+        val result = likeService.likeFeedComment(member, feedCommentId)
 
         // then
         assertEquals(likeFeedComment.id, result.id)
@@ -243,7 +235,7 @@ class LikeServiceTest : BaseServiceTest() {
     @Test
     fun `unlikeFeedComment - 피드 댓글 좋아요를 취소한다`() {
         // when
-        likeService.unlikeFeedComment("member1", 1L)
+        likeService.unlikeFeedComment(member, 1L)
 
         // then - 예외가 발생하지 않으면 성공
     }

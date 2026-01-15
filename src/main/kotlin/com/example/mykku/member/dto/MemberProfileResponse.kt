@@ -4,7 +4,7 @@ import com.example.mykku.member.domain.Member
 import java.time.LocalDateTime
 
 data class MemberProfileResponse(
-    val id: String,
+    val memberId: String,
     val email: String,
     val nickname: String,
     val profileImage: String,
@@ -16,7 +16,7 @@ data class MemberProfileResponse(
     companion object {
         fun from(member: Member): MemberProfileResponse {
             return MemberProfileResponse(
-                id = member.id,
+                memberId = member.memberId,
                 email = member.email,
                 nickname = member.nickname,
                 profileImage = member.profileImage,

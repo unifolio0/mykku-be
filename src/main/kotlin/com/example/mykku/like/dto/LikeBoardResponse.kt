@@ -9,7 +9,7 @@ data class LikeBoardResponse(
 ) {
     constructor(likeBoard: LikeBoard) : this(
         id = likeBoard.id!!,
-        memberId = likeBoard.member.id,
+        memberId = likeBoard.member.memberId,
         boardId = likeBoard.board.id!!
     )
 }

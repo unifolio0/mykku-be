@@ -1,5 +1,6 @@
 package com.example.mykku.dailymessage
 
+import com.example.mykku.block.tool.BlockFilterHelper
 import com.example.mykku.dailymessage.dto.CommentResponse
 import com.example.mykku.dailymessage.dto.CreateCommentRequest
 import com.example.mykku.dailymessage.dto.DailyMessageCommentsResponse
@@ -9,7 +10,7 @@ import com.example.mykku.dailymessage.exception.DailyMessageException
 import com.example.mykku.dailymessage.tool.DailyMessageCommentReader
 import com.example.mykku.dailymessage.tool.DailyMessageCommentWriter
 import com.example.mykku.dailymessage.tool.DailyMessageReader
-import com.example.mykku.member.tool.MemberReader
+import com.example.mykku.member.domain.Member
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -19,18 +20,34 @@ class DailyMessageCommentService(
     private val dailyMessageReader: DailyMessageReader,
     private val dailyMessageCommentReader: DailyMessageCommentReader,
     private val dailyMessageCommentWriter: DailyMessageCommentWriter,
-    private val memberReader: MemberReader,
+    private val blockFilterHelper: BlockFilterHelper
 ) {
     @Transactional(readOnly = true)
-    fun getComments(dailyMessageId: Long, pageable: Pageable): DailyMessageCommentsResponse {
+    fun getComments(dailyMessageId: Long, memberId: String?, pageable: Pageable): DailyMessageCommentsResponse {
         dailyMessageReader.getDailyMessage(dailyMessageId)
 
         val commentsPage = dailyMessageCommentReader.getCommentsByDailyMessageId(dailyMessageId, pageable)
-        val repliesMap = dailyMessageCommentReader.getRepliesByParentComments(commentsPage.content)
 
-        val commentResponses = commentsPage.content.map { comment ->
+        val filteredComments = blockFilterHelper.filterContent(
+            items = commentsPage.content,
+            memberId = memberId,
+            memberIdExtractor = { it.member.id },
+            contentExtractors = listOf({ it.content })
+        )
+
+        val repliesMap = dailyMessageCommentReader.getRepliesByParentComments(filteredComments)
+
+        val commentResponses = filteredComments.map { comment ->
             val replies = repliesMap[comment.id] ?: emptyList()
-            val replyResponses = replies.map { reply ->
+
+            val filteredReplies = blockFilterHelper.filterContent(
+                items = replies,
+                memberId = memberId,
+                memberIdExtractor = { it.member.id },
+                contentExtractors = listOf({ it.content })
+            )
+
+            val replyResponses = filteredReplies.map { reply ->
                 ReplyResponse(
                     id = reply.id!!,
                     content = reply.content,
@@ -65,11 +82,10 @@ class DailyMessageCommentService(
     @Transactional
     fun createComment(
         dailyMessageId: Long,
-        memberId: String,
+        member: Member,
         request: CreateCommentRequest,
     ): CommentResponse {
         val dailyMessage = dailyMessageReader.getDailyMessage(dailyMessageId)
-        val member = memberReader.getMemberById(memberId)
 
         val parentComment = request.parentCommentId?.let { parentId ->
             dailyMessageCommentReader.getCommentByDailyMessageId(parentId, dailyMessageId)
@@ -96,12 +112,12 @@ class DailyMessageCommentService(
     @Transactional
     fun updateComment(
         commentId: Long,
-        memberId: String,
+        member: Member,
         request: UpdateCommentRequest,
     ): CommentResponse {
         val comment = dailyMessageCommentReader.getComment(commentId)
 
-        if (comment.member.id != memberId) {
+        if (comment.member.id != member.id) {
             throw DailyMessageException.commentForbiddenAccess()
         }
 
@@ -122,10 +138,10 @@ class DailyMessageCommentService(
     }
 
     @Transactional
-    fun deleteComment(commentId: Long, memberId: String) {
+    fun deleteComment(commentId: Long, member: Member) {
         val comment = dailyMessageCommentReader.getComment(commentId)
 
-        if (comment.member.id != memberId) {
+        if (comment.member.id != member.id) {
             throw DailyMessageException.commentForbiddenAccess()
         }
 

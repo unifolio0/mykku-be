@@ -51,3 +51,4 @@ Thumbs.db
 src/main/resources/application-local.yml
 src/main/resources/dev-secret.yml
 src/main/resources/firebase/service-account-key-dev.json
+docs/plans/

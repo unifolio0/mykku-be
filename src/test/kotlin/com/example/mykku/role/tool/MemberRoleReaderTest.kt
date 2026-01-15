@@ -34,6 +34,7 @@ class MemberRoleReaderTest {
         role = Role(id = 1L, name = "테스트 칭호", description = "설명")
         member = Member.createEmailMember(
             id = "test-id",
+            memberId = "testmemberid",
             email = "test@example.com",
             password = "password",
             nickname = "테스터",
@@ -90,6 +91,7 @@ class MemberRoleReaderTest {
     fun `다른 회원의 MemberRole을 조회하면 예외가 발생한다`() {
         val otherMember = Member.createEmailMember(
             id = "other-id",
+            memberId = "testmemberid2",
             email = "other@example.com",
             password = "password",
             nickname = "다른사람",

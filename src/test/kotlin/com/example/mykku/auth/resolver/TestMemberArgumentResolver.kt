@@ -15,6 +15,7 @@ class TestMemberArgumentResolver : HandlerMethodArgumentResolver {
     companion object {
         val TEST_MEMBER = Member(
             id = "member123",
+            memberId = "testmemberid",
             nickname = "testuser",
             role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "https://example.com/profile.jpg",

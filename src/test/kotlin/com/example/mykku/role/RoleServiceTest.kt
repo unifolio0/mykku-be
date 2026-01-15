@@ -41,6 +41,7 @@ class RoleServiceTest {
         role2 = Role(id = 2L, name = "칭호2", description = "설명2")
         member = Member.createEmailMember(
             id = "test-id",
+            memberId = "testmemberid",
             email = "test@example.com",
             password = "password",
             nickname = "테스터"

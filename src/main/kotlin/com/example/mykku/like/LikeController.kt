@@ -37,7 +37,7 @@ class LikeController(
             "createdAt",
             Sort.Direction.DESC
         )
-        val response = likeService.getLikedBoards(memberId = member.id, pageable = pageable)
+        val response = likeService.getLikedBoards(member = member, pageable = pageable)
         return ResponseEntity.ok(
             ApiResponse(
                 message = "즐겨찾기한 게시판 목록을 성공적으로 조회하였습니다.",
@@ -53,7 +53,7 @@ class LikeController(
     ): ResponseEntity<ApiResponse<LikeBoardResponse>> {
         val response = likeService.likeBoard(
             boardId = boardId,
-            memberId = member.id
+            member = member
         )
         return ResponseEntity.ok(
             ApiResponse(
@@ -68,7 +68,7 @@ class LikeController(
         @PathVariable boardId: Long,
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
-        likeService.unlikeBoard(memberId = member.id, boardId = boardId)
+        likeService.unlikeBoard(member = member, boardId = boardId)
         return ResponseEntity.ok(
             ApiResponse(
                 message = "게시판 즐겨찾기 해제가 성공적으로 처리되었습니다.",
@@ -83,7 +83,7 @@ class LikeController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<LikeFeedResponse>> {
         val response = likeService.likeFeed(
-            memberId = member.id,
+            member = member,
             feedId = feedId
         )
         return ResponseEntity.ok(
@@ -99,7 +99,7 @@ class LikeController(
         @PathVariable feedId: Long,
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
-        likeService.unlikeFeed(memberId = member.id, feedId = feedId)
+        likeService.unlikeFeed(member = member, feedId = feedId)
         return ResponseEntity.ok(
             ApiResponse(
                 message = "피드 좋아요 해제가 성공적으로 처리되었습니다.",
@@ -114,7 +114,7 @@ class LikeController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<LikeDailyMessageCommentResponse>> {
         val response = likeService.likeDailyMessageComment(
-            memberId = member.id,
+            member = member,
             dailyMessageCommentId = dailyMessageCommentId
         )
         return ResponseEntity.ok(
@@ -130,7 +130,7 @@ class LikeController(
         @PathVariable dailyMessageCommentId: Long,
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
-        likeService.unlikeDailyMessageComment(memberId = member.id, dailyMessageCommentId = dailyMessageCommentId)
+        likeService.unlikeDailyMessageComment(member = member, dailyMessageCommentId = dailyMessageCommentId)
         return ResponseEntity.ok(
             ApiResponse(
                 message = "댓글 좋아요 해제가 성공적으로 처리되었습니다.",
@@ -145,7 +145,7 @@ class LikeController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<LikeFeedCommentResponse>> {
         val response = likeService.likeFeedComment(
-            memberId = member.id,
+            member = member,
             feedCommentId = feedCommentId
         )
         return ResponseEntity.ok(
@@ -161,7 +161,7 @@ class LikeController(
         @PathVariable feedCommentId: Long,
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
-        likeService.unlikeFeedComment(memberId = member.id, feedCommentId = feedCommentId)
+        likeService.unlikeFeedComment(member = member, feedCommentId = feedCommentId)
         return ResponseEntity.ok(
             ApiResponse(
                 message = "댓글 좋아요 해제가 성공적으로 처리되었습니다.",

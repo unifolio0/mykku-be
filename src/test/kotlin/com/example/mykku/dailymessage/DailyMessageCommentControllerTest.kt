@@ -35,6 +35,7 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
         memberRepository.save(
             Member(
                 id = "member1",
+                memberId = "testmemberid1",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
@@ -96,6 +97,7 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
         val member = memberRepository.save(
             Member(
                 id = "member1",
+                memberId = "testmemberid2",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
@@ -157,6 +159,7 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
         val member = memberRepository.save(
             Member(
                 id = "member1",
+                memberId = "testmemberid3",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
@@ -198,6 +201,7 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
         val member1 = memberRepository.save(
             Member(
                 id = "member1",
+                memberId = "testmemberid4",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
@@ -209,6 +213,7 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
         memberRepository.save(
             Member(
                 id = "member2",
+                memberId = "testmemberid5",
                 socialId = "member2",
                 provider = SocialProvider.GOOGLE,
                 email = "member2@example.com",

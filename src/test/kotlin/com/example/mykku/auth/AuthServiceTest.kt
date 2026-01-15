@@ -55,7 +55,7 @@ class AuthServiceTest : BaseServiceTest() {
             accessTokenExpiresIn = 86400000L,
             refreshTokenExpiresIn = 1209600000L,
             member = MemberInfo(
-                id = "google_123456",
+                memberId = "google_123456",
                 email = "test@google.com",
                 nickname = "Test User",
                 profileImage = "profile.jpg"
@@ -81,7 +81,7 @@ class AuthServiceTest : BaseServiceTest() {
             accessTokenExpiresIn = 86400000L,
             refreshTokenExpiresIn = 1209600000L,
             member = MemberInfo(
-                id = "kakao_123456",
+                memberId = "kakao_123456",
                 email = "test@kakao.com",
                 nickname = "카카오유저",
                 profileImage = "kakao_profile.jpg"
@@ -107,7 +107,7 @@ class AuthServiceTest : BaseServiceTest() {
             accessTokenExpiresIn = 86400000L,
             refreshTokenExpiresIn = 1209600000L,
             member = MemberInfo(
-                id = "apple_apple.user.123456",
+                memberId = "apple_apple.user.123456",
                 email = "test@privaterelay.appleid.com",
                 nickname = "애플사용자",
                 profileImage = ""
@@ -133,7 +133,7 @@ class AuthServiceTest : BaseServiceTest() {
             accessTokenExpiresIn = 86400000L,
             refreshTokenExpiresIn = 1209600000L,
             member = MemberInfo(
-                id = "naver_naver123456",
+                memberId = "naver_naver123456",
                 email = "test@naver.com",
                 nickname = "네이버별명",
                 profileImage = "naver_profile.jpg"
@@ -159,7 +159,7 @@ class AuthServiceTest : BaseServiceTest() {
             accessTokenExpiresIn = 86400000L,
             refreshTokenExpiresIn = 1209600000L,
             member = MemberInfo(
-                id = "google_123456",
+                memberId = "google_123456",
                 email = "new@google.com",
                 nickname = "New User",
                 profileImage = "profile.jpg"
@@ -185,7 +185,7 @@ class AuthServiceTest : BaseServiceTest() {
             accessTokenExpiresIn = 86400000L,
             refreshTokenExpiresIn = 1209600000L,
             member = MemberInfo(
-                id = "kakao_123456",
+                memberId = "kakao_123456",
                 email = "kakao_123456@kakao.com",
                 nickname = "카카오유저",
                 profileImage = "kakao_profile.jpg"
@@ -211,7 +211,7 @@ class AuthServiceTest : BaseServiceTest() {
             accessTokenExpiresIn = 86400000L,
             refreshTokenExpiresIn = 1209600000L,
             member = MemberInfo(
-                id = "apple_apple.user.123456",
+                memberId = "apple_apple.user.123456",
                 email = "apple_apple.user.123456@privaterelay.appleid.com",
                 nickname = "애플사용자",
                 profileImage = ""

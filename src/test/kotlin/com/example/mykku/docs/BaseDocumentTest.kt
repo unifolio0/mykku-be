@@ -2,6 +2,7 @@ package com.example.mykku.docs
 
 import com.example.mykku.admin.service.AdminRoleService
 import com.example.mykku.auth.AuthService
+import com.example.mykku.block.BlockService
 import com.example.mykku.auth.tool.JwtTokenProvider
 import com.example.mykku.board.BoardService
 import com.example.mykku.contest.ContestService
@@ -120,6 +121,9 @@ abstract class BaseDocumentTest {
     @MockitoBean
     protected lateinit var dailyMessageCommentService: DailyMessageCommentService
 
+    @MockitoBean
+    protected lateinit var blockService: BlockService
+
     companion object {
         const val TEST_MEMBER_ID = "test-member-id"
         const val TEST_MEMBER_EMAIL = "test@example.com"
@@ -178,6 +182,7 @@ abstract class BaseDocumentTest {
         testMember = memberRepository.save(
             Member(
                 id = TEST_MEMBER_ID,
+                memberId = "testmemberid",
                 nickname = "testuser",
                 role = null,
                 profileImage = "https://example.com/profile.jpg",

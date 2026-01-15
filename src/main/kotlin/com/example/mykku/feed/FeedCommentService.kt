@@ -12,7 +12,7 @@ import com.example.mykku.feed.tool.FeedCommentReader
 import com.example.mykku.feed.tool.FeedCommentWriter
 import com.example.mykku.feed.tool.FeedReader
 import com.example.mykku.like.tool.LikeFeedCommentReader
-import com.example.mykku.member.tool.MemberReader
+import com.example.mykku.member.domain.Member
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -23,7 +23,6 @@ class FeedCommentService(
     private val feedCommentReader: FeedCommentReader,
     private val feedCommentWriter: FeedCommentWriter,
     private val likeFeedCommentReader: LikeFeedCommentReader,
-    private val memberReader: MemberReader,
 ) {
     @Transactional(readOnly = true)
     fun getComments(feedId: Long, memberId: String?, pageable: Pageable): FeedCommentsResponse {
@@ -39,7 +38,7 @@ class FeedCommentService(
                     id = reply.id!!,
                     content = reply.content,
                     author = CommentAuthorResponse(
-                        memberId = reply.member.id,
+                        memberId = reply.member.memberId,
                         nickname = reply.member.nickname,
                         profileImage = reply.member.profileImage
                     ),
@@ -54,7 +53,7 @@ class FeedCommentService(
                 id = comment.id!!,
                 content = comment.content,
                 author = CommentAuthorResponse(
-                    memberId = comment.member.id,
+                    memberId = comment.member.memberId,
                     nickname = comment.member.nickname,
                     profileImage = comment.member.profileImage
                 ),
@@ -80,11 +79,10 @@ class FeedCommentService(
     @Transactional
     fun createComment(
         feedId: Long,
-        memberId: String,
+        member: Member,
         request: CreateFeedCommentRequest,
     ): SingleFeedCommentResponse {
         val feed = feedReader.getFeedById(feedId)
-        val member = memberReader.getMemberById(memberId)
 
         val parentComment = request.parentCommentId?.let { parentId ->
             feedCommentReader.getFeedCommentById(parentId)
@@ -101,7 +99,7 @@ class FeedCommentService(
             id = comment.id!!,
             content = comment.content,
             author = CommentAuthorResponse(
-                memberId = comment.member.id,
+                memberId = comment.member.memberId,
                 nickname = comment.member.nickname,
                 profileImage = comment.member.profileImage
             ),
@@ -113,12 +111,12 @@ class FeedCommentService(
     @Transactional
     fun updateComment(
         commentId: Long,
-        memberId: String,
+        member: Member,
         request: UpdateFeedCommentRequest,
     ): SingleFeedCommentResponse {
         val comment = feedCommentReader.getFeedCommentById(commentId)
 
-        if (comment.member.id != memberId) {
+        if (comment.member.id != member.id) {
             throw FeedException.feedCommentForbiddenAccess()
         }
 
@@ -131,7 +129,7 @@ class FeedCommentService(
             id = updatedComment.id!!,
             content = updatedComment.content,
             author = CommentAuthorResponse(
-                memberId = updatedComment.member.id,
+                memberId = updatedComment.member.memberId,
                 nickname = updatedComment.member.nickname,
                 profileImage = updatedComment.member.profileImage
             ),
@@ -141,10 +139,10 @@ class FeedCommentService(
     }
 
     @Transactional
-    fun deleteComment(commentId: Long, memberId: String) {
+    fun deleteComment(commentId: Long, member: Member) {
         val comment = feedCommentReader.getFeedCommentById(commentId)
 
-        if (comment.member.id != memberId) {
+        if (comment.member.id != member.id) {
             throw FeedException.feedCommentForbiddenAccess()
         }
 

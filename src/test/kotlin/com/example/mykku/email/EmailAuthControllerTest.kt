@@ -60,6 +60,7 @@ class EmailAuthControllerTest : BaseControllerTest() {
             ?: roleRepository.save(Role(name = "일반 덕후", description = "테스트용 칭호"))
         val member = Member.createEmailMember(
             id = "existingMember",
+            memberId = "existingmember",
             email = existingEmail,
             password = "password",
             nickname = "기존유저",
@@ -172,6 +173,7 @@ class EmailAuthControllerTest : BaseControllerTest() {
     @DisplayName("회원가입 - 성공")
     fun `signup - 회원가입 성공 및 자동 로그인`() {
         val request = SignupRequest(
+            memberId = "newuser123",
             email = "newuser@example.com",
             password = "password123!",
             nickname = "신규유저"
@@ -198,6 +200,7 @@ class EmailAuthControllerTest : BaseControllerTest() {
             ?: roleRepository.save(Role(name = "일반 덕후", description = "테스트용 칭호"))
         val member = Member.createEmailMember(
             id = "existingMember",
+            memberId = "existingmember2",
             email = existingEmail,
             password = "password",
             nickname = "기존유저",
@@ -205,6 +208,7 @@ class EmailAuthControllerTest : BaseControllerTest() {
         memberRepository.save(member)
 
         val request = SignupRequest(
+            memberId = "newuser456",
             email = existingEmail,
             password = "password123!",
             nickname = "신규유저"
@@ -224,6 +228,7 @@ class EmailAuthControllerTest : BaseControllerTest() {
     @DisplayName("회원가입 - 잘못된 비밀번호 형식")
     fun `signup - 잘못된 비밀번호 형식으로 회원가입 시 실패`() {
         val request = SignupRequest(
+            memberId = "newuser789",
             email = "newuser@example.com",
             password = "short",
             nickname = "신규유저"
@@ -247,6 +252,7 @@ class EmailAuthControllerTest : BaseControllerTest() {
             ?: roleRepository.save(Role(name = "일반 덕후", description = "테스트용 칭호"))
         val member = Member.createEmailMember(
             id = "loginMember",
+            memberId = "loginmember1",
             email = email,
             password = passwordEncoder.encode(password),
             nickname = "로그인유저",
@@ -296,6 +302,7 @@ class EmailAuthControllerTest : BaseControllerTest() {
             ?: roleRepository.save(Role(name = "일반 덕후", description = "테스트용 칭호"))
         val member = Member.createEmailMember(
             id = "wrongPasswordMember",
+            memberId = "wrongpassword1",
             email = email,
             password = passwordEncoder.encode("correctPassword123!"),
             nickname = "유저",
@@ -325,6 +332,7 @@ class EmailAuthControllerTest : BaseControllerTest() {
             ?: roleRepository.save(Role(name = "일반 덕후", description = "테스트용 칭호"))
         val member = Member.createEmailMember(
             id = "resetMember",
+            memberId = "resetmember1",
             email = email,
             password = passwordEncoder.encode("oldPassword123!"),
             nickname = "재설정유저",

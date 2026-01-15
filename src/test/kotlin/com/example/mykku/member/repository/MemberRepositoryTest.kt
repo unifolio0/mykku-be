@@ -58,12 +58,14 @@ class MemberRepositoryTest : BaseRepositoryTest() {
 
         val emailMember = Member.createEmailMember(
             id = "emailMember",
+            memberId = "emailuser1",
             email = email,
             password = "password",
             nickname = "이메일유저"
         )
         val socialMember = Member.createSocialMember(
             id = "socialMember",
+            memberId = "socialuser1",
             email = "social@example.com",
             nickname = "소셜유저",
             profileImage = "",
@@ -81,5 +83,45 @@ class MemberRepositoryTest : BaseRepositoryTest() {
         assertNotNull(foundSocialMember)
         assertEquals(SocialProvider.EMAIL, foundEmailMember?.provider)
         assertEquals(SocialProvider.GOOGLE, foundSocialMember?.provider)
+    }
+
+    @Test
+    fun `memberId로 회원 존재 여부 확인 - 존재하는 경우`() {
+        val memberId = "uniquememberid"
+        createAndSaveMember(id = "test1", memberId = memberId)
+
+        val exists = memberRepository.existsByMemberId(memberId)
+
+        assertTrue(exists)
+    }
+
+    @Test
+    fun `memberId로 회원 존재 여부 확인 - 존재하지 않는 경우`() {
+        val memberId = "nonexistentid"
+
+        val exists = memberRepository.existsByMemberId(memberId)
+
+        assertFalse(exists)
+    }
+
+    @Test
+    fun `memberId로 회원 조회 - 존재하는 경우`() {
+        val memberId = "uniquememberid"
+        val savedMember = createAndSaveMember(id = "test1", memberId = memberId)
+
+        val foundMember = memberRepository.findByMemberId(memberId)
+
+        assertNotNull(foundMember)
+        assertEquals(savedMember.id, foundMember?.id)
+        assertEquals(memberId, foundMember?.memberId)
+    }
+
+    @Test
+    fun `memberId로 회원 조회 - 존재하지 않는 경우`() {
+        val memberId = "nonexistentid"
+
+        val foundMember = memberRepository.findByMemberId(memberId)
+
+        assertNull(foundMember)
     }
 }

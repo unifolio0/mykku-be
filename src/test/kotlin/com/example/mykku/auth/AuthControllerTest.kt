@@ -28,6 +28,7 @@ class AuthControllerTest : BaseControllerTest() {
         val member = memberRepository.save(
             Member(
                 id = "member1",
+                memberId = "testmemberid1",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
                 email = "member1@example.com",
@@ -79,6 +80,7 @@ class AuthControllerTest : BaseControllerTest() {
         val member = memberRepository.save(
             Member(
                 id = "member2",
+                memberId = "testmemberid2",
                 socialId = "member2",
                 provider = SocialProvider.GOOGLE,
                 email = "member2@example.com",
@@ -111,6 +113,7 @@ class AuthControllerTest : BaseControllerTest() {
         val member = memberRepository.save(
             Member(
                 id = "member_to_delete",
+                memberId = "testmemberid3",
                 socialId = "member_to_delete",
                 provider = SocialProvider.GOOGLE,
                 email = "delete@example.com",

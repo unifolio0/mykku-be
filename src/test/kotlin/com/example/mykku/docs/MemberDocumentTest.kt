@@ -104,7 +104,7 @@ class MemberDocumentTest : BaseDocumentTest() {
         @Test
         fun `성공`() {
             val response = MemberProfileResponse(
-                id = TEST_MEMBER_ID,
+                memberId = "testmemberid",
                 email = TEST_MEMBER_EMAIL,
                 nickname = "testuser",
                 profileImage = "https://example.com/profile.jpg",
@@ -122,7 +122,7 @@ class MemberDocumentTest : BaseDocumentTest() {
                     response()
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data.id").type(JsonFieldType.STRING).description("회원 ID"),
+                            fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("회원 ID"),
                             fieldWithPath("data.email").type(JsonFieldType.STRING).description("이메일"),
                             fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("닉네임"),
                             fieldWithPath("data.profileImage").type(JsonFieldType.STRING).description("프로필 이미지 URL"),
@@ -166,7 +166,7 @@ class MemberDocumentTest : BaseDocumentTest() {
                 profileImage = "https://example.com/new-profile.jpg"
             )
             val response = MemberProfileResponse(
-                id = TEST_MEMBER_ID,
+                memberId = "testmemberid",
                 email = TEST_MEMBER_EMAIL,
                 nickname = "새닉네임",
                 profileImage = "https://example.com/new-profile.jpg",
@@ -184,7 +184,7 @@ class MemberDocumentTest : BaseDocumentTest() {
                     response()
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data.id").type(JsonFieldType.STRING).description("회원 ID"),
+                            fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("회원 ID"),
                             fieldWithPath("data.email").type(JsonFieldType.STRING).description("이메일"),
                             fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("닉네임"),
                             fieldWithPath("data.profileImage").type(JsonFieldType.STRING).description("프로필 이미지 URL"),

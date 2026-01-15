@@ -51,7 +51,7 @@ class AuthDocumentTest : BaseDocumentTest() {
                 accessTokenExpiresIn = 86400000,
                 refreshTokenExpiresIn = 1209600000,
                 member = MemberInfo(
-                    id = "google_123456789",
+                    memberId = "google_123456789",
                     email = "user@gmail.com",
                     nickname = "홍길동",
                     profileImage = "https://lh3.googleusercontent.com/profile.jpg"
@@ -76,7 +76,7 @@ class AuthDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.refreshTokenExpiresIn").type(JsonFieldType.NUMBER)
                                 .description("리프레시 토큰 만료 시간 (밀리초)"),
                             fieldWithPath("data.member").type(JsonFieldType.OBJECT).description("회원 정보"),
-                            fieldWithPath("data.member.id").type(JsonFieldType.STRING).description("회원 ID"),
+                            fieldWithPath("data.member.memberId").type(JsonFieldType.STRING).description("회원 ID"),
                             fieldWithPath("data.member.email").type(JsonFieldType.STRING).description("회원 이메일"),
                             fieldWithPath("data.member.nickname").type(JsonFieldType.STRING).description("회원 닉네임"),
                             fieldWithPath("data.member.profileImage").type(JsonFieldType.STRING)

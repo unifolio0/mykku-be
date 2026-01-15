@@ -27,8 +27,10 @@ class MemberOrchestrator(
     }
 
     private fun createMember(memberInfo: OAuthMemberInfo): Member {
+        val generatedMemberId = generateMemberId(memberInfo.provider.name, memberInfo.socialId)
         val member = Member.createSocialMember(
             id = memberInfo.memberId,
+            memberId = generatedMemberId,
             nickname = memberInfo.nickname,
             profileImage = memberInfo.profileImage,
             provider = memberInfo.provider,
@@ -38,5 +40,10 @@ class MemberOrchestrator(
 
         memberWriter.save(member)
         return member
+    }
+
+    private fun generateMemberId(provider: String, socialId: String): String {
+        val base = "${provider.lowercase()}${socialId}"
+        return base.filter { it.isLetterOrDigit() }.take(16)
     }
 }

@@ -17,6 +17,7 @@ abstract class BaseServiceTest {
      */
     protected fun createTestMember(
         id: String = "testMember",
+        memberId: String? = null,
         nickname: String = "테스트유저",
         email: String = "test@example.com",
         socialId: String = "12345",
@@ -26,6 +27,7 @@ abstract class BaseServiceTest {
     ): Member {
         return Member(
             id = id,
+            memberId = memberId ?: id,
             nickname = nickname,
             email = email,
             socialId = socialId,

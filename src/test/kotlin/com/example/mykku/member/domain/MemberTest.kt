@@ -15,6 +15,7 @@ class MemberTest {
 
         Member(
             id = "test_member",
+            memberId = "testmember1",
             nickname = validNickname,
             role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "profile.jpg",
@@ -31,6 +32,7 @@ class MemberTest {
         val exception = assertThrows<MemberException> {
             Member(
                 id = "test_member",
+                memberId = "testmember2",
                 nickname = invalidNickname,
                 role = Role(name = "일반 덕후", description = "테스트용 칭호"),
                 profileImage = "profile.jpg",
@@ -47,6 +49,7 @@ class MemberTest {
     fun `유효한 패턴의 nickname으로 생성할 수 있다`() {
         Member(
             id = "test_member",
+            memberId = "testmember3",
             nickname = "한글123",
             role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "profile.jpg",
@@ -57,6 +60,7 @@ class MemberTest {
 
         Member(
             id = "test_member2",
+            memberId = "testmember4",
             nickname = "English123",
             role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "profile.jpg",
@@ -67,6 +71,7 @@ class MemberTest {
 
         Member(
             id = "test_member3",
+            memberId = "testmember5",
             nickname = "123456",
             role = Role(name = "일반 덕후", description = "테스트용 칭호"),
             profileImage = "profile.jpg",
@@ -81,6 +86,7 @@ class MemberTest {
         val exception = assertThrows<MemberException> {
             Member(
                 id = "test_member",
+                memberId = "testmember6",
                 nickname = "닉네임!",
                 role = Role(name = "일반 덕후", description = "테스트용 칭호"),
                 profileImage = "profile.jpg",
