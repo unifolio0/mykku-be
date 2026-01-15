@@ -44,7 +44,7 @@ MAX_RETRIES=30
 RETRY_COUNT=0
 
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/actuator/health 2>/dev/null || echo "000")
+    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/actuator/health/liveness 2>/dev/null || echo "000")
     if [ "$HTTP_STATUS" = "200" ]; then
         echo "Application is healthy! (HTTP $HTTP_STATUS)"
         break
