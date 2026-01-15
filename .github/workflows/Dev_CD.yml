@@ -114,6 +114,13 @@ jobs:
           path: ./docker-compose.dev.yml
           if-no-files-found: error
 
+      - name: Upload nginx config
+        uses: actions/upload-artifact@v4
+        with:
+          name: nginx-config
+          path: ./nginx/
+          if-no-files-found: error
+
   deploy:
     needs: build-and-push
     runs-on: dev
@@ -131,11 +138,19 @@ jobs:
           name: docker-compose
           path: ~/app
 
+      - name: Download nginx config
+        uses: actions/download-artifact@v4
+        with:
+          name: nginx-config
+          path: ~/app/nginx
+
       - name: Deploy with Docker Compose
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           IMAGE_TAG: ${{ github.sha }}
+          LETSENCRYPT_EMAIL: ${{ secrets.LETSENCRYPT_EMAIL }}
         run: |
           export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
           export IMAGE_TAG=${{ github.sha }}
+          export LETSENCRYPT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }}
           sudo -E sh ~/app/scripts/replace-new-version.sh
