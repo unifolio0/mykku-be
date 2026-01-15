@@ -44,11 +44,12 @@ MAX_RETRIES=30
 RETRY_COUNT=0
 
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-    if docker exec mykku-app wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health 2>/dev/null; then
-        echo "Application is healthy!"
+    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/actuator/health 2>/dev/null || echo "000")
+    if [ "$HTTP_STATUS" = "200" ]; then
+        echo "Application is healthy! (HTTP $HTTP_STATUS)"
         break
     fi
-    echo "Waiting for health check... ($((RETRY_COUNT + 1))/$MAX_RETRIES)"
+    echo "Waiting for health check... ($((RETRY_COUNT + 1))/$MAX_RETRIES) - HTTP $HTTP_STATUS"
     sleep 5
     RETRY_COUNT=$((RETRY_COUNT + 1))
 done
