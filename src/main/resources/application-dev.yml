@@ -1,6 +1,11 @@
+server:
+  shutdown: graceful
+
 spring:
   config:
     import: dev-secret.yml
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
   servlet:
     multipart:
       max-file-size: 10MB
@@ -80,3 +85,12 @@ springdoc:
     disable-swagger-default-url: true
     filter: true
     persist-authorization: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never

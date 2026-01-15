@@ -1,34 +1,69 @@
 #!/bin/bash
 
-PID=$(lsof -t -i:8080)
+set -e
 
-# 프로세스 종료
-if [ -z "$PID" ]; then
-  echo "No process is using port 8080."
-else
-  echo "Killing process with PID: $PID"
-  kill -15 "$PID"
+APP_DIR="/home/ubuntu/app"
+COMPOSE_FILE="$APP_DIR/docker-compose.dev.yml"
+DOCKER_USERNAME="${DOCKER_USERNAME:-}"
+IMAGE_TAG="${IMAGE_TAG:-latest}"
 
-  # 직전 명령(프로세스 종료 명령)이 정상 동작했는지 확인
-  if [ $? -eq 0 ]; then
-    echo "Process $PID terminated successfully."
-  else
-    echo "Failed to terminate process $PID."
-  fi
+echo "=== MyKKU Docker Deployment ==="
+echo "Image: ${DOCKER_USERNAME}/mykku-be:${IMAGE_TAG}"
+echo "Compose file: ${COMPOSE_FILE}"
+
+if [ -z "$DOCKER_USERNAME" ]; then
+    echo "Error: DOCKER_USERNAME is not set"
+    exit 1
 fi
 
-JAR_FILE=$(ls /home/ubuntu/app/*.jar | head -n 1)
+if [ ! -f "$COMPOSE_FILE" ]; then
+    echo "Error: docker-compose.dev.yml not found at $COMPOSE_FILE"
+    exit 1
+fi
 
-echo "Starting application..."
+export DOCKER_USERNAME
+export IMAGE_TAG
 
-sudo nohup java \
-    -Dspring.profiles.active=dev \
-    -Duser.timezone=Asia/Seoul \
-    -Dserver.port=8080 \
-    -Ddd.service=mykku \
-    -Ddd.env=dev \
-    -jar "$JAR_FILE" > /dev/null 2>&1 &
+echo "Pulling new image..."
+docker pull "${DOCKER_USERNAME}/mykku-be:${IMAGE_TAG}"
 
-echo "Application started. PID: $!"
-echo "Logs are managed by Logback: /home/ubuntu/app/logs/mykku.log"
-echo "To view logs: tail -f /home/ubuntu/app/logs/mykku.log"
+echo "Stopping existing container with graceful shutdown..."
+if docker ps -q -f name=mykku-app | grep -q .; then
+    docker stop --time=30 mykku-app || true
+fi
+
+echo "Removing old container..."
+docker rm -f mykku-app 2>/dev/null || true
+
+echo "Starting new container..."
+cd "$APP_DIR"
+docker compose -f "$COMPOSE_FILE" up -d
+
+echo "Waiting for application to be healthy..."
+MAX_RETRIES=30
+RETRY_COUNT=0
+
+while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+    if docker exec mykku-app wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health 2>/dev/null; then
+        echo "Application is healthy!"
+        break
+    fi
+    echo "Waiting for health check... ($((RETRY_COUNT + 1))/$MAX_RETRIES)"
+    sleep 5
+    RETRY_COUNT=$((RETRY_COUNT + 1))
+done
+
+if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+    echo "Warning: Health check timeout. Check container logs."
+    docker logs mykku-app --tail 50
+fi
+
+echo "Cleaning up old images..."
+docker image prune -f --filter "until=24h"
+
+echo "=== Deployment Complete ==="
+echo "Container status:"
+docker ps -f name=mykku-app
+echo ""
+echo "To view logs: docker logs -f mykku-app"
+echo "Or file logs: tail -f /home/ubuntu/app/logs/mykku.log"
