@@ -11,6 +11,7 @@ import org.springframework.restdocs.request.ParameterDescriptor
 import org.springframework.restdocs.request.RequestDocumentation.pathParameters
 import org.springframework.restdocs.request.RequestDocumentation.queryParameters
 import org.springframework.restdocs.request.RequestPartDescriptor
+import org.springframework.restdocs.payload.PayloadDocumentation.requestPartFields
 import org.springframework.restdocs.request.RequestDocumentation.requestParts
 import org.springframework.restdocs.snippet.Snippet
 
@@ -61,6 +62,11 @@ class RestDocumentationRequest {
 
     fun requestPart(vararg descriptors: RequestPartDescriptor): RestDocumentationRequest {
         snippets.add(requestParts(*descriptors))
+        return this
+    }
+
+    fun requestPartField(partName: String, vararg descriptors: FieldDescriptor): RestDocumentationRequest {
+        snippets.add(requestPartFields(partName, *descriptors))
         return this
     }
 

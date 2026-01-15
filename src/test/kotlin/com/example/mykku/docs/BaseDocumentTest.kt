@@ -216,6 +216,11 @@ abstract class BaseDocumentTest {
         if (config.requestParts.isNotEmpty()) {
             requestPart(*config.requestParts.toTypedArray())
         }
+        if (config.requestPartFields.isNotEmpty()) {
+            config.requestPartFields.forEach { (partName, fields) ->
+                requestPartField(partName, *fields.toTypedArray())
+            }
+        }
         if (config.headerDescriptors.isNotEmpty()) {
             requestHeader(*config.headerDescriptors.toTypedArray())
         }
