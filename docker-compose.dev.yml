@@ -12,6 +12,7 @@ services:
       - nginx-vhost:/etc/nginx/vhost.d
       - nginx-html:/usr/share/nginx/html
       - /home/ubuntu/app/nginx/vhost.d/default:/etc/nginx/vhost.d/default:ro
+      - /home/ubuntu/app/nginx/vhost.d/api.dev.mykku.kr_location:/etc/nginx/vhost.d/api.dev.mykku.kr_location:ro
     environment:
       - TZ=Asia/Seoul
     logging:
