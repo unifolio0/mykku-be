@@ -1,6 +1,8 @@
-package com.example.mykku.contest.adapter.input.web
+package com.example.mykku.admin.controller
 
 import com.example.mykku.common.dto.ApiResponse
+import com.example.mykku.contest.adapter.input.web.SetContestWinnersRequest
+import com.example.mykku.contest.adapter.input.web.SetContestWinnersResponse
 import com.example.mykku.contest.application.port.input.SetContestWinnersUseCase
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
@@ -11,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/v1/admin/contests")
-class AdminContestController(
+@RequestMapping("/admin/api/v1/contests")
+class AdminContestApiController(
     private val setContestWinnersUseCase: SetContestWinnersUseCase
 ) {
 

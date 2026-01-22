@@ -4,6 +4,7 @@ import com.example.mykku.board.adapter.output.persistence.BoardJpaRepository
 import com.example.mykku.board.adapter.output.persistence.entity.BoardJpaEntity
 import com.example.mykku.config.TestEmailConfig
 import com.example.mykku.config.TestEmailSenderConfig
+import com.example.mykku.config.TestImageUploadConfig
 import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.member.domain.vo.SocialProvider
@@ -22,7 +23,7 @@ import org.springframework.test.context.ActiveProfiles
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-@Import(TestEmailConfig::class, TestEmailSenderConfig::class)
+@Import(TestEmailConfig::class, TestEmailSenderConfig::class, TestImageUploadConfig::class)
 @ExtendWith(DatabaseCleaner::class)
 abstract class BaseControllerTest {
 
