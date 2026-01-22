@@ -1,18 +1,15 @@
 package com.example.mykku.email
 
-import com.example.mykku.auth.dto.LoginResponse
-import com.example.mykku.auth.tool.JwtTokenProvider
+import com.example.mykku.auth.adapter.input.web.dto.LoginResponse
+import com.example.mykku.auth.adapter.output.persistence.JwtTokenProviderAdapter
 import com.example.mykku.email.domain.VerificationPurpose
 import com.example.mykku.email.exception.EmailAuthException
 import com.example.mykku.member.exception.MemberException
 import com.example.mykku.email.tool.EmailSender
 import com.example.mykku.email.tool.RedisVerificationCodeManager
 import com.example.mykku.email.util.TemporaryPasswordGenerator
-import com.example.mykku.member.domain.Member
-import com.example.mykku.member.tool.MemberReader
-import com.example.mykku.member.tool.MemberWriter
-import com.example.mykku.role.tool.MemberRoleWriter
-import com.example.mykku.role.tool.RoleReader
+import com.example.mykku.member.domain.entity.Member
+import com.example.mykku.member.application.port.output.MemberRepository
 import java.util.UUID
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -22,17 +19,14 @@ import org.springframework.transaction.annotation.Transactional
 class EmailAuthService(
     private val emailSender: EmailSender,
     private val redisVerificationCodeManager: RedisVerificationCodeManager,
-    private val memberReader: MemberReader,
-    private val memberWriter: MemberWriter,
+    private val memberRepository: MemberRepository,
     private val passwordEncoder: PasswordEncoder,
-    private val jwtTokenProvider: JwtTokenProvider,
-    private val roleReader: RoleReader,
-    private val memberRoleWriter: MemberRoleWriter
+    private val jwtTokenProvider: JwtTokenProviderAdapter
 ) {
 
     @Transactional
     fun sendVerificationCode(email: String, purpose: VerificationPurpose) {
-        if (purpose == VerificationPurpose.SIGNUP && memberReader.existsByEmail(email)) {
+        if (purpose == VerificationPurpose.SIGNUP && memberRepository.existsByEmail(email)) {
             throw EmailAuthException.emailAlreadyExists()
         }
 
@@ -63,10 +57,10 @@ class EmailAuthService(
 
     @Transactional
     fun signup(email: String, password: String, nickname: String, userMemberId: String): LoginResponse {
-        if (memberReader.existsByEmail(email)) {
+        if (memberRepository.existsByEmail(email)) {
             throw EmailAuthException.emailAlreadyExists()
         }
-        if (memberReader.existsByMemberId(userMemberId)) {
+        if (memberRepository.existsByMemberId(userMemberId)) {
             throw MemberException.memberIdAlreadyExists()
         }
 
@@ -81,45 +75,47 @@ class EmailAuthService(
             nickname = nickname
         )
 
-        memberWriter.save(member)
+        memberRepository.save(member)
 
-        return jwtTokenProvider.createLoginResponse(member, email, false)
+        val result = jwtTokenProvider.createLoginResult(member, email, false)
+        return LoginResponse.from(result)
     }
 
     @Transactional(readOnly = true)
     fun login(email: String, password: String): LoginResponse {
-        val member = memberReader.findByEmail(email)
+        val member = memberRepository.findByEmail(email)
             ?: throw EmailAuthException.invalidEmailOrPassword()
 
         if (member.password == null || !passwordEncoder.matches(password, member.password)) {
             throw EmailAuthException.invalidEmailOrPassword()
         }
 
-        return jwtTokenProvider.createLoginResponse(member, email, true)
+        val result = jwtTokenProvider.createLoginResult(member, email, true)
+        return LoginResponse.from(result)
     }
 
     @Transactional
     fun resetPassword(email: String, code: String, newPassword: String) {
         verifyCode(email, code, VerificationPurpose.PASSWORD_RESET)
 
-        val member = memberReader.findByEmail(email)
+        val member = memberRepository.findByEmail(email)
             ?: throw EmailAuthException.invalidEmailOrPassword()
 
         val encodedPassword = passwordEncoder.encode(newPassword)
-        member.password = encodedPassword
-        memberWriter.save(member)
+        member.changePassword(encodedPassword)
+        memberRepository.save(member)
     }
 
     @Transactional
     fun sendTemporaryPassword(email: String) {
-        val member = memberReader.findByEmail(email)
+        val member = memberRepository.findByEmail(email)
             ?: throw EmailAuthException.invalidEmailOrPassword()
 
         val temporaryPassword = TemporaryPasswordGenerator.generate()
         val encodedPassword = passwordEncoder.encode(temporaryPassword)
 
-        member.password = encodedPassword
-        memberWriter.save(member)
+        member.changePassword(encodedPassword)
+        memberRepository.save(member)
 
         try {
             emailSender.sendTemporaryPassword(
@@ -133,6 +129,6 @@ class EmailAuthService(
 
     @Transactional(readOnly = true)
     fun checkMemberIdAvailability(memberId: String): Boolean {
-        return !memberReader.existsByMemberId(memberId)
+        return !memberRepository.existsByMemberId(memberId)
     }
 }

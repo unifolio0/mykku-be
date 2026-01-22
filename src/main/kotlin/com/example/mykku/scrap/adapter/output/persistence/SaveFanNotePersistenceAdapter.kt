@@ -1,7 +1,7 @@
 package com.example.mykku.scrap.adapter.output.persistence
 
-import com.example.mykku.fannote.repository.FanNoteRepository
-import com.example.mykku.member.repository.MemberRepository
+import com.example.mykku.fannote.adapter.output.persistence.repository.FanNoteJpaRepository
+import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
 import com.example.mykku.scrap.adapter.output.persistence.entity.SaveFanNoteJpaEntity
 import com.example.mykku.scrap.application.dto.SaveFanNoteResult
 import com.example.mykku.scrap.application.port.output.SaveFanNotePort
@@ -14,14 +14,14 @@ import org.springframework.stereotype.Repository
 @Repository
 class SaveFanNotePersistenceAdapter(
     private val saveFanNoteJpaRepository: SaveFanNoteJpaRepository,
-    private val memberRepository: MemberRepository,
-    private val fanNoteRepository: FanNoteRepository
+    private val memberJpaRepository: MemberJpaRepository,
+    private val fanNoteJpaRepository: FanNoteJpaRepository
 ) : SaveFanNotePort {
 
     override fun save(saveFanNote: SaveFanNoteEntity): SaveFanNoteEntity {
-        val member = memberRepository.findByIdOrNull(saveFanNote.memberId)
+        val member = memberJpaRepository.findByIdOrNull(saveFanNote.memberId)
             ?: throw IllegalArgumentException("Member not found: ${saveFanNote.memberId}")
-        val fanNote = fanNoteRepository.findByIdOrNull(saveFanNote.fanNoteId)
+        val fanNote = fanNoteJpaRepository.findByIdOrNull(saveFanNote.fanNoteId)
             ?: throw IllegalArgumentException("FanNote not found: ${saveFanNote.fanNoteId}")
 
         val jpaEntity = SaveFanNoteJpaEntity.fromDomain(saveFanNote, member, fanNote)

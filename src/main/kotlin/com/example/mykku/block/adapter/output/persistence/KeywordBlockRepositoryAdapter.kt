@@ -5,7 +5,7 @@ import com.example.mykku.block.adapter.output.persistence.repository.KeywordBloc
 import com.example.mykku.block.application.port.output.KeywordBlockRepository
 import com.example.mykku.block.domain.entity.KeywordBlock
 import com.example.mykku.block.domain.vo.KeywordBlockId
-import com.example.mykku.member.adapter.output.persistence.repository.MemberJpaRepository
+import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository

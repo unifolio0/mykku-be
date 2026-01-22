@@ -20,10 +20,10 @@ class UnblockMemberService(
         val blockedMember = memberRepository.findByMemberId(command.blockedMemberId)
             ?: throw MemberException.memberNotFound()
 
-        if (!memberBlockRepository.existsByBlockerIdAndBlockedId(command.blockerId, blockedMember.id)) {
+        if (!memberBlockRepository.existsByBlockerIdAndBlockedId(command.blockerId, blockedMember.id.value)) {
             throw BlockException.memberBlockNotFound()
         }
 
-        memberBlockRepository.deleteByBlockerIdAndBlockedId(command.blockerId, blockedMember.id)
+        memberBlockRepository.deleteByBlockerIdAndBlockedId(command.blockerId, blockedMember.id.value)
     }
 }

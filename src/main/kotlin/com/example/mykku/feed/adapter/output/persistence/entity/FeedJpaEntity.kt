@@ -4,7 +4,7 @@ import com.example.mykku.board.adapter.output.persistence.entity.BoardJpaEntity
 import com.example.mykku.common.domain.BaseEntity
 import com.example.mykku.feed.domain.entity.Feed
 import com.example.mykku.feed.exception.FeedException
-import com.example.mykku.member.domain.Member
+import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -40,7 +40,7 @@ class FeedJpaEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    val member: Member
+    val member: MemberJpaEntity
 ) : BaseEntity() {
 
     companion object {

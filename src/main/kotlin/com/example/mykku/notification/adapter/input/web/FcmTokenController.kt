@@ -2,7 +2,7 @@ package com.example.mykku.notification.adapter.input.web
 
 import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
-import com.example.mykku.member.domain.Member
+import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.notification.application.dto.DeleteFcmTokenCommand
 import com.example.mykku.notification.application.dto.RegisterFcmTokenCommand
 import com.example.mykku.notification.application.port.input.ManageFcmTokenUseCase
@@ -24,7 +24,7 @@ class FcmTokenController(
 
     @PostMapping
     fun registerToken(
-        @CurrentMember member: Member,
+        @CurrentMember member: MemberJpaEntity,
         @RequestBody @Valid request: RegisterFcmTokenRequest
     ): ResponseEntity<ApiResponse<FcmTokenResponse>> {
         val command = RegisterFcmTokenCommand(
@@ -45,7 +45,7 @@ class FcmTokenController(
 
     @GetMapping
     fun getTokens(
-        @CurrentMember member: Member
+        @CurrentMember member: MemberJpaEntity
     ): ResponseEntity<ApiResponse<List<FcmTokenResponse>>> {
         val tokens = manageFcmTokenUseCase.getTokens(member.id)
 
@@ -59,7 +59,7 @@ class FcmTokenController(
 
     @DeleteMapping("/{deviceId}")
     fun deleteToken(
-        @CurrentMember member: Member,
+        @CurrentMember member: MemberJpaEntity,
         @PathVariable deviceId: String
     ): ResponseEntity<ApiResponse<Unit>> {
         val command = DeleteFcmTokenCommand(member.id, deviceId)

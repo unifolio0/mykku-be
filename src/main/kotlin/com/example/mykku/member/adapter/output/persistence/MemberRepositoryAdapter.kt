@@ -4,19 +4,20 @@ import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntit
 import com.example.mykku.member.application.port.output.MemberRepository
 import com.example.mykku.member.domain.entity.Member
 import com.example.mykku.member.domain.vo.MemberId
-import com.example.mykku.role.tool.RoleReader
+import com.example.mykku.role.adapter.output.persistence.repository.RoleJpaRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 
 @Repository
 class MemberRepositoryAdapter(
     private val memberJpaRepository: MemberJpaRepository,
-    private val roleReader: RoleReader
+    private val roleJpaRepository: RoleJpaRepository
 ) : MemberRepository {
 
     override fun save(member: Member): Member {
         val existingEntity = memberJpaRepository.findById(member.id.value).orElse(null)
 
-        val role = member.roleId?.let { roleReader.findById(it) }
+        val role = member.roleId?.let { roleJpaRepository.findByIdOrNull(it) }
 
         val entityToSave = if (existingEntity != null) {
             existingEntity.updateFromDomain(member)

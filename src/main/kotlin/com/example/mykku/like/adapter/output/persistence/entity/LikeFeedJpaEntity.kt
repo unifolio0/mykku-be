@@ -1,9 +1,9 @@
 package com.example.mykku.like.adapter.output.persistence.entity
 
 import com.example.mykku.common.domain.BaseEntity
-import com.example.mykku.feed.domain.Feed
+import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
 import com.example.mykku.like.domain.entity.LikeFeedEntity
-import com.example.mykku.member.domain.Member
+import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
@@ -22,11 +22,11 @@ class LikeFeedJpaEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    val member: Member,
+    val member: MemberJpaEntity,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feed_id")
-    val feed: Feed
+    val feed: FeedJpaEntity
 ) : BaseEntity() {
 
     fun toDomain(): LikeFeedEntity {
@@ -42,8 +42,8 @@ class LikeFeedJpaEntity(
     companion object {
         fun fromDomain(
             domain: LikeFeedEntity,
-            member: Member,
-            feed: Feed
+            member: MemberJpaEntity,
+            feed: FeedJpaEntity
         ): LikeFeedJpaEntity {
             return LikeFeedJpaEntity(
                 id = domain.id?.value,

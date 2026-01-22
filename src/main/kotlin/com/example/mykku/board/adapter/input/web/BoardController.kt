@@ -4,10 +4,13 @@ import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.board.application.port.input.ListBoardsUseCase
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.common.util.PageableValidator
-import com.example.mykku.feed.FeedService
-import com.example.mykku.feed.dto.PagedFeedsResponse
-import com.example.mykku.feed.dto.PopularFeedsResponse
-import com.example.mykku.member.domain.Member
+import com.example.mykku.feed.adapter.input.web.dto.PagedFeedsResponse
+import com.example.mykku.feed.adapter.input.web.dto.PopularFeedsResponse
+import com.example.mykku.feed.application.dto.GetPopularFeedsQuery
+import com.example.mykku.feed.application.dto.ListFeedsQuery
+import com.example.mykku.feed.application.port.input.GetPopularFeedsUseCase
+import com.example.mykku.feed.application.port.input.ListFeedsUseCase
+import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -19,7 +22,8 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v1/boards")
 class BoardController(
     private val listBoardsUseCase: ListBoardsUseCase,
-    private val feedService: FeedService
+    private val listFeedsUseCase: ListFeedsUseCase,
+    private val getPopularFeedsUseCase: GetPopularFeedsUseCase
 ) {
     @GetMapping
     fun getBoards(): ResponseEntity<ApiResponse<BoardResponses>> {
@@ -40,18 +44,19 @@ class BoardController(
         @PathVariable boardId: Long,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int,
-        @CurrentMember(required = false) member: Member?
+        @CurrentMember(required = false) member: MemberJpaEntity?
     ): ResponseEntity<ApiResponse<PagedFeedsResponse>> {
         val pageable = PageableValidator.validateAndCreate(page, size)
-        val feeds = feedService.getFeedsByBoard(
+        val query = ListFeedsQuery(
             boardId = boardId,
             memberId = member?.id,
             pageable = pageable
         )
+        val result = listFeedsUseCase.execute(query)
         return ResponseEntity.ok(
             ApiResponse(
                 message = "보드별 피드 목록을 성공적으로 조회했습니다.",
-                data = feeds
+                data = PagedFeedsResponse.from(result)
             )
         )
     }
@@ -59,13 +64,14 @@ class BoardController(
     @GetMapping("/{boardId}/feeds/popular")
     fun getPopularFeedsByBoard(
         @PathVariable boardId: Long,
-        @CurrentMember(required = false) member: Member?
+        @CurrentMember(required = false) member: MemberJpaEntity?
     ): ResponseEntity<ApiResponse<PopularFeedsResponse>> {
-        val response = feedService.getPopularFeedsByBoard(boardId, member?.id)
+        val query = GetPopularFeedsQuery(boardId = boardId, memberId = member?.id)
+        val result = getPopularFeedsUseCase.execute(query)
         return ResponseEntity.ok(
             ApiResponse(
                 message = "인기 피드 목록을 성공적으로 조회했습니다.",
-                data = response
+                data = PopularFeedsResponse.from(result)
             )
         )
     }

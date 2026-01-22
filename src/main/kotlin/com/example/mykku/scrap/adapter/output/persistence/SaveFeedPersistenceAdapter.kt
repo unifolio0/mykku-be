@@ -1,7 +1,7 @@
 package com.example.mykku.scrap.adapter.output.persistence
 
-import com.example.mykku.feed.repository.FeedRepository
-import com.example.mykku.member.repository.MemberRepository
+import com.example.mykku.feed.adapter.output.persistence.FeedJpaRepository
+import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
 import com.example.mykku.scrap.adapter.output.persistence.entity.SaveFeedJpaEntity
 import com.example.mykku.scrap.application.dto.SaveFeedResult
 import com.example.mykku.scrap.application.port.output.SaveFeedPort
@@ -15,14 +15,14 @@ import org.springframework.stereotype.Repository
 class SaveFeedPersistenceAdapter(
     private val saveFeedJpaRepository: SaveFeedJpaRepository,
     private val folderJpaRepository: FolderJpaRepository,
-    private val memberRepository: MemberRepository,
-    private val feedRepository: FeedRepository
+    private val memberJpaRepository: MemberJpaRepository,
+    private val feedJpaRepository: FeedJpaRepository
 ) : SaveFeedPort {
 
     override fun save(saveFeed: SaveFeedEntity): SaveFeedEntity {
-        val member = memberRepository.findByIdOrNull(saveFeed.memberId)
+        val member = memberJpaRepository.findByIdOrNull(saveFeed.memberId)
             ?: throw IllegalArgumentException("Member not found: ${saveFeed.memberId}")
-        val feed = feedRepository.findByIdOrNull(saveFeed.feedId)
+        val feed = feedJpaRepository.findByIdOrNull(saveFeed.feedId)
             ?: throw IllegalArgumentException("Feed not found: ${saveFeed.feedId}")
         val folder = folderJpaRepository.findByIdOrNull(saveFeed.folderId)
             ?: throw IllegalArgumentException("Folder not found: ${saveFeed.folderId}")

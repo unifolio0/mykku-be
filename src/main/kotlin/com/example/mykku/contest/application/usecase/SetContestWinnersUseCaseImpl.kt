@@ -12,8 +12,6 @@ import com.example.mykku.contest.domain.vo.ContestId
 import com.example.mykku.contest.domain.vo.ContestParticipationId
 import com.example.mykku.contest.domain.vo.ContestStatusType
 import com.example.mykku.contest.exception.ContestException
-import com.example.mykku.feed.tool.FeedReader
-import com.example.mykku.member.tool.MemberReader
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -21,9 +19,7 @@ import org.springframework.transaction.annotation.Transactional
 class SetContestWinnersUseCaseImpl(
     private val contestRepository: ContestRepository,
     private val contestParticipationRepository: ContestParticipationRepository,
-    private val contestWinnerRepository: ContestWinnerRepository,
-    private val feedReader: FeedReader,
-    private val memberReader: MemberReader
+    private val contestWinnerRepository: ContestWinnerRepository
 ) : SetContestWinnersUseCase {
 
     @Transactional
@@ -98,15 +94,13 @@ class SetContestWinnersUseCaseImpl(
     ): SetContestWinnersResult {
         val winnerInfos = winners.map { winner ->
             val participation = participationsMap[winner.participationId.value]!!
-            val feed = feedReader.findById(participation.feedId)
-            val member = memberReader.getMemberById(participation.memberId)
 
             WinnerInfoResult(
                 winnerId = winner.id.value,
                 winnerRank = winner.winnerRank,
-                feedId = feed.id!!,
-                feedTitle = feed.title,
-                authorNickname = member.nickname
+                feedId = participation.feedId,
+                feedTitle = "",
+                authorNickname = ""
             )
         }
 

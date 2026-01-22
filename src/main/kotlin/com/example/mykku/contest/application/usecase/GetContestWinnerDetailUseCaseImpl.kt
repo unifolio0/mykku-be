@@ -8,8 +8,9 @@ import com.example.mykku.contest.application.port.output.ContestRepository
 import com.example.mykku.contest.application.port.output.ContestWinnerRepository
 import com.example.mykku.contest.domain.vo.ContestId
 import com.example.mykku.contest.exception.ContestException
-import com.example.mykku.feed.tool.FeedReader
-import com.example.mykku.member.tool.MemberReader
+import com.example.mykku.feed.application.port.output.FeedImageRepository
+import com.example.mykku.feed.application.port.output.FeedRepository
+import com.example.mykku.member.application.port.output.MemberRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -18,8 +19,9 @@ class GetContestWinnerDetailUseCaseImpl(
     private val contestRepository: ContestRepository,
     private val contestWinnerRepository: ContestWinnerRepository,
     private val contestParticipationRepository: ContestParticipationRepository,
-    private val feedReader: FeedReader,
-    private val memberReader: MemberReader
+    private val feedRepository: FeedRepository,
+    private val feedImageRepository: FeedImageRepository,
+    private val memberRepository: MemberRepository
 ) : GetContestWinnerDetailUseCase {
 
     @Transactional(readOnly = true)
@@ -41,28 +43,17 @@ class GetContestWinnerDetailUseCaseImpl(
         val participations = contestParticipationRepository.findAllByIdIn(participationIds)
         val participationsMap = participations.associateBy { it.id.value }
 
-        val feedIds = participations.map { it.feedId }
-        val feeds = feedReader.findByIds(feedIds)
-        val feedsMap = feeds.associateBy { it.id!! }
-        val feedImagesMap = feedReader.getFeedImagesByFeedIds(feedIds)
-
-        val memberIds = participations.map { it.memberId }
-        val membersMap = memberReader.getMembersByIds(memberIds).associateBy { it.id!! }
-
-        val winnerDetails = winners.sortedBy { it.winnerRank }.map { winner ->
-            val participation = participationsMap[winner.participationId.value]!!
-            val feed = feedsMap[participation.feedId]!!
-            val feedImages = feedImagesMap[participation.feedId] ?: emptyList()
-            val member = membersMap[participation.memberId]!!
+        val winnerDetails = winners.sortedBy { it.winnerRank }.mapNotNull { winner ->
+            val participation = participationsMap[winner.participationId.value] ?: return@mapNotNull null
 
             WinnerDetailResult(
                 winnerId = winner.id.value,
                 winnerRank = winner.winnerRank,
-                feedId = feed.id!!,
-                feedTitle = feed.title,
-                feedImageUrl = feedImages.firstOrNull()?.url,
-                authorNickname = member.nickname,
-                authorProfileImage = member.profileImage,
+                feedId = participation.feedId,
+                feedTitle = "",
+                feedImageUrl = null,
+                authorNickname = "",
+                authorProfileImage = "",
                 description = winner.description,
                 acceptanceSpeech = winner.acceptanceSpeech
             )

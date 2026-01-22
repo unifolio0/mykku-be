@@ -1,7 +1,7 @@
 package com.example.mykku.scrap.adapter.output.persistence
 
-import com.example.mykku.event.repository.EventRepository
-import com.example.mykku.member.repository.MemberRepository
+import com.example.mykku.event.adapter.output.persistence.repository.EventJpaRepository
+import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
 import com.example.mykku.scrap.adapter.output.persistence.entity.SaveEventJpaEntity
 import com.example.mykku.scrap.application.dto.SaveEventResult
 import com.example.mykku.scrap.application.port.output.SaveEventPort
@@ -14,14 +14,14 @@ import org.springframework.stereotype.Repository
 @Repository
 class SaveEventPersistenceAdapter(
     private val saveEventJpaRepository: SaveEventJpaRepository,
-    private val memberRepository: MemberRepository,
-    private val eventRepository: EventRepository
+    private val memberJpaRepository: MemberJpaRepository,
+    private val eventJpaRepository: EventJpaRepository
 ) : SaveEventPort {
 
     override fun save(saveEvent: SaveEventEntity): SaveEventEntity {
-        val member = memberRepository.findByIdOrNull(saveEvent.memberId)
+        val member = memberJpaRepository.findByIdOrNull(saveEvent.memberId)
             ?: throw IllegalArgumentException("Member not found: ${saveEvent.memberId}")
-        val event = eventRepository.findByIdOrNull(saveEvent.eventId)
+        val event = eventJpaRepository.findByIdOrNull(saveEvent.eventId)
             ?: throw IllegalArgumentException("Event not found: ${saveEvent.eventId}")
 
         val jpaEntity = SaveEventJpaEntity.fromDomain(saveEvent, member, event)

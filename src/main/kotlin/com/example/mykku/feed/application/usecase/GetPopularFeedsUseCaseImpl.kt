@@ -1,6 +1,6 @@
 package com.example.mykku.feed.application.usecase
 
-import com.example.mykku.block.tool.BlockFilterHelper
+import com.example.mykku.block.application.port.input.BlockFilterUseCase
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
 import com.example.mykku.feed.application.dto.GetPopularFeedsQuery
 import com.example.mykku.feed.application.dto.PopularFeedResult
@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 class GetPopularFeedsUseCaseImpl(
     private val feedRepository: FeedRepository,
-    private val blockFilterHelper: BlockFilterHelper
+    private val blockFilterUseCase: BlockFilterUseCase
 ) : GetPopularFeedsUseCase {
 
     companion object {
@@ -29,16 +29,12 @@ class GetPopularFeedsUseCaseImpl(
             DEFAULT_POPULAR_FEEDS_DAYS_AGO
         )
 
-        val legacyFeeds = popularFeeds.map { createLegacyFeed(it) }
-        val filteredLegacyFeeds = blockFilterHelper.filterContent(
-            items = legacyFeeds,
+        val filteredFeeds = blockFilterUseCase.filterContent(
+            items = popularFeeds,
             memberId = query.memberId,
             memberIdExtractor = { it.member.id },
             contentExtractors = listOf({ it.title }, { it.content })
         )
-
-        val filteredFeedIds = filteredLegacyFeeds.map { it.id }.toSet()
-        val filteredFeeds = popularFeeds.filter { it.id in filteredFeedIds }
 
         return PopularFeedsResult(
             feeds = filteredFeeds.mapIndexed { index, feed ->
@@ -49,18 +45,6 @@ class GetPopularFeedsUseCaseImpl(
                     content = feed.content
                 )
             }
-        )
-    }
-
-    private fun createLegacyFeed(feed: FeedJpaEntity): com.example.mykku.feed.domain.Feed {
-        return com.example.mykku.feed.domain.Feed(
-            id = feed.id,
-            title = feed.title,
-            content = feed.content,
-            likeCount = feed.likeCount,
-            commentCount = feed.commentCount,
-            board = feed.board,
-            member = feed.member
         )
     }
 }

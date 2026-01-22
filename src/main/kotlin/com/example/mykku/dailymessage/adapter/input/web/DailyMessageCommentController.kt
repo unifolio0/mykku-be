@@ -7,7 +7,7 @@ import com.example.mykku.dailymessage.application.port.input.CreateCommentUseCas
 import com.example.mykku.dailymessage.application.port.input.DeleteCommentUseCase
 import com.example.mykku.dailymessage.application.port.input.GetCommentsUseCase
 import com.example.mykku.dailymessage.application.port.input.UpdateCommentUseCase
-import com.example.mykku.member.domain.Member
+import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -33,7 +33,7 @@ class DailyMessageCommentController(
         @PathVariable dailyMessageId: Long,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int,
-        @CurrentMember(required = false) member: Member?
+        @CurrentMember(required = false) member: MemberJpaEntity?
     ): ResponseEntity<ApiResponse<DailyMessageCommentsResponse>> {
         val pageable = PageableValidator.validateAndCreate(
             page,
@@ -55,7 +55,7 @@ class DailyMessageCommentController(
     fun createComment(
         @PathVariable dailyMessageId: Long,
         @RequestBody request: CreateCommentRequest,
-        @CurrentMember member: Member
+        @CurrentMember member: MemberJpaEntity
     ): ResponseEntity<ApiResponse<CommentResponse>> {
         val command = request.toCommand(
             dailyMessageId = dailyMessageId,
@@ -77,7 +77,7 @@ class DailyMessageCommentController(
     fun updateComment(
         @PathVariable commentId: Long,
         @RequestBody request: UpdateCommentRequest,
-        @CurrentMember member: Member
+        @CurrentMember member: MemberJpaEntity
     ): ResponseEntity<ApiResponse<CommentResponse>> {
         val command = request.toCommand(commentId, member.id)
         val result = updateCommentUseCase.execute(command)
@@ -93,7 +93,7 @@ class DailyMessageCommentController(
     @DeleteMapping("/comments/{commentId}")
     fun deleteComment(
         @PathVariable commentId: Long,
-        @CurrentMember member: Member
+        @CurrentMember member: MemberJpaEntity
     ): ResponseEntity<ApiResponse<Unit>> {
         deleteCommentUseCase.execute(commentId, member.id)
 

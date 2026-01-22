@@ -9,7 +9,8 @@ import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntit
 import com.example.mykku.member.application.port.input.ChangePasswordUseCase
 import com.example.mykku.member.application.port.input.GetMemberProfileUseCase
 import com.example.mykku.member.application.port.input.UpdateMemberProfileUseCase
-import com.example.mykku.role.tool.RoleReader
+import com.example.mykku.role.adapter.output.persistence.repository.RoleJpaRepository
+import org.springframework.data.repository.findByIdOrNull
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -25,7 +26,7 @@ class MemberController(
     private val getMemberProfileUseCase: GetMemberProfileUseCase,
     private val updateMemberProfileUseCase: UpdateMemberProfileUseCase,
     private val changePasswordUseCase: ChangePasswordUseCase,
-    private val roleReader: RoleReader
+    private val roleJpaRepository: RoleJpaRepository
 ) {
 
     @GetMapping("/me")
@@ -34,7 +35,7 @@ class MemberController(
     ): ResponseEntity<ApiResponse<MemberProfileResponse>> {
         val member = memberEntity.toDomain()
         val result = getMemberProfileUseCase.getMyProfile(member)
-        val roleName = result.roleId?.let { roleReader.findById(it)?.name }
+        val roleName = result.roleId?.let { roleJpaRepository.findByIdOrNull(it)?.name }
         val response = MemberProfileResponse.from(result, roleName)
         return ResponseEntity.ok(ApiResponse("프로필 조회 성공", response))
     }
@@ -46,7 +47,7 @@ class MemberController(
     ): ResponseEntity<ApiResponse<MemberProfileResponse>> {
         val member = memberEntity.toDomain()
         val result = updateMemberProfileUseCase.updateProfile(member, request.toCommand())
-        val roleName = result.roleId?.let { roleReader.findById(it)?.name }
+        val roleName = result.roleId?.let { roleJpaRepository.findByIdOrNull(it)?.name }
         val response = MemberProfileResponse.from(result, roleName)
         return ResponseEntity.ok(ApiResponse("프로필이 수정되었습니다", response))
     }

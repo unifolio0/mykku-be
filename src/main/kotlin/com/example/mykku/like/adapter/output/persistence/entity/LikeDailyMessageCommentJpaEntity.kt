@@ -1,9 +1,9 @@
 package com.example.mykku.like.adapter.output.persistence.entity
 
 import com.example.mykku.common.domain.BaseEntity
-import com.example.mykku.dailymessage.domain.DailyMessageComment
+import com.example.mykku.dailymessage.adapter.output.persistence.entity.DailyMessageCommentJpaEntity
 import com.example.mykku.like.domain.entity.LikeDailyMessageCommentEntity
-import com.example.mykku.member.domain.Member
+import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
@@ -22,11 +22,11 @@ class LikeDailyMessageCommentJpaEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    val member: Member,
+    val member: MemberJpaEntity,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "daily_message_comment_id")
-    val dailyMessageComment: DailyMessageComment
+    val dailyMessageComment: DailyMessageCommentJpaEntity
 ) : BaseEntity() {
 
     fun toDomain(): LikeDailyMessageCommentEntity {
@@ -42,8 +42,8 @@ class LikeDailyMessageCommentJpaEntity(
     companion object {
         fun fromDomain(
             domain: LikeDailyMessageCommentEntity,
-            member: Member,
-            dailyMessageComment: DailyMessageComment
+            member: MemberJpaEntity,
+            dailyMessageComment: DailyMessageCommentJpaEntity
         ): LikeDailyMessageCommentJpaEntity {
             return LikeDailyMessageCommentJpaEntity(
                 id = domain.id?.value,

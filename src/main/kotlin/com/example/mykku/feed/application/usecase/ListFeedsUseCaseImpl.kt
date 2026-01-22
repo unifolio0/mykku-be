@@ -1,7 +1,7 @@
 package com.example.mykku.feed.application.usecase
 
-import com.example.mykku.block.tool.BlockFilterHelper
-import com.example.mykku.contest.repository.ContestTagRepository
+import com.example.mykku.block.application.port.input.BlockFilterUseCase
+import com.example.mykku.contest.application.port.output.ContestTagRepository
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedTagJpaEntity
 import com.example.mykku.feed.application.dto.AuthorResult
@@ -16,9 +16,8 @@ import com.example.mykku.feed.application.port.output.FeedCommentRepository
 import com.example.mykku.feed.application.port.output.FeedImageRepository
 import com.example.mykku.feed.application.port.output.FeedRepository
 import com.example.mykku.feed.application.port.output.FeedTagRepository
-import com.example.mykku.like.tool.LikeFeedReader
-import com.example.mykku.scrap.tool.SaveFeedReader
-import org.springframework.data.domain.Page
+import com.example.mykku.like.application.port.output.LikeFeedPort
+import com.example.mykku.scrap.application.port.output.SaveFeedPort
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -31,24 +30,20 @@ class ListFeedsUseCaseImpl(
     private val feedTagRepository: FeedTagRepository,
     private val feedCommentRepository: FeedCommentRepository,
     private val contestTagRepository: ContestTagRepository,
-    private val likeFeedReader: LikeFeedReader,
-    private val saveFeedReader: SaveFeedReader,
-    private val blockFilterHelper: BlockFilterHelper
+    private val likeFeedPort: LikeFeedPort,
+    private val saveFeedPort: SaveFeedPort,
+    private val blockFilterUseCase: BlockFilterUseCase
 ) : ListFeedsUseCase {
 
     override fun execute(query: ListFeedsQuery): PagedFeedsResult {
         val feedPage = feedRepository.findByBoardId(query.boardId, query.pageable)
 
-        val legacyFeeds = feedPage.content.map { createLegacyFeed(it) }
-        val filteredLegacyFeeds = blockFilterHelper.filterContent(
-            items = legacyFeeds,
+        val filteredFeeds = blockFilterUseCase.filterContent(
+            items = feedPage.content,
             memberId = query.memberId,
             memberIdExtractor = { it.member.id },
             contentExtractors = listOf({ it.title }, { it.content })
         )
-
-        val filteredFeedIds = filteredLegacyFeeds.map { it.id }.toSet()
-        val filteredFeeds = feedPage.content.filter { it.id in filteredFeedIds }
 
         val feedResponses = convertToFeedResults(query.memberId ?: "", filteredFeeds)
 
@@ -72,13 +67,13 @@ class ListFeedsUseCaseImpl(
         val allTags = feedTagsMap.values.flatten()
         val contestTagsMap = getContestTagsMap(allTags)
 
-        val legacyFeeds = feeds.map { createLegacyFeed(it) }
+        val feedIds = feeds.map { it.id!! }
         val likedFeedIds = if (memberId.isNotEmpty()) {
-            likeFeedReader.getLikedFeedsByMember(memberId, legacyFeeds)
+            likeFeedPort.findByMemberIdAndFeedIdIn(memberId, feedIds).map { it.feedId }.toSet()
         } else emptySet()
 
         val savedFeedIds = if (memberId.isNotEmpty()) {
-            saveFeedReader.getSavedFeedsByMember(memberId, legacyFeeds)
+            saveFeedPort.findByMemberIdAndFeedIdIn(memberId, feedIds).map { it.feedId }.toSet()
         } else emptySet()
 
         return feeds.map { feed ->
@@ -120,17 +115,5 @@ class ListFeedsUseCaseImpl(
         val titles = feedTags.map { it.title }.distinct()
         val contestTags = contestTagRepository.findAllByTitleIn(titles)
         return contestTags.associateBy { it.title }
-    }
-
-    private fun createLegacyFeed(feed: FeedJpaEntity): com.example.mykku.feed.domain.Feed {
-        return com.example.mykku.feed.domain.Feed(
-            id = feed.id,
-            title = feed.title,
-            content = feed.content,
-            likeCount = feed.likeCount,
-            commentCount = feed.commentCount,
-            board = feed.board,
-            member = feed.member
-        )
     }
 }

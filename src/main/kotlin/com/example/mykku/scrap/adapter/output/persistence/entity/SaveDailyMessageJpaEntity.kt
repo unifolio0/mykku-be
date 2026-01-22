@@ -1,8 +1,8 @@
 package com.example.mykku.scrap.adapter.output.persistence.entity
 
 import com.example.mykku.common.domain.BaseEntity
-import com.example.mykku.dailymessage.domain.DailyMessage
-import com.example.mykku.member.domain.Member
+import com.example.mykku.dailymessage.adapter.output.persistence.entity.DailyMessageJpaEntity
+import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.scrap.domain.entity.SaveDailyMessageEntity
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -22,11 +22,11 @@ class SaveDailyMessageJpaEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    val member: Member,
+    val member: MemberJpaEntity,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "daily_message_id")
-    val dailyMessage: DailyMessage
+    val dailyMessage: DailyMessageJpaEntity
 ) : BaseEntity() {
 
     fun toDomain(): SaveDailyMessageEntity {
@@ -42,8 +42,8 @@ class SaveDailyMessageJpaEntity(
     companion object {
         fun fromDomain(
             domain: SaveDailyMessageEntity,
-            member: Member,
-            dailyMessage: DailyMessage
+            member: MemberJpaEntity,
+            dailyMessage: DailyMessageJpaEntity
         ): SaveDailyMessageJpaEntity {
             return SaveDailyMessageJpaEntity(
                 id = domain.id?.value,

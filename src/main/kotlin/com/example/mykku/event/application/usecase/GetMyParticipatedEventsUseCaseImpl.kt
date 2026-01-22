@@ -7,36 +7,27 @@ import com.example.mykku.event.application.port.input.GetMyParticipatedEventsUse
 import com.example.mykku.event.application.port.output.EventImageRepository
 import com.example.mykku.event.application.port.output.EventParticipationRepository
 import com.example.mykku.event.domain.entity.Event
-import com.example.mykku.member.tool.MemberReader
-import com.example.mykku.scrap.tool.SaveEventReader
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class GetMyParticipatedEventsUseCaseImpl(
     private val eventParticipationRepository: EventParticipationRepository,
-    private val eventImageRepository: EventImageRepository,
-    private val saveEventReader: SaveEventReader,
-    private val memberReader: MemberReader
+    private val eventImageRepository: EventImageRepository
 ) : GetMyParticipatedEventsUseCase {
 
     @Transactional(readOnly = true)
-    override fun execute(memberId: Long, page: Int, size: Int): PagedEventsResult {
+    override fun execute(memberId: String, page: Int, size: Int): PagedEventsResult {
         val pageable = PageableValidator.validateAndCreate(page, size)
-        val member = memberReader.getMemberById(memberId)
 
         val eventPage = eventParticipationRepository.findEventsByMemberId(memberId, pageable)
 
         val eventIds = eventPage.content.map { it.id }
         val imagesByEventId = eventImageRepository.findByEventIds(eventIds)
             .groupBy { it.eventId.value }
-        val savedEventIds = saveEventReader.getSavedEventIdsByEventIds(
-            member,
-            eventIds.map { it.value }
-        )
 
         val eventListResults = eventPage.content.map { event ->
-            toEventListResult(event, imagesByEventId, savedEventIds)
+            toEventListResult(event, imagesByEventId)
         }
 
         return PagedEventsResult(
@@ -51,8 +42,7 @@ class GetMyParticipatedEventsUseCaseImpl(
 
     private fun toEventListResult(
         event: Event,
-        imagesByEventId: Map<Long, List<com.example.mykku.event.domain.entity.EventImage>>,
-        savedEventIds: Set<Long>
+        imagesByEventId: Map<Long, List<com.example.mykku.event.domain.entity.EventImage>>
     ): EventListResult {
         val images = imagesByEventId[event.id.value] ?: emptyList()
 
@@ -63,7 +53,7 @@ class GetMyParticipatedEventsUseCaseImpl(
             expiredAt = event.expiredAt,
             status = event.status,
             thumbnailUrl = images.sortedBy { it.orderIndex }.firstOrNull()?.url,
-            isSaved = savedEventIds.contains(event.id.value)
+            isSaved = false
         )
     }
 }

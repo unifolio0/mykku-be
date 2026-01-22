@@ -2,7 +2,7 @@ package com.example.mykku.notification.adapter.input.web
 
 import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
-import com.example.mykku.member.domain.Member
+import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.notification.application.dto.GetNotificationSettingsQuery
 import com.example.mykku.notification.application.dto.UpdateNotificationSettingCommand
 import com.example.mykku.notification.application.port.input.ManageNotificationSettingUseCase
@@ -22,7 +22,7 @@ class NotificationSettingController(
 
     @GetMapping
     fun getSettings(
-        @CurrentMember member: Member
+        @CurrentMember member: MemberJpaEntity
     ): ResponseEntity<ApiResponse<List<NotificationSettingResponse>>> {
         val query = GetNotificationSettingsQuery(member.id)
         val settings = manageNotificationSettingUseCase.getOrCreateSettings(query)
@@ -37,7 +37,7 @@ class NotificationSettingController(
 
     @PatchMapping
     fun updateSetting(
-        @CurrentMember member: Member,
+        @CurrentMember member: MemberJpaEntity,
         @RequestBody @Valid request: UpdateNotificationSettingRequest
     ): ResponseEntity<ApiResponse<NotificationSettingResponse>> {
         val command = UpdateNotificationSettingCommand(

@@ -1,7 +1,7 @@
 package com.example.mykku.role.adapter.output.persistence.entity
 
 import com.example.mykku.common.domain.BaseEntity
-import com.example.mykku.member.domain.Member
+import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.role.domain.entity.MemberRole
 import com.example.mykku.role.domain.vo.MemberRoleId
 import com.example.mykku.role.domain.vo.RoleId
@@ -23,7 +23,7 @@ class MemberRoleJpaEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
-    val member: Member,
+    val member: MemberJpaEntity,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", nullable = false)
@@ -41,7 +41,7 @@ class MemberRoleJpaEntity(
     }
 
     companion object {
-        fun fromDomain(domain: MemberRole, member: Member, role: RoleJpaEntity): MemberRoleJpaEntity {
+        fun fromDomain(domain: MemberRole, member: MemberJpaEntity, role: RoleJpaEntity): MemberRoleJpaEntity {
             return MemberRoleJpaEntity(
                 id = if (domain.id.value == 0L) null else domain.id.value,
                 member = member,

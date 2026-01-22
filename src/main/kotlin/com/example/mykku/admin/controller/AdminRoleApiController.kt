@@ -2,10 +2,10 @@ package com.example.mykku.admin.controller
 
 import com.example.mykku.admin.service.AdminRoleService
 import com.example.mykku.common.dto.ApiResponse
-import com.example.mykku.role.dto.CreateRoleRequest
-import com.example.mykku.role.dto.MemberRoleResponse
-import com.example.mykku.role.dto.RoleResponse
-import com.example.mykku.role.dto.UpdateRoleRequest
+import com.example.mykku.role.adapter.input.web.CreateRoleRequest
+import com.example.mykku.role.adapter.input.web.MemberRoleResponse
+import com.example.mykku.role.adapter.input.web.RoleResponse
+import com.example.mykku.role.adapter.input.web.UpdateRoleRequest
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

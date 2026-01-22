@@ -2,7 +2,7 @@ package com.example.mykku.feed.adapter.output.persistence
 
 import com.example.mykku.board.adapter.output.persistence.entity.BoardJpaEntity
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
-import com.example.mykku.member.domain.Member
+import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
@@ -13,7 +13,7 @@ import java.time.LocalDateTime
 
 @Repository
 interface FeedJpaRepository : JpaRepository<FeedJpaEntity, Long> {
-    fun findAllByMemberIn(members: List<Member>): List<FeedJpaEntity>
+    fun findAllByMemberIn(members: List<MemberJpaEntity>): List<FeedJpaEntity>
 
     @Query("""
         SELECT f FROM FeedJpaEntity f
@@ -21,7 +21,7 @@ interface FeedJpaRepository : JpaRepository<FeedJpaEntity, Long> {
         ORDER BY f.createdAt DESC
     """)
     fun findAllByMemberInOrderByCreatedAtDesc(
-        @Param("members") members: List<Member>,
+        @Param("members") members: List<MemberJpaEntity>,
         pageable: Pageable
     ): Page<FeedJpaEntity>
 

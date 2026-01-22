@@ -23,7 +23,7 @@ data class ContestListQuery(
     val sortType: ContestSortType,
     val page: Int,
     val size: Int,
-    val memberId: Long
+    val memberId: String
 )
 
 data class SetContestWinnersCommand(
@@ -39,6 +39,6 @@ data class WinnerSelectionCommand(
 
 data class UpdateAcceptanceSpeechCommand(
     val winnerId: Long,
-    val memberId: Long,
+    val memberId: String?,
     val acceptanceSpeech: String
 )

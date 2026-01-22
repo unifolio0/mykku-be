@@ -1,6 +1,6 @@
 package com.example.mykku.scrap.adapter.output.persistence
 
-import com.example.mykku.member.repository.MemberRepository
+import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
 import com.example.mykku.scrap.adapter.output.persistence.entity.FolderJpaEntity
 import com.example.mykku.scrap.application.port.output.FolderPort
 import com.example.mykku.scrap.domain.entity.FolderEntity
@@ -10,11 +10,11 @@ import org.springframework.stereotype.Repository
 @Repository
 class FolderPersistenceAdapter(
     private val folderJpaRepository: FolderJpaRepository,
-    private val memberRepository: MemberRepository
+    private val memberJpaRepository: MemberJpaRepository
 ) : FolderPort {
 
     override fun save(folder: FolderEntity): FolderEntity {
-        val member = memberRepository.findByIdOrNull(folder.memberId)
+        val member = memberJpaRepository.findByIdOrNull(folder.memberId)
             ?: throw IllegalArgumentException("Member not found: ${folder.memberId}")
 
         val jpaEntity = if (folder.id != null) {

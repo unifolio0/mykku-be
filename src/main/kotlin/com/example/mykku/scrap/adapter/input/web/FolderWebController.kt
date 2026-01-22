@@ -2,7 +2,7 @@ package com.example.mykku.scrap.adapter.input.web
 
 import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
-import com.example.mykku.member.domain.Member
+import com.example.mykku.member.domain.entity.Member
 import com.example.mykku.scrap.adapter.input.web.dto.CreateFolderWebRequest
 import com.example.mykku.scrap.adapter.input.web.dto.FolderWebResponse
 import com.example.mykku.scrap.adapter.input.web.dto.FoldersWebResponse
@@ -34,7 +34,7 @@ class FolderWebController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<FolderWebResponse>> {
         val command = CreateFolderCommand(
-            memberId = member.id,
+            memberId = member.id.value,
             name = request.name,
             description = request.description
         )
@@ -51,7 +51,7 @@ class FolderWebController(
     fun getFolders(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<FoldersWebResponse>> {
-        val result = folderUseCase.getFolders(member.id)
+        val result = folderUseCase.getFolders(member.id.value)
         return ResponseEntity.ok(
             ApiResponse(
                 message = "폴더 목록을 성공적으로 조회했습니다.",
@@ -67,7 +67,7 @@ class FolderWebController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<FolderWebResponse>> {
         val command = UpdateFolderCommand(
-            memberId = member.id,
+            memberId = member.id.value,
             folderId = folderId,
             name = request.name,
             description = request.description
@@ -87,7 +87,7 @@ class FolderWebController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
         val command = DeleteFolderCommand(
-            memberId = member.id,
+            memberId = member.id.value,
             folderId = folderId
         )
         folderUseCase.deleteFolder(command)

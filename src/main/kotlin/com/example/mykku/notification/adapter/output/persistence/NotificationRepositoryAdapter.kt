@@ -1,6 +1,6 @@
 package com.example.mykku.notification.adapter.output.persistence
 
-import com.example.mykku.member.adapter.output.persistence.repository.MemberJpaRepository
+import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
 import com.example.mykku.notification.adapter.output.persistence.entity.NotificationJpaEntity
 import com.example.mykku.notification.adapter.output.persistence.repository.NotificationJpaRepository
 import com.example.mykku.notification.application.port.output.NotificationRepository

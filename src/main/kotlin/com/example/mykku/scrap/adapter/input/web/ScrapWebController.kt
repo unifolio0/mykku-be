@@ -3,7 +3,7 @@ package com.example.mykku.scrap.adapter.input.web
 import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.common.util.PageableValidator
-import com.example.mykku.member.domain.Member
+import com.example.mykku.member.domain.entity.Member
 import com.example.mykku.scrap.adapter.input.web.dto.SaveDailyMessageWebResponse
 import com.example.mykku.scrap.adapter.input.web.dto.SaveEventWebResponse
 import com.example.mykku.scrap.adapter.input.web.dto.SaveFanNoteWebResponse
@@ -56,7 +56,7 @@ class ScrapWebController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
         val command = SaveFeedCommand(
-            memberId = member.id,
+            memberId = member.id.value,
             feedId = feedId,
             folderId = request.folderId
         )
@@ -75,7 +75,7 @@ class ScrapWebController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
         val command = UnsaveFeedCommand(
-            memberId = member.id,
+            memberId = member.id.value,
             feedId = feedId
         )
         saveFeedUseCase.unsaveFeed(command)
@@ -94,7 +94,7 @@ class ScrapWebController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
         val command = UpdateSaveFeedFolderCommand(
-            memberId = member.id,
+            memberId = member.id.value,
             feedId = feedId,
             folderId = request.folderId
         )
@@ -116,7 +116,7 @@ class ScrapWebController(
     ): ResponseEntity<ApiResponse<Page<SaveFeedWebResponse>>> {
         PageableValidator.validateAndCreate(page, size)
         val query = GetSavedFeedsQuery(
-            memberId = member.id,
+            memberId = member.id.value,
             folderId = folderId,
             page = page,
             size = size
@@ -137,7 +137,7 @@ class ScrapWebController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
         val command = SaveDailyMessageCommand(
-            memberId = member.id,
+            memberId = member.id.value,
             dailyMessageId = dailyMessageId
         )
         saveDailyMessageUseCase.saveDailyMessage(command)
@@ -155,7 +155,7 @@ class ScrapWebController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
         val command = UnsaveDailyMessageCommand(
-            memberId = member.id,
+            memberId = member.id.value,
             dailyMessageId = dailyMessageId
         )
         saveDailyMessageUseCase.unsaveDailyMessage(command)
@@ -175,7 +175,7 @@ class ScrapWebController(
     ): ResponseEntity<ApiResponse<Page<SaveDailyMessageWebResponse>>> {
         PageableValidator.validateAndCreate(page, size)
         val query = GetSavedDailyMessagesQuery(
-            memberId = member.id,
+            memberId = member.id.value,
             page = page,
             size = size
         )
@@ -195,7 +195,7 @@ class ScrapWebController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
         val command = SaveEventCommand(
-            memberId = member.id,
+            memberId = member.id.value,
             eventId = eventId
         )
         saveEventUseCase.saveEvent(command)
@@ -213,7 +213,7 @@ class ScrapWebController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
         val command = UnsaveEventCommand(
-            memberId = member.id,
+            memberId = member.id.value,
             eventId = eventId
         )
         saveEventUseCase.unsaveEvent(command)
@@ -233,7 +233,7 @@ class ScrapWebController(
     ): ResponseEntity<ApiResponse<Page<SaveEventWebResponse>>> {
         PageableValidator.validateAndCreate(page, size)
         val query = GetSavedEventsQuery(
-            memberId = member.id,
+            memberId = member.id.value,
             page = page,
             size = size
         )
@@ -253,7 +253,7 @@ class ScrapWebController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
         val command = SaveFanNoteCommand(
-            memberId = member.id,
+            memberId = member.id.value,
             fanNoteId = fanNoteId
         )
         saveFanNoteUseCase.saveFanNote(command)
@@ -271,7 +271,7 @@ class ScrapWebController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
         val command = UnsaveFanNoteCommand(
-            memberId = member.id,
+            memberId = member.id.value,
             fanNoteId = fanNoteId
         )
         saveFanNoteUseCase.unsaveFanNote(command)
@@ -291,7 +291,7 @@ class ScrapWebController(
     ): ResponseEntity<ApiResponse<Page<SaveFanNoteWebResponse>>> {
         PageableValidator.validateAndCreate(page, size)
         val query = GetSavedFanNotesQuery(
-            memberId = member.id,
+            memberId = member.id.value,
             page = page,
             size = size
         )

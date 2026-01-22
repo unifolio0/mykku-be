@@ -21,7 +21,7 @@ import com.example.mykku.like.application.port.input.LikeBoardUseCase
 import com.example.mykku.like.application.port.input.LikeDailyMessageCommentUseCase
 import com.example.mykku.like.application.port.input.LikeFeedCommentUseCase
 import com.example.mykku.like.application.port.input.LikeFeedUseCase
-import com.example.mykku.member.domain.Member
+import com.example.mykku.member.domain.entity.Member
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
@@ -50,7 +50,7 @@ class LikeWebController(
     ): ResponseEntity<ApiResponse<Page<LikeBoardInfoWebResponse>>> {
         PageableValidator.validateAndCreate(page, size, "createdAt", Sort.Direction.DESC)
         val query = GetLikedBoardsQuery(
-            memberId = member.id,
+            memberId = member.id.value,
             page = page,
             size = size
         )
@@ -70,7 +70,7 @@ class LikeWebController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<LikeBoardWebResponse>> {
         val command = LikeBoardCommand(
-            memberId = member.id,
+            memberId = member.id.value,
             boardId = boardId
         )
         val result = likeBoardUseCase.likeBoard(command)
@@ -88,7 +88,7 @@ class LikeWebController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
         val command = UnlikeBoardCommand(
-            memberId = member.id,
+            memberId = member.id.value,
             boardId = boardId
         )
         likeBoardUseCase.unlikeBoard(command)
@@ -106,7 +106,7 @@ class LikeWebController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<LikeFeedWebResponse>> {
         val command = LikeFeedCommand(
-            memberId = member.id,
+            memberId = member.id.value,
             feedId = feedId
         )
         val result = likeFeedUseCase.likeFeed(command)
@@ -124,7 +124,7 @@ class LikeWebController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
         val command = UnlikeFeedCommand(
-            memberId = member.id,
+            memberId = member.id.value,
             feedId = feedId
         )
         likeFeedUseCase.unlikeFeed(command)
@@ -142,7 +142,7 @@ class LikeWebController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<LikeDailyMessageCommentWebResponse>> {
         val command = LikeDailyMessageCommentCommand(
-            memberId = member.id,
+            memberId = member.id.value,
             dailyMessageCommentId = dailyMessageCommentId
         )
         val result = likeDailyMessageCommentUseCase.likeDailyMessageComment(command)
@@ -160,7 +160,7 @@ class LikeWebController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
         val command = UnlikeDailyMessageCommentCommand(
-            memberId = member.id,
+            memberId = member.id.value,
             dailyMessageCommentId = dailyMessageCommentId
         )
         likeDailyMessageCommentUseCase.unlikeDailyMessageComment(command)
@@ -178,7 +178,7 @@ class LikeWebController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<LikeFeedCommentWebResponse>> {
         val command = LikeFeedCommentCommand(
-            memberId = member.id,
+            memberId = member.id.value,
             feedCommentId = feedCommentId
         )
         val result = likeFeedCommentUseCase.likeFeedComment(command)
@@ -196,7 +196,7 @@ class LikeWebController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
         val command = UnlikeFeedCommentCommand(
-            memberId = member.id,
+            memberId = member.id.value,
             feedCommentId = feedCommentId
         )
         likeFeedCommentUseCase.unlikeFeedComment(command)

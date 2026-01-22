@@ -2,7 +2,7 @@ package com.example.mykku.preference.adapter.input.web
 
 import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
-import com.example.mykku.member.domain.Member
+import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.preference.application.dto.UpdateGenrePreferenceCommand
 import com.example.mykku.preference.application.dto.UpdateGoodsPreferenceCommand
 import com.example.mykku.preference.application.dto.UpdateMoodPreferenceCommand
@@ -34,10 +34,10 @@ class PreferenceController(
     @PostMapping("/genre")
     fun updateGenrePreferences(
         @RequestBody @Valid request: UpdateGenrePreferenceRequest,
-        @CurrentMember member: Member
+        @CurrentMember memberEntity: MemberJpaEntity
     ): ResponseEntity<ApiResponse<Unit>> {
         val command = UpdateGenrePreferenceCommand(
-            memberId = member.id,
+            memberId = memberEntity.id,
             genreTypes = request.genreTypes
         )
         updateGenrePreferenceUseCase.updateGenrePreferences(command)
@@ -52,10 +52,10 @@ class PreferenceController(
     @PostMapping("/goods")
     fun updateGoodsPreferences(
         @RequestBody @Valid request: UpdateGoodsPreferenceRequest,
-        @CurrentMember member: Member
+        @CurrentMember memberEntity: MemberJpaEntity
     ): ResponseEntity<ApiResponse<Unit>> {
         val command = UpdateGoodsPreferenceCommand(
-            memberId = member.id,
+            memberId = memberEntity.id,
             goodsTypes = request.goodsTypes
         )
         updateGoodsPreferenceUseCase.updateGoodsPreferences(command)
@@ -70,10 +70,10 @@ class PreferenceController(
     @PostMapping("/mood")
     fun updateMoodPreferences(
         @RequestBody @Valid request: UpdateMoodPreferenceRequest,
-        @CurrentMember member: Member
+        @CurrentMember memberEntity: MemberJpaEntity
     ): ResponseEntity<ApiResponse<Unit>> {
         val command = UpdateMoodPreferenceCommand(
-            memberId = member.id,
+            memberId = memberEntity.id,
             moodTypes = request.moodTypes
         )
         updateMoodPreferenceUseCase.updateMoodPreferences(command)
@@ -87,9 +87,9 @@ class PreferenceController(
 
     @GetMapping("/genre")
     fun getGenrePreferences(
-        @CurrentMember member: Member
+        @CurrentMember memberEntity: MemberJpaEntity
     ): ResponseEntity<ApiResponse<GenrePreferenceResponse>> {
-        val result = getGenrePreferenceUseCase.getGenrePreferences(member.id)
+        val result = getGenrePreferenceUseCase.getGenrePreferences(memberEntity.id)
         return ResponseEntity.ok(
             ApiResponse(
                 message = "장르 취향을 성공적으로 조회했습니다.",
@@ -100,9 +100,9 @@ class PreferenceController(
 
     @GetMapping("/goods")
     fun getGoodsPreferences(
-        @CurrentMember member: Member
+        @CurrentMember memberEntity: MemberJpaEntity
     ): ResponseEntity<ApiResponse<GoodsPreferenceResponse>> {
-        val result = getGoodsPreferenceUseCase.getGoodsPreferences(member.id)
+        val result = getGoodsPreferenceUseCase.getGoodsPreferences(memberEntity.id)
         return ResponseEntity.ok(
             ApiResponse(
                 message = "굿즈 취향을 성공적으로 조회했습니다.",
@@ -113,9 +113,9 @@ class PreferenceController(
 
     @GetMapping("/mood")
     fun getMoodPreferences(
-        @CurrentMember member: Member
+        @CurrentMember memberEntity: MemberJpaEntity
     ): ResponseEntity<ApiResponse<MoodPreferenceResponse>> {
-        val result = getMoodPreferenceUseCase.getMoodPreferences(member.id)
+        val result = getMoodPreferenceUseCase.getMoodPreferences(memberEntity.id)
         return ResponseEntity.ok(
             ApiResponse(
                 message = "분위기 취향을 성공적으로 조회했습니다.",

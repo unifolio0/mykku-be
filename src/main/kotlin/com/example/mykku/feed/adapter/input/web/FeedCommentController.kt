@@ -11,7 +11,7 @@ import com.example.mykku.feed.application.dto.UpdateFeedCommentCommand
 import com.example.mykku.feed.application.port.input.CreateFeedCommentUseCase
 import com.example.mykku.feed.application.port.input.DeleteFeedCommentUseCase
 import com.example.mykku.feed.application.port.input.UpdateFeedCommentUseCase
-import com.example.mykku.member.domain.Member
+import com.example.mykku.member.domain.entity.Member
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -36,7 +36,7 @@ class FeedCommentController(
     ): ResponseEntity<ApiResponse<SingleFeedCommentResponse>> {
         val command = CreateFeedCommentCommand(
             feedId = feedId,
-            memberId = member.id,
+            memberId = member.id.value,
             content = request.content,
             parentCommentId = request.parentCommentId
         )
@@ -59,7 +59,7 @@ class FeedCommentController(
     ): ResponseEntity<ApiResponse<SingleFeedCommentResponse>> {
         val command = UpdateFeedCommentCommand(
             commentId = commentId,
-            memberId = member.id,
+            memberId = member.id.value,
             content = request.content
         )
 
@@ -80,7 +80,7 @@ class FeedCommentController(
     ): ResponseEntity<ApiResponse<Unit>> {
         val command = DeleteFeedCommentCommand(
             commentId = commentId,
-            memberId = member.id
+            memberId = member.id.value
         )
 
         deleteFeedCommentUseCase.execute(command, member)

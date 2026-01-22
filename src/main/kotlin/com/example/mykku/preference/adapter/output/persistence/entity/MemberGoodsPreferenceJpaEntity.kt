@@ -1,7 +1,7 @@
 package com.example.mykku.preference.adapter.output.persistence.entity
 
 import com.example.mykku.common.domain.BaseEntity
-import com.example.mykku.member.domain.Member
+import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.preference.domain.entity.MemberGoodsPreference
 import com.example.mykku.preference.domain.vo.GoodsType
 import com.example.mykku.preference.domain.vo.PreferenceId
@@ -26,7 +26,7 @@ class MemberGoodsPreferenceJpaEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
-    val member: Member,
+    val member: MemberJpaEntity,
 
     @Enumerated(EnumType.STRING)
     @Column(name = "goods_type", nullable = false, length = 50)
@@ -44,7 +44,7 @@ class MemberGoodsPreferenceJpaEntity(
     }
 
     companion object {
-        fun fromDomain(domain: MemberGoodsPreference, member: Member): MemberGoodsPreferenceJpaEntity {
+        fun fromDomain(domain: MemberGoodsPreference, member: MemberJpaEntity): MemberGoodsPreferenceJpaEntity {
             return MemberGoodsPreferenceJpaEntity(
                 id = domain.id.value,
                 member = member,

@@ -3,7 +3,7 @@ package com.example.mykku.dailymessage.adapter.output.persistence.entity
 import com.example.mykku.common.domain.BaseEntity
 import com.example.mykku.dailymessage.domain.entity.DailyMessageComment
 import com.example.mykku.dailymessage.domain.vo.DailyMessageCommentId
-import com.example.mykku.member.domain.Member
+import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -37,7 +37,7 @@ class DailyMessageCommentJpaEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    val member: Member
+    val member: MemberJpaEntity
 ) : BaseEntity() {
 
     fun toDomain(): DailyMessageComment {
@@ -64,7 +64,7 @@ class DailyMessageCommentJpaEntity(
         fun fromDomain(
             comment: DailyMessageComment,
             dailyMessageJpaEntity: DailyMessageJpaEntity,
-            memberEntity: Member,
+            memberEntity: MemberJpaEntity,
             parentCommentEntity: DailyMessageCommentJpaEntity? = null
         ): DailyMessageCommentJpaEntity {
             return DailyMessageCommentJpaEntity(

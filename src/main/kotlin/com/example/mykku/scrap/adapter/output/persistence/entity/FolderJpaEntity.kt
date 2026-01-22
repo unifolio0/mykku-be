@@ -1,7 +1,7 @@
 package com.example.mykku.scrap.adapter.output.persistence.entity
 
 import com.example.mykku.common.domain.BaseEntity
-import com.example.mykku.member.domain.Member
+import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.scrap.domain.entity.FolderEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -22,7 +22,7 @@ class FolderJpaEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    val member: Member,
+    val member: MemberJpaEntity,
 
     @Column(nullable = false, length = 50)
     var name: String,
@@ -50,7 +50,7 @@ class FolderJpaEntity(
     companion object {
         fun fromDomain(
             domain: FolderEntity,
-            member: Member
+            member: MemberJpaEntity
         ): FolderJpaEntity {
             return FolderJpaEntity(
                 id = domain.id?.value,

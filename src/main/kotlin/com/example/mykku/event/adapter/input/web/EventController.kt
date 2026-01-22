@@ -8,7 +8,7 @@ import com.example.mykku.event.application.port.input.GetEventUseCase
 import com.example.mykku.event.application.port.input.ListEventsUseCase
 import com.example.mykku.event.domain.vo.EventSortType
 import com.example.mykku.event.domain.vo.EventStatusType
-import com.example.mykku.member.domain.Member
+import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -45,14 +45,14 @@ class EventController(
         @RequestParam(defaultValue = "LATEST") sortType: EventSortType,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int,
-        @CurrentMember member: Member
+        @CurrentMember memberEntity: MemberJpaEntity
     ): ResponseEntity<ApiResponse<PagedEventsResponse>> {
         val query = EventListQuery(
             status = status,
             sortType = sortType,
             page = page,
             size = size,
-            memberId = member.id!!
+            memberId = memberEntity.id
         )
         val result = listEventsUseCase.execute(query)
         return ResponseEntity.ok(
@@ -66,9 +66,9 @@ class EventController(
     @GetMapping("/{eventId}")
     fun getEventDetail(
         @PathVariable eventId: Long,
-        @CurrentMember member: Member
+        @CurrentMember memberEntity: MemberJpaEntity
     ): ResponseEntity<ApiResponse<EventDetailResponse>> {
-        val result = getEventUseCase.execute(eventId, member.id!!)
+        val result = getEventUseCase.execute(eventId, memberEntity.id)
         return ResponseEntity.ok(
             ApiResponse(
                 message = "이벤트 상세 정보를 성공적으로 조회했습니다.",

@@ -1,7 +1,7 @@
 package com.example.mykku.scrap.adapter.output.persistence
 
-import com.example.mykku.dailymessage.repository.DailyMessageRepository
-import com.example.mykku.member.repository.MemberRepository
+import com.example.mykku.dailymessage.adapter.output.persistence.repository.DailyMessageJpaRepository
+import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
 import com.example.mykku.scrap.adapter.output.persistence.entity.SaveDailyMessageJpaEntity
 import com.example.mykku.scrap.application.dto.SaveDailyMessageResult
 import com.example.mykku.scrap.application.port.output.SaveDailyMessagePort
@@ -14,14 +14,14 @@ import org.springframework.stereotype.Repository
 @Repository
 class SaveDailyMessagePersistenceAdapter(
     private val saveDailyMessageJpaRepository: SaveDailyMessageJpaRepository,
-    private val memberRepository: MemberRepository,
-    private val dailyMessageRepository: DailyMessageRepository
+    private val memberJpaRepository: MemberJpaRepository,
+    private val dailyMessageJpaRepository: DailyMessageJpaRepository
 ) : SaveDailyMessagePort {
 
     override fun save(saveDailyMessage: SaveDailyMessageEntity): SaveDailyMessageEntity {
-        val member = memberRepository.findByIdOrNull(saveDailyMessage.memberId)
+        val member = memberJpaRepository.findByIdOrNull(saveDailyMessage.memberId)
             ?: throw IllegalArgumentException("Member not found: ${saveDailyMessage.memberId}")
-        val dailyMessage = dailyMessageRepository.findByIdOrNull(saveDailyMessage.dailyMessageId)
+        val dailyMessage = dailyMessageJpaRepository.findByIdOrNull(saveDailyMessage.dailyMessageId)
             ?: throw IllegalArgumentException("DailyMessage not found: ${saveDailyMessage.dailyMessageId}")
 
         val jpaEntity = SaveDailyMessageJpaEntity.fromDomain(saveDailyMessage, member, dailyMessage)

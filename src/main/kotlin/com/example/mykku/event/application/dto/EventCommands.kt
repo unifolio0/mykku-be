@@ -22,5 +22,5 @@ data class EventListQuery(
     val sortType: EventSortType,
     val page: Int,
     val size: Int,
-    val memberId: Long
+    val memberId: String
 )

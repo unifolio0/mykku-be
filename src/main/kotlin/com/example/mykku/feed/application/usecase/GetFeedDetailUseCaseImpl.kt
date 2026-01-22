@@ -1,6 +1,6 @@
 package com.example.mykku.feed.application.usecase
 
-import com.example.mykku.contest.repository.ContestTagRepository
+import com.example.mykku.contest.application.port.output.ContestTagRepository
 import com.example.mykku.feed.application.dto.AuthorResult
 import com.example.mykku.feed.application.dto.FeedDetailResult
 import com.example.mykku.feed.application.dto.FeedImageResult
@@ -11,8 +11,8 @@ import com.example.mykku.feed.application.port.output.FeedImageRepository
 import com.example.mykku.feed.application.port.output.FeedRepository
 import com.example.mykku.feed.application.port.output.FeedTagRepository
 import com.example.mykku.feed.domain.vo.FeedId
-import com.example.mykku.like.tool.LikeFeedReader
-import com.example.mykku.scrap.tool.SaveFeedReader
+import com.example.mykku.like.application.port.output.LikeFeedPort
+import com.example.mykku.scrap.application.port.output.SaveFeedPort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -23,8 +23,8 @@ class GetFeedDetailUseCaseImpl(
     private val feedImageRepository: FeedImageRepository,
     private val feedTagRepository: FeedTagRepository,
     private val contestTagRepository: ContestTagRepository,
-    private val likeFeedReader: LikeFeedReader,
-    private val saveFeedReader: SaveFeedReader
+    private val likeFeedPort: LikeFeedPort,
+    private val saveFeedPort: SaveFeedPort
 ) : GetFeedDetailUseCase {
 
     override fun execute(query: GetFeedDetailQuery): FeedDetailResult {
@@ -35,9 +35,8 @@ class GetFeedDetailUseCaseImpl(
 
         val contestTagTitles = getContestTagTitles(feedTags.map { it.title })
 
-        val legacyFeed = createLegacyFeed(feed)
-        val isLiked = query.memberId?.let { likeFeedReader.isLiked(it, legacyFeed) } ?: false
-        val isSaved = query.memberId?.let { saveFeedReader.isSaved(it, legacyFeed) } ?: false
+        val isLiked = query.memberId?.let { likeFeedPort.existsByMemberIdAndFeedId(it, feed.id!!) } ?: false
+        val isSaved = query.memberId?.let { saveFeedPort.existsByMemberIdAndFeedId(it, feed.id!!) } ?: false
 
         return FeedDetailResult(
             id = feed.id!!,
@@ -65,17 +64,5 @@ class GetFeedDetailUseCaseImpl(
     private fun getContestTagTitles(tagTitles: List<String>): Set<String> {
         val contestTags = contestTagRepository.findAllByTitleIn(tagTitles)
         return contestTags.map { it.title }.toSet()
-    }
-
-    private fun createLegacyFeed(feed: com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity): com.example.mykku.feed.domain.Feed {
-        return com.example.mykku.feed.domain.Feed(
-            id = feed.id,
-            title = feed.title,
-            content = feed.content,
-            likeCount = feed.likeCount,
-            commentCount = feed.commentCount,
-            board = feed.board,
-            member = feed.member
-        )
     }
 }

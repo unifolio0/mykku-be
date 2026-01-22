@@ -1,8 +1,8 @@
 package com.example.mykku.scrap.adapter.output.persistence.entity
 
 import com.example.mykku.common.domain.BaseEntity
-import com.example.mykku.feed.domain.Feed
-import com.example.mykku.member.domain.Member
+import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
+import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.scrap.domain.entity.SaveFeedEntity
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -22,11 +22,11 @@ class SaveFeedJpaEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    val member: Member,
+    val member: MemberJpaEntity,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feed_id")
-    val feed: Feed,
+    val feed: FeedJpaEntity,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "folder_id")
@@ -51,8 +51,8 @@ class SaveFeedJpaEntity(
     companion object {
         fun fromDomain(
             domain: SaveFeedEntity,
-            member: Member,
-            feed: Feed,
+            member: MemberJpaEntity,
+            feed: FeedJpaEntity,
             folder: FolderJpaEntity
         ): SaveFeedJpaEntity {
             return SaveFeedJpaEntity(

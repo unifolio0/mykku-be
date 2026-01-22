@@ -73,7 +73,7 @@ data class UpdateAcceptanceSpeechRequest(
     @field:Size(max = 1000, message = "수상 소감은 1000자 이하여야 합니다")
     val acceptanceSpeech: String
 ) {
-    fun toCommand(winnerId: Long, memberId: Long): UpdateAcceptanceSpeechCommand {
+    fun toCommand(winnerId: Long, memberId: String?): UpdateAcceptanceSpeechCommand {
         return UpdateAcceptanceSpeechCommand(
             winnerId = winnerId,
             memberId = memberId,

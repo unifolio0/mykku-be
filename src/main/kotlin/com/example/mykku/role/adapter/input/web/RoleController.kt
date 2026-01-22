@@ -2,7 +2,7 @@ package com.example.mykku.role.adapter.input.web
 
 import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
-import com.example.mykku.member.domain.Member
+import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.role.application.dto.ChangeRepresentativeRoleCommand
 import com.example.mykku.role.application.port.input.ChangeRepresentativeRoleUseCase
 import com.example.mykku.role.application.port.input.GetMyRolesUseCase
@@ -21,9 +21,9 @@ class RoleController(
 ) {
     @GetMapping("/me")
     fun getMyRoles(
-        @CurrentMember member: Member
+        @CurrentMember memberEntity: MemberJpaEntity
     ): ResponseEntity<ApiResponse<List<MemberRoleResponse>>> {
-        val results = getMyRolesUseCase.getMyRoles(member.id, member.role?.id)
+        val results = getMyRolesUseCase.getMyRoles(memberEntity.id, memberEntity.role?.id)
         val responses = results.map { result ->
             MemberRoleResponse(
                 id = result.id,
@@ -47,10 +47,10 @@ class RoleController(
     @PatchMapping("/{memberRoleId}/representative")
     fun changeRepresentativeRole(
         @PathVariable memberRoleId: Long,
-        @CurrentMember member: Member
+        @CurrentMember memberEntity: MemberJpaEntity
     ): ResponseEntity<ApiResponse<Unit>> {
         val command = ChangeRepresentativeRoleCommand(
-            memberId = member.id,
+            memberId = memberEntity.id,
             memberRoleId = memberRoleId
         )
         changeRepresentativeRoleUseCase.changeRepresentativeRole(command)

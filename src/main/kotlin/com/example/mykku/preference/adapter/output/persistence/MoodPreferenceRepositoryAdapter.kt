@@ -1,7 +1,6 @@
 package com.example.mykku.preference.adapter.output.persistence
 
-import com.example.mykku.member.domain.Member
-import com.example.mykku.member.repository.MemberRepository
+import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
 import com.example.mykku.preference.adapter.output.persistence.entity.MemberMoodPreferenceJpaEntity
 import com.example.mykku.preference.adapter.output.persistence.repository.MemberMoodPreferenceJpaRepository
 import com.example.mykku.preference.application.port.output.MoodPreferenceRepository
@@ -12,14 +11,14 @@ import org.springframework.stereotype.Component
 @Component
 class MoodPreferenceRepositoryAdapter(
     private val jpaRepository: MemberMoodPreferenceJpaRepository,
-    private val memberRepository: MemberRepository
+    private val memberJpaRepository: MemberJpaRepository
 ) : MoodPreferenceRepository {
 
     override fun saveAll(preferences: List<MemberMoodPreference>): List<MemberMoodPreference> {
         if (preferences.isEmpty()) return emptyList()
 
         val memberId = preferences.first().memberId
-        val member = memberRepository.findById(memberId).orElseThrow {
+        val member = memberJpaRepository.findById(memberId).orElseThrow {
             IllegalArgumentException("Member not found: $memberId")
         }
 

@@ -1,24 +1,24 @@
 package com.example.mykku.like.adapter.output.persistence
 
-import com.example.mykku.feed.repository.FeedCommentRepository
+import com.example.mykku.feed.adapter.output.persistence.FeedCommentJpaRepository
 import com.example.mykku.like.adapter.output.persistence.entity.LikeFeedCommentJpaEntity
 import com.example.mykku.like.application.port.output.LikeFeedCommentPort
 import com.example.mykku.like.domain.entity.LikeFeedCommentEntity
-import com.example.mykku.member.repository.MemberRepository
+import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 
 @Repository
 class LikeFeedCommentPersistenceAdapter(
     private val likeFeedCommentJpaRepository: LikeFeedCommentJpaRepository,
-    private val memberRepository: MemberRepository,
-    private val feedCommentRepository: FeedCommentRepository
+    private val memberJpaRepository: MemberJpaRepository,
+    private val feedCommentJpaRepository: FeedCommentJpaRepository
 ) : LikeFeedCommentPort {
 
     override fun save(likeFeedComment: LikeFeedCommentEntity): LikeFeedCommentEntity {
-        val member = memberRepository.findByIdOrNull(likeFeedComment.memberId)
+        val member = memberJpaRepository.findByIdOrNull(likeFeedComment.memberId)
             ?: throw IllegalArgumentException("Member not found: ${likeFeedComment.memberId}")
-        val feedComment = feedCommentRepository.findByIdOrNull(likeFeedComment.feedCommentId)
+        val feedComment = feedCommentJpaRepository.findByIdOrNull(likeFeedComment.feedCommentId)
             ?: throw IllegalArgumentException("FeedComment not found: ${likeFeedComment.feedCommentId}")
 
         val jpaEntity = LikeFeedCommentJpaEntity.fromDomain(likeFeedComment, member, feedComment)

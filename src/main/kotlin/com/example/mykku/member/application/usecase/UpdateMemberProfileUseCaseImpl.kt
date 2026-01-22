@@ -6,7 +6,8 @@ import com.example.mykku.member.application.port.input.UpdateMemberProfileUseCas
 import com.example.mykku.member.application.port.output.MemberRepository
 import com.example.mykku.member.domain.entity.Member
 import com.example.mykku.member.exception.MemberException
-import com.example.mykku.role.tool.RoleReader
+import com.example.mykku.role.adapter.output.persistence.repository.RoleJpaRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -14,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class UpdateMemberProfileUseCaseImpl(
     private val memberRepository: MemberRepository,
-    private val roleReader: RoleReader
+    private val roleJpaRepository: RoleJpaRepository
 ) : UpdateMemberProfileUseCase {
 
     override fun updateProfile(member: Member, command: UpdateProfileCommand): MemberProfileResult {
@@ -27,7 +28,7 @@ class UpdateMemberProfileUseCaseImpl(
         member.updateProfile(command.nickname, command.profileImage)
         val savedMember = memberRepository.save(member)
 
-        val roleName = savedMember.roleId?.let { roleReader.findById(it)?.name }
+        val roleName = savedMember.roleId?.let { roleJpaRepository.findByIdOrNull(it)?.name }
         return MemberProfileResult.from(savedMember, roleName)
     }
 }

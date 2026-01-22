@@ -21,7 +21,7 @@ import com.example.mykku.feed.application.port.input.GetFeedCommentsUseCase
 import com.example.mykku.feed.application.port.input.GetFeedDetailUseCase
 import com.example.mykku.feed.application.port.input.UpdateFeedUseCase
 import com.example.mykku.feed.exception.FeedException
-import com.example.mykku.member.domain.Member
+import com.example.mykku.member.domain.entity.Member
 import jakarta.validation.Valid
 import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
@@ -98,7 +98,7 @@ class FeedController(
         @PathVariable feedId: Long,
         @CurrentMember(required = false) member: Member?
     ): ResponseEntity<ApiResponse<FeedDetailResponse>> {
-        val query = GetFeedDetailQuery(feedId = feedId, memberId = member?.id)
+        val query = GetFeedDetailQuery(feedId = feedId, memberId = member?.id?.value)
         val result = getFeedDetailUseCase.execute(query)
 
         return ResponseEntity.ok(
@@ -125,7 +125,7 @@ class FeedController(
 
         val query = GetFeedCommentsQuery(
             feedId = feedId,
-            memberId = member?.id,
+            memberId = member?.id?.value,
             pageable = pageable
         )
 
@@ -144,7 +144,7 @@ class FeedController(
         @PathVariable feedId: Long,
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
-        val command = DeleteFeedCommand(feedId = feedId, memberId = member.id)
+        val command = DeleteFeedCommand(feedId = feedId, memberId = member.id.value)
         deleteFeedUseCase.execute(command, member)
 
         return ResponseEntity.ok(
@@ -166,7 +166,7 @@ class FeedController(
 
         val command = UpdateFeedCommand(
             feedId = feedId,
-            memberId = member.id,
+            memberId = member.id.value,
             title = request.title,
             content = request.content,
             boardId = request.boardId,

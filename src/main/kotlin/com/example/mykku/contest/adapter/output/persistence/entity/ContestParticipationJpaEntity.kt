@@ -4,8 +4,8 @@ import com.example.mykku.common.domain.BaseEntity
 import com.example.mykku.contest.domain.entity.ContestParticipation
 import com.example.mykku.contest.domain.vo.ContestId
 import com.example.mykku.contest.domain.vo.ContestParticipationId
-import com.example.mykku.feed.domain.Feed
-import com.example.mykku.member.domain.Member
+import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
+import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
@@ -24,7 +24,7 @@ class ContestParticipationJpaEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    val member: Member,
+    val member: MemberJpaEntity,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "contest_id")
@@ -32,7 +32,7 @@ class ContestParticipationJpaEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feed_id")
-    val feed: Feed
+    val feed: FeedJpaEntity
 ) : BaseEntity() {
 
     fun toDomain(): ContestParticipation {
@@ -40,7 +40,7 @@ class ContestParticipationJpaEntity(
             id = ContestParticipationId.of(id!!),
             contestId = ContestId.of(contest.id!!),
             feedId = feed.id!!,
-            memberId = member.id!!,
+            memberId = member.id.hashCode().toLong(),
             createdAt = createdAt,
             updatedAt = updatedAt
         )
@@ -50,8 +50,8 @@ class ContestParticipationJpaEntity(
         fun fromDomain(
             participation: ContestParticipation,
             contestJpaEntity: ContestJpaEntity,
-            member: Member,
-            feed: Feed
+            member: MemberJpaEntity,
+            feed: FeedJpaEntity
         ): ContestParticipationJpaEntity {
             return ContestParticipationJpaEntity(
                 id = if (participation.id.value == 0L) null else participation.id.value,

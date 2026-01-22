@@ -1,6 +1,6 @@
 package com.example.mykku.role.adapter.output.persistence
 
-import com.example.mykku.member.repository.MemberRepository
+import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
 import com.example.mykku.role.adapter.output.persistence.entity.MemberRoleJpaEntity
 import com.example.mykku.role.adapter.output.persistence.repository.MemberRoleJpaRepository
 import com.example.mykku.role.adapter.output.persistence.repository.RoleJpaRepository
@@ -16,11 +16,11 @@ import org.springframework.stereotype.Component
 class MemberRoleRepositoryAdapter(
     private val jpaRepository: MemberRoleJpaRepository,
     private val roleJpaRepository: RoleJpaRepository,
-    private val memberRepository: MemberRepository
+    private val memberJpaRepository: MemberJpaRepository
 ) : MemberRoleRepository {
 
     override fun save(memberRole: MemberRole): MemberRole {
-        val member = memberRepository.findById(memberRole.memberId).orElseThrow {
+        val member = memberJpaRepository.findById(memberRole.memberId).orElseThrow {
             IllegalArgumentException("Member not found: ${memberRole.memberId}")
         }
 

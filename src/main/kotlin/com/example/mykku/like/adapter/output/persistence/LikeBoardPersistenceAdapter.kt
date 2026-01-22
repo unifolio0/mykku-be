@@ -1,11 +1,11 @@
 package com.example.mykku.like.adapter.output.persistence
 
-import com.example.mykku.board.repository.BoardRepository
+import com.example.mykku.board.adapter.output.persistence.BoardJpaRepository
 import com.example.mykku.like.adapter.output.persistence.entity.LikeBoardJpaEntity
 import com.example.mykku.like.application.dto.LikeBoardInfoResult
 import com.example.mykku.like.application.port.output.LikeBoardPort
 import com.example.mykku.like.domain.entity.LikeBoardEntity
-import com.example.mykku.member.repository.MemberRepository
+import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
@@ -14,14 +14,14 @@ import org.springframework.stereotype.Repository
 @Repository
 class LikeBoardPersistenceAdapter(
     private val likeBoardJpaRepository: LikeBoardJpaRepository,
-    private val memberRepository: MemberRepository,
-    private val boardRepository: BoardRepository
+    private val memberJpaRepository: MemberJpaRepository,
+    private val boardJpaRepository: BoardJpaRepository
 ) : LikeBoardPort {
 
     override fun save(likeBoard: LikeBoardEntity): LikeBoardEntity {
-        val member = memberRepository.findByIdOrNull(likeBoard.memberId)
+        val member = memberJpaRepository.findByIdOrNull(likeBoard.memberId)
             ?: throw IllegalArgumentException("Member not found: ${likeBoard.memberId}")
-        val board = boardRepository.findByIdOrNull(likeBoard.boardId)
+        val board = boardJpaRepository.findByIdOrNull(likeBoard.boardId)
             ?: throw IllegalArgumentException("Board not found: ${likeBoard.boardId}")
 
         val jpaEntity = LikeBoardJpaEntity.fromDomain(likeBoard, member, board)

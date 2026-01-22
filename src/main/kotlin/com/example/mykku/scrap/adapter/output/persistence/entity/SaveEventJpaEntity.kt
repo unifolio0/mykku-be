@@ -1,8 +1,8 @@
 package com.example.mykku.scrap.adapter.output.persistence.entity
 
 import com.example.mykku.common.domain.BaseEntity
-import com.example.mykku.event.domain.Event
-import com.example.mykku.member.domain.Member
+import com.example.mykku.event.adapter.output.persistence.entity.EventJpaEntity
+import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.scrap.domain.entity.SaveEventEntity
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -22,11 +22,11 @@ class SaveEventJpaEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    val member: Member,
+    val member: MemberJpaEntity,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
-    val event: Event
+    val event: EventJpaEntity
 ) : BaseEntity() {
 
     fun toDomain(): SaveEventEntity {
@@ -42,8 +42,8 @@ class SaveEventJpaEntity(
     companion object {
         fun fromDomain(
             domain: SaveEventEntity,
-            member: Member,
-            event: Event
+            member: MemberJpaEntity,
+            event: EventJpaEntity
         ): SaveEventJpaEntity {
             return SaveEventJpaEntity(
                 id = domain.id?.value,

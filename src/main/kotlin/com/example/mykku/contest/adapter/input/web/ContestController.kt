@@ -8,7 +8,7 @@ import com.example.mykku.contest.application.port.input.GetContestUseCase
 import com.example.mykku.contest.application.port.input.ListContestsUseCase
 import com.example.mykku.contest.domain.vo.ContestSortType
 import com.example.mykku.contest.domain.vo.ContestStatusType
-import com.example.mykku.member.domain.Member
+import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -45,14 +45,14 @@ class ContestController(
         @RequestParam(defaultValue = "LATEST") sortType: ContestSortType,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int,
-        @CurrentMember member: Member
+        @CurrentMember memberEntity: MemberJpaEntity
     ): ResponseEntity<ApiResponse<PagedContestsResponse>> {
         val query = ContestListQuery(
             status = status,
             sortType = sortType,
             page = page,
             size = size,
-            memberId = member.id!!
+            memberId = memberEntity.id
         )
         val result = listContestsUseCase.execute(query)
         return ResponseEntity.ok(
@@ -66,9 +66,9 @@ class ContestController(
     @GetMapping("/{contestId}")
     fun getContestDetail(
         @PathVariable contestId: Long,
-        @CurrentMember member: Member
+        @CurrentMember memberEntity: MemberJpaEntity
     ): ResponseEntity<ApiResponse<ContestDetailResponse>> {
-        val result = getContestUseCase.execute(contestId, member.id!!)
+        val result = getContestUseCase.execute(contestId, memberEntity.id)
         return ResponseEntity.ok(
             ApiResponse(
                 message = "공모전 상세 정보를 성공적으로 조회했습니다.",

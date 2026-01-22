@@ -3,7 +3,7 @@ package com.example.mykku.member.adapter.output.persistence.entity
 import com.example.mykku.common.domain.BaseEntity
 import com.example.mykku.member.domain.entity.Member
 import com.example.mykku.member.domain.vo.SocialProvider
-import com.example.mykku.role.domain.Role
+import com.example.mykku.role.adapter.output.persistence.entity.RoleJpaEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -28,7 +28,7 @@ class MemberJpaEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
-    var role: Role? = null,
+    var role: RoleJpaEntity? = null,
 
     @Column(name = "profile_image")
     var profileImage: String,
@@ -75,7 +75,7 @@ class MemberJpaEntity(
     }
 
     companion object {
-        fun fromDomain(member: Member, role: Role? = null): MemberJpaEntity {
+        fun fromDomain(member: Member, role: RoleJpaEntity? = null): MemberJpaEntity {
             return MemberJpaEntity(
                 id = member.id.value,
                 memberId = member.memberId,

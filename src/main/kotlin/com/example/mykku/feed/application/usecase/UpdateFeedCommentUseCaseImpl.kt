@@ -7,7 +7,7 @@ import com.example.mykku.feed.application.port.input.UpdateFeedCommentUseCase
 import com.example.mykku.feed.application.port.output.FeedCommentRepository
 import com.example.mykku.feed.domain.vo.FeedCommentId
 import com.example.mykku.feed.exception.FeedException
-import com.example.mykku.member.domain.Member
+import com.example.mykku.member.domain.entity.Member
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -20,7 +20,7 @@ class UpdateFeedCommentUseCaseImpl(
     override fun execute(command: UpdateFeedCommentCommand, member: Member): SingleFeedCommentResult {
         val comment = feedCommentRepository.findByIdOrThrow(FeedCommentId.of(command.commentId))
 
-        if (comment.member.id != member.id) {
+        if (comment.member.id != member.id.value) {
             throw FeedException.feedCommentForbiddenAccess()
         }
 

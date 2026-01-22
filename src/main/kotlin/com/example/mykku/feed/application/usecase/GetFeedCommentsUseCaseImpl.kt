@@ -9,7 +9,7 @@ import com.example.mykku.feed.application.port.input.GetFeedCommentsUseCase
 import com.example.mykku.feed.application.port.output.FeedCommentRepository
 import com.example.mykku.feed.application.port.output.FeedRepository
 import com.example.mykku.feed.domain.vo.FeedId
-import com.example.mykku.like.tool.LikeFeedCommentReader
+import com.example.mykku.like.application.port.output.LikeFeedCommentPort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional
 class GetFeedCommentsUseCaseImpl(
     private val feedRepository: FeedRepository,
     private val feedCommentRepository: FeedCommentRepository,
-    private val likeFeedCommentReader: LikeFeedCommentReader
+    private val likeFeedCommentPort: LikeFeedCommentPort
 ) : GetFeedCommentsUseCase {
 
     override fun execute(query: GetFeedCommentsQuery): FeedCommentsResult {
@@ -34,10 +34,8 @@ class GetFeedCommentsUseCaseImpl(
 
         val commentResponses = commentsPage.content.map { comment ->
             val replies = repliesMap[comment.id] ?: emptyList()
-            val legacyComment = createLegacyComment(comment)
 
             val replyResponses = replies.map { reply ->
-                val legacyReply = createLegacyComment(reply)
                 FeedCommentReplyResult(
                     id = reply.id!!,
                     content = reply.content,
@@ -47,7 +45,7 @@ class GetFeedCommentsUseCaseImpl(
                         profileImage = reply.member.profileImage
                     ),
                     likeCount = reply.likeCount,
-                    isLiked = query.memberId?.let { likeFeedCommentReader.isLiked(it, legacyReply) } ?: false,
+                    isLiked = query.memberId?.let { likeFeedCommentPort.existsByMemberIdAndFeedCommentId(it, reply.id!!) } ?: false,
                     createdAt = reply.createdAt,
                     updatedAt = reply.updatedAt
                 )
@@ -62,7 +60,7 @@ class GetFeedCommentsUseCaseImpl(
                     profileImage = comment.member.profileImage
                 ),
                 likeCount = comment.likeCount,
-                isLiked = query.memberId?.let { likeFeedCommentReader.isLiked(it, legacyComment) } ?: false,
+                isLiked = query.memberId?.let { likeFeedCommentPort.existsByMemberIdAndFeedCommentId(it, comment.id!!) } ?: false,
                 replies = replyResponses,
                 replyCount = replyResponses.size,
                 createdAt = comment.createdAt,
@@ -77,29 +75,6 @@ class GetFeedCommentsUseCaseImpl(
             currentPage = commentsPage.number,
             pageSize = commentsPage.size,
             hasNext = commentsPage.hasNext()
-        )
-    }
-
-    private fun createLegacyComment(
-        comment: com.example.mykku.feed.adapter.output.persistence.entity.FeedCommentJpaEntity
-    ): com.example.mykku.feed.domain.FeedComment {
-        val legacyFeed = com.example.mykku.feed.domain.Feed(
-            id = comment.feed.id,
-            title = comment.feed.title,
-            content = comment.feed.content,
-            likeCount = comment.feed.likeCount,
-            commentCount = comment.feed.commentCount,
-            board = comment.feed.board,
-            member = comment.feed.member
-        )
-
-        return com.example.mykku.feed.domain.FeedComment(
-            id = comment.id,
-            content = comment.content,
-            likeCount = comment.likeCount,
-            feed = legacyFeed,
-            parentComment = null,
-            member = comment.member
         )
     }
 }

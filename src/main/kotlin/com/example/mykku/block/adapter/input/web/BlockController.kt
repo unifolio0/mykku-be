@@ -15,7 +15,7 @@ import com.example.mykku.block.application.port.input.UnblockKeywordUseCase
 import com.example.mykku.block.application.port.input.UnblockMemberUseCase
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.common.util.PageableValidator
-import com.example.mykku.member.domain.Member
+import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -41,7 +41,7 @@ class BlockController(
 
     @PostMapping("/members")
     fun blockMember(
-        @CurrentMember member: Member,
+        @CurrentMember member: MemberJpaEntity,
         @RequestBody request: BlockMemberRequest
     ): ResponseEntity<ApiResponse<MemberBlockResponse>> {
         val command = BlockMemberCommand(
@@ -56,7 +56,7 @@ class BlockController(
 
     @DeleteMapping("/members/{memberId}")
     fun unblockMember(
-        @CurrentMember member: Member,
+        @CurrentMember member: MemberJpaEntity,
         @PathVariable memberId: String
     ): ResponseEntity<ApiResponse<Unit>> {
         val command = UnblockMemberCommand(
@@ -70,7 +70,7 @@ class BlockController(
 
     @GetMapping("/members")
     fun getMemberBlocks(
-        @CurrentMember member: Member,
+        @CurrentMember member: MemberJpaEntity,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int
     ): ResponseEntity<ApiResponse<MemberBlockListResponse>> {
@@ -88,7 +88,7 @@ class BlockController(
 
     @PostMapping("/keywords")
     fun blockKeyword(
-        @CurrentMember member: Member,
+        @CurrentMember member: MemberJpaEntity,
         @RequestBody request: BlockKeywordRequest
     ): ResponseEntity<ApiResponse<KeywordBlockResponse>> {
         val command = BlockKeywordCommand(
@@ -103,7 +103,7 @@ class BlockController(
 
     @DeleteMapping("/keywords/{keyword}")
     fun unblockKeyword(
-        @CurrentMember member: Member,
+        @CurrentMember member: MemberJpaEntity,
         @PathVariable keyword: String
     ): ResponseEntity<ApiResponse<Unit>> {
         val command = UnblockKeywordCommand(
@@ -117,7 +117,7 @@ class BlockController(
 
     @GetMapping("/keywords")
     fun getKeywordBlocks(
-        @CurrentMember member: Member,
+        @CurrentMember member: MemberJpaEntity,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int
     ): ResponseEntity<ApiResponse<KeywordBlockListResponse>> {

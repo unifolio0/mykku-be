@@ -26,13 +26,13 @@ class BlockMemberService(
         val blockedMember = memberRepository.findByMemberId(command.blockedMemberId)
             ?: throw MemberException.memberNotFound()
 
-        if (memberBlockRepository.existsByBlockerIdAndBlockedId(command.blockerId, blockedMember.id)) {
+        if (memberBlockRepository.existsByBlockerIdAndBlockedId(command.blockerId, blockedMember.id.value)) {
             throw BlockException.memberAlreadyBlocked()
         }
 
         val memberBlock = MemberBlock.create(
             blockerId = command.blockerId,
-            blockedId = blockedMember.id
+            blockedId = blockedMember.id.value
         )
 
         val savedBlock = memberBlockRepository.save(memberBlock)

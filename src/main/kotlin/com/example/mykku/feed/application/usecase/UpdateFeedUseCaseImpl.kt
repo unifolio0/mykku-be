@@ -1,7 +1,7 @@
 package com.example.mykku.feed.application.usecase
 
 import com.example.mykku.board.adapter.output.persistence.BoardJpaRepository
-import com.example.mykku.contest.repository.ContestTagRepository
+import com.example.mykku.contest.application.port.output.ContestTagRepository
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedImageJpaEntity
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedTagJpaEntity
@@ -18,9 +18,9 @@ import com.example.mykku.feed.domain.vo.FeedId
 import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.image.ImageUploadService
 import com.example.mykku.image.dto.ImageUploadResult
-import com.example.mykku.like.tool.LikeFeedReader
-import com.example.mykku.member.domain.Member
-import com.example.mykku.scrap.tool.SaveFeedReader
+import com.example.mykku.like.application.port.output.LikeFeedPort
+import com.example.mykku.member.domain.entity.Member
+import com.example.mykku.scrap.application.port.output.SaveFeedPort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -33,8 +33,8 @@ class UpdateFeedUseCaseImpl(
     private val boardJpaRepository: BoardJpaRepository,
     private val contestTagRepository: ContestTagRepository,
     private val imageUploadService: ImageUploadService,
-    private val likeFeedReader: LikeFeedReader,
-    private val saveFeedReader: SaveFeedReader
+    private val likeFeedPort: LikeFeedPort,
+    private val saveFeedPort: SaveFeedPort
 ) : UpdateFeedUseCase {
 
     override fun execute(command: UpdateFeedCommand, member: Member): FeedDetailResult {
@@ -57,9 +57,8 @@ class UpdateFeedUseCaseImpl(
         val remainingImages = feedImageRepository.findByFeed(savedFeed)
 
         val contestTagTitles = getContestTagTitles(updatedTags.map { it.title })
-        val legacyFeed = createLegacyFeed(savedFeed)
-        val isLiked = likeFeedReader.isLiked(member.id, legacyFeed)
-        val isSaved = saveFeedReader.isSaved(member.id, legacyFeed)
+        val isLiked = likeFeedPort.existsByMemberIdAndFeedId(member.id.value, savedFeed.id!!)
+        val isSaved = saveFeedPort.existsByMemberIdAndFeedId(member.id.value, savedFeed.id!!)
 
         return FeedDetailResult(
             id = savedFeed.id!!,
@@ -67,7 +66,7 @@ class UpdateFeedUseCaseImpl(
                 memberId = member.memberId,
                 nickname = member.nickname,
                 profileImage = member.profileImage,
-                role = member.role?.name ?: ""
+                role = ""
             ),
             boardId = savedFeed.board.id!!,
             boardTitle = savedFeed.board.title,
@@ -85,7 +84,7 @@ class UpdateFeedUseCaseImpl(
     }
 
     private fun validateFeedOwner(feed: FeedJpaEntity, member: Member) {
-        if (feed.member.id != member.id) {
+        if (feed.member.id != member.id.value) {
             throw FeedException.feedForbiddenAccess()
         }
     }
@@ -160,17 +159,5 @@ class UpdateFeedUseCaseImpl(
     private fun getContestTagTitles(tagTitles: List<String>): Set<String> {
         val contestTags = contestTagRepository.findAllByTitleIn(tagTitles)
         return contestTags.map { it.title }.toSet()
-    }
-
-    private fun createLegacyFeed(feed: FeedJpaEntity): com.example.mykku.feed.domain.Feed {
-        return com.example.mykku.feed.domain.Feed(
-            id = feed.id,
-            title = feed.title,
-            content = feed.content,
-            likeCount = feed.likeCount,
-            commentCount = feed.commentCount,
-            board = feed.board,
-            member = feed.member
-        )
     }
 }

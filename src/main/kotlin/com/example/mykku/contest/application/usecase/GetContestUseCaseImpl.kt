@@ -8,8 +8,6 @@ import com.example.mykku.contest.application.port.output.ContestRepository
 import com.example.mykku.contest.application.port.output.ContestTagRepository
 import com.example.mykku.contest.domain.vo.ContestId
 import com.example.mykku.contest.exception.ContestException
-import com.example.mykku.scrap.tool.SaveContestReader
-import com.example.mykku.member.tool.MemberReader
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -17,20 +15,16 @@ import org.springframework.transaction.annotation.Transactional
 class GetContestUseCaseImpl(
     private val contestRepository: ContestRepository,
     private val contestImageRepository: ContestImageRepository,
-    private val contestTagRepository: ContestTagRepository,
-    private val saveContestReader: SaveContestReader,
-    private val memberReader: MemberReader
+    private val contestTagRepository: ContestTagRepository
 ) : GetContestUseCase {
 
     @Transactional(readOnly = true)
-    override fun execute(contestId: Long, memberId: Long): ContestDetailResult {
+    override fun execute(contestId: Long, memberId: String): ContestDetailResult {
         val contest = contestRepository.findById(ContestId.of(contestId))
             ?: throw ContestException.contestNotFound()
 
-        val member = memberReader.getMemberById(memberId)
         val images = contestImageRepository.findByContestIds(listOf(contest.id))
         val tags = contestTagRepository.findByContestIds(listOf(contest.id))
-        val isSaved = saveContestReader.isSavedByContestId(member, contestId)
 
         return ContestDetailResult(
             id = contest.id.value,
@@ -43,7 +37,7 @@ class GetContestUseCaseImpl(
                 ContestImageResult(url = it.url, orderIndex = it.orderIndex)
             },
             tags = tags.map { it.title },
-            isSaved = isSaved,
+            isSaved = false,
             createdAt = contest.createdAt
         )
     }

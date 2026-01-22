@@ -8,7 +8,7 @@ import com.example.mykku.dailymessage.domain.entity.DailyMessageComment
 import com.example.mykku.dailymessage.domain.vo.DailyMessageCommentId
 import com.example.mykku.dailymessage.domain.vo.DailyMessageId
 import com.example.mykku.dailymessage.exception.DailyMessageException
-import com.example.mykku.member.repository.MemberRepository
+import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Component
@@ -17,14 +17,14 @@ import org.springframework.stereotype.Component
 class DailyMessageCommentRepositoryAdapter(
     private val dailyMessageCommentJpaRepository: DailyMessageCommentJpaRepository,
     private val dailyMessageJpaRepository: DailyMessageJpaRepository,
-    private val memberRepository: MemberRepository
+    private val memberJpaRepository: MemberJpaRepository
 ) : DailyMessageCommentRepository {
 
     override fun save(comment: DailyMessageComment): DailyMessageComment {
         val dailyMessageJpaEntity = dailyMessageJpaRepository.findById(comment.dailyMessageId)
             .orElseThrow { DailyMessageException.dailyMessageNotFound() }
 
-        val memberEntity = memberRepository.findById(comment.memberId)
+        val memberEntity = memberJpaRepository.findById(comment.memberId)
             .orElseThrow { throw IllegalStateException("Member not found: ${comment.memberId}") }
 
         val parentCommentEntity = comment.parentCommentId?.let { parentId ->

@@ -1,10 +1,10 @@
 package com.example.mykku.feed.application.usecase
 
 import com.example.mykku.board.adapter.output.persistence.BoardJpaRepository
-import com.example.mykku.contest.repository.ContestTagRepository
-import com.example.mykku.contest.tool.ContestParticipationReader
-import com.example.mykku.contest.tool.ContestParticipationWriter
-import com.example.mykku.contest.tool.ContestReader
+import com.example.mykku.contest.application.port.output.ContestParticipationRepository
+import com.example.mykku.contest.application.port.output.ContestRepository
+import com.example.mykku.contest.application.port.output.ContestTagRepository
+import com.example.mykku.contest.domain.vo.ContestStatusType
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedImageJpaEntity
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedTagJpaEntity
@@ -18,9 +18,11 @@ import com.example.mykku.feed.application.port.output.FeedTagRepository
 import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.image.ImageUploadService
 import com.example.mykku.image.dto.ImageUploadResult
-import com.example.mykku.member.domain.Member
+import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
+import com.example.mykku.member.domain.entity.Member
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 @Transactional
@@ -29,15 +31,19 @@ class CreateFeedUseCaseImpl(
     private val feedImageRepository: FeedImageRepository,
     private val feedTagRepository: FeedTagRepository,
     private val boardJpaRepository: BoardJpaRepository,
+    private val memberJpaRepository: MemberJpaRepository,
     private val imageUploadService: ImageUploadService,
-    private val contestReader: ContestReader,
-    private val contestParticipationWriter: ContestParticipationWriter,
-    private val contestParticipationReader: ContestParticipationReader
+    private val contestRepository: ContestRepository,
+    private val contestTagRepository: ContestTagRepository,
+    private val contestParticipationRepository: ContestParticipationRepository
 ) : CreateFeedUseCase {
 
     override fun execute(command: CreateFeedCommand, member: Member): CreateFeedResult {
         val board = boardJpaRepository.findById(command.boardId)
             .orElseThrow { IllegalArgumentException("Board not found") }
+
+        val memberJpaEntity = memberJpaRepository.findById(member.id.value)
+            .orElseThrow { IllegalArgumentException("Member not found") }
 
         val imageResults = uploadImages(command.images)
         validateImageCount(imageResults.size)
@@ -49,7 +55,7 @@ class CreateFeedUseCaseImpl(
             title = command.title,
             content = command.content,
             board = board,
-            member = member
+            member = memberJpaEntity
         )
         val savedFeed = feedRepository.save(feedJpaEntity)
 
@@ -120,30 +126,32 @@ class CreateFeedUseCaseImpl(
         if (feedTags.isEmpty()) return
 
         val feedTagTitles = feedTags.map { it.title }.toSet()
-        val activeContestsWithTags = contestReader.getActiveContestsWithAllTags()
+        val activeContests = contestRepository.findByStatusAndExpiredAtAfter(
+            ContestStatusType.ACTIVE,
+            LocalDateTime.now()
+        )
 
-        activeContestsWithTags
-            .filter { (_, requiredTags) ->
-                requiredTags.isNotEmpty() && feedTagTitles.containsAll(requiredTags)
-            }
-            .forEach { (contest, _) ->
-                val legacyFeed = createLegacyFeedForContest(feed)
-                if (!contestParticipationReader.existsByMemberAndContestAndFeed(member, contest, legacyFeed)) {
-                    contestParticipationWriter.participateViaFeed(member, contest, legacyFeed)
+        if (activeContests.isEmpty()) return
+
+        val contestIds = activeContests.map { it.id }
+        val contestTags = contestTagRepository.findByContestIds(contestIds)
+        val contestTagsMap = contestTags.groupBy { it.contestId }
+
+        activeContests.forEach { contest ->
+            val requiredTags = contestTagsMap[contest.id]?.map { it.title }?.toSet() ?: emptySet()
+            if (requiredTags.isNotEmpty() && feedTagTitles.containsAll(requiredTags)) {
+                val memberIdStr = member.id.value
+                val memberIdLong = member.id.value.hashCode().toLong()
+                if (!contestParticipationRepository.existsByMemberIdAndContestIdAndFeedId(memberIdStr, contest.id, feed.id!!)) {
+                    val participation = com.example.mykku.contest.domain.entity.ContestParticipation.create(
+                        contestId = contest.id,
+                        feedId = feed.id!!,
+                        memberId = memberIdLong
+                    )
+                    contestParticipationRepository.save(participation)
                 }
             }
-    }
-
-    private fun createLegacyFeedForContest(feed: FeedJpaEntity): com.example.mykku.feed.domain.Feed {
-        return com.example.mykku.feed.domain.Feed(
-            id = feed.id,
-            title = feed.title,
-            content = feed.content,
-            likeCount = feed.likeCount,
-            commentCount = feed.commentCount,
-            board = feed.board,
-            member = feed.member
-        )
+        }
     }
 
     private fun buildCreateFeedResult(
