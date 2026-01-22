@@ -1,8 +1,8 @@
 package com.example.mykku.contest.exception
 
 import com.example.mykku.common.exception.DomainErrorCode
-import com.example.mykku.contest.domain.Contest
-import com.example.mykku.contest.domain.ContestTag
+import com.example.mykku.contest.domain.entity.Contest
+import com.example.mykku.contest.domain.entity.ContestTag
 import org.springframework.http.HttpStatus
 
 enum class ContestErrorCode(

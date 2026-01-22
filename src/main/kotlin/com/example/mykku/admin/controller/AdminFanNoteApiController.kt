@@ -3,7 +3,7 @@ package com.example.mykku.admin.controller
 import com.example.mykku.admin.dto.fannote.FanNoteCreateRequest
 import com.example.mykku.admin.service.AdminFanNoteService
 import com.example.mykku.common.dto.ApiResponse
-import com.example.mykku.fannote.dto.FanNoteDetailResponse
+import com.example.mykku.fannote.adapter.input.web.FanNoteDetailResponse
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping

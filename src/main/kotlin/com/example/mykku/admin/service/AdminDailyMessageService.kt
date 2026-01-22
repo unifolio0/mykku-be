@@ -2,41 +2,57 @@ package com.example.mykku.admin.service
 
 import com.example.mykku.admin.dto.dailymessage.DailyMessageCreateRequest
 import com.example.mykku.admin.dto.dailymessage.DailyMessageListResponse
-import com.example.mykku.dailymessage.domain.DailyMessage
-import com.example.mykku.dailymessage.tool.DailyMessageReader
-import com.example.mykku.dailymessage.tool.DailyMessageWriter
+import com.example.mykku.dailymessage.application.dto.CreateDailyMessageCommand
+import com.example.mykku.dailymessage.application.port.input.CreateDailyMessageUseCase
+import com.example.mykku.dailymessage.application.port.input.DeleteDailyMessageUseCase
+import com.example.mykku.dailymessage.application.port.input.GetAllDailyMessagesUseCase
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 @Transactional(readOnly = true)
 class AdminDailyMessageService(
-    private val dailyMessageReader: DailyMessageReader,
-    private val dailyMessageWriter: DailyMessageWriter
+    private val createDailyMessageUseCase: CreateDailyMessageUseCase,
+    private val getAllDailyMessagesUseCase: GetAllDailyMessagesUseCase,
+    private val deleteDailyMessageUseCase: DeleteDailyMessageUseCase
 ) {
 
     @Transactional
     fun create(request: DailyMessageCreateRequest): DailyMessageListResponse {
-        val dailyMessage = DailyMessage(
+        val command = CreateDailyMessageCommand(
             title = request.title,
             content = request.content,
             date = request.date
         )
 
-        val saved = dailyMessageWriter.save(dailyMessage)
-        return DailyMessageListResponse.from(saved)
+        val result = createDailyMessageUseCase.execute(command)
+        return DailyMessageListResponse(
+            id = result.id,
+            title = result.title,
+            content = result.content,
+            date = result.date,
+            createdAt = LocalDateTime.now()
+        )
     }
 
     fun findAll(pageable: Pageable): Page<DailyMessageListResponse> {
-        return dailyMessageReader.findAll(pageable)
-            .map { DailyMessageListResponse.from(it) }
+        return getAllDailyMessagesUseCase.execute(pageable)
+            .map { result ->
+                DailyMessageListResponse(
+                    id = result.id,
+                    title = result.title,
+                    content = result.content,
+                    date = result.date,
+                    createdAt = LocalDateTime.now()
+                )
+            }
     }
 
     @Transactional
     fun deleteById(id: Long) {
-        dailyMessageReader.getDailyMessage(id)
-        dailyMessageWriter.deleteById(id)
+        deleteDailyMessageUseCase.execute(id)
     }
 }

@@ -1,6 +1,6 @@
 package com.example.mykku.feed.domain
 
-import com.example.mykku.board.domain.Board
+import com.example.mykku.board.adapter.output.persistence.entity.BoardJpaEntity
 import com.example.mykku.common.domain.BaseEntity
 import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.member.domain.Member
@@ -33,7 +33,7 @@ class Feed(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
-    var board: Board,
+    var board: BoardJpaEntity,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
