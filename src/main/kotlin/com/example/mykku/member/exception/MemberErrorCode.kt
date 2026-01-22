@@ -1,7 +1,7 @@
 package com.example.mykku.member.exception
 
 import com.example.mykku.common.exception.DomainErrorCode
-import com.example.mykku.member.domain.Member
+import com.example.mykku.member.domain.entity.Member
 import org.springframework.http.HttpStatus
 
 enum class MemberErrorCode(

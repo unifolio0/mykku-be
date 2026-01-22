@@ -1,15 +1,15 @@
 package com.example.mykku.dailymessage.exception
 
 import com.example.mykku.common.exception.DomainErrorCode
-import com.example.mykku.dailymessage.domain.DailyMessage
-import com.example.mykku.dailymessage.domain.DailyMessageComment
+import com.example.mykku.dailymessage.domain.entity.DailyMessage
+import com.example.mykku.dailymessage.domain.entity.DailyMessageComment
 import org.springframework.http.HttpStatus
 
 enum class DailyMessageErrorCode(
     override val status: HttpStatus,
     override val message: String
 ) : DomainErrorCode {
-    
+
     DAILY_MESSAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "일상 메시지를 찾을 수 없습니다"),
     DAILY_MESSAGE_CONTENT_TOO_LONG(HttpStatus.BAD_REQUEST, "일상 메시지 내용은 ${DailyMessage.CONTENT_MAX_LENGTH}자 이하여야 합니다"),
 

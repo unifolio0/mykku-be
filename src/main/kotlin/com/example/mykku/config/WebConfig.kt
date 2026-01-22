@@ -1,6 +1,6 @@
 package com.example.mykku.config
 
-import com.example.mykku.auth.resolver.MemberArgumentResolver
+import com.example.mykku.auth.adapter.input.web.MemberArgumentResolver
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry

@@ -1,14 +1,15 @@
 package com.example.mykku
 
-import com.example.mykku.board.domain.Board
-import com.example.mykku.board.repository.BoardRepository
+import com.example.mykku.board.adapter.output.persistence.BoardJpaRepository
+import com.example.mykku.board.adapter.output.persistence.entity.BoardJpaEntity
 import com.example.mykku.config.TestEmailConfig
 import com.example.mykku.config.TestEmailSenderConfig
-import com.example.mykku.member.domain.Member
-import com.example.mykku.member.domain.SocialProvider
-import com.example.mykku.member.repository.MemberRepository
-import com.example.mykku.role.domain.Role
-import com.example.mykku.role.repository.RoleRepository
+import com.example.mykku.config.TestImageUploadConfig
+import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
+import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
+import com.example.mykku.member.domain.vo.SocialProvider
+import com.example.mykku.role.adapter.output.persistence.entity.RoleJpaEntity
+import com.example.mykku.role.adapter.output.persistence.repository.RoleJpaRepository
 import com.example.mykku.util.DatabaseCleaner
 import com.example.mykku.util.TestTokenGenerator
 import io.restassured.RestAssured
@@ -22,7 +23,7 @@ import org.springframework.test.context.ActiveProfiles
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-@Import(TestEmailConfig::class, TestEmailSenderConfig::class)
+@Import(TestEmailConfig::class, TestEmailSenderConfig::class, TestImageUploadConfig::class)
 @ExtendWith(DatabaseCleaner::class)
 abstract class BaseControllerTest {
 
@@ -30,22 +31,19 @@ abstract class BaseControllerTest {
     protected var port: Int = 0
 
     @Autowired
-    protected lateinit var memberRepository: MemberRepository
+    protected lateinit var memberJpaRepository: MemberJpaRepository
 
     @Autowired
-    protected lateinit var boardRepository: BoardRepository
+    protected lateinit var boardJpaRepository: BoardJpaRepository
 
     @Autowired
-    protected lateinit var roleRepository: RoleRepository
+    protected lateinit var roleJpaRepository: RoleJpaRepository
 
     @BeforeEach
     fun baseSetUp() {
         RestAssured.port = port
     }
 
-    /**
-     * 테스트용 Member 엔티티 생성 및 저장
-     */
     protected fun createAndSaveMember(
         id: String = "testMember",
         memberId: String? = null,
@@ -53,10 +51,10 @@ abstract class BaseControllerTest {
         email: String = "test@example.com",
         socialId: String = "12345",
         provider: SocialProvider = SocialProvider.GOOGLE,
-        role: Role? = null,
+        role: RoleJpaEntity? = null,
         profileImage: String = ""
-    ): Member {
-        val member = Member(
+    ): MemberJpaEntity {
+        val member = MemberJpaEntity(
             id = id,
             memberId = memberId ?: id,
             nickname = nickname,
@@ -66,21 +64,18 @@ abstract class BaseControllerTest {
             role = role,
             profileImage = profileImage
         )
-        return memberRepository.save(member)
+        return memberJpaRepository.save(member)
     }
 
-    /**
-     * 테스트용 Board 엔티티 생성 및 저장
-     */
     protected fun createAndSaveBoard(
         title: String = "테스트 게시판",
         logo: String = "test_logo.png"
-    ): Board {
-        val board = Board(
+    ): BoardJpaEntity {
+        val board = BoardJpaEntity(
             title = title,
             logo = logo
         )
-        return boardRepository.save(board)
+        return boardJpaRepository.save(board)
     }
 
     /**

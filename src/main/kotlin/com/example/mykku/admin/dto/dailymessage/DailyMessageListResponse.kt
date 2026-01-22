@@ -1,6 +1,6 @@
 package com.example.mykku.admin.dto.dailymessage
 
-import com.example.mykku.dailymessage.domain.DailyMessage
+import com.example.mykku.dailymessage.application.dto.DailyMessageSummaryResult
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -12,13 +12,13 @@ data class DailyMessageListResponse(
     val createdAt: LocalDateTime
 ) {
     companion object {
-        fun from(dailyMessage: DailyMessage): DailyMessageListResponse {
+        fun from(result: DailyMessageSummaryResult, createdAt: LocalDateTime): DailyMessageListResponse {
             return DailyMessageListResponse(
-                id = dailyMessage.id!!,
-                title = dailyMessage.title,
-                content = dailyMessage.content,
-                date = dailyMessage.date,
-                createdAt = dailyMessage.createdAt
+                id = result.id,
+                title = result.title,
+                content = result.content,
+                date = result.date,
+                createdAt = createdAt
             )
         }
     }

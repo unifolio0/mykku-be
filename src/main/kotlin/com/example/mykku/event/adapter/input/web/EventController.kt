@@ -1,0 +1,79 @@
+package com.example.mykku.event.adapter.input.web
+
+import com.example.mykku.auth.config.CurrentMember
+import com.example.mykku.common.dto.ApiResponse
+import com.example.mykku.event.application.dto.EventListQuery
+import com.example.mykku.event.application.port.input.CreateEventUseCase
+import com.example.mykku.event.application.port.input.GetEventUseCase
+import com.example.mykku.event.application.port.input.ListEventsUseCase
+import com.example.mykku.event.domain.vo.EventSortType
+import com.example.mykku.event.domain.vo.EventStatusType
+import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
+
+@RestController
+@RequestMapping("/api/v1/events")
+class EventController(
+    private val createEventUseCase: CreateEventUseCase,
+    private val getEventUseCase: GetEventUseCase,
+    private val listEventsUseCase: ListEventsUseCase
+) {
+
+    @PostMapping
+    fun createEvent(
+        @RequestBody request: CreateEventRequest
+    ): ResponseEntity<ApiResponse<CreateEventResponse>> {
+        val result = createEventUseCase.execute(request.toCommand())
+        return ResponseEntity.ok(
+            ApiResponse(
+                message = "이벤트가 성공적으로 생성되었습니다.",
+                data = CreateEventResponse.from(result)
+            )
+        )
+    }
+
+    @GetMapping
+    fun getEvents(
+        @RequestParam(defaultValue = "ACTIVE") status: EventStatusType,
+        @RequestParam(defaultValue = "LATEST") sortType: EventSortType,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "20") size: Int,
+        @CurrentMember memberEntity: MemberJpaEntity
+    ): ResponseEntity<ApiResponse<PagedEventsResponse>> {
+        val query = EventListQuery(
+            status = status,
+            sortType = sortType,
+            page = page,
+            size = size,
+            memberId = memberEntity.id
+        )
+        val result = listEventsUseCase.execute(query)
+        return ResponseEntity.ok(
+            ApiResponse(
+                message = "이벤트 목록을 성공적으로 조회했습니다.",
+                data = PagedEventsResponse.from(result)
+            )
+        )
+    }
+
+    @GetMapping("/{eventId}")
+    fun getEventDetail(
+        @PathVariable eventId: Long,
+        @CurrentMember memberEntity: MemberJpaEntity
+    ): ResponseEntity<ApiResponse<EventDetailResponse>> {
+        val result = getEventUseCase.execute(eventId, memberEntity.id)
+        return ResponseEntity.ok(
+            ApiResponse(
+                message = "이벤트 상세 정보를 성공적으로 조회했습니다.",
+                data = EventDetailResponse.from(result)
+            )
+        )
+    }
+}

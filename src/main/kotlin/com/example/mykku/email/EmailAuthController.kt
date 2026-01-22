@@ -1,6 +1,6 @@
 package com.example.mykku.email
 
-import com.example.mykku.auth.dto.LoginResponse
+import com.example.mykku.auth.adapter.input.web.dto.LoginResponse
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.email.dto.CheckMemberIdRequest
 import com.example.mykku.email.dto.CheckMemberIdResponse
