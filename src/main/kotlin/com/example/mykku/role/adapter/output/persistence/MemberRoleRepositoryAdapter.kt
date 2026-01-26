@@ -8,6 +8,7 @@ import com.example.mykku.role.application.port.output.MemberRoleWithRole
 import com.example.mykku.role.domain.entity.MemberRole
 import com.example.mykku.role.domain.vo.MemberRoleId
 import com.example.mykku.role.domain.vo.RoleId
+import com.example.mykku.role.exception.RoleException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 
@@ -19,7 +20,7 @@ class MemberRoleRepositoryAdapter(
 
     override fun save(memberRole: MemberRole): MemberRole {
         val roleEntity = roleJpaRepository.findByIdOrNull(memberRole.roleId.value)
-            ?: throw IllegalArgumentException("Role not found: ${memberRole.roleId.value}")
+            ?: throw RoleException.roleNotFound()
 
         val entity = MemberRoleJpaEntity.fromDomain(memberRole, roleEntity)
         return jpaRepository.save(entity).toDomain()

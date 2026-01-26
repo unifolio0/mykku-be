@@ -10,7 +10,9 @@ import com.example.mykku.contest.domain.vo.ContestId
 import com.example.mykku.contest.domain.vo.ContestParticipationId
 import com.example.mykku.contest.exception.ContestException
 import com.example.mykku.feed.adapter.output.persistence.FeedJpaRepository
+import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
+import com.example.mykku.member.exception.MemberException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
@@ -26,10 +28,10 @@ class ContestParticipationRepositoryAdapter(
     override fun save(participation: ContestParticipation): ContestParticipation {
         val contestJpaEntity = contestJpaRepository.findById(participation.contestId.value)
             .orElseThrow { ContestException.contestNotFound() }
-        val memberJpaEntity = memberJpaRepository.findByMemberId(participation.memberId.toString())
-            ?: throw IllegalArgumentException("Member not found")
+        val memberJpaEntity = memberJpaRepository.findByMemberId(participation.memberId)
+            ?: throw MemberException.memberNotFound()
         val feedJpaEntity = feedJpaRepository.findById(participation.feedId)
-            .orElseThrow { IllegalArgumentException("Feed not found") }
+            .orElseThrow { FeedException.feedNotFound() }
 
         val jpaEntity = ContestParticipationJpaEntity.fromDomain(
             participation,

@@ -1,0 +1,208 @@
+package com.example.mykku.role.adapter.output.persistence
+
+import com.example.mykku.BaseRepositoryTest
+import com.example.mykku.role.application.port.output.MemberRoleRepository
+import com.example.mykku.role.domain.entity.MemberRole
+import com.example.mykku.role.domain.vo.MemberRoleId
+import com.example.mykku.role.domain.vo.RoleId
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+
+@DisplayName("MemberRoleRepository 통합 테스트")
+class MemberRoleRepositoryAdapterTest : BaseRepositoryTest() {
+
+    @Autowired
+    private lateinit var memberRoleRepository: MemberRoleRepository
+
+    private fun createMemberRole(
+        memberId: String,
+        roleId: RoleId
+    ): MemberRole {
+        return MemberRole.create(memberId = memberId, roleId = roleId)
+    }
+
+    @Nested
+    @DisplayName("save 메서드")
+    inner class Save {
+
+        @Test
+        @DisplayName("새로운 멤버 역할을 저장하면 ID가 생성된다")
+        fun saveNewMemberRole() {
+            val role = createAndSaveRole(name = "save_role", description = "저장 테스트 역할")
+            val member = createAndSaveMember(id = "save_member1", email = "save_member1@test.com", socialId = "save_social1")
+
+            val memberRole = createMemberRole(memberId = member.id, roleId = RoleId(role.id!!))
+
+            val savedMemberRole = memberRoleRepository.save(memberRole)
+
+            assertThat(savedMemberRole.id.value).isGreaterThan(0)
+            assertThat(savedMemberRole.memberId).isEqualTo(member.id)
+            assertThat(savedMemberRole.roleId.value).isEqualTo(role.id)
+        }
+    }
+
+    @Nested
+    @DisplayName("findById 메서드")
+    inner class FindById {
+
+        @Test
+        @DisplayName("존재하는 ID로 조회하면 멤버 역할을 반환한다")
+        fun findByExistingId() {
+            val role = createAndSaveRole(name = "findById_role", description = "조회 테스트 역할")
+            val member = createAndSaveMember(id = "findById_member1", email = "findById_member1@test.com", socialId = "findById_social1")
+
+            val savedMemberRole = memberRoleRepository.save(createMemberRole(memberId = member.id, roleId = RoleId(role.id!!)))
+
+            val foundMemberRole = memberRoleRepository.findById(savedMemberRole.id)
+
+            assertThat(foundMemberRole).isNotNull
+            assertThat(foundMemberRole!!.id).isEqualTo(savedMemberRole.id)
+            assertThat(foundMemberRole.memberId).isEqualTo(savedMemberRole.memberId)
+            assertThat(foundMemberRole.roleId).isEqualTo(savedMemberRole.roleId)
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 ID로 조회하면 null을 반환한다")
+        fun findByNonExistingId() {
+            val foundMemberRole = memberRoleRepository.findById(MemberRoleId(999999L))
+
+            assertThat(foundMemberRole).isNull()
+        }
+    }
+
+    @Nested
+    @DisplayName("findByMemberId 메서드")
+    inner class FindByMemberId {
+
+        @Test
+        @DisplayName("멤버 ID로 조회하면 해당 멤버의 모든 역할을 반환한다")
+        fun findByMemberId() {
+            val role1 = createAndSaveRole(name = "fmid_role1", description = "역할1")
+            val role2 = createAndSaveRole(name = "fmid_role2", description = "역할2")
+            val member1 = createAndSaveMember(id = "fmid_m1", email = "fmid_m1@test.com", socialId = "fmid_s1")
+            val member2 = createAndSaveMember(id = "fmid_m2", email = "fmid_m2@test.com", socialId = "fmid_s2")
+
+            memberRoleRepository.save(createMemberRole(memberId = member1.id, roleId = RoleId(role1.id!!)))
+            memberRoleRepository.save(createMemberRole(memberId = member1.id, roleId = RoleId(role2.id!!)))
+            memberRoleRepository.save(createMemberRole(memberId = member2.id, roleId = RoleId(role1.id!!)))
+
+            val memberRoles = memberRoleRepository.findByMemberId(member1.id)
+
+            assertThat(memberRoles).hasSize(2)
+            assertThat(memberRoles.map { it.roleId.value }).containsExactlyInAnyOrder(role1.id, role2.id)
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 멤버 ID로 조회하면 빈 리스트를 반환한다")
+        fun findByNonExistingMemberId() {
+            val memberRoles = memberRoleRepository.findByMemberId("non_existing")
+
+            assertThat(memberRoles).isEmpty()
+        }
+    }
+
+    @Nested
+    @DisplayName("findByMemberIdWithRole 메서드")
+    inner class FindByMemberIdWithRole {
+
+        @Test
+        @DisplayName("멤버 ID로 조회하면 역할 정보와 함께 반환한다")
+        fun findByMemberIdWithRole() {
+            val role1 = createAndSaveRole(name = "fwr_ADMIN", description = "관리자")
+            val role2 = createAndSaveRole(name = "fwr_USER", description = "일반 사용자")
+            val member = createAndSaveMember(id = "fwr_m1", email = "fwr_m1@test.com", socialId = "fwr_s1")
+
+            memberRoleRepository.save(createMemberRole(memberId = member.id, roleId = RoleId(role1.id!!)))
+            memberRoleRepository.save(createMemberRole(memberId = member.id, roleId = RoleId(role2.id!!)))
+
+            val memberRolesWithRole = memberRoleRepository.findByMemberIdWithRole(member.id)
+
+            assertThat(memberRolesWithRole).hasSize(2)
+            assertThat(memberRolesWithRole.map { it.role.name }).containsExactlyInAnyOrder("fwr_ADMIN", "fwr_USER")
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 멤버 ID로 조회하면 빈 리스트를 반환한다")
+        fun findByNonExistingMemberIdWithRole() {
+            val memberRolesWithRole = memberRoleRepository.findByMemberIdWithRole("non_existing")
+
+            assertThat(memberRolesWithRole).isEmpty()
+        }
+    }
+
+    @Nested
+    @DisplayName("existsByMemberIdAndRoleId 메서드")
+    inner class ExistsByMemberIdAndRoleId {
+
+        @Test
+        @DisplayName("해당 멤버와 역할 조합이 존재하면 true를 반환한다")
+        fun existsByMemberIdAndRoleId() {
+            val role = createAndSaveRole(name = "emr_role", description = "존재 확인 역할")
+            val member = createAndSaveMember(id = "emr_m1", email = "emr_m1@test.com", socialId = "emr_s1")
+
+            memberRoleRepository.save(createMemberRole(memberId = member.id, roleId = RoleId(role.id!!)))
+
+            val exists = memberRoleRepository.existsByMemberIdAndRoleId(member.id, RoleId(role.id!!))
+
+            assertThat(exists).isTrue()
+        }
+
+        @Test
+        @DisplayName("해당 멤버와 역할 조합이 존재하지 않으면 false를 반환한다")
+        fun notExistsByMemberIdAndRoleId() {
+            val role = createAndSaveRole(name = "nemr_role", description = "존재하지 않는 역할")
+
+            val exists = memberRoleRepository.existsByMemberIdAndRoleId("nemr_m1", RoleId(role.id!!))
+
+            assertThat(exists).isFalse()
+        }
+    }
+
+    @Nested
+    @DisplayName("existsByRoleId 메서드")
+    inner class ExistsByRoleId {
+
+        @Test
+        @DisplayName("해당 역할 ID를 가진 멤버 역할이 존재하면 true를 반환한다")
+        fun existsByRoleId() {
+            val role = createAndSaveRole(name = "eri_role", description = "역할 존재 확인")
+            val member = createAndSaveMember(id = "eri_m1", email = "eri_m1@test.com", socialId = "eri_s1")
+
+            memberRoleRepository.save(createMemberRole(memberId = member.id, roleId = RoleId(role.id!!)))
+
+            val exists = memberRoleRepository.existsByRoleId(RoleId(role.id!!))
+
+            assertThat(exists).isTrue()
+        }
+
+        @Test
+        @DisplayName("해당 역할 ID를 가진 멤버 역할이 존재하지 않으면 false를 반환한다")
+        fun notExistsByRoleId() {
+            val exists = memberRoleRepository.existsByRoleId(RoleId(999999L))
+
+            assertThat(exists).isFalse()
+        }
+    }
+
+    @Nested
+    @DisplayName("delete 메서드")
+    inner class Delete {
+
+        @Test
+        @DisplayName("멤버 역할을 삭제하면 조회되지 않는다")
+        fun deleteMemberRole() {
+            val role = createAndSaveRole(name = "delete_role", description = "삭제 테스트 역할")
+            val member = createAndSaveMember(id = "delete_member1", email = "delete_member1@test.com", socialId = "delete_social1")
+
+            val savedMemberRole = memberRoleRepository.save(createMemberRole(memberId = member.id, roleId = RoleId(role.id!!)))
+
+            memberRoleRepository.delete(savedMemberRole)
+
+            val foundMemberRole = memberRoleRepository.findById(savedMemberRole.id)
+            assertThat(foundMemberRole).isNull()
+        }
+    }
+}

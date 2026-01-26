@@ -40,7 +40,7 @@ class ContestParticipationJpaEntity(
             id = ContestParticipationId.of(id!!),
             contestId = ContestId.of(contest.id!!),
             feedId = feed.id!!,
-            memberId = member.id.hashCode().toLong(),
+            memberId = member.id,
             createdAt = createdAt,
             updatedAt = updatedAt
         )

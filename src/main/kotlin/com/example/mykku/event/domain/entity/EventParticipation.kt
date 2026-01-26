@@ -7,14 +7,14 @@ import java.time.LocalDateTime
 class EventParticipation private constructor(
     val id: EventParticipationId,
     val eventId: EventId,
-    val memberId: Long,
+    val memberId: String,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 ) {
     companion object {
         fun create(
             eventId: EventId,
-            memberId: Long
+            memberId: String
         ): EventParticipation {
             val now = LocalDateTime.now()
             return EventParticipation(
@@ -29,7 +29,7 @@ class EventParticipation private constructor(
         fun reconstitute(
             id: EventParticipationId,
             eventId: EventId,
-            memberId: Long,
+            memberId: String,
             createdAt: LocalDateTime,
             updatedAt: LocalDateTime
         ): EventParticipation {

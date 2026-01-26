@@ -2,6 +2,7 @@ package com.example.mykku.feed.application.usecase
 
 import com.example.mykku.board.application.port.output.BoardRepository
 import com.example.mykku.board.domain.vo.BoardId
+import com.example.mykku.board.exception.BoardException
 import com.example.mykku.contest.application.port.output.ContestTagRepository
 import com.example.mykku.feed.application.dto.AuthorResult
 import com.example.mykku.feed.application.dto.FeedDetailResult
@@ -15,6 +16,7 @@ import com.example.mykku.feed.application.port.output.FeedTagRepository
 import com.example.mykku.feed.domain.vo.FeedId
 import com.example.mykku.like.application.port.output.LikeFeedPort
 import com.example.mykku.member.application.port.output.MemberRepository
+import com.example.mykku.member.exception.MemberException
 import com.example.mykku.role.application.port.output.RoleRepository
 import com.example.mykku.role.domain.vo.RoleId
 import com.example.mykku.scrap.application.port.output.SaveFeedPort
@@ -42,9 +44,9 @@ class GetFeedDetailUseCaseImpl(
         val feedTags = feedTagRepository.findByFeedId(feed.id!!)
 
         val board = boardRepository.findById(BoardId(feed.boardId))
-            ?: throw IllegalArgumentException("Board not found")
+            ?: throw BoardException.boardNotFound()
         val member = memberRepository.findByIdString(feed.memberId)
-            ?: throw IllegalArgumentException("Member not found")
+            ?: throw MemberException.memberNotFound()
         val roleName = member.roleId?.let { roleRepository.findById(RoleId.of(it))?.name } ?: ""
 
         val contestTagTitles = getContestTagTitles(feedTags.map { it.title })

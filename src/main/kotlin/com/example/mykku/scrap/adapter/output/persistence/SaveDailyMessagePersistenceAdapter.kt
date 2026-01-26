@@ -1,7 +1,9 @@
 package com.example.mykku.scrap.adapter.output.persistence
 
 import com.example.mykku.dailymessage.adapter.output.persistence.repository.DailyMessageJpaRepository
+import com.example.mykku.dailymessage.exception.DailyMessageException
 import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
+import com.example.mykku.member.exception.MemberException
 import com.example.mykku.scrap.adapter.output.persistence.entity.SaveDailyMessageJpaEntity
 import com.example.mykku.scrap.application.dto.SaveDailyMessageResult
 import com.example.mykku.scrap.application.port.output.SaveDailyMessagePort
@@ -20,9 +22,9 @@ class SaveDailyMessagePersistenceAdapter(
 
     override fun save(saveDailyMessage: SaveDailyMessageEntity): SaveDailyMessageEntity {
         val member = memberJpaRepository.findByIdOrNull(saveDailyMessage.memberId)
-            ?: throw IllegalArgumentException("Member not found: ${saveDailyMessage.memberId}")
+            ?: throw MemberException.memberNotFound()
         val dailyMessage = dailyMessageJpaRepository.findByIdOrNull(saveDailyMessage.dailyMessageId)
-            ?: throw IllegalArgumentException("DailyMessage not found: ${saveDailyMessage.dailyMessageId}")
+            ?: throw DailyMessageException.dailyMessageNotFound()
 
         val jpaEntity = SaveDailyMessageJpaEntity.fromDomain(saveDailyMessage, member, dailyMessage)
         return saveDailyMessageJpaRepository.save(jpaEntity).toDomain()

@@ -2,6 +2,7 @@ package com.example.mykku.feed.application.usecase
 
 import com.example.mykku.board.application.port.output.BoardRepository
 import com.example.mykku.board.domain.vo.BoardId
+import com.example.mykku.board.exception.BoardException
 import com.example.mykku.contest.application.port.output.ContestTagRepository
 import com.example.mykku.feed.application.dto.AuthorResult
 import com.example.mykku.feed.application.dto.FeedDetailResult
@@ -58,7 +59,7 @@ class UpdateFeedUseCaseImpl(
         val remainingImages = feedImageRepository.findByFeedId(savedFeed.id!!)
 
         val board = boardRepository.findById(BoardId(savedFeed.boardId))
-            ?: throw IllegalArgumentException("Board not found")
+            ?: throw BoardException.boardNotFound()
         val roleName = member.roleId?.let { roleRepository.findById(RoleId.of(it))?.name } ?: ""
 
         val contestTagTitles = getContestTagTitles(updatedTags.map { it.title })

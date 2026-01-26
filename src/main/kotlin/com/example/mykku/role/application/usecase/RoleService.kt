@@ -1,6 +1,7 @@
 package com.example.mykku.role.application.usecase
 
 import com.example.mykku.member.application.port.output.MemberRepository
+import com.example.mykku.member.exception.MemberException
 import com.example.mykku.role.application.dto.ChangeRepresentativeRoleCommand
 import com.example.mykku.role.application.dto.MemberRoleResult
 import com.example.mykku.role.application.dto.RoleResult
@@ -51,7 +52,7 @@ class RoleService(
             ?: throw RoleException.roleNotFound()
 
         val member = memberRepository.findByIdString(command.memberId)
-            ?: throw IllegalArgumentException("Member not found: ${command.memberId}")
+            ?: throw MemberException.memberNotFound()
 
         member.assignRole(role.id.value)
         memberRepository.save(member)

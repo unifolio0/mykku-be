@@ -24,7 +24,7 @@ class UpdateAcceptanceSpeechUseCaseImpl(
         val participation = contestParticipationRepository.findById(winner.participationId)
             ?: throw ContestException.participationNotFound()
 
-        if (participation.memberId != command.memberId?.hashCode()?.toLong()) {
+        if (participation.memberId != command.memberId) {
             throw ContestException.notWinnerOwner()
         }
 

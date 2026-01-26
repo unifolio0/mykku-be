@@ -7,7 +7,9 @@ import com.example.mykku.event.application.port.output.EventParticipationReposit
 import com.example.mykku.event.domain.entity.Event
 import com.example.mykku.event.domain.entity.EventParticipation
 import com.example.mykku.event.domain.vo.EventId
+import com.example.mykku.event.exception.EventException
 import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
+import com.example.mykku.member.exception.MemberException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
@@ -21,9 +23,9 @@ class EventParticipationRepositoryAdapter(
 
     override fun save(participation: EventParticipation): EventParticipation {
         val eventJpaEntity = eventJpaRepository.findById(participation.eventId.value)
-            .orElseThrow { IllegalArgumentException("Event not found: ${participation.eventId.value}") }
-        val memberJpaEntity = memberJpaRepository.findById(participation.memberId.toString())
-            .orElseThrow { IllegalArgumentException("Member not found: ${participation.memberId}") }
+            .orElseThrow { EventException.eventNotFound() }
+        val memberJpaEntity = memberJpaRepository.findById(participation.memberId)
+            .orElseThrow { MemberException.memberNotFound() }
 
         val entity = EventParticipationJpaEntity.fromDomain(participation, eventJpaEntity, memberJpaEntity)
         return eventParticipationJpaRepository.save(entity).toDomain()
@@ -31,14 +33,14 @@ class EventParticipationRepositoryAdapter(
 
     override fun findByEventId(eventId: EventId, pageable: Pageable): Page<EventParticipation> {
         val eventJpaEntity = eventJpaRepository.findById(eventId.value)
-            .orElseThrow { IllegalArgumentException("Event not found: ${eventId.value}") }
+            .orElseThrow { EventException.eventNotFound() }
         return eventParticipationJpaRepository.findByEvent(eventJpaEntity, pageable)
             .map { it.toDomain() }
     }
 
     override fun findEventsByMemberId(memberId: String, pageable: Pageable): Page<Event> {
         val memberJpaEntity = memberJpaRepository.findById(memberId)
-            .orElseThrow { IllegalArgumentException("Member not found: $memberId") }
+            .orElseThrow { MemberException.memberNotFound() }
         return eventParticipationJpaRepository.findEventsByMember(memberJpaEntity, pageable)
             .map { it.toDomain() }
     }

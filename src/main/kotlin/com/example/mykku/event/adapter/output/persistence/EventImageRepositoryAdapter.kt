@@ -6,6 +6,7 @@ import com.example.mykku.event.adapter.output.persistence.repository.EventJpaRep
 import com.example.mykku.event.application.port.output.EventImageRepository
 import com.example.mykku.event.domain.entity.EventImage
 import com.example.mykku.event.domain.vo.EventId
+import com.example.mykku.event.exception.EventException
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -16,7 +17,7 @@ class EventImageRepositoryAdapter(
 
     override fun save(eventImage: EventImage): EventImage {
         val eventJpaEntity = eventJpaRepository.findById(eventImage.eventId.value)
-            .orElseThrow { IllegalArgumentException("Event not found: ${eventImage.eventId.value}") }
+            .orElseThrow { EventException.eventNotFound() }
         val entity = EventImageJpaEntity.fromDomain(eventImage, eventJpaEntity)
         return eventImageJpaRepository.save(entity).toDomain()
     }
@@ -31,7 +32,7 @@ class EventImageRepositoryAdapter(
 
         val entities = eventImages.map { eventImage ->
             val eventJpaEntity = eventEntities[eventImage.eventId.value]
-                ?: throw IllegalArgumentException("Event not found: ${eventImage.eventId.value}")
+                ?: throw EventException.eventNotFound()
             EventImageJpaEntity.fromDomain(eventImage, eventJpaEntity)
         }
 

@@ -34,7 +34,7 @@ class EventParticipationJpaEntity(
         return EventParticipation.reconstitute(
             id = EventParticipationId.of(id!!),
             eventId = EventId.of(event.id!!),
-            memberId = member.id.hashCode().toLong(),
+            memberId = member.id,
             createdAt = createdAt,
             updatedAt = updatedAt
         )

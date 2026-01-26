@@ -2,6 +2,7 @@ package com.example.mykku.feed.application.usecase
 
 import com.example.mykku.board.application.port.output.BoardRepository
 import com.example.mykku.board.domain.vo.BoardId
+import com.example.mykku.board.exception.BoardException
 import com.example.mykku.contest.application.port.output.ContestParticipationRepository
 import com.example.mykku.contest.application.port.output.ContestRepository
 import com.example.mykku.contest.application.port.output.ContestTagRepository
@@ -39,7 +40,7 @@ class CreateFeedUseCaseImpl(
 
     override fun execute(command: CreateFeedCommand, member: Member): CreateFeedResult {
         val board = boardRepository.findById(BoardId(command.boardId))
-            ?: throw IllegalArgumentException("Board not found")
+            ?: throw BoardException.boardNotFound()
 
         val imageResults = uploadImages(command.images)
         validateImageCount(imageResults.size)
@@ -134,12 +135,11 @@ class CreateFeedUseCaseImpl(
             val requiredTags = contestTagsMap[contest.id]?.map { it.title }?.toSet() ?: emptySet()
             if (requiredTags.isNotEmpty() && feedTagTitles.containsAll(requiredTags)) {
                 val memberIdStr = member.id.value
-                val memberIdLong = member.id.value.hashCode().toLong()
                 if (!contestParticipationRepository.existsByMemberIdAndContestIdAndFeedId(memberIdStr, contest.id, feed.id!!.value)) {
                     val participation = com.example.mykku.contest.domain.entity.ContestParticipation.create(
                         contestId = contest.id,
                         feedId = feed.id!!.value,
-                        memberId = memberIdLong
+                        memberId = memberIdStr
                     )
                     contestParticipationRepository.save(participation)
                 }

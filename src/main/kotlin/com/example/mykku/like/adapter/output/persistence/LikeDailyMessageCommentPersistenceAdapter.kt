@@ -1,10 +1,12 @@
 package com.example.mykku.like.adapter.output.persistence
 
 import com.example.mykku.dailymessage.adapter.output.persistence.repository.DailyMessageCommentJpaRepository
+import com.example.mykku.dailymessage.exception.DailyMessageException
 import com.example.mykku.like.adapter.output.persistence.entity.LikeDailyMessageCommentJpaEntity
 import com.example.mykku.like.application.port.output.LikeDailyMessageCommentPort
 import com.example.mykku.like.domain.entity.LikeDailyMessageCommentEntity
 import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
+import com.example.mykku.member.exception.MemberException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 
@@ -17,9 +19,9 @@ class LikeDailyMessageCommentPersistenceAdapter(
 
     override fun save(likeDailyMessageComment: LikeDailyMessageCommentEntity): LikeDailyMessageCommentEntity {
         val member = memberJpaRepository.findByIdOrNull(likeDailyMessageComment.memberId)
-            ?: throw IllegalArgumentException("Member not found: ${likeDailyMessageComment.memberId}")
+            ?: throw MemberException.memberNotFound()
         val dailyMessageComment = dailyMessageCommentJpaRepository.findByIdOrNull(likeDailyMessageComment.dailyMessageCommentId)
-            ?: throw IllegalArgumentException("DailyMessageComment not found: ${likeDailyMessageComment.dailyMessageCommentId}")
+            ?: throw DailyMessageException.dailyMessageCommentNotFound()
 
         val jpaEntity = LikeDailyMessageCommentJpaEntity.fromDomain(likeDailyMessageComment, member, dailyMessageComment)
         return likeDailyMessageCommentJpaRepository.save(jpaEntity).toDomain()
