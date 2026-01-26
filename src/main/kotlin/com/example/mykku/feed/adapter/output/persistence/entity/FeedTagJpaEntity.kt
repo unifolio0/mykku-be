@@ -1,6 +1,6 @@
 package com.example.mykku.feed.adapter.output.persistence.entity
 
-import com.example.mykku.common.domain.BaseEntity
+import com.example.mykku.common.adapter.persistence.BaseJpaEntity
 import com.example.mykku.feed.domain.entity.FeedTag
 import com.example.mykku.feed.exception.FeedException
 import jakarta.persistence.Column
@@ -26,11 +26,19 @@ class FeedTagJpaEntity(
 
     @Column(name = "title")
     var title: String
-) : BaseEntity() {
+) : BaseJpaEntity() {
 
     companion object {
         const val TITLE_MAX_LENGTH = 20
         val VALID_PATTERN = Regex("^[가-힣a-zA-Z0-9]+$")
+
+        fun fromDomain(feedTag: FeedTag, feed: FeedJpaEntity): FeedTagJpaEntity {
+            return FeedTagJpaEntity(
+                id = feedTag.id?.value,
+                feed = feed,
+                title = feedTag.title
+            )
+        }
     }
 
     init {

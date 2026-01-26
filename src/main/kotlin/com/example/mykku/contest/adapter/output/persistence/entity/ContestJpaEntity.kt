@@ -1,6 +1,6 @@
 package com.example.mykku.contest.adapter.output.persistence.entity
 
-import com.example.mykku.common.domain.BaseEntity
+import com.example.mykku.common.adapter.persistence.BaseJpaEntity
 import com.example.mykku.contest.domain.entity.Contest
 import com.example.mykku.contest.domain.vo.ContestId
 import com.example.mykku.contest.domain.vo.ContestStatusType
@@ -39,7 +39,7 @@ class ContestJpaEntity(
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     var status: ContestStatusType = ContestStatusType.ACTIVE
-) : BaseEntity() {
+) : BaseJpaEntity() {
 
     fun toDomain(): Contest {
         return Contest.reconstitute(

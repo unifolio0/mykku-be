@@ -1,9 +1,9 @@
 package com.example.mykku.feed.exception
 
 import com.example.mykku.common.exception.DomainErrorCode
-import com.example.mykku.feed.domain.Feed
-import com.example.mykku.feed.domain.FeedComment
-import com.example.mykku.feed.domain.FeedTag
+import com.example.mykku.feed.domain.entity.Feed
+import com.example.mykku.feed.domain.entity.FeedComment
+import com.example.mykku.feed.domain.entity.FeedTag
 import org.springframework.http.HttpStatus
 
 enum class FeedErrorCode(

@@ -1,6 +1,6 @@
 package com.example.mykku.contest.adapter.output.persistence.entity
 
-import com.example.mykku.common.domain.BaseEntity
+import com.example.mykku.common.adapter.persistence.BaseJpaEntity
 import com.example.mykku.contest.domain.entity.ContestWinner
 import com.example.mykku.contest.domain.vo.ContestId
 import com.example.mykku.contest.domain.vo.ContestParticipationId
@@ -38,7 +38,7 @@ class ContestWinnerJpaEntity(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "participation_id")
     val participation: ContestParticipationJpaEntity
-) : BaseEntity() {
+) : BaseJpaEntity() {
 
     fun toDomain(): ContestWinner {
         return ContestWinner.reconstitute(

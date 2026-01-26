@@ -1,6 +1,6 @@
 package com.example.mykku.notification.adapter.output.persistence.entity
 
-import com.example.mykku.common.domain.BaseEntity
+import com.example.mykku.common.adapter.persistence.BaseJpaEntity
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.notification.domain.entity.Notification
 import com.example.mykku.notification.domain.vo.NotificationId
@@ -43,7 +43,7 @@ class NotificationJpaEntity(
 
     @Column(length = 100)
     val relatedResourceType: String? = null
-) : BaseEntity() {
+) : BaseJpaEntity() {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

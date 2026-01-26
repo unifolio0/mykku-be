@@ -1,6 +1,6 @@
 package com.example.mykku.fannote.adapter.output.persistence.entity
 
-import com.example.mykku.common.domain.BaseEntity
+import com.example.mykku.common.adapter.persistence.BaseJpaEntity
 import com.example.mykku.fannote.domain.entity.FanNote
 import com.example.mykku.fannote.domain.vo.FanNoteId
 import jakarta.persistence.Column
@@ -32,7 +32,7 @@ class FanNoteJpaEntity(
 
     @Column(nullable = true, length = 500)
     var coverImageUrl: String? = null
-) : BaseEntity() {
+) : BaseJpaEntity() {
 
     fun toDomain(): FanNote {
         return FanNote.reconstitute(

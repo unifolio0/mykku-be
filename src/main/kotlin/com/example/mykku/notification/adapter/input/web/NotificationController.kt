@@ -3,7 +3,7 @@ package com.example.mykku.notification.adapter.input.web
 import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.common.util.PageableValidator
-import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
+import com.example.mykku.member.domain.entity.Member
 import com.example.mykku.notification.application.dto.DeleteNotificationCommand
 import com.example.mykku.notification.application.dto.GetNotificationsQuery
 import com.example.mykku.notification.application.dto.GetUnreadCountQuery
@@ -34,7 +34,7 @@ class NotificationController(
 
     @GetMapping
     fun getNotifications(
-        @CurrentMember member: MemberJpaEntity,
+        @CurrentMember member: Member,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int
     ): ResponseEntity<ApiResponse<Page<NotificationResponse>>> {
@@ -45,7 +45,7 @@ class NotificationController(
             Sort.Direction.DESC
         )
 
-        val query = GetNotificationsQuery(member.id, pageable)
+        val query = GetNotificationsQuery(member.id.value, pageable)
         val notifications = getNotificationsUseCase.getNotifications(query)
 
         return ResponseEntity.ok(
@@ -58,7 +58,7 @@ class NotificationController(
 
     @GetMapping("/unread")
     fun getUnreadNotifications(
-        @CurrentMember member: MemberJpaEntity,
+        @CurrentMember member: Member,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int
     ): ResponseEntity<ApiResponse<Page<NotificationResponse>>> {
@@ -69,7 +69,7 @@ class NotificationController(
             Sort.Direction.DESC
         )
 
-        val query = GetUnreadNotificationsQuery(member.id, pageable)
+        val query = GetUnreadNotificationsQuery(member.id.value, pageable)
         val notifications = getNotificationsUseCase.getUnreadNotifications(query)
 
         return ResponseEntity.ok(
@@ -82,9 +82,9 @@ class NotificationController(
 
     @GetMapping("/unread/count")
     fun getUnreadCount(
-        @CurrentMember member: MemberJpaEntity
+        @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Long>> {
-        val query = GetUnreadCountQuery(member.id)
+        val query = GetUnreadCountQuery(member.id.value)
         val count = getNotificationsUseCase.getUnreadCount(query)
 
         return ResponseEntity.ok(
@@ -98,9 +98,9 @@ class NotificationController(
     @PatchMapping("/{notificationId}/read")
     fun markAsRead(
         @PathVariable notificationId: Long,
-        @CurrentMember member: MemberJpaEntity
+        @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
-        val command = MarkAsReadCommand(notificationId, member.id)
+        val command = MarkAsReadCommand(notificationId, member.id.value)
         markNotificationReadUseCase.markAsRead(command)
 
         return ResponseEntity.ok(
@@ -110,9 +110,9 @@ class NotificationController(
 
     @PatchMapping("/read-all")
     fun markAllAsRead(
-        @CurrentMember member: MemberJpaEntity
+        @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
-        val command = MarkAllAsReadCommand(member.id)
+        val command = MarkAllAsReadCommand(member.id.value)
         markNotificationReadUseCase.markAllAsRead(command)
 
         return ResponseEntity.ok(
@@ -123,9 +123,9 @@ class NotificationController(
     @DeleteMapping("/{notificationId}")
     fun deleteNotification(
         @PathVariable notificationId: Long,
-        @CurrentMember member: MemberJpaEntity
+        @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
-        val command = DeleteNotificationCommand(notificationId, member.id)
+        val command = DeleteNotificationCommand(notificationId, member.id.value)
         deleteNotificationUseCase.deleteNotification(command)
 
         return ResponseEntity.ok(

@@ -8,8 +8,11 @@ import com.example.mykku.feed.application.dto.GetFeedCommentsQuery
 import com.example.mykku.feed.application.port.input.GetFeedCommentsUseCase
 import com.example.mykku.feed.application.port.output.FeedCommentRepository
 import com.example.mykku.feed.application.port.output.FeedRepository
+import com.example.mykku.feed.domain.entity.FeedComment
+import com.example.mykku.feed.domain.vo.FeedCommentId
 import com.example.mykku.feed.domain.vo.FeedId
 import com.example.mykku.like.application.port.output.LikeFeedCommentPort
+import com.example.mykku.member.application.port.output.MemberRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -18,49 +21,58 @@ import org.springframework.transaction.annotation.Transactional
 class GetFeedCommentsUseCaseImpl(
     private val feedRepository: FeedRepository,
     private val feedCommentRepository: FeedCommentRepository,
+    private val memberRepository: MemberRepository,
     private val likeFeedCommentPort: LikeFeedCommentPort
 ) : GetFeedCommentsUseCase {
 
     override fun execute(query: GetFeedCommentsQuery): FeedCommentsResult {
         val feed = feedRepository.findByIdOrThrow(FeedId.of(query.feedId))
-        val commentsPage = feedCommentRepository.findByFeedAndParentCommentIsNull(feed, query.pageable)
+        val commentsPage = feedCommentRepository.findByFeedIdAndParentCommentIsNull(feed.id!!, query.pageable)
 
-        val repliesMap = if (commentsPage.content.isNotEmpty()) {
-            feedCommentRepository.findByParentCommentIn(commentsPage.content)
-                .groupBy { it.parentComment?.id ?: 0L }
+        val parentCommentIds = commentsPage.content.mapNotNull { it.id }
+        val repliesMap = if (parentCommentIds.isNotEmpty()) {
+            feedCommentRepository.findByParentCommentIds(parentCommentIds)
+                .groupBy { it.parentCommentId?.value ?: 0L }
         } else {
             emptyMap()
         }
 
+        val allComments = commentsPage.content + repliesMap.values.flatten()
+        val memberIds = allComments.map { it.memberId }.distinct()
+        val membersMap = memberIds.mapNotNull { memberRepository.findByIdString(it) }
+            .associateBy { it.id.value }
+
         val commentResponses = commentsPage.content.map { comment ->
-            val replies = repliesMap[comment.id] ?: emptyList()
+            val replies = repliesMap[comment.id?.value] ?: emptyList()
+            val commentMember = membersMap[comment.memberId]
 
             val replyResponses = replies.map { reply ->
+                val replyMember = membersMap[reply.memberId]
                 FeedCommentReplyResult(
-                    id = reply.id!!,
+                    id = reply.id!!.value,
                     content = reply.content,
                     author = CommentAuthorResult(
-                        memberId = reply.member.memberId,
-                        nickname = reply.member.nickname,
-                        profileImage = reply.member.profileImage
+                        memberId = replyMember?.memberId ?: "",
+                        nickname = replyMember?.nickname ?: "",
+                        profileImage = replyMember?.profileImage ?: ""
                     ),
                     likeCount = reply.likeCount,
-                    isLiked = query.memberId?.let { likeFeedCommentPort.existsByMemberIdAndFeedCommentId(it, reply.id!!) } ?: false,
+                    isLiked = query.memberId?.let { likeFeedCommentPort.existsByMemberIdAndFeedCommentId(it, reply.id!!.value) } ?: false,
                     createdAt = reply.createdAt,
                     updatedAt = reply.updatedAt
                 )
             }
 
             FeedCommentResult(
-                id = comment.id!!,
+                id = comment.id!!.value,
                 content = comment.content,
                 author = CommentAuthorResult(
-                    memberId = comment.member.memberId,
-                    nickname = comment.member.nickname,
-                    profileImage = comment.member.profileImage
+                    memberId = commentMember?.memberId ?: "",
+                    nickname = commentMember?.nickname ?: "",
+                    profileImage = commentMember?.profileImage ?: ""
                 ),
                 likeCount = comment.likeCount,
-                isLiked = query.memberId?.let { likeFeedCommentPort.existsByMemberIdAndFeedCommentId(it, comment.id!!) } ?: false,
+                isLiked = query.memberId?.let { likeFeedCommentPort.existsByMemberIdAndFeedCommentId(it, comment.id!!.value) } ?: false,
                 replies = replyResponses,
                 replyCount = replyResponses.size,
                 createdAt = comment.createdAt,

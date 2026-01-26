@@ -15,7 +15,7 @@ import com.example.mykku.block.application.port.input.UnblockKeywordUseCase
 import com.example.mykku.block.application.port.input.UnblockMemberUseCase
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.common.util.PageableValidator
-import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
+import com.example.mykku.member.domain.entity.Member
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -41,11 +41,11 @@ class BlockController(
 
     @PostMapping("/members")
     fun blockMember(
-        @CurrentMember member: MemberJpaEntity,
+        @CurrentMember member: Member,
         @RequestBody request: BlockMemberRequest
     ): ResponseEntity<ApiResponse<MemberBlockResponse>> {
         val command = BlockMemberCommand(
-            blockerId = member.id,
+            blockerId = member.id.value,
             blockedMemberId = request.memberId
         )
         val result = blockMemberUseCase.blockMember(command)
@@ -56,11 +56,11 @@ class BlockController(
 
     @DeleteMapping("/members/{memberId}")
     fun unblockMember(
-        @CurrentMember member: MemberJpaEntity,
+        @CurrentMember member: Member,
         @PathVariable memberId: String
     ): ResponseEntity<ApiResponse<Unit>> {
         val command = UnblockMemberCommand(
-            blockerId = member.id,
+            blockerId = member.id.value,
             blockedMemberId = memberId
         )
         unblockMemberUseCase.unblockMember(command)
@@ -70,7 +70,7 @@ class BlockController(
 
     @GetMapping("/members")
     fun getMemberBlocks(
-        @CurrentMember member: MemberJpaEntity,
+        @CurrentMember member: Member,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int
     ): ResponseEntity<ApiResponse<MemberBlockListResponse>> {
@@ -80,7 +80,7 @@ class BlockController(
             "createdAt",
             Sort.Direction.DESC
         )
-        val query = GetMemberBlocksQuery(member.id, pageable)
+        val query = GetMemberBlocksQuery(member.id.value, pageable)
         val result = getMemberBlocksUseCase.getMemberBlocks(query)
 
         return ResponseEntity.ok(ApiResponse(message = "차단한 사용자 목록을 조회했습니다.", data = MemberBlockListResponse.from(result)))
@@ -88,11 +88,11 @@ class BlockController(
 
     @PostMapping("/keywords")
     fun blockKeyword(
-        @CurrentMember member: MemberJpaEntity,
+        @CurrentMember member: Member,
         @RequestBody request: BlockKeywordRequest
     ): ResponseEntity<ApiResponse<KeywordBlockResponse>> {
         val command = BlockKeywordCommand(
-            memberId = member.id,
+            memberId = member.id.value,
             keyword = request.keyword
         )
         val result = blockKeywordUseCase.blockKeyword(command)
@@ -103,11 +103,11 @@ class BlockController(
 
     @DeleteMapping("/keywords/{keyword}")
     fun unblockKeyword(
-        @CurrentMember member: MemberJpaEntity,
+        @CurrentMember member: Member,
         @PathVariable keyword: String
     ): ResponseEntity<ApiResponse<Unit>> {
         val command = UnblockKeywordCommand(
-            memberId = member.id,
+            memberId = member.id.value,
             keyword = keyword
         )
         unblockKeywordUseCase.unblockKeyword(command)
@@ -117,7 +117,7 @@ class BlockController(
 
     @GetMapping("/keywords")
     fun getKeywordBlocks(
-        @CurrentMember member: MemberJpaEntity,
+        @CurrentMember member: Member,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int
     ): ResponseEntity<ApiResponse<KeywordBlockListResponse>> {
@@ -127,7 +127,7 @@ class BlockController(
             "createdAt",
             Sort.Direction.DESC
         )
-        val query = GetKeywordBlocksQuery(member.id, pageable)
+        val query = GetKeywordBlocksQuery(member.id.value, pageable)
         val result = getKeywordBlocksUseCase.getKeywordBlocks(query)
 
         return ResponseEntity.ok(ApiResponse(message = "차단한 키워드 목록을 조회했습니다.", data = KeywordBlockListResponse.from(result)))

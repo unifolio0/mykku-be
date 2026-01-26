@@ -1,40 +1,58 @@
 package com.example.mykku.feed.adapter.output.persistence
 
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedImageJpaEntity
-import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
 import com.example.mykku.feed.application.port.output.FeedImageRepository
+import com.example.mykku.feed.domain.entity.FeedImage
+import com.example.mykku.feed.domain.vo.FeedId
 import org.springframework.stereotype.Repository
 
 @Repository
 class FeedImageRepositoryAdapter(
-    private val feedImageJpaRepository: FeedImageJpaRepository
+    private val feedImageJpaRepository: FeedImageJpaRepository,
+    private val feedJpaRepository: FeedJpaRepository
 ) : FeedImageRepository {
 
-    override fun saveAll(feedImageJpaEntities: List<FeedImageJpaEntity>): List<FeedImageJpaEntity> {
-        return feedImageJpaRepository.saveAll(feedImageJpaEntities)
+    override fun saveAll(feedImages: List<FeedImage>, feedId: FeedId): List<FeedImage> {
+        if (feedImages.isEmpty()) return emptyList()
+        val feed = feedJpaRepository.findById(feedId.value)
+            .orElseThrow { IllegalArgumentException("Feed not found: ${feedId.value}") }
+        val jpaEntities = feedImages.map { FeedImageJpaEntity.fromDomain(it, feed) }
+        return feedImageJpaRepository.saveAll(jpaEntities).map { it.toDomain() }
     }
 
-    override fun findByFeed(feed: FeedJpaEntity): List<FeedImageJpaEntity> {
-        return feedImageJpaRepository.findByFeed(feed)
+    override fun findByFeedId(feedId: FeedId): List<FeedImage> {
+        val feed = feedJpaRepository.findById(feedId.value).orElse(null) ?: return emptyList()
+        return feedImageJpaRepository.findByFeed(feed).map { it.toDomain() }
     }
 
-    override fun findByFeedIn(feeds: List<FeedJpaEntity>): List<FeedImageJpaEntity> {
+    override fun findByFeedIds(feedIds: List<FeedId>): List<FeedImage> {
+        if (feedIds.isEmpty()) return emptyList()
+        val feeds = feedJpaRepository.findAllById(feedIds.map { it.value })
         if (feeds.isEmpty()) return emptyList()
-        return feedImageJpaRepository.findByFeedIn(feeds)
+        return feedImageJpaRepository.findByFeedIn(feeds).map { it.toDomain() }
     }
 
-    override fun findAllByIdInAndFeed(ids: List<Long>, feed: FeedJpaEntity): List<FeedImageJpaEntity> {
+    override fun findAllByIdInAndFeedId(ids: List<Long>, feedId: FeedId): List<FeedImage> {
         if (ids.isEmpty()) return emptyList()
-        return feedImageJpaRepository.findAllByIdInAndFeed(ids, feed)
+        val feed = feedJpaRepository.findById(feedId.value).orElse(null) ?: return emptyList()
+        return feedImageJpaRepository.findAllByIdInAndFeed(ids, feed).map { it.toDomain() }
     }
 
-    override fun deleteAll(feedImageJpaEntities: List<FeedImageJpaEntity>) {
-        if (feedImageJpaEntities.isNotEmpty()) {
-            feedImageJpaRepository.deleteAll(feedImageJpaEntities)
+    override fun deleteAll(feedImages: List<FeedImage>) {
+        if (feedImages.isEmpty()) return
+        val ids = feedImages.mapNotNull { it.id?.value }
+        if (ids.isNotEmpty()) {
+            feedImageJpaRepository.deleteAllById(ids)
         }
     }
 
-    override fun deleteAllByFeed(feed: FeedJpaEntity) {
+    override fun deleteAllByIds(ids: List<Long>) {
+        if (ids.isEmpty()) return
+        feedImageJpaRepository.deleteAllById(ids)
+    }
+
+    override fun deleteAllByFeedId(feedId: FeedId) {
+        val feed = feedJpaRepository.findById(feedId.value).orElse(null) ?: return
         feedImageJpaRepository.deleteAllByFeed(feed)
     }
 }

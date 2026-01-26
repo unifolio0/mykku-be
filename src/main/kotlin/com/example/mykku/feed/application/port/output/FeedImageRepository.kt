@@ -1,14 +1,14 @@
 package com.example.mykku.feed.application.port.output
 
-import com.example.mykku.feed.adapter.output.persistence.entity.FeedImageJpaEntity
-import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
+import com.example.mykku.feed.domain.entity.FeedImage
 import com.example.mykku.feed.domain.vo.FeedId
 
 interface FeedImageRepository {
-    fun saveAll(feedImageJpaEntities: List<FeedImageJpaEntity>): List<FeedImageJpaEntity>
-    fun findByFeed(feed: FeedJpaEntity): List<FeedImageJpaEntity>
-    fun findByFeedIn(feeds: List<FeedJpaEntity>): List<FeedImageJpaEntity>
-    fun findAllByIdInAndFeed(ids: List<Long>, feed: FeedJpaEntity): List<FeedImageJpaEntity>
-    fun deleteAll(feedImageJpaEntities: List<FeedImageJpaEntity>)
-    fun deleteAllByFeed(feed: FeedJpaEntity)
+    fun saveAll(feedImages: List<FeedImage>, feedId: FeedId): List<FeedImage>
+    fun findByFeedId(feedId: FeedId): List<FeedImage>
+    fun findByFeedIds(feedIds: List<FeedId>): List<FeedImage>
+    fun findAllByIdInAndFeedId(ids: List<Long>, feedId: FeedId): List<FeedImage>
+    fun deleteAll(feedImages: List<FeedImage>)
+    fun deleteAllByIds(ids: List<Long>)
+    fun deleteAllByFeedId(feedId: FeedId)
 }

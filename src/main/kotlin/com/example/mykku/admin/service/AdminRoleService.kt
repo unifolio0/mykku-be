@@ -70,7 +70,7 @@ class AdminRoleService(
             .orElseThrow { MemberException.memberNotFound() }
 
         val memberRole = MemberRoleJpaEntity(
-            member = member,
+            memberId = memberId,
             role = role
         )
         val savedMemberRole = memberRoleJpaRepository.save(memberRole)

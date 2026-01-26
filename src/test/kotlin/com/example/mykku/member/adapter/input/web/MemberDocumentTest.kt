@@ -113,6 +113,7 @@ class MemberDocumentTest : BaseDocumentTest() {
                 nickname = "testuser",
                 profileImage = "https://example.com/profile.jpg",
                 roleId = 1L,
+                roleName = "테스트 칭호",
                 provider = "GOOGLE",
                 emailVerified = true,
                 createdAt = LocalDateTime.now()
@@ -175,6 +176,7 @@ class MemberDocumentTest : BaseDocumentTest() {
                 nickname = "새닉네임",
                 profileImage = "https://example.com/new-profile.jpg",
                 roleId = 1L,
+                roleName = "테스트 칭호",
                 provider = "GOOGLE",
                 emailVerified = true,
                 createdAt = LocalDateTime.now()

@@ -1,6 +1,6 @@
 package com.example.mykku.event.adapter.output.persistence.entity
 
-import com.example.mykku.common.domain.BaseEntity
+import com.example.mykku.common.adapter.persistence.BaseJpaEntity
 import com.example.mykku.event.domain.entity.Event
 import com.example.mykku.event.domain.vo.EventId
 import com.example.mykku.event.domain.vo.EventStatusType
@@ -39,7 +39,7 @@ class EventJpaEntity(
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     var status: EventStatusType = EventStatusType.ACTIVE
-) : BaseEntity() {
+) : BaseJpaEntity() {
 
     fun toDomain(): Event {
         return Event.reconstitute(

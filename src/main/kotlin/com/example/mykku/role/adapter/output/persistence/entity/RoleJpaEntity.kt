@@ -1,6 +1,6 @@
 package com.example.mykku.role.adapter.output.persistence.entity
 
-import com.example.mykku.common.domain.BaseEntity
+import com.example.mykku.common.adapter.persistence.BaseJpaEntity
 import com.example.mykku.role.domain.entity.Role
 import com.example.mykku.role.domain.vo.RoleId
 import jakarta.persistence.Column
@@ -22,7 +22,7 @@ class RoleJpaEntity(
 
     @Column(length = 200)
     var description: String? = null
-) : BaseEntity() {
+) : BaseJpaEntity() {
 
     fun toDomain(): Role {
         return Role.reconstitute(

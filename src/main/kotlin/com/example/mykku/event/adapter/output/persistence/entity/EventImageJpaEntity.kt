@@ -1,6 +1,6 @@
 package com.example.mykku.event.adapter.output.persistence.entity
 
-import com.example.mykku.common.domain.BaseEntity
+import com.example.mykku.common.adapter.persistence.BaseJpaEntity
 import com.example.mykku.event.domain.entity.EventImage
 import com.example.mykku.event.domain.vo.EventId
 import com.example.mykku.event.domain.vo.EventImageId
@@ -30,7 +30,7 @@ class EventImageJpaEntity(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
     val event: EventJpaEntity
-) : BaseEntity() {
+) : BaseJpaEntity() {
 
     fun toDomain(): EventImage {
         return EventImage.reconstitute(

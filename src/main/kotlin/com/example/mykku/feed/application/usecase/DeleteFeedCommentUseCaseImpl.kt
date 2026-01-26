@@ -18,7 +18,7 @@ class DeleteFeedCommentUseCaseImpl(
     override fun execute(command: DeleteFeedCommentCommand, member: Member) {
         val comment = feedCommentRepository.findByIdOrThrow(FeedCommentId.of(command.commentId))
 
-        if (comment.member.id != member.id.value) {
+        if (!comment.isOwnedBy(member.id.value)) {
             throw FeedException.feedCommentForbiddenAccess()
         }
 

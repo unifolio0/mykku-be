@@ -2,13 +2,13 @@ package com.example.mykku.feed.application.usecase
 
 import com.example.mykku.contest.application.port.output.ContestParticipationRepository
 import com.example.mykku.contest.application.port.output.ContestWinnerRepository
-import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
 import com.example.mykku.feed.application.dto.DeleteFeedCommand
 import com.example.mykku.feed.application.port.input.DeleteFeedUseCase
 import com.example.mykku.feed.application.port.output.FeedCommentRepository
 import com.example.mykku.feed.application.port.output.FeedImageRepository
 import com.example.mykku.feed.application.port.output.FeedRepository
 import com.example.mykku.feed.application.port.output.FeedTagRepository
+import com.example.mykku.feed.domain.entity.Feed
 import com.example.mykku.feed.domain.vo.FeedId
 import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.like.application.port.output.LikeFeedCommentPort
@@ -39,30 +39,32 @@ class DeleteFeedUseCaseImpl(
         deleteFeed(feed)
     }
 
-    private fun validateFeedOwner(feed: FeedJpaEntity, member: Member) {
-        if (feed.member.id != member.id.value) {
+    private fun validateFeedOwner(feed: Feed, member: Member) {
+        if (!feed.isOwnedBy(member.id.value)) {
             throw FeedException.feedForbiddenAccess()
         }
     }
 
-    private fun deleteRelatedData(feed: FeedJpaEntity) {
-        val commentIds = feedCommentRepository.findIdsByFeed(feed)
+    private fun deleteRelatedData(feed: Feed) {
+        val feedId = feed.id!!
+        val commentIds = feedCommentRepository.findIdsByFeedId(feedId)
 
         likeFeedCommentPort.deleteAllByFeedCommentIdIn(commentIds)
-        feedCommentRepository.deleteAllByFeed(feed)
-        likeFeedPort.deleteAllByFeedId(feed.id!!)
+        feedCommentRepository.deleteAllByFeedId(feedId)
+        likeFeedPort.deleteAllByFeedId(feedId.value)
 
-        saveFeedPort.deleteAllByFeedId(feed.id!!)
+        saveFeedPort.deleteAllByFeedId(feedId.value)
 
-        val participations = contestParticipationRepository.findByFeedId(feed.id!!)
+        val participations = contestParticipationRepository.findByFeedId(feedId.value)
         val participationIds = participations.map { it.id }
         contestWinnerRepository.deleteAllByParticipationIds(participationIds)
         contestParticipationRepository.deleteAll(participations)
     }
 
-    private fun deleteFeed(feed: FeedJpaEntity) {
-        feedTagRepository.deleteAllByFeed(feed)
-        feedImageRepository.deleteAllByFeed(feed)
+    private fun deleteFeed(feed: Feed) {
+        val feedId = feed.id!!
+        feedTagRepository.deleteAllByFeedId(feedId)
+        feedImageRepository.deleteAllByFeedId(feedId)
         feedRepository.delete(feed)
     }
 }

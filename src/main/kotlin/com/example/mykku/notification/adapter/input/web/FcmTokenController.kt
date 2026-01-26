@@ -2,7 +2,7 @@ package com.example.mykku.notification.adapter.input.web
 
 import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
-import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
+import com.example.mykku.member.domain.entity.Member
 import com.example.mykku.notification.application.dto.DeleteFcmTokenCommand
 import com.example.mykku.notification.application.dto.RegisterFcmTokenCommand
 import com.example.mykku.notification.application.port.input.ManageFcmTokenUseCase
@@ -24,11 +24,11 @@ class FcmTokenController(
 
     @PostMapping
     fun registerToken(
-        @CurrentMember member: MemberJpaEntity,
+        @CurrentMember member: Member,
         @RequestBody @Valid request: RegisterFcmTokenRequest
     ): ResponseEntity<ApiResponse<FcmTokenResponse>> {
         val command = RegisterFcmTokenCommand(
-            memberId = member.id,
+            memberId = member.id.value,
             token = request.token,
             deviceId = request.deviceId,
             deviceType = request.deviceType
@@ -45,9 +45,9 @@ class FcmTokenController(
 
     @GetMapping
     fun getTokens(
-        @CurrentMember member: MemberJpaEntity
+        @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<List<FcmTokenResponse>>> {
-        val tokens = manageFcmTokenUseCase.getTokens(member.id)
+        val tokens = manageFcmTokenUseCase.getTokens(member.id.value)
 
         return ResponseEntity.ok(
             ApiResponse(
@@ -59,10 +59,10 @@ class FcmTokenController(
 
     @DeleteMapping("/{deviceId}")
     fun deleteToken(
-        @CurrentMember member: MemberJpaEntity,
+        @CurrentMember member: Member,
         @PathVariable deviceId: String
     ): ResponseEntity<ApiResponse<Unit>> {
-        val command = DeleteFcmTokenCommand(member.id, deviceId)
+        val command = DeleteFcmTokenCommand(member.id.value, deviceId)
         manageFcmTokenUseCase.deleteToken(command)
 
         return ResponseEntity.ok(

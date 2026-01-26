@@ -1,21 +1,20 @@
 package com.example.mykku.feed.application.port.output
 
-import com.example.mykku.feed.adapter.output.persistence.entity.FeedCommentJpaEntity
-import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
+import com.example.mykku.feed.domain.entity.FeedComment
 import com.example.mykku.feed.domain.vo.FeedCommentId
 import com.example.mykku.feed.domain.vo.FeedId
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
 interface FeedCommentRepository {
-    fun save(feedCommentJpaEntity: FeedCommentJpaEntity): FeedCommentJpaEntity
-    fun findById(id: FeedCommentId): FeedCommentJpaEntity?
-    fun findByIdOrThrow(id: FeedCommentId): FeedCommentJpaEntity
-    fun findByFeedAndParentCommentIsNull(feed: FeedJpaEntity, pageable: Pageable): Page<FeedCommentJpaEntity>
-    fun findByParentComment(parentComment: FeedCommentJpaEntity): List<FeedCommentJpaEntity>
-    fun findByParentCommentIn(parentComments: List<FeedCommentJpaEntity>): List<FeedCommentJpaEntity>
-    fun countByFeed(feed: FeedJpaEntity): Long
-    fun findIdsByFeed(feed: FeedJpaEntity): List<Long>
-    fun delete(feedCommentJpaEntity: FeedCommentJpaEntity)
-    fun deleteAllByFeed(feed: FeedJpaEntity)
+    fun save(feedComment: FeedComment, feedId: FeedId, memberId: String): FeedComment
+    fun findById(id: FeedCommentId): FeedComment?
+    fun findByIdOrThrow(id: FeedCommentId): FeedComment
+    fun findByFeedIdAndParentCommentIsNull(feedId: FeedId, pageable: Pageable): Page<FeedComment>
+    fun findByParentCommentId(parentCommentId: FeedCommentId): List<FeedComment>
+    fun findByParentCommentIds(parentCommentIds: List<FeedCommentId>): List<FeedComment>
+    fun countByFeedId(feedId: FeedId): Long
+    fun findIdsByFeedId(feedId: FeedId): List<Long>
+    fun delete(feedComment: FeedComment)
+    fun deleteAllByFeedId(feedId: FeedId)
 }

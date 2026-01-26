@@ -1,7 +1,6 @@
 package com.example.mykku.role.application.usecase
 
-import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
-import com.example.mykku.role.adapter.output.persistence.repository.RoleJpaRepository
+import com.example.mykku.member.application.port.output.MemberRepository
 import com.example.mykku.role.application.dto.ChangeRepresentativeRoleCommand
 import com.example.mykku.role.application.dto.MemberRoleResult
 import com.example.mykku.role.application.dto.RoleResult
@@ -11,7 +10,6 @@ import com.example.mykku.role.application.port.output.MemberRoleRepository
 import com.example.mykku.role.application.port.output.RoleRepository
 import com.example.mykku.role.domain.vo.MemberRoleId
 import com.example.mykku.role.exception.RoleException
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -20,8 +18,7 @@ import org.springframework.transaction.annotation.Transactional
 class RoleService(
     private val memberRoleRepository: MemberRoleRepository,
     private val roleRepository: RoleRepository,
-    private val memberJpaRepository: MemberJpaRepository,
-    private val roleJpaRepository: RoleJpaRepository
+    private val memberRepository: MemberRepository
 ) : GetMyRolesUseCase, ChangeRepresentativeRoleUseCase {
 
     override fun getMyRoles(memberId: String, representativeRoleId: Long?): List<MemberRoleResult> {
@@ -53,14 +50,10 @@ class RoleService(
         val role = roleRepository.findById(memberRole.roleId)
             ?: throw RoleException.roleNotFound()
 
-        val member = memberJpaRepository.findById(command.memberId).orElseThrow {
-            IllegalArgumentException("Member not found: ${command.memberId}")
-        }
+        val member = memberRepository.findByIdString(command.memberId)
+            ?: throw IllegalArgumentException("Member not found: ${command.memberId}")
 
-        val roleJpaEntity = roleJpaRepository.findByIdOrNull(role.id.value)
-            ?: throw RoleException.roleNotFound()
-
-        member.role = roleJpaEntity
-        memberJpaRepository.save(member)
+        member.assignRole(role.id.value)
+        memberRepository.save(member)
     }
 }

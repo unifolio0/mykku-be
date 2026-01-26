@@ -1,6 +1,6 @@
 package com.example.mykku.preference.adapter.output.persistence.entity
 
-import com.example.mykku.common.domain.BaseEntity
+import com.example.mykku.common.adapter.persistence.BaseJpaEntity
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.preference.domain.entity.MemberMoodPreference
 import com.example.mykku.preference.domain.vo.MoodType
@@ -31,7 +31,7 @@ class MemberMoodPreferenceJpaEntity(
     @Enumerated(EnumType.STRING)
     @Column(name = "mood_type", nullable = false, length = 50)
     val moodType: MoodType
-) : BaseEntity() {
+) : BaseJpaEntity() {
 
     fun toDomain(): MemberMoodPreference {
         return MemberMoodPreference.reconstitute(

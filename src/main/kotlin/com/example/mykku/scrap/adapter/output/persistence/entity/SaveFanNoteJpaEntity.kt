@@ -1,6 +1,6 @@
 package com.example.mykku.scrap.adapter.output.persistence.entity
 
-import com.example.mykku.common.domain.BaseEntity
+import com.example.mykku.common.adapter.persistence.BaseJpaEntity
 import com.example.mykku.fannote.adapter.output.persistence.entity.FanNoteJpaEntity
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.scrap.domain.entity.SaveFanNoteEntity
@@ -27,7 +27,7 @@ class SaveFanNoteJpaEntity(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fan_note_id")
     val fanNote: FanNoteJpaEntity
-) : BaseEntity() {
+) : BaseJpaEntity() {
 
     fun toDomain(): SaveFanNoteEntity {
         return SaveFanNoteEntity.reconstitute(

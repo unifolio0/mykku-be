@@ -1,6 +1,6 @@
 package com.example.mykku.feed.adapter.output.persistence.entity
 
-import com.example.mykku.common.domain.BaseEntity
+import com.example.mykku.common.adapter.persistence.BaseJpaEntity
 import com.example.mykku.feed.domain.entity.FeedImage
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -31,7 +31,7 @@ class FeedImageJpaEntity(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feed_id")
     val feed: FeedJpaEntity
-) : BaseEntity() {
+) : BaseJpaEntity() {
 
     fun toDomain(): FeedImage = FeedImage.reconstitute(
         id = id!!,
@@ -42,4 +42,16 @@ class FeedImageJpaEntity(
         createdAt = createdAt,
         updatedAt = updatedAt
     )
+
+    companion object {
+        fun fromDomain(feedImage: FeedImage, feed: FeedJpaEntity): FeedImageJpaEntity {
+            return FeedImageJpaEntity(
+                id = feedImage.id?.value,
+                url = feedImage.url,
+                width = feedImage.width,
+                height = feedImage.height,
+                feed = feed
+            )
+        }
+    }
 }

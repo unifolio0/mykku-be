@@ -1,61 +1,84 @@
 package com.example.mykku.feed.adapter.output.persistence
 
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedCommentJpaEntity
-import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
 import com.example.mykku.feed.application.port.output.FeedCommentRepository
+import com.example.mykku.feed.domain.entity.FeedComment
 import com.example.mykku.feed.domain.vo.FeedCommentId
+import com.example.mykku.feed.domain.vo.FeedId
 import com.example.mykku.feed.exception.FeedException
+import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
 
 @Repository
 class FeedCommentRepositoryAdapter(
-    private val feedCommentJpaRepository: FeedCommentJpaRepository
+    private val feedCommentJpaRepository: FeedCommentJpaRepository,
+    private val feedJpaRepository: FeedJpaRepository,
+    private val memberJpaRepository: MemberJpaRepository
 ) : FeedCommentRepository {
 
-    override fun save(feedCommentJpaEntity: FeedCommentJpaEntity): FeedCommentJpaEntity {
-        return feedCommentJpaRepository.save(feedCommentJpaEntity)
+    override fun save(feedComment: FeedComment, feedId: FeedId, memberId: String): FeedComment {
+        val feed = feedJpaRepository.findById(feedId.value)
+            .orElseThrow { IllegalArgumentException("Feed not found: ${feedId.value}") }
+        val member = memberJpaRepository.findById(memberId)
+            .orElseThrow { IllegalArgumentException("Member not found: $memberId") }
+        val parentComment = feedComment.parentCommentId?.let {
+            feedCommentJpaRepository.findById(it.value).orElse(null)
+        }
+        val jpaEntity = FeedCommentJpaEntity.fromDomain(feedComment, feed, member, parentComment)
+        return feedCommentJpaRepository.save(jpaEntity).toDomain()
     }
 
-    override fun findById(id: FeedCommentId): FeedCommentJpaEntity? {
-        return feedCommentJpaRepository.findById(id.value).orElse(null)
-    }
-
-    override fun findByIdOrThrow(id: FeedCommentId): FeedCommentJpaEntity {
+    override fun findById(id: FeedCommentId): FeedComment? {
         return feedCommentJpaRepository.findById(id.value)
+            .map { it.toDomain() }
+            .orElse(null)
+    }
+
+    override fun findByIdOrThrow(id: FeedCommentId): FeedComment {
+        return feedCommentJpaRepository.findById(id.value)
+            .map { it.toDomain() }
             .orElseThrow { FeedException.feedCommentNotFound() }
     }
 
-    override fun findByFeedAndParentCommentIsNull(
-        feed: FeedJpaEntity,
-        pageable: Pageable
-    ): Page<FeedCommentJpaEntity> {
+    override fun findByFeedIdAndParentCommentIsNull(feedId: FeedId, pageable: Pageable): Page<FeedComment> {
+        val feed = feedJpaRepository.findById(feedId.value).orElse(null)
+            ?: return Page.empty(pageable)
         return feedCommentJpaRepository.findByFeedAndParentCommentIsNull(feed, pageable)
+            .map { it.toDomain() }
     }
 
-    override fun findByParentComment(parentComment: FeedCommentJpaEntity): List<FeedCommentJpaEntity> {
-        return feedCommentJpaRepository.findByParentComment(parentComment)
+    override fun findByParentCommentId(parentCommentId: FeedCommentId): List<FeedComment> {
+        val parentComment = feedCommentJpaRepository.findById(parentCommentId.value).orElse(null)
+            ?: return emptyList()
+        return feedCommentJpaRepository.findByParentComment(parentComment).map { it.toDomain() }
     }
 
-    override fun findByParentCommentIn(parentComments: List<FeedCommentJpaEntity>): List<FeedCommentJpaEntity> {
+    override fun findByParentCommentIds(parentCommentIds: List<FeedCommentId>): List<FeedComment> {
+        if (parentCommentIds.isEmpty()) return emptyList()
+        val parentComments = feedCommentJpaRepository.findAllById(parentCommentIds.map { it.value })
         if (parentComments.isEmpty()) return emptyList()
-        return feedCommentJpaRepository.findByParentCommentIn(parentComments)
+        return feedCommentJpaRepository.findByParentCommentIn(parentComments.toList()).map { it.toDomain() }
     }
 
-    override fun countByFeed(feed: FeedJpaEntity): Long {
+    override fun countByFeedId(feedId: FeedId): Long {
+        val feed = feedJpaRepository.findById(feedId.value).orElse(null) ?: return 0
         return feedCommentJpaRepository.countByFeed(feed)
     }
 
-    override fun findIdsByFeed(feed: FeedJpaEntity): List<Long> {
+    override fun findIdsByFeedId(feedId: FeedId): List<Long> {
+        val feed = feedJpaRepository.findById(feedId.value).orElse(null) ?: return emptyList()
         return feedCommentJpaRepository.findIdsByFeed(feed)
     }
 
-    override fun delete(feedCommentJpaEntity: FeedCommentJpaEntity) {
-        feedCommentJpaRepository.delete(feedCommentJpaEntity)
+    override fun delete(feedComment: FeedComment) {
+        val id = feedComment.id?.value ?: return
+        feedCommentJpaRepository.deleteById(id)
     }
 
-    override fun deleteAllByFeed(feed: FeedJpaEntity) {
+    override fun deleteAllByFeedId(feedId: FeedId) {
+        val feed = feedJpaRepository.findById(feedId.value).orElse(null) ?: return
         feedCommentJpaRepository.deleteAllByFeed(feed)
     }
 }

@@ -2,7 +2,7 @@ package com.example.mykku.block.adapter.output.persistence.entity
 
 import com.example.mykku.block.domain.entity.MemberBlock
 import com.example.mykku.block.domain.vo.MemberBlockId
-import com.example.mykku.common.domain.BaseEntity
+import com.example.mykku.common.adapter.persistence.BaseJpaEntity
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -31,7 +31,7 @@ class MemberBlockJpaEntity(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "blocked_id")
     val blocked: MemberJpaEntity
-) : BaseEntity() {
+) : BaseJpaEntity() {
 
     fun toDomain(): MemberBlock {
         return MemberBlock.reconstitute(

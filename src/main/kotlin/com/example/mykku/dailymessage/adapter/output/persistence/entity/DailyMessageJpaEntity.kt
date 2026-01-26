@@ -1,6 +1,6 @@
 package com.example.mykku.dailymessage.adapter.output.persistence.entity
 
-import com.example.mykku.common.domain.BaseEntity
+import com.example.mykku.common.adapter.persistence.BaseJpaEntity
 import com.example.mykku.dailymessage.domain.entity.DailyMessage
 import com.example.mykku.dailymessage.domain.vo.DailyMessageId
 import jakarta.persistence.Column
@@ -26,7 +26,7 @@ class DailyMessageJpaEntity(
 
     @Column(name = "date")
     var date: LocalDate
-) : BaseEntity() {
+) : BaseJpaEntity() {
 
     fun toDomain(): DailyMessage {
         return DailyMessage.reconstitute(
