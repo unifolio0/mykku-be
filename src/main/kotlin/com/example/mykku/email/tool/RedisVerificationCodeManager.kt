@@ -11,7 +11,7 @@ class RedisVerificationCodeManager(
 ) {
     companion object {
         private const val CODE_LENGTH = 6
-        private const val EXPIRATION_MINUTES = 5L
+        private const val EXPIRATION_MINUTES = 3L
         private const val KEY_PREFIX = "email:verification:"
     }
 
