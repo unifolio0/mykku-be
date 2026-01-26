@@ -50,7 +50,6 @@ dependencies {
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
     testImplementation("io.rest-assured:rest-assured:5.5.0")
     testImplementation("io.rest-assured:spring-mock-mvc:5.5.0")
-    testImplementation("com.h2database:h2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     // RestDocs API Spec
