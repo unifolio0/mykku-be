@@ -47,6 +47,7 @@ class RestDocumentationRequest {
 
     fun requestHeader(vararg descriptors: HeaderDescriptor): RestDocumentationRequest {
         snippets.add(requestHeaders(*descriptors))
+        resourceBuilder.headers(*descriptors)
         return this
     }
 
