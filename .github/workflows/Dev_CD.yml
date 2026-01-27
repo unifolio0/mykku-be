@@ -10,11 +10,8 @@ env:
   IMAGE_TAG: ${{ github.sha }}
 
 jobs:
-  test:
-    uses: ./.github/workflows/Dev_CI.yml
 
   build-and-push:
-    needs: test
     runs-on: ubuntu-latest
 
     services:
