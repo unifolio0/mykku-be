@@ -116,6 +116,12 @@ openapi3 {
     outputDirectory = layout.buildDirectory.dir("resources/main/static/docs").get().asFile.path
 }
 
+afterEvaluate {
+    tasks.named("openapi3") {
+        dependsOn("test")
+    }
+}
+
 tasks.named("generateSwaggerUI") {
     dependsOn("openapi3")
 
