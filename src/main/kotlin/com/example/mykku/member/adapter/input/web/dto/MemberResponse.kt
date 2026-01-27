@@ -14,13 +14,13 @@ data class MemberProfileResponse(
     val createdAt: LocalDateTime
 ) {
     companion object {
-        fun from(result: MemberProfileResult, roleName: String?): MemberProfileResponse {
+        fun from(result: MemberProfileResult): MemberProfileResponse {
             return MemberProfileResponse(
                 memberId = result.memberId,
                 email = result.email,
                 nickname = result.nickname,
                 profileImage = result.profileImage,
-                role = roleName,
+                role = result.roleName,
                 provider = result.provider,
                 emailVerified = result.emailVerified,
                 createdAt = result.createdAt

@@ -9,6 +9,7 @@ data class MemberProfileResult(
     val nickname: String,
     val profileImage: String,
     val roleId: Long?,
+    val roleName: String?,
     val provider: String?,
     val emailVerified: Boolean,
     val createdAt: LocalDateTime
@@ -21,6 +22,7 @@ data class MemberProfileResult(
                 nickname = member.nickname,
                 profileImage = member.profileImage,
                 roleId = member.roleId,
+                roleName = roleName,
                 provider = member.provider?.name,
                 emailVerified = member.emailVerified,
                 createdAt = member.createdAt

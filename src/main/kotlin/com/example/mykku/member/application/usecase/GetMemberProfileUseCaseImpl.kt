@@ -4,8 +4,8 @@ import com.example.mykku.member.application.dto.MemberProfileResult
 import com.example.mykku.member.application.port.input.GetMemberProfileUseCase
 import com.example.mykku.member.application.port.output.MemberRepository
 import com.example.mykku.member.domain.entity.Member
-import com.example.mykku.role.adapter.output.persistence.repository.RoleJpaRepository
-import org.springframework.data.repository.findByIdOrNull
+import com.example.mykku.role.application.port.output.RoleRepository
+import com.example.mykku.role.domain.vo.RoleId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -13,11 +13,11 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 class GetMemberProfileUseCaseImpl(
     private val memberRepository: MemberRepository,
-    private val roleJpaRepository: RoleJpaRepository
+    private val roleRepository: RoleRepository
 ) : GetMemberProfileUseCase {
 
     override fun getMyProfile(member: Member): MemberProfileResult {
-        val roleName = member.roleId?.let { roleJpaRepository.findByIdOrNull(it)?.name }
+        val roleName = member.roleId?.let { roleRepository.findById(RoleId.of(it))?.name }
         return MemberProfileResult.from(member, roleName)
     }
 }

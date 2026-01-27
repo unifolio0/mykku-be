@@ -1,13 +1,12 @@
 package com.example.mykku.feed.application.usecase
 
-import com.example.mykku.board.adapter.output.persistence.BoardJpaRepository
+import com.example.mykku.board.application.port.output.BoardRepository
+import com.example.mykku.board.domain.vo.BoardId
+import com.example.mykku.board.exception.BoardException
 import com.example.mykku.contest.application.port.output.ContestParticipationRepository
 import com.example.mykku.contest.application.port.output.ContestRepository
 import com.example.mykku.contest.application.port.output.ContestTagRepository
 import com.example.mykku.contest.domain.vo.ContestStatusType
-import com.example.mykku.feed.adapter.output.persistence.entity.FeedImageJpaEntity
-import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
-import com.example.mykku.feed.adapter.output.persistence.entity.FeedTagJpaEntity
 import com.example.mykku.feed.application.dto.CreateFeedCommand
 import com.example.mykku.feed.application.dto.CreateFeedResult
 import com.example.mykku.feed.application.dto.FeedImageResult
@@ -15,10 +14,12 @@ import com.example.mykku.feed.application.port.input.CreateFeedUseCase
 import com.example.mykku.feed.application.port.output.FeedImageRepository
 import com.example.mykku.feed.application.port.output.FeedRepository
 import com.example.mykku.feed.application.port.output.FeedTagRepository
+import com.example.mykku.feed.domain.entity.Feed
+import com.example.mykku.feed.domain.entity.FeedImage
+import com.example.mykku.feed.domain.entity.FeedTag
 import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.image.ImageUploadService
 import com.example.mykku.image.dto.ImageUploadResult
-import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
 import com.example.mykku.member.domain.entity.Member
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -30,8 +31,7 @@ class CreateFeedUseCaseImpl(
     private val feedRepository: FeedRepository,
     private val feedImageRepository: FeedImageRepository,
     private val feedTagRepository: FeedTagRepository,
-    private val boardJpaRepository: BoardJpaRepository,
-    private val memberJpaRepository: MemberJpaRepository,
+    private val boardRepository: BoardRepository,
     private val imageUploadService: ImageUploadService,
     private val contestRepository: ContestRepository,
     private val contestTagRepository: ContestTagRepository,
@@ -39,11 +39,8 @@ class CreateFeedUseCaseImpl(
 ) : CreateFeedUseCase {
 
     override fun execute(command: CreateFeedCommand, member: Member): CreateFeedResult {
-        val board = boardJpaRepository.findById(command.boardId)
-            .orElseThrow { IllegalArgumentException("Board not found") }
-
-        val memberJpaEntity = memberJpaRepository.findById(member.id.value)
-            .orElseThrow { IllegalArgumentException("Member not found") }
+        val board = boardRepository.findById(BoardId(command.boardId))
+            ?: throw BoardException.boardNotFound()
 
         val imageResults = uploadImages(command.images)
         validateImageCount(imageResults.size)
@@ -51,23 +48,23 @@ class CreateFeedUseCaseImpl(
         val normalizedTags = normalizeTags(command.tags)
         validateTagCount(normalizedTags.size)
 
-        val feedJpaEntity = FeedJpaEntity(
+        val feed = Feed.create(
             title = command.title,
             content = command.content,
-            board = board,
-            member = memberJpaEntity
+            boardId = command.boardId,
+            memberId = member.id.value
         )
-        val savedFeed = feedRepository.save(feedJpaEntity)
+        val savedFeed = feedRepository.save(feed, command.boardId, member.id.value)
 
         val feedImages = createFeedImages(imageResults, savedFeed)
-        val savedImages = feedImageRepository.saveAll(feedImages)
+        val savedImages = feedImageRepository.saveAll(feedImages, savedFeed.id!!)
 
         val feedTags = createFeedTags(normalizedTags, savedFeed)
-        val savedTags = feedTagRepository.saveAll(feedTags)
+        val savedTags = feedTagRepository.saveAll(feedTags, savedFeed.id!!)
 
         recordContestParticipationIfApplicable(member, savedTags, savedFeed)
 
-        return buildCreateFeedResult(savedFeed, savedImages, savedTags, member)
+        return buildCreateFeedResult(savedFeed, savedImages, savedTags, member, board.title)
     }
 
     private fun uploadImages(images: List<org.springframework.web.multipart.MultipartFile>): List<ImageUploadResult> {
@@ -76,7 +73,7 @@ class CreateFeedUseCaseImpl(
     }
 
     private fun validateImageCount(count: Int) {
-        if (count > FeedJpaEntity.IMAGE_MAX_COUNT) {
+        if (count > Feed.IMAGE_MAX_COUNT) {
             throw FeedException.feedImageLimitExceeded()
         }
     }
@@ -90,38 +87,35 @@ class CreateFeedUseCaseImpl(
     }
 
     private fun validateTagCount(count: Int) {
-        if (count > FeedJpaEntity.TAG_MAX_COUNT) {
+        if (count > Feed.TAG_MAX_COUNT) {
             throw FeedException.feedTagLimitExceeded()
         }
     }
 
     private fun createFeedImages(
         imageResults: List<ImageUploadResult>,
-        feed: FeedJpaEntity
-    ): List<FeedImageJpaEntity> {
+        feed: Feed
+    ): List<FeedImage> {
         return imageResults.map { imageResult ->
-            if (imageResult.width <= 0 || imageResult.height <= 0) {
-                throw FeedException.imageInvalidDimensions()
-            }
-            FeedImageJpaEntity(
+            FeedImage.create(
                 url = imageResult.url,
                 width = imageResult.width,
                 height = imageResult.height,
-                feed = feed
+                feedId = feed.id!!
             )
         }
     }
 
-    private fun createFeedTags(tags: List<String>, feed: FeedJpaEntity): List<FeedTagJpaEntity> {
+    private fun createFeedTags(tags: List<String>, feed: Feed): List<FeedTag> {
         return tags.map { tagTitle ->
-            FeedTagJpaEntity(feed = feed, title = tagTitle)
+            FeedTag.create(feedId = feed.id!!, title = tagTitle)
         }
     }
 
     private fun recordContestParticipationIfApplicable(
         member: Member,
-        feedTags: List<FeedTagJpaEntity>,
-        feed: FeedJpaEntity
+        feedTags: List<FeedTag>,
+        feed: Feed
     ) {
         if (feedTags.isEmpty()) return
 
@@ -141,12 +135,11 @@ class CreateFeedUseCaseImpl(
             val requiredTags = contestTagsMap[contest.id]?.map { it.title }?.toSet() ?: emptySet()
             if (requiredTags.isNotEmpty() && feedTagTitles.containsAll(requiredTags)) {
                 val memberIdStr = member.id.value
-                val memberIdLong = member.id.value.hashCode().toLong()
-                if (!contestParticipationRepository.existsByMemberIdAndContestIdAndFeedId(memberIdStr, contest.id, feed.id!!)) {
+                if (!contestParticipationRepository.existsByMemberIdAndContestIdAndFeedId(memberIdStr, contest.id, feed.id!!.value)) {
                     val participation = com.example.mykku.contest.domain.entity.ContestParticipation.create(
                         contestId = contest.id,
-                        feedId = feed.id!!,
-                        memberId = memberIdLong
+                        feedId = feed.id!!.value,
+                        memberId = memberIdStr
                     )
                     contestParticipationRepository.save(participation)
                 }
@@ -155,21 +148,22 @@ class CreateFeedUseCaseImpl(
     }
 
     private fun buildCreateFeedResult(
-        feed: FeedJpaEntity,
-        images: List<FeedImageJpaEntity>,
-        tags: List<FeedTagJpaEntity>,
-        member: Member
+        feed: Feed,
+        images: List<FeedImage>,
+        tags: List<FeedTag>,
+        member: Member,
+        boardTitle: String
     ): CreateFeedResult {
         return CreateFeedResult(
-            id = feed.id!!,
+            id = feed.id!!.value,
             title = feed.title,
             content = feed.content,
-            boardId = feed.board.id!!,
-            boardTitle = feed.board.title,
+            boardId = feed.boardId,
+            boardTitle = boardTitle,
             authorId = member.memberId,
             authorNickname = member.nickname,
             authorProfileUrl = member.profileImage,
-            images = images.map { FeedImageResult(it.id!!, it.url, it.width, it.height) },
+            images = images.map { FeedImageResult(it.id!!.value, it.url, it.width, it.height) },
             tags = tags.map { it.title },
             likeCount = feed.likeCount,
             commentCount = feed.commentCount,

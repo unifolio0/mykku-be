@@ -40,7 +40,8 @@ class ScrapDocumentTest : BaseDocumentTest() {
             ),
             requestBodyFields = listOf(
                 fieldWithPath("folderId").type(JsonFieldType.NUMBER).description("저장할 폴더 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -105,7 +106,8 @@ class ScrapDocumentTest : BaseDocumentTest() {
             description = "저장된 피드를 취소합니다.",
             pathParameters = listOf(
                 parameterWithName("feedId").description("저장 취소할 피드 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -168,7 +170,8 @@ class ScrapDocumentTest : BaseDocumentTest() {
                 parameterWithName("folderId").description("필터링할 폴더 ID").optional(),
                 parameterWithName("page").description("페이지 번호 (0부터 시작)").optional(),
                 parameterWithName("size").description("페이지 크기").optional()
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -249,7 +252,8 @@ class ScrapDocumentTest : BaseDocumentTest() {
             ),
             requestBodyFields = listOf(
                 fieldWithPath("folderId").type(JsonFieldType.NUMBER).description("변경할 폴더 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -291,7 +295,8 @@ class ScrapDocumentTest : BaseDocumentTest() {
             description = "하루덕담을 저장합니다.",
             pathParameters = listOf(
                 parameterWithName("dailyMessageId").description("저장할 하루덕담 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -352,7 +357,8 @@ class ScrapDocumentTest : BaseDocumentTest() {
             description = "저장된 하루덕담을 취소합니다.",
             pathParameters = listOf(
                 parameterWithName("dailyMessageId").description("저장 취소할 하루덕담 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -414,7 +420,8 @@ class ScrapDocumentTest : BaseDocumentTest() {
             queryParameters = listOf(
                 parameterWithName("page").description("페이지 번호 (0부터 시작)").optional(),
                 parameterWithName("size").description("페이지 크기").optional()
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -491,7 +498,8 @@ class ScrapDocumentTest : BaseDocumentTest() {
             description = "이벤트를 저장합니다.",
             pathParameters = listOf(
                 parameterWithName("eventId").description("저장할 이벤트 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -552,7 +560,8 @@ class ScrapDocumentTest : BaseDocumentTest() {
             description = "저장된 이벤트를 취소합니다.",
             pathParameters = listOf(
                 parameterWithName("eventId").description("저장 취소할 이벤트 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -614,7 +623,8 @@ class ScrapDocumentTest : BaseDocumentTest() {
             queryParameters = listOf(
                 parameterWithName("page").description("페이지 번호 (0부터 시작)").optional(),
                 parameterWithName("size").description("페이지 크기").optional()
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -690,7 +700,8 @@ class ScrapDocumentTest : BaseDocumentTest() {
             description = "덕질노트를 저장합니다.",
             pathParameters = listOf(
                 parameterWithName("fanNoteId").description("저장할 덕질노트 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -751,7 +762,8 @@ class ScrapDocumentTest : BaseDocumentTest() {
             description = "저장된 덕질노트를 취소합니다.",
             pathParameters = listOf(
                 parameterWithName("fanNoteId").description("저장 취소할 덕질노트 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -813,7 +825,8 @@ class ScrapDocumentTest : BaseDocumentTest() {
             queryParameters = listOf(
                 parameterWithName("page").description("페이지 번호 (0부터 시작)").optional(),
                 parameterWithName("size").description("페이지 크기").optional()
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test

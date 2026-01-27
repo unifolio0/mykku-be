@@ -1,10 +1,9 @@
 package com.example.mykku.feed.application.usecase
 
-import com.example.mykku.board.adapter.output.persistence.BoardJpaRepository
+import com.example.mykku.board.application.port.output.BoardRepository
+import com.example.mykku.board.domain.vo.BoardId
+import com.example.mykku.board.exception.BoardException
 import com.example.mykku.contest.application.port.output.ContestTagRepository
-import com.example.mykku.feed.adapter.output.persistence.entity.FeedImageJpaEntity
-import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
-import com.example.mykku.feed.adapter.output.persistence.entity.FeedTagJpaEntity
 import com.example.mykku.feed.application.dto.AuthorResult
 import com.example.mykku.feed.application.dto.FeedDetailResult
 import com.example.mykku.feed.application.dto.FeedImageResult
@@ -14,12 +13,17 @@ import com.example.mykku.feed.application.port.input.UpdateFeedUseCase
 import com.example.mykku.feed.application.port.output.FeedImageRepository
 import com.example.mykku.feed.application.port.output.FeedRepository
 import com.example.mykku.feed.application.port.output.FeedTagRepository
+import com.example.mykku.feed.domain.entity.Feed
+import com.example.mykku.feed.domain.entity.FeedImage
+import com.example.mykku.feed.domain.entity.FeedTag
 import com.example.mykku.feed.domain.vo.FeedId
 import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.image.ImageUploadService
 import com.example.mykku.image.dto.ImageUploadResult
 import com.example.mykku.like.application.port.output.LikeFeedPort
 import com.example.mykku.member.domain.entity.Member
+import com.example.mykku.role.application.port.output.RoleRepository
+import com.example.mykku.role.domain.vo.RoleId
 import com.example.mykku.scrap.application.port.output.SaveFeedPort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -30,7 +34,8 @@ class UpdateFeedUseCaseImpl(
     private val feedRepository: FeedRepository,
     private val feedImageRepository: FeedImageRepository,
     private val feedTagRepository: FeedTagRepository,
-    private val boardJpaRepository: BoardJpaRepository,
+    private val boardRepository: BoardRepository,
+    private val roleRepository: RoleRepository,
     private val contestTagRepository: ContestTagRepository,
     private val imageUploadService: ImageUploadService,
     private val likeFeedPort: LikeFeedPort,
@@ -42,39 +47,40 @@ class UpdateFeedUseCaseImpl(
         validateFeedOwner(feed, member)
         validateFinalImageCount(feed, command)
 
-        val board = command.boardId?.let {
-            boardJpaRepository.findById(it).orElseThrow { IllegalArgumentException("Board not found") }
-        }
+        val newBoardId = command.boardId
+        val updatedFeed = feed.update(command.title, command.content, newBoardId)
 
-        feed.update(command.title, command.content, board)
-
-        deleteImages(command.deleteImageIds, feed)
+        deleteImages(command.deleteImageIds, feed.id!!)
         val newImageResults = uploadImages(command.newImages)
-        addNewImages(newImageResults, feed)
-        val updatedTags = updateTags(command.tags, feed)
+        addNewImages(newImageResults, feed.id!!)
+        val updatedTags = updateTags(command.tags, feed.id!!)
 
-        val savedFeed = feedRepository.save(feed)
-        val remainingImages = feedImageRepository.findByFeed(savedFeed)
+        val savedFeed = feedRepository.update(updatedFeed)
+        val remainingImages = feedImageRepository.findByFeedId(savedFeed.id!!)
+
+        val board = boardRepository.findById(BoardId(savedFeed.boardId))
+            ?: throw BoardException.boardNotFound()
+        val roleName = member.roleId?.let { roleRepository.findById(RoleId.of(it))?.name } ?: ""
 
         val contestTagTitles = getContestTagTitles(updatedTags.map { it.title })
-        val isLiked = likeFeedPort.existsByMemberIdAndFeedId(member.id.value, savedFeed.id!!)
-        val isSaved = saveFeedPort.existsByMemberIdAndFeedId(member.id.value, savedFeed.id!!)
+        val isLiked = likeFeedPort.existsByMemberIdAndFeedId(member.id.value, savedFeed.id!!.value)
+        val isSaved = saveFeedPort.existsByMemberIdAndFeedId(member.id.value, savedFeed.id!!.value)
 
         return FeedDetailResult(
-            id = savedFeed.id!!,
+            id = savedFeed.id!!.value,
             author = AuthorResult(
                 memberId = member.memberId,
                 nickname = member.nickname,
                 profileImage = member.profileImage,
-                role = ""
+                role = roleName
             ),
-            boardId = savedFeed.board.id!!,
-            boardTitle = savedFeed.board.title,
+            boardId = savedFeed.boardId,
+            boardTitle = board.title,
             createdAt = savedFeed.createdAt,
             updatedAt = savedFeed.updatedAt,
             title = savedFeed.title,
             content = savedFeed.content,
-            images = remainingImages.map { FeedImageResult(it.id!!, it.url, it.width, it.height) },
+            images = remainingImages.map { FeedImageResult(it.id!!.value, it.url, it.width, it.height) },
             tags = updatedTags.map { TagResult(it.title, contestTagTitles.contains(it.title)) },
             likeCount = savedFeed.likeCount,
             isLiked = isLiked,
@@ -83,32 +89,32 @@ class UpdateFeedUseCaseImpl(
         )
     }
 
-    private fun validateFeedOwner(feed: FeedJpaEntity, member: Member) {
-        if (feed.member.id != member.id.value) {
+    private fun validateFeedOwner(feed: Feed, member: Member) {
+        if (!feed.isOwnedBy(member.id.value)) {
             throw FeedException.feedForbiddenAccess()
         }
     }
 
-    private fun validateFinalImageCount(feed: FeedJpaEntity, command: UpdateFeedCommand) {
-        val existingImages = feedImageRepository.findByFeed(feed)
+    private fun validateFinalImageCount(feed: Feed, command: UpdateFeedCommand) {
+        val existingImages = feedImageRepository.findByFeedId(feed.id!!)
         val existingImageCount = existingImages.size
         val deleteImageCount = command.deleteImageIds.size
         val newImageCount = command.newImages.size
         val finalImageCount = existingImageCount - deleteImageCount + newImageCount
 
-        if (finalImageCount > FeedJpaEntity.IMAGE_MAX_COUNT) {
+        if (finalImageCount > Feed.IMAGE_MAX_COUNT) {
             throw FeedException.feedImageLimitExceeded()
         }
     }
 
-    private fun deleteImages(deleteImageIds: List<Long>, feed: FeedJpaEntity) {
+    private fun deleteImages(deleteImageIds: List<Long>, feedId: FeedId) {
         if (deleteImageIds.isEmpty()) return
 
-        val imagesToDelete = feedImageRepository.findAllByIdInAndFeed(deleteImageIds, feed)
+        val imagesToDelete = feedImageRepository.findAllByIdInAndFeedId(deleteImageIds, feedId)
         if (imagesToDelete.size != deleteImageIds.size) {
             throw FeedException.feedImageNotFound()
         }
-        feedImageRepository.deleteAll(imagesToDelete)
+        feedImageRepository.deleteAllByIds(deleteImageIds)
     }
 
     private fun uploadImages(images: List<org.springframework.web.multipart.MultipartFile>): List<ImageUploadResult> {
@@ -116,29 +122,26 @@ class UpdateFeedUseCaseImpl(
         else imageUploadService.uploadImages(images)
     }
 
-    private fun addNewImages(imageResults: List<ImageUploadResult>, feed: FeedJpaEntity) {
+    private fun addNewImages(imageResults: List<ImageUploadResult>, feedId: FeedId) {
         if (imageResults.isEmpty()) return
 
         val newFeedImages = imageResults.map { imageResult ->
-            if (imageResult.width <= 0 || imageResult.height <= 0) {
-                throw FeedException.imageInvalidDimensions()
-            }
-            FeedImageJpaEntity(
+            FeedImage.create(
                 url = imageResult.url,
                 width = imageResult.width,
                 height = imageResult.height,
-                feed = feed
+                feedId = feedId
             )
         }
-        feedImageRepository.saveAll(newFeedImages)
+        feedImageRepository.saveAll(newFeedImages, feedId)
     }
 
-    private fun updateTags(tags: List<String>?, feed: FeedJpaEntity): List<FeedTagJpaEntity> {
+    private fun updateTags(tags: List<String>?, feedId: FeedId): List<FeedTag> {
         if (tags == null) {
-            return feedTagRepository.findByFeed(feed)
+            return feedTagRepository.findByFeedId(feedId)
         }
 
-        feedTagRepository.deleteAllByFeed(feed)
+        feedTagRepository.deleteAllByFeedId(feedId)
 
         val normalizedDistinctTags = tags.asSequence()
             .map { it.trim() }
@@ -146,14 +149,14 @@ class UpdateFeedUseCaseImpl(
             .distinct()
             .toList()
 
-        if (normalizedDistinctTags.size > FeedJpaEntity.TAG_MAX_COUNT) {
+        if (normalizedDistinctTags.size > Feed.TAG_MAX_COUNT) {
             throw FeedException.feedTagLimitExceeded()
         }
 
         val feedTags = normalizedDistinctTags.map { tagTitle ->
-            FeedTagJpaEntity(feed = feed, title = tagTitle)
+            FeedTag.create(feedId = feedId, title = tagTitle)
         }
-        return feedTagRepository.saveAll(feedTags)
+        return feedTagRepository.saveAll(feedTags, feedId)
     }
 
     private fun getContestTagTitles(tagTitles: List<String>): Set<String> {

@@ -4,7 +4,7 @@ import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.contest.adapter.input.web.PagedContestsResponse
 import com.example.mykku.contest.application.port.input.GetMyParticipatedContestsUseCase
-import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
+import com.example.mykku.member.domain.entity.Member
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -21,10 +21,10 @@ class MemberContestController(
     fun getMyParticipatedContests(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int,
-        @CurrentMember memberEntity: MemberJpaEntity
+        @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<PagedContestsResponse>> {
         val result = getMyParticipatedContestsUseCase.execute(
-            memberId = memberEntity.id,
+            memberId = member.id.value,
             page = page,
             size = size
         )

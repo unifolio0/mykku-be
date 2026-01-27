@@ -1,6 +1,6 @@
 package com.example.mykku.dailymessage.adapter.output.persistence.entity
 
-import com.example.mykku.common.domain.BaseEntity
+import com.example.mykku.common.adapter.persistence.BaseJpaEntity
 import com.example.mykku.dailymessage.domain.entity.DailyMessageComment
 import com.example.mykku.dailymessage.domain.vo.DailyMessageCommentId
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
@@ -38,7 +38,7 @@ class DailyMessageCommentJpaEntity(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     val member: MemberJpaEntity
-) : BaseEntity() {
+) : BaseJpaEntity() {
 
     fun toDomain(): DailyMessageComment {
         return DailyMessageComment.reconstitute(

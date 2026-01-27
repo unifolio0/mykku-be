@@ -2,7 +2,7 @@ package com.example.mykku.board.adapter.output.persistence.entity
 
 import com.example.mykku.board.domain.entity.Board
 import com.example.mykku.board.domain.vo.BoardId
-import com.example.mykku.common.domain.BaseEntity
+import com.example.mykku.common.adapter.persistence.BaseJpaEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -22,7 +22,7 @@ class BoardJpaEntity(
 
     @Column(name = "logo")
     var logo: String
-) : BaseEntity() {
+) : BaseJpaEntity() {
 
     fun toDomain(): Board = Board.reconstitute(
         id = BoardId.of(id!!),

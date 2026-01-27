@@ -5,7 +5,7 @@ import com.example.mykku.role.adapter.input.web.CreateRoleRequest
 import com.example.mykku.role.adapter.input.web.UpdateRoleRequest
 import com.example.mykku.role.adapter.output.persistence.entity.RoleJpaEntity
 import com.example.mykku.role.application.port.output.MemberRoleRepository
-import com.example.mykku.role.domain.Role
+import com.example.mykku.role.domain.entity.Role
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import org.hamcrest.Matchers.equalTo

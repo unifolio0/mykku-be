@@ -150,7 +150,8 @@ class EventDocumentTest : BaseDocumentTest() {
                     .optional(),
                 parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
                 parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -234,7 +235,8 @@ class EventDocumentTest : BaseDocumentTest() {
             description = "특정 이벤트의 상세 정보를 조회합니다.",
             pathParameters = listOf(
                 parameterWithName("eventId").description("이벤트 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test

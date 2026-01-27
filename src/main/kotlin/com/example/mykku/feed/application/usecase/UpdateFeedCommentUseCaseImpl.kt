@@ -20,23 +20,23 @@ class UpdateFeedCommentUseCaseImpl(
     override fun execute(command: UpdateFeedCommentCommand, member: Member): SingleFeedCommentResult {
         val comment = feedCommentRepository.findByIdOrThrow(FeedCommentId.of(command.commentId))
 
-        if (comment.member.id != member.id.value) {
+        if (!comment.isOwnedBy(member.id.value)) {
             throw FeedException.feedCommentForbiddenAccess()
         }
 
-        comment.updateContent(command.content)
-        val updatedComment = feedCommentRepository.save(comment)
+        val updatedComment = comment.updateContent(command.content)
+        val savedComment = feedCommentRepository.save(updatedComment, comment.feedId, member.id.value)
 
         return SingleFeedCommentResult(
-            id = updatedComment.id!!,
-            content = updatedComment.content,
+            id = savedComment.id!!.value,
+            content = savedComment.content,
             author = CommentAuthorResult(
-                memberId = updatedComment.member.memberId,
-                nickname = updatedComment.member.nickname,
-                profileImage = updatedComment.member.profileImage
+                memberId = member.memberId,
+                nickname = member.nickname,
+                profileImage = member.profileImage
             ),
-            likeCount = updatedComment.likeCount,
-            createdAt = updatedComment.createdAt
+            likeCount = savedComment.likeCount,
+            createdAt = savedComment.createdAt
         )
     }
 }

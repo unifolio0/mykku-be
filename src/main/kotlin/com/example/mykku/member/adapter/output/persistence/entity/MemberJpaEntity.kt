@@ -1,6 +1,6 @@
 package com.example.mykku.member.adapter.output.persistence.entity
 
-import com.example.mykku.common.domain.BaseEntity
+import com.example.mykku.common.adapter.persistence.BaseJpaEntity
 import com.example.mykku.member.domain.entity.Member
 import com.example.mykku.member.domain.vo.SocialProvider
 import com.example.mykku.role.adapter.output.persistence.entity.RoleJpaEntity
@@ -48,7 +48,7 @@ class MemberJpaEntity(
 
     @Column(name = "email_verified")
     var emailVerified: Boolean = false
-) : BaseEntity() {
+) : BaseJpaEntity() {
 
     fun toDomain(): Member {
         return Member.reconstitute(

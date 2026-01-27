@@ -5,7 +5,7 @@ import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.contest.application.port.input.GetContestWinnerDetailUseCase
 import com.example.mykku.contest.application.port.input.GetContestWinnersListUseCase
 import com.example.mykku.contest.application.port.input.UpdateAcceptanceSpeechUseCase
-import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
+import com.example.mykku.member.domain.entity.Member
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -50,10 +50,10 @@ class ContestWinnerController(
     @PatchMapping("/winners/{winnerId}/acceptance-speech")
     fun updateAcceptanceSpeech(
         @PathVariable winnerId: Long,
-        @CurrentMember memberEntity: MemberJpaEntity,
+        @CurrentMember member: Member,
         @RequestBody @Valid request: UpdateAcceptanceSpeechRequest
     ): ResponseEntity<ApiResponse<UpdateAcceptanceSpeechResponse>> {
-        val result = updateAcceptanceSpeechUseCase.execute(request.toCommand(winnerId, memberEntity.id))
+        val result = updateAcceptanceSpeechUseCase.execute(request.toCommand(winnerId, member.id.value))
         return ResponseEntity.ok(
             ApiResponse(
                 message = "수상 소감이 성공적으로 등록되었습니다.",

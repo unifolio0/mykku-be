@@ -1,6 +1,6 @@
 package com.example.mykku.fannote.adapter.output.persistence.entity
 
-import com.example.mykku.common.domain.BaseEntity
+import com.example.mykku.common.adapter.persistence.BaseJpaEntity
 import com.example.mykku.fannote.domain.entity.FanNotePage
 import com.example.mykku.fannote.domain.vo.FanNotePageId
 import jakarta.persistence.Column
@@ -29,7 +29,7 @@ class FanNotePageJpaEntity(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fan_note_id", nullable = false)
     var fanNote: FanNoteJpaEntity
-) : BaseEntity() {
+) : BaseJpaEntity() {
 
     fun toDomain(): FanNotePage {
         return FanNotePage.reconstitute(

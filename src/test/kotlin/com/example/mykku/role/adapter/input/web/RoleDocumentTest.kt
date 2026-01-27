@@ -32,7 +32,8 @@ class RoleDocumentTest : BaseDocumentTest() {
         private val apiConfig = ApiRequestConfig(
             tag = Tag.ROLE_API,
             summary = "내 칭호 목록 조회",
-            description = "로그인한 회원의 칭호 목록을 조회합니다."
+            description = "로그인한 회원의 칭호 목록을 조회합니다.",
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -93,7 +94,8 @@ class RoleDocumentTest : BaseDocumentTest() {
             description = "대표 칭호를 변경합니다.",
             pathParameters = listOf(
                 parameterWithName("memberRoleId").description("대표로 설정할 보유 칭호 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test

@@ -139,7 +139,8 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                 fieldWithPath("content").type(JsonFieldType.STRING).description("댓글 내용"),
                 fieldWithPath("parentCommentId").type(JsonFieldType.NUMBER).description("부모 댓글 ID (답글인 경우)")
                     .optional()
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -230,7 +231,8 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
             requestBodyFields = listOf(
                 fieldWithPath("content").type(JsonFieldType.STRING).description("답글 내용"),
                 fieldWithPath("parentCommentId").type(JsonFieldType.NUMBER).description("부모 댓글 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -294,7 +296,8 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
             ),
             requestBodyFields = listOf(
                 fieldWithPath("content").type(JsonFieldType.STRING).description("수정할 댓글 내용")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -398,7 +401,8 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
             description = "하루 덕담 댓글을 삭제합니다.",
             pathParameters = listOf(
                 parameterWithName("commentId").description("삭제할 댓글 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test

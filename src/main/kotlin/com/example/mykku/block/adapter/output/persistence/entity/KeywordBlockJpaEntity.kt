@@ -2,7 +2,7 @@ package com.example.mykku.block.adapter.output.persistence.entity
 
 import com.example.mykku.block.domain.entity.KeywordBlock
 import com.example.mykku.block.domain.vo.KeywordBlockId
-import com.example.mykku.common.domain.BaseEntity
+import com.example.mykku.common.adapter.persistence.BaseJpaEntity
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -31,7 +31,7 @@ class KeywordBlockJpaEntity(
 
     @Column(name = "keyword", length = 50)
     val keyword: String
-) : BaseEntity() {
+) : BaseJpaEntity() {
 
     fun toDomain(): KeywordBlock {
         return KeywordBlock.reconstitute(

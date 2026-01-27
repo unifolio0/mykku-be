@@ -32,7 +32,8 @@ class FcmTokenDocumentTest : BaseDocumentTest() {
                 fieldWithPath("deviceId").type(JsonFieldType.STRING).description("기기 고유 식별자"),
                 fieldWithPath("deviceType").type(JsonFieldType.STRING).description("기기 타입 (ANDROID, IOS 등)")
                     .optional()
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -84,7 +85,8 @@ class FcmTokenDocumentTest : BaseDocumentTest() {
         private val apiConfig = ApiRequestConfig(
             tag = Tag.FCM_TOKEN_API,
             summary = "FCM 토큰 목록 조회",
-            description = "등록된 FCM 토큰 목록을 조회합니다."
+            description = "등록된 FCM 토큰 목록을 조회합니다.",
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -141,7 +143,8 @@ class FcmTokenDocumentTest : BaseDocumentTest() {
             description = "등록된 FCM 토큰을 삭제합니다.",
             pathParameters = listOf(
                 parameterWithName("deviceId").description("삭제할 기기 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test

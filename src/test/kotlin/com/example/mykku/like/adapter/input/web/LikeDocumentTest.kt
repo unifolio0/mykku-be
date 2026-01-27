@@ -37,7 +37,8 @@ class LikeDocumentTest : BaseDocumentTest() {
             queryParameters = listOf(
                 parameterWithName("page").description("페이지 번호 (기본값: 0)").optional(),
                 parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -113,7 +114,8 @@ class LikeDocumentTest : BaseDocumentTest() {
             description = "게시판을 즐겨찾기에 추가합니다.",
             pathParameters = listOf(
                 parameterWithName("boardId").description("즐겨찾기할 게시판 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -178,7 +180,8 @@ class LikeDocumentTest : BaseDocumentTest() {
             description = "게시판 즐겨찾기를 취소합니다.",
             pathParameters = listOf(
                 parameterWithName("boardId").description("즐겨찾기 취소할 게시판 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -239,7 +242,8 @@ class LikeDocumentTest : BaseDocumentTest() {
             description = "피드에 좋아요를 누릅니다.",
             pathParameters = listOf(
                 parameterWithName("feedId").description("좋아요할 피드 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -304,7 +308,8 @@ class LikeDocumentTest : BaseDocumentTest() {
             description = "피드 좋아요를 취소합니다.",
             pathParameters = listOf(
                 parameterWithName("feedId").description("좋아요 취소할 피드 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -365,7 +370,8 @@ class LikeDocumentTest : BaseDocumentTest() {
             description = "댓글에 좋아요를 누릅니다.",
             pathParameters = listOf(
                 parameterWithName("feedCommentId").description("좋아요할 댓글 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -430,7 +436,8 @@ class LikeDocumentTest : BaseDocumentTest() {
             description = "댓글 좋아요를 취소합니다.",
             pathParameters = listOf(
                 parameterWithName("feedCommentId").description("좋아요 취소할 댓글 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -491,7 +498,8 @@ class LikeDocumentTest : BaseDocumentTest() {
             description = "하루 덕담 댓글에 좋아요를 누릅니다.",
             pathParameters = listOf(
                 parameterWithName("id").description("좋아요할 하루 덕담 댓글 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -558,7 +566,8 @@ class LikeDocumentTest : BaseDocumentTest() {
             description = "하루 덕담 댓글 좋아요를 취소합니다.",
             pathParameters = listOf(
                 parameterWithName("id").description("좋아요 취소할 하루 덕담 댓글 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test

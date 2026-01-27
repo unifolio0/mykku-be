@@ -30,7 +30,8 @@ class MemberContestDocumentTest : BaseDocumentTest() {
             queryParameters = listOf(
                 parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
                 parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test

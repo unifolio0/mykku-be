@@ -34,7 +34,8 @@ class FolderDocumentTest : BaseDocumentTest() {
             requestBodyFields = listOf(
                 fieldWithPath("name").type(JsonFieldType.STRING).description("폴더 이름"),
                 fieldWithPath("description").type(JsonFieldType.STRING).description("폴더 설명").optional()
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -137,7 +138,8 @@ class FolderDocumentTest : BaseDocumentTest() {
         private val apiConfig = ApiRequestConfig(
             tag = Tag.FOLDER_API,
             summary = "폴더 목록 조회",
-            description = "사용자의 스크랩 폴더 목록을 조회합니다."
+            description = "사용자의 스크랩 폴더 목록을 조회합니다.",
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -205,7 +207,8 @@ class FolderDocumentTest : BaseDocumentTest() {
             requestBodyFields = listOf(
                 fieldWithPath("name").type(JsonFieldType.STRING).description("폴더 이름"),
                 fieldWithPath("description").type(JsonFieldType.STRING).description("폴더 설명").optional()
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -314,7 +317,8 @@ class FolderDocumentTest : BaseDocumentTest() {
             description = "폴더를 삭제합니다.",
             pathParameters = listOf(
                 parameterWithName("folderId").description("삭제할 폴더 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test

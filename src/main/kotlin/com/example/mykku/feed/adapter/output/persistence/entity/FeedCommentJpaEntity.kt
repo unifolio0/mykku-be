@@ -1,6 +1,6 @@
 package com.example.mykku.feed.adapter.output.persistence.entity
 
-import com.example.mykku.common.domain.BaseEntity
+import com.example.mykku.common.adapter.persistence.BaseJpaEntity
 import com.example.mykku.feed.domain.entity.FeedComment
 import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
@@ -38,10 +38,26 @@ class FeedCommentJpaEntity(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     val member: MemberJpaEntity
-) : BaseEntity() {
+) : BaseJpaEntity() {
 
     companion object {
         const val CONTENT_MAX_LENGTH = 1000
+
+        fun fromDomain(
+            feedComment: FeedComment,
+            feed: FeedJpaEntity,
+            member: MemberJpaEntity,
+            parentComment: FeedCommentJpaEntity? = null
+        ): FeedCommentJpaEntity {
+            return FeedCommentJpaEntity(
+                id = feedComment.id?.value,
+                content = feedComment.content,
+                likeCount = feedComment.likeCount,
+                feed = feed,
+                parentComment = parentComment,
+                member = member
+            )
+        }
     }
 
     init {
@@ -56,7 +72,7 @@ class FeedCommentJpaEntity(
         likeCount = likeCount,
         feedId = feed.id!!,
         parentCommentId = parentComment?.id,
-        memberId = member.id.hashCode().toLong(),
+        memberId = member.id,
         createdAt = createdAt,
         updatedAt = updatedAt
     )

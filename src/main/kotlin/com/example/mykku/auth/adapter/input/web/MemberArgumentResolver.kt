@@ -4,7 +4,6 @@ import com.example.mykku.auth.adapter.output.persistence.JwtTokenProviderAdapter
 import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.auth.exception.AuthException
 import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
-import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.member.domain.entity.Member
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.core.MethodParameter
@@ -27,8 +26,7 @@ class MemberArgumentResolver(
 
     override fun supportsParameter(parameter: MethodParameter): Boolean {
         return parameter.hasParameterAnnotation(CurrentMember::class.java) &&
-                (Member::class.java.isAssignableFrom(parameter.parameterType) ||
-                        MemberJpaEntity::class.java.isAssignableFrom(parameter.parameterType))
+                Member::class.java.isAssignableFrom(parameter.parameterType)
     }
 
     override fun resolveArgument(
@@ -52,11 +50,7 @@ class MemberArgumentResolver(
         val memberJpaEntity = memberJpaRepository.findById(memberId).orElse(null)
             ?: return handleNullableParameter(parameter)
 
-        return if (Member::class.java.isAssignableFrom(parameter.parameterType)) {
-            memberJpaEntity.toDomain()
-        } else {
-            memberJpaEntity
-        }
+        return memberJpaEntity.toDomain()
     }
 
     private fun handleNullableParameter(parameter: MethodParameter): Any? {

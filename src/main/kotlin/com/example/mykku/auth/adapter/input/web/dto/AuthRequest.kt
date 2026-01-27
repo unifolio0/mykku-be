@@ -2,6 +2,7 @@ package com.example.mykku.auth.adapter.input.web.dto
 
 import com.example.mykku.auth.application.dto.MobileLoginCommand
 import com.example.mykku.auth.application.dto.RefreshTokenCommand
+import com.example.mykku.auth.exception.AuthException
 import com.example.mykku.member.domain.vo.SocialProvider
 
 data class MobileLoginRequest(
@@ -22,7 +23,7 @@ data class MobileLoginRequest(
                 }
             }
             SocialProvider.EMAIL -> {
-                throw IllegalArgumentException("EMAIL 제공자는 모바일 로그인을 지원하지 않습니다")
+                throw AuthException.mobileLoginNotSupported()
             }
         }
     }

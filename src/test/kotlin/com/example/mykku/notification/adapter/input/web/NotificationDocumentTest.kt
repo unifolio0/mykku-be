@@ -35,7 +35,8 @@ class NotificationDocumentTest : BaseDocumentTest() {
             queryParameters = listOf(
                 parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
                 parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -143,7 +144,8 @@ class NotificationDocumentTest : BaseDocumentTest() {
             queryParameters = listOf(
                 parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
                 parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -247,7 +249,8 @@ class NotificationDocumentTest : BaseDocumentTest() {
         private val apiConfig = ApiRequestConfig(
             tag = Tag.NOTIFICATION_API,
             summary = "읽지 않은 알림 개수 조회",
-            description = "읽지 않은 알림의 개수를 조회합니다."
+            description = "읽지 않은 알림의 개수를 조회합니다.",
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -285,7 +288,8 @@ class NotificationDocumentTest : BaseDocumentTest() {
             description = "특정 알림을 읽음 처리합니다.",
             pathParameters = listOf(
                 parameterWithName("notificationId").description("읽음 처리할 알림 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -320,7 +324,8 @@ class NotificationDocumentTest : BaseDocumentTest() {
         private val apiConfig = ApiRequestConfig(
             tag = Tag.NOTIFICATION_API,
             summary = "모든 알림 읽음 처리",
-            description = "모든 알림을 읽음 처리합니다."
+            description = "모든 알림을 읽음 처리합니다.",
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -356,7 +361,8 @@ class NotificationDocumentTest : BaseDocumentTest() {
             description = "특정 알림을 삭제합니다.",
             pathParameters = listOf(
                 parameterWithName("notificationId").description("삭제할 알림 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test

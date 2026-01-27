@@ -38,8 +38,8 @@ class RoleControllerTest : BaseControllerTest() {
             nickname = "테스터",
             role = role1
         )
-        memberRoleJpaRepository.save(MemberRoleJpaEntity(member = member, role = role1))
-        memberRoleJpaRepository.save(MemberRoleJpaEntity(member = member, role = role2))
+        memberRoleJpaRepository.save(MemberRoleJpaEntity(memberId = member.id, role = role1))
+        memberRoleJpaRepository.save(MemberRoleJpaEntity(memberId = member.id, role = role2))
 
         // when & then
         RestAssured
@@ -65,8 +65,8 @@ class RoleControllerTest : BaseControllerTest() {
             nickname = "테스터",
             role = role1
         )
-        val memberRole1 = memberRoleJpaRepository.save(MemberRoleJpaEntity(member = member, role = role1))
-        val memberRole2 = memberRoleJpaRepository.save(MemberRoleJpaEntity(member = member, role = role2))
+        val memberRole1 = memberRoleJpaRepository.save(MemberRoleJpaEntity(memberId = member.id, role = role1))
+        val memberRole2 = memberRoleJpaRepository.save(MemberRoleJpaEntity(memberId = member.id, role = role2))
 
         // when & then
         RestAssured

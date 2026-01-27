@@ -1,10 +1,12 @@
 package com.example.mykku.like.adapter.output.persistence
 
 import com.example.mykku.feed.adapter.output.persistence.FeedCommentJpaRepository
+import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.like.adapter.output.persistence.entity.LikeFeedCommentJpaEntity
 import com.example.mykku.like.application.port.output.LikeFeedCommentPort
 import com.example.mykku.like.domain.entity.LikeFeedCommentEntity
 import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
+import com.example.mykku.member.exception.MemberException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 
@@ -17,9 +19,9 @@ class LikeFeedCommentPersistenceAdapter(
 
     override fun save(likeFeedComment: LikeFeedCommentEntity): LikeFeedCommentEntity {
         val member = memberJpaRepository.findByIdOrNull(likeFeedComment.memberId)
-            ?: throw IllegalArgumentException("Member not found: ${likeFeedComment.memberId}")
+            ?: throw MemberException.memberNotFound()
         val feedComment = feedCommentJpaRepository.findByIdOrNull(likeFeedComment.feedCommentId)
-            ?: throw IllegalArgumentException("FeedComment not found: ${likeFeedComment.feedCommentId}")
+            ?: throw FeedException.feedCommentNotFound()
 
         val jpaEntity = LikeFeedCommentJpaEntity.fromDomain(likeFeedComment, member, feedComment)
         return likeFeedCommentJpaRepository.save(jpaEntity).toDomain()

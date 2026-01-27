@@ -1,6 +1,6 @@
 package com.example.mykku.like.adapter.output.persistence.entity
 
-import com.example.mykku.common.domain.BaseEntity
+import com.example.mykku.common.adapter.persistence.BaseJpaEntity
 import com.example.mykku.dailymessage.adapter.output.persistence.entity.DailyMessageCommentJpaEntity
 import com.example.mykku.like.domain.entity.LikeDailyMessageCommentEntity
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
@@ -27,7 +27,7 @@ class LikeDailyMessageCommentJpaEntity(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "daily_message_comment_id")
     val dailyMessageComment: DailyMessageCommentJpaEntity
-) : BaseEntity() {
+) : BaseJpaEntity() {
 
     fun toDomain(): LikeDailyMessageCommentEntity {
         return LikeDailyMessageCommentEntity.reconstitute(

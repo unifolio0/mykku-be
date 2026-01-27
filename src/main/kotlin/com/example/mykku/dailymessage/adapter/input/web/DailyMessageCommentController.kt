@@ -7,7 +7,7 @@ import com.example.mykku.dailymessage.application.port.input.CreateCommentUseCas
 import com.example.mykku.dailymessage.application.port.input.DeleteCommentUseCase
 import com.example.mykku.dailymessage.application.port.input.GetCommentsUseCase
 import com.example.mykku.dailymessage.application.port.input.UpdateCommentUseCase
-import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
+import com.example.mykku.member.domain.entity.Member
 import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -33,7 +33,7 @@ class DailyMessageCommentController(
         @PathVariable dailyMessageId: Long,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int,
-        @CurrentMember(required = false) member: MemberJpaEntity?
+        @CurrentMember(required = false) member: Member?
     ): ResponseEntity<ApiResponse<DailyMessageCommentsResponse>> {
         val pageable = PageableValidator.validateAndCreate(
             page,
@@ -41,7 +41,7 @@ class DailyMessageCommentController(
             "createdAt",
             Sort.Direction.DESC
         )
-        val result = getCommentsUseCase.execute(dailyMessageId, member?.id, pageable)
+        val result = getCommentsUseCase.execute(dailyMessageId, member?.id?.value, pageable)
 
         return ResponseEntity.ok(
             ApiResponse(
@@ -55,11 +55,11 @@ class DailyMessageCommentController(
     fun createComment(
         @PathVariable dailyMessageId: Long,
         @RequestBody request: CreateCommentRequest,
-        @CurrentMember member: MemberJpaEntity
+        @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<CommentResponse>> {
         val command = request.toCommand(
             dailyMessageId = dailyMessageId,
-            memberId = member.id,
+            memberId = member.id.value,
             memberNickname = member.nickname,
             memberProfileImage = member.profileImage
         )
@@ -77,9 +77,9 @@ class DailyMessageCommentController(
     fun updateComment(
         @PathVariable commentId: Long,
         @RequestBody request: UpdateCommentRequest,
-        @CurrentMember member: MemberJpaEntity
+        @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<CommentResponse>> {
-        val command = request.toCommand(commentId, member.id)
+        val command = request.toCommand(commentId, member.id.value)
         val result = updateCommentUseCase.execute(command)
 
         return ResponseEntity.ok(
@@ -93,9 +93,9 @@ class DailyMessageCommentController(
     @DeleteMapping("/comments/{commentId}")
     fun deleteComment(
         @PathVariable commentId: Long,
-        @CurrentMember member: MemberJpaEntity
+        @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<Unit>> {
-        deleteCommentUseCase.execute(commentId, member.id)
+        deleteCommentUseCase.execute(commentId, member.id.value)
 
         return ResponseEntity.ok(
             ApiResponse(

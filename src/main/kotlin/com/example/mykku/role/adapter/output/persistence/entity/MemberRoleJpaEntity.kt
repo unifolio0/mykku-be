@@ -1,10 +1,10 @@
 package com.example.mykku.role.adapter.output.persistence.entity
 
-import com.example.mykku.common.domain.BaseEntity
-import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
+import com.example.mykku.common.adapter.persistence.BaseJpaEntity
 import com.example.mykku.role.domain.entity.MemberRole
 import com.example.mykku.role.domain.vo.MemberRoleId
 import com.example.mykku.role.domain.vo.RoleId
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
@@ -21,19 +21,18 @@ class MemberRoleJpaEntity(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    val member: MemberJpaEntity,
+    @Column(name = "member_id", nullable = false)
+    val memberId: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", nullable = false)
     val role: RoleJpaEntity
-) : BaseEntity() {
+) : BaseJpaEntity() {
 
     fun toDomain(): MemberRole {
         return MemberRole.reconstitute(
             id = MemberRoleId.of(id!!),
-            memberId = member.id,
+            memberId = memberId,
             roleId = RoleId.of(role.id!!),
             createdAt = createdAt,
             updatedAt = updatedAt
@@ -41,10 +40,10 @@ class MemberRoleJpaEntity(
     }
 
     companion object {
-        fun fromDomain(domain: MemberRole, member: MemberJpaEntity, role: RoleJpaEntity): MemberRoleJpaEntity {
+        fun fromDomain(domain: MemberRole, role: RoleJpaEntity): MemberRoleJpaEntity {
             return MemberRoleJpaEntity(
                 id = if (domain.id.value == 0L) null else domain.id.value,
-                member = member,
+                memberId = domain.memberId,
                 role = role
             )
         }

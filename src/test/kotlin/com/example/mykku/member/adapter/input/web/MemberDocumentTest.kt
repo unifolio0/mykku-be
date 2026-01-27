@@ -36,7 +36,8 @@ class MemberDocumentTest : BaseDocumentTest() {
                     .description("현재 비밀번호"),
                 fieldWithPath("newPassword").type(JsonFieldType.STRING)
                     .description("새로운 비밀번호 (최소 8자, 영문/숫자/특수문자 포함)")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -102,7 +103,8 @@ class MemberDocumentTest : BaseDocumentTest() {
         private val apiConfig = ApiRequestConfig(
             tag = Tag.MEMBER_API,
             summary = "내 프로필 조회",
-            description = "로그인한 사용자의 프로필 정보를 조회합니다."
+            description = "로그인한 사용자의 프로필 정보를 조회합니다.",
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -113,6 +115,7 @@ class MemberDocumentTest : BaseDocumentTest() {
                 nickname = "testuser",
                 profileImage = "https://example.com/profile.jpg",
                 roleId = 1L,
+                roleName = "테스트 칭호",
                 provider = "GOOGLE",
                 emailVerified = true,
                 createdAt = LocalDateTime.now()
@@ -160,7 +163,8 @@ class MemberDocumentTest : BaseDocumentTest() {
                     .description("새로운 닉네임 (최대 10자, 한글/영문/숫자만 허용)").optional(),
                 fieldWithPath("profileImage").type(JsonFieldType.STRING)
                     .description("새로운 프로필 이미지 URL").optional()
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -175,6 +179,7 @@ class MemberDocumentTest : BaseDocumentTest() {
                 nickname = "새닉네임",
                 profileImage = "https://example.com/new-profile.jpg",
                 roleId = 1L,
+                roleName = "테스트 칭호",
                 provider = "GOOGLE",
                 emailVerified = true,
                 createdAt = LocalDateTime.now()

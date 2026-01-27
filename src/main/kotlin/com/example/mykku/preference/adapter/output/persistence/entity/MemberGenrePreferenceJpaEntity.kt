@@ -1,6 +1,6 @@
 package com.example.mykku.preference.adapter.output.persistence.entity
 
-import com.example.mykku.common.domain.BaseEntity
+import com.example.mykku.common.adapter.persistence.BaseJpaEntity
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.preference.domain.entity.MemberGenrePreference
 import com.example.mykku.preference.domain.vo.GenreType
@@ -31,7 +31,7 @@ class MemberGenrePreferenceJpaEntity(
     @Enumerated(EnumType.STRING)
     @Column(name = "genre_type", nullable = false, length = 50)
     val genreType: GenreType
-) : BaseEntity() {
+) : BaseJpaEntity() {
 
     fun toDomain(): MemberGenrePreference {
         return MemberGenrePreference.reconstitute(

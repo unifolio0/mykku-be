@@ -16,5 +16,6 @@ class AuthException(
         fun oauthInvalidToken(): AuthException = AuthException(AuthErrorCode.OAUTH_INVALID_TOKEN)
         fun oauthAccessDenied(): AuthException = AuthException(AuthErrorCode.OAUTH_ACCESS_DENIED)
         fun oauthServerError(): AuthException = AuthException(AuthErrorCode.OAUTH_SERVER_ERROR)
+        fun mobileLoginNotSupported(): AuthException = AuthException(AuthErrorCode.MOBILE_LOGIN_NOT_SUPPORTED)
     }
 }

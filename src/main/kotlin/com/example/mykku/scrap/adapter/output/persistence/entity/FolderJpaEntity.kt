@@ -1,6 +1,6 @@
 package com.example.mykku.scrap.adapter.output.persistence.entity
 
-import com.example.mykku.common.domain.BaseEntity
+import com.example.mykku.common.adapter.persistence.BaseJpaEntity
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.scrap.domain.entity.FolderEntity
 import jakarta.persistence.Column
@@ -29,7 +29,7 @@ class FolderJpaEntity(
 
     @Column(length = 200)
     var description: String? = null
-) : BaseEntity() {
+) : BaseJpaEntity() {
 
     fun toDomain(): FolderEntity {
         return FolderEntity.reconstitute(
