@@ -33,7 +33,8 @@ class BlockDocumentTest : BaseDocumentTest() {
             description = "특정 사용자를 차단합니다. 양방향 차단이 적용되어 서로의 콘텐츠를 볼 수 없습니다.",
             requestBodyFields = listOf(
                 fieldWithPath("memberId").type(JsonFieldType.STRING).description("차단할 사용자 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -130,7 +131,8 @@ class BlockDocumentTest : BaseDocumentTest() {
             description = "차단된 사용자의 차단을 해제합니다.",
             pathParameters = listOf(
                 parameterWithName("memberId").description("차단 해제할 사용자 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -188,7 +190,8 @@ class BlockDocumentTest : BaseDocumentTest() {
             queryParameters = listOf(
                 parameterWithName("page").description("페이지 번호 (0부터 시작)").optional(),
                 parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -254,7 +257,8 @@ class BlockDocumentTest : BaseDocumentTest() {
             description = "특정 키워드를 차단합니다. 해당 키워드가 포함된 콘텐츠가 목록에서 필터링됩니다.",
             requestBodyFields = listOf(
                 fieldWithPath("keyword").type(JsonFieldType.STRING).description("차단할 키워드 (최대 50자)")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -369,7 +373,8 @@ class BlockDocumentTest : BaseDocumentTest() {
             description = "차단된 키워드를 해제합니다.",
             pathParameters = listOf(
                 parameterWithName("keyword").description("차단 해제할 키워드")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -427,7 +432,8 @@ class BlockDocumentTest : BaseDocumentTest() {
             queryParameters = listOf(
                 parameterWithName("page").description("페이지 번호 (0부터 시작)").optional(),
                 parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test

@@ -23,7 +23,8 @@ class NotificationSettingDocumentTest : BaseDocumentTest() {
         private val apiConfig = ApiRequestConfig(
             tag = Tag.NOTIFICATION_SETTING_API,
             summary = "알림 설정 목록 조회",
-            description = "알림 설정 목록을 조회합니다."
+            description = "알림 설정 목록을 조회합니다.",
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -85,7 +86,8 @@ class NotificationSettingDocumentTest : BaseDocumentTest() {
                 fieldWithPath("notificationType").type(JsonFieldType.STRING)
                     .description("변경할 알림 타입 (FEED_LIKE, FEED_COMMENT, SYSTEM_NOTICE)"),
                 fieldWithPath("isEnabled").type(JsonFieldType.BOOLEAN).description("활성화 여부")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test

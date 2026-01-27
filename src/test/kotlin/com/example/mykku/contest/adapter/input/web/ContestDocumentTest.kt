@@ -238,7 +238,8 @@ class ContestDocumentTest : BaseDocumentTest() {
                     .optional(),
                 parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
                 parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -325,7 +326,8 @@ class ContestDocumentTest : BaseDocumentTest() {
             description = "특정 공모전의 상세 정보를 조회합니다.",
             pathParameters = listOf(
                 parameterWithName("contestId").description("공모전 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test

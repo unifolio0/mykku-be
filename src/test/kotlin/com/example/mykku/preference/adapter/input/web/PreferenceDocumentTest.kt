@@ -36,7 +36,8 @@ class PreferenceDocumentTest : BaseDocumentTest() {
             requestBodyFields = listOf(
                 fieldWithPath("genreTypes").type(JsonFieldType.ARRAY)
                     .description("장르 취향 목록 (${GenreType.entries.joinToString { it.name }})")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -100,7 +101,8 @@ class PreferenceDocumentTest : BaseDocumentTest() {
         private val apiConfig = ApiRequestConfig(
             tag = Tag.PREFERENCE_API,
             summary = "장르 취향 조회",
-            description = "장르 취향을 조회합니다."
+            description = "장르 취향을 조회합니다.",
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -144,7 +146,8 @@ class PreferenceDocumentTest : BaseDocumentTest() {
             requestBodyFields = listOf(
                 fieldWithPath("goodsTypes").type(JsonFieldType.ARRAY)
                     .description("굿즈 취향 목록 (${GoodsType.entries.joinToString { it.name }})")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -184,7 +187,8 @@ class PreferenceDocumentTest : BaseDocumentTest() {
         private val apiConfig = ApiRequestConfig(
             tag = Tag.PREFERENCE_API,
             summary = "굿즈 취향 조회",
-            description = "굿즈 취향을 조회합니다."
+            description = "굿즈 취향을 조회합니다.",
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -228,7 +232,8 @@ class PreferenceDocumentTest : BaseDocumentTest() {
             requestBodyFields = listOf(
                 fieldWithPath("moodTypes").type(JsonFieldType.ARRAY)
                     .description("분위기 취향 목록 (${MoodType.entries.joinToString { it.name }})")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -268,7 +273,8 @@ class PreferenceDocumentTest : BaseDocumentTest() {
         private val apiConfig = ApiRequestConfig(
             tag = Tag.PREFERENCE_API,
             summary = "분위기 취향 조회",
-            description = "분위기 취향을 조회합니다."
+            description = "분위기 취향을 조회합니다.",
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test

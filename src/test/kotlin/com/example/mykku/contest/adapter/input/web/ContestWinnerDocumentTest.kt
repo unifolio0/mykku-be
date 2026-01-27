@@ -223,7 +223,8 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
             ),
             requestBodyFields = listOf(
                 fieldWithPath("acceptanceSpeech").type(JsonFieldType.STRING).description("수상 소감 (최대 1000자)")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test

@@ -93,6 +93,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.http.HttpHeaders
+import org.springframework.restdocs.headers.HeaderDescriptor
+import org.springframework.restdocs.headers.HeaderDocumentation.headerWithName
 import org.springframework.restdocs.RestDocumentationContextProvider
 import org.springframework.restdocs.RestDocumentationExtension
 import org.springframework.restdocs.operation.preprocess.Preprocessors
@@ -311,6 +313,10 @@ abstract class BaseDocumentTest {
 
         val AUTH_HEADER: Headers = Headers(
             Header(HttpHeaders.AUTHORIZATION, "Bearer $TEST_ACCESS_TOKEN")
+        )
+
+        val AUTH_HEADER_DESCRIPTOR: List<HeaderDescriptor> = listOf(
+            headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer {JWT 액세스 토큰}")
         )
     }
 

@@ -74,7 +74,8 @@ class FeedDocumentTest : BaseDocumentTest() {
                     fieldWithPath("boardId").type(JsonFieldType.NUMBER).description("게시판 ID (필수)"),
                     fieldWithPath("tags").type(JsonFieldType.ARRAY).description("태그 목록 (최대 7개)").optional()
                 )
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -592,7 +593,8 @@ class FeedDocumentTest : BaseDocumentTest() {
                     fieldWithPath("tags").type(JsonFieldType.ARRAY).description("태그 목록 (최대 7개)").optional(),
                     fieldWithPath("deleteImageIds").type(JsonFieldType.ARRAY).description("삭제할 이미지 ID 목록").optional()
                 )
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
@@ -785,7 +787,8 @@ class FeedDocumentTest : BaseDocumentTest() {
             description = "피드를 삭제합니다. 작성자만 삭제할 수 있으며, 관련된 모든 데이터(이미지, 태그, 댓글, 좋아요, 스크랩)가 함께 삭제됩니다.",
             pathParameters = listOf(
                 parameterWithName("feedId").description("삭제할 피드의 ID")
-            )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
