@@ -1,5 +1,6 @@
 package com.example.mykku.feed.application.dto
 
+import com.example.mykku.role.application.dto.RoleResult
 import java.time.LocalDateTime
 
 data class FeedDetailResult(
@@ -23,7 +24,7 @@ data class AuthorResult(
     val memberId: String?,
     val nickname: String?,
     val profileImage: String,
-    val role: String
+    val role: RoleResult?
 )
 
 data class TagResult(

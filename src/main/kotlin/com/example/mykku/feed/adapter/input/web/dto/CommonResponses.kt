@@ -1,10 +1,12 @@
 package com.example.mykku.feed.adapter.input.web.dto
 
+import com.example.mykku.role.adapter.input.web.RoleResponse
+
 data class AuthorResponse(
     val memberId: String?,
     val nickname: String?,
     val profileImage: String,
-    val role: String
+    val role: RoleResponse?
 )
 
 data class TagResponse(

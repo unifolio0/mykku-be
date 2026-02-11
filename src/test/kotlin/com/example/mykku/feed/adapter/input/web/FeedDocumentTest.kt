@@ -15,6 +15,7 @@ import com.example.mykku.feed.application.dto.FeedImageResult
 import com.example.mykku.feed.application.dto.TagResult
 import com.example.mykku.feed.exception.FeedErrorCode
 import com.example.mykku.feed.exception.FeedException
+import com.example.mykku.role.application.dto.RoleResult
 import io.restassured.http.ContentType
 import java.time.LocalDateTime
 import org.junit.jupiter.api.DisplayName
@@ -305,7 +306,7 @@ class FeedDocumentTest : BaseDocumentTest() {
                     memberId = "member1",
                     nickname = "작성자닉네임",
                     profileImage = "https://example.com/profile.jpg",
-                    role = "일반 덕후"
+                    role = RoleResult(id = 1L, name = "일반 덕후", description = "일반 덕후 칭호")
                 ),
                 boardId = 1L,
                 boardTitle = "자유게시판",
@@ -345,7 +346,10 @@ class FeedDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.author.nickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
                             fieldWithPath("data.author.profileImage").type(JsonFieldType.STRING)
                                 .description("작성자 프로필 이미지 URL").optional(),
-                            fieldWithPath("data.author.role").type(JsonFieldType.STRING).description("작성자 칭호"),
+                            fieldWithPath("data.author.role").type(JsonFieldType.OBJECT).description("작성자 칭호").optional(),
+                            fieldWithPath("data.author.role.id").type(JsonFieldType.NUMBER).description("칭호 ID"),
+                            fieldWithPath("data.author.role.name").type(JsonFieldType.STRING).description("칭호 이름"),
+                            fieldWithPath("data.author.role.description").type(JsonFieldType.STRING).description("칭호 설명").optional(),
                             fieldWithPath("data.boardId").type(JsonFieldType.NUMBER).description("게시판 ID"),
                             fieldWithPath("data.boardTitle").type(JsonFieldType.STRING).description("게시판 이름"),
                             fieldWithPath("data.title").type(JsonFieldType.STRING).description("피드 제목"),
@@ -606,7 +610,7 @@ class FeedDocumentTest : BaseDocumentTest() {
                     memberId = "member1",
                     nickname = "작성자닉네임",
                     profileImage = "https://example.com/profile.jpg",
-                    role = "일반 덕후"
+                    role = RoleResult(id = 1L, name = "일반 덕후", description = "일반 덕후 칭호")
                 ),
                 boardId = 1L,
                 boardTitle = "자유게시판",
@@ -653,7 +657,10 @@ class FeedDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.author.nickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
                             fieldWithPath("data.author.profileImage").type(JsonFieldType.STRING)
                                 .description("작성자 프로필 이미지 URL").optional(),
-                            fieldWithPath("data.author.role").type(JsonFieldType.STRING).description("작성자 칭호"),
+                            fieldWithPath("data.author.role").type(JsonFieldType.OBJECT).description("작성자 칭호").optional(),
+                            fieldWithPath("data.author.role.id").type(JsonFieldType.NUMBER).description("칭호 ID"),
+                            fieldWithPath("data.author.role.name").type(JsonFieldType.STRING).description("칭호 이름"),
+                            fieldWithPath("data.author.role.description").type(JsonFieldType.STRING).description("칭호 설명").optional(),
                             fieldWithPath("data.boardId").type(JsonFieldType.NUMBER).description("게시판 ID"),
                             fieldWithPath("data.boardTitle").type(JsonFieldType.STRING).description("게시판 이름"),
                             fieldWithPath("data.title").type(JsonFieldType.STRING).description("피드 제목"),

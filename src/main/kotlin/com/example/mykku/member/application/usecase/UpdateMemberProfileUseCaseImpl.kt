@@ -6,6 +6,7 @@ import com.example.mykku.member.application.port.input.UpdateMemberProfileUseCas
 import com.example.mykku.member.application.port.output.MemberRepository
 import com.example.mykku.member.domain.entity.Member
 import com.example.mykku.member.exception.MemberException
+import com.example.mykku.role.application.dto.RoleResult
 import com.example.mykku.role.application.port.output.RoleRepository
 import com.example.mykku.role.domain.vo.RoleId
 import org.springframework.stereotype.Service
@@ -28,7 +29,8 @@ class UpdateMemberProfileUseCaseImpl(
         member.updateProfile(command.nickname, command.profileImage)
         val savedMember = memberRepository.save(member)
 
-        val roleName = savedMember.roleId?.let { roleRepository.findById(RoleId.of(it))?.name }
-        return MemberProfileResult.from(savedMember, roleName)
+        val role = savedMember.roleId?.let { roleRepository.findById(RoleId.of(it)) }
+        val roleResult = role?.let { RoleResult(it.id.value, it.name, it.description) }
+        return MemberProfileResult.from(savedMember, roleResult)
     }
 }

@@ -1,6 +1,7 @@
 package com.example.mykku.member.adapter.input.web.dto
 
 import com.example.mykku.member.application.dto.MemberProfileResult
+import com.example.mykku.role.adapter.input.web.RoleResponse
 import java.time.LocalDateTime
 
 data class MemberProfileResponse(
@@ -8,7 +9,7 @@ data class MemberProfileResponse(
     val email: String,
     val nickname: String?,
     val profileImage: String,
-    val role: String?,
+    val role: RoleResponse?,
     val provider: String?,
     val emailVerified: Boolean,
     val createdAt: LocalDateTime
@@ -20,7 +21,7 @@ data class MemberProfileResponse(
                 email = result.email,
                 nickname = result.nickname,
                 profileImage = result.profileImage,
-                role = result.roleName,
+                role = result.role?.let { RoleResponse(it.id, it.name, it.description) },
                 provider = result.provider,
                 emailVerified = result.emailVerified,
                 createdAt = result.createdAt

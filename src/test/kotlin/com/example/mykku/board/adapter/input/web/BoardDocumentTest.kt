@@ -20,6 +20,7 @@ import com.example.mykku.feed.application.dto.PagedFeedsResult
 import com.example.mykku.feed.application.dto.PopularFeedResult
 import com.example.mykku.feed.application.dto.PopularFeedsResult
 import com.example.mykku.feed.application.dto.TagResult
+import com.example.mykku.role.application.dto.RoleResult
 import io.restassured.http.ContentType
 import java.time.LocalDateTime
 import org.junit.jupiter.api.DisplayName
@@ -104,7 +105,7 @@ class BoardDocumentTest : BaseDocumentTest() {
                             memberId = "member1",
                             nickname = "닉네임1",
                             profileImage = "https://example.com/profile1.jpg",
-                            role = "일반 덕후"
+                            role = RoleResult(id = 1L, name = "일반 덕후", description = "일반 덕후 칭호")
                         ),
                         board = "자유게시판",
                         createdAt = LocalDateTime.of(2024, 1, 1, 12, 0),
@@ -163,7 +164,10 @@ class BoardDocumentTest : BaseDocumentTest() {
                                 .description("작성자 닉네임"),
                             fieldWithPath("data.feeds[].author.profileImage").type(JsonFieldType.STRING)
                                 .description("작성자 프로필 이미지 URL").optional(),
-                            fieldWithPath("data.feeds[].author.role").type(JsonFieldType.STRING).description("작성자 칭호"),
+                            fieldWithPath("data.feeds[].author.role").type(JsonFieldType.OBJECT).description("작성자 칭호").optional(),
+                            fieldWithPath("data.feeds[].author.role.id").type(JsonFieldType.NUMBER).description("칭호 ID"),
+                            fieldWithPath("data.feeds[].author.role.name").type(JsonFieldType.STRING).description("칭호 이름"),
+                            fieldWithPath("data.feeds[].author.role.description").type(JsonFieldType.STRING).description("칭호 설명").optional(),
                             fieldWithPath("data.feeds[].board").type(JsonFieldType.STRING).description("게시판 이름"),
                             fieldWithPath("data.feeds[].title").type(JsonFieldType.STRING).description("피드 제목"),
                             fieldWithPath("data.feeds[].content").type(JsonFieldType.STRING).description("피드 내용"),

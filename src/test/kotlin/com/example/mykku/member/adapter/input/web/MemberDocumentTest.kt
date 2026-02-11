@@ -11,6 +11,7 @@ import com.example.mykku.member.adapter.input.web.dto.UpdateProfileRequest
 import com.example.mykku.member.application.dto.MemberProfileResult
 import com.example.mykku.member.exception.MemberErrorCode
 import com.example.mykku.member.exception.MemberException
+import com.example.mykku.role.application.dto.RoleResult
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -116,8 +117,7 @@ class MemberDocumentTest : BaseDocumentTest() {
                 email = TEST_MEMBER_EMAIL,
                 nickname = "testuser",
                 profileImage = "https://example.com/profile.jpg",
-                roleId = 1L,
-                roleName = "테스트 칭호",
+                role = RoleResult(id = 1L, name = "테스트 칭호", description = "테스트 칭호 설명"),
                 provider = "GOOGLE",
                 emailVerified = true,
                 createdAt = LocalDateTime.now()
@@ -135,7 +135,10 @@ class MemberDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.email").type(JsonFieldType.STRING).description("이메일"),
                             fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("닉네임"),
                             fieldWithPath("data.profileImage").type(JsonFieldType.STRING).description("프로필 이미지 URL"),
-                            fieldWithPath("data.role").type(JsonFieldType.STRING).description("역할/칭호").optional(),
+                            fieldWithPath("data.role").type(JsonFieldType.OBJECT).description("역할/칭호").optional(),
+                            fieldWithPath("data.role.id").type(JsonFieldType.NUMBER).description("칭호 ID"),
+                            fieldWithPath("data.role.name").type(JsonFieldType.STRING).description("칭호 이름"),
+                            fieldWithPath("data.role.description").type(JsonFieldType.STRING).description("칭호 설명").optional(),
                             fieldWithPath("data.provider").type(JsonFieldType.STRING).description("가입 경로 (GOOGLE, KAKAO, EMAIL 등)").optional(),
                             fieldWithPath("data.emailVerified").type(JsonFieldType.BOOLEAN).description("이메일 인증 여부"),
                             fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("가입일시")
@@ -180,8 +183,7 @@ class MemberDocumentTest : BaseDocumentTest() {
                 email = TEST_MEMBER_EMAIL,
                 nickname = "새닉네임",
                 profileImage = "https://example.com/new-profile.jpg",
-                roleId = 1L,
-                roleName = "테스트 칭호",
+                role = RoleResult(id = 1L, name = "테스트 칭호", description = "테스트 칭호 설명"),
                 provider = "GOOGLE",
                 emailVerified = true,
                 createdAt = LocalDateTime.now()
@@ -199,7 +201,10 @@ class MemberDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.email").type(JsonFieldType.STRING).description("이메일"),
                             fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("닉네임"),
                             fieldWithPath("data.profileImage").type(JsonFieldType.STRING).description("프로필 이미지 URL"),
-                            fieldWithPath("data.role").type(JsonFieldType.STRING).description("역할/칭호").optional(),
+                            fieldWithPath("data.role").type(JsonFieldType.OBJECT).description("역할/칭호").optional(),
+                            fieldWithPath("data.role.id").type(JsonFieldType.NUMBER).description("칭호 ID"),
+                            fieldWithPath("data.role.name").type(JsonFieldType.STRING).description("칭호 이름"),
+                            fieldWithPath("data.role.description").type(JsonFieldType.STRING).description("칭호 설명").optional(),
                             fieldWithPath("data.provider").type(JsonFieldType.STRING).description("가입 경로").optional(),
                             fieldWithPath("data.emailVerified").type(JsonFieldType.BOOLEAN).description("이메일 인증 여부"),
                             fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("가입일시")
@@ -296,8 +301,7 @@ class MemberDocumentTest : BaseDocumentTest() {
                 email = TEST_MEMBER_EMAIL,
                 nickname = "새닉네임",
                 profileImage = "https://example.com/profile.jpg",
-                roleId = null,
-                roleName = null,
+                role = null,
                 provider = "GOOGLE",
                 emailVerified = true,
                 createdAt = LocalDateTime.now()
@@ -315,7 +319,7 @@ class MemberDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.email").type(JsonFieldType.STRING).description("이메일"),
                             fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("닉네임"),
                             fieldWithPath("data.profileImage").type(JsonFieldType.STRING).description("프로필 이미지 URL"),
-                            fieldWithPath("data.role").type(JsonFieldType.STRING).description("역할/칭호").optional(),
+                            fieldWithPath("data.role").type(JsonFieldType.OBJECT).description("역할/칭호").optional(),
                             fieldWithPath("data.provider").type(JsonFieldType.STRING).description("가입 경로").optional(),
                             fieldWithPath("data.emailVerified").type(JsonFieldType.BOOLEAN).description("이메일 인증 여부"),
                             fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("가입일시")

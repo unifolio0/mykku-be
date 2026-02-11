@@ -18,9 +18,9 @@ import com.example.mykku.feed.application.port.output.FeedRepository
 import com.example.mykku.feed.application.port.output.FeedTagRepository
 import com.example.mykku.feed.domain.entity.Feed
 import com.example.mykku.feed.domain.entity.FeedTag
-import com.example.mykku.feed.domain.vo.FeedId
 import com.example.mykku.like.application.port.output.LikeFeedPort
 import com.example.mykku.member.application.port.output.MemberRepository
+import com.example.mykku.role.application.dto.RoleResult
 import com.example.mykku.role.application.port.output.RoleRepository
 import com.example.mykku.role.domain.vo.RoleId
 import com.example.mykku.scrap.application.port.output.SaveFeedPort
@@ -101,7 +101,8 @@ class ListFeedsUseCaseImpl(
 
             val member = membersMap[feed.memberId]
             val board = boardsMap[feed.boardId]
-            val roleName = member?.roleId?.let { roleRepository.findById(RoleId.of(it))?.name } ?: ""
+            val role = member?.roleId?.let { roleRepository.findById(RoleId.of(it)) }
+            val roleResult = role?.let { RoleResult(it.id.value, it.name, it.description) }
 
             val firstComment = feedCommentRepository.findByFeedIdAndParentCommentIsNull(
                 feed.id!!, PageRequest.of(0, 1)
@@ -115,7 +116,7 @@ class ListFeedsUseCaseImpl(
                     memberId = member?.memberId ?: "",
                     nickname = member?.nickname ?: "",
                     profileImage = member?.profileImage ?: "",
-                    role = roleName
+                    role = roleResult
                 ),
                 board = board?.title ?: "",
                 createdAt = feed.createdAt,

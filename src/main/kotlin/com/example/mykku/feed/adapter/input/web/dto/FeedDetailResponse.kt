@@ -1,6 +1,7 @@
 package com.example.mykku.feed.adapter.input.web.dto
 
 import com.example.mykku.feed.application.dto.FeedDetailResult
+import com.example.mykku.role.adapter.input.web.RoleResponse
 import java.time.LocalDateTime
 
 data class FeedDetailResponse(
@@ -26,7 +27,7 @@ data class FeedDetailResponse(
                 memberId = result.author.memberId,
                 nickname = result.author.nickname,
                 profileImage = result.author.profileImage,
-                role = result.author.role
+                role = result.author.role?.let { RoleResponse(it.id, it.name, it.description) }
             ),
             boardId = result.boardId,
             boardTitle = result.boardTitle,

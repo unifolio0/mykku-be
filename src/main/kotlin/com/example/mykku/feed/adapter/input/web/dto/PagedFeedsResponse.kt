@@ -1,6 +1,7 @@
 package com.example.mykku.feed.adapter.input.web.dto
 
 import com.example.mykku.feed.application.dto.PagedFeedsResult
+import com.example.mykku.role.adapter.input.web.RoleResponse
 import java.time.LocalDateTime
 
 data class PagedFeedsResponse(
@@ -21,7 +22,7 @@ data class PagedFeedsResponse(
                         memberId = feedResult.author.memberId,
                         nickname = feedResult.author.nickname,
                         profileImage = feedResult.author.profileImage,
-                        role = feedResult.author.role
+                        role = feedResult.author.role?.let { RoleResponse(it.id, it.name, it.description) }
                     ),
                     board = feedResult.board,
                     createdAt = feedResult.createdAt,

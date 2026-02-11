@@ -9,6 +9,7 @@ import com.example.mykku.feed.application.dto.FeedDetailResult
 import com.example.mykku.feed.application.dto.FeedImageResult
 import com.example.mykku.feed.application.dto.GetFeedDetailQuery
 import com.example.mykku.feed.application.dto.TagResult
+import com.example.mykku.role.application.dto.RoleResult
 import com.example.mykku.feed.application.port.input.GetFeedDetailUseCase
 import com.example.mykku.feed.application.port.output.FeedImageRepository
 import com.example.mykku.feed.application.port.output.FeedRepository
@@ -47,7 +48,8 @@ class GetFeedDetailUseCaseImpl(
             ?: throw BoardException.boardNotFound()
         val member = memberRepository.findByIdString(feed.memberId)
             ?: throw MemberException.memberNotFound()
-        val roleName = member.roleId?.let { roleRepository.findById(RoleId.of(it))?.name } ?: ""
+        val role = member.roleId?.let { roleRepository.findById(RoleId.of(it)) }
+        val roleResult = role?.let { RoleResult(it.id.value, it.name, it.description) }
 
         val contestTagTitles = getContestTagTitles(feedTags.map { it.title })
 
@@ -60,7 +62,7 @@ class GetFeedDetailUseCaseImpl(
                 memberId = member.memberId,
                 nickname = member.nickname,
                 profileImage = member.profileImage,
-                role = roleName
+                role = roleResult
             ),
             boardId = feed.boardId,
             boardTitle = board.title,
