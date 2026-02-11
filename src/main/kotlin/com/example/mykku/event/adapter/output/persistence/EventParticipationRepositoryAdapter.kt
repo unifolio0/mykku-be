@@ -24,7 +24,7 @@ class EventParticipationRepositoryAdapter(
     override fun save(participation: EventParticipation): EventParticipation {
         val eventJpaEntity = eventJpaRepository.findById(participation.eventId.value)
             .orElseThrow { EventException.eventNotFound() }
-        val memberJpaEntity = memberJpaRepository.findById(participation.memberId)
+        val memberJpaEntity = memberJpaRepository.findById(participation.memberId!!)
             .orElseThrow { MemberException.memberNotFound() }
 
         val entity = EventParticipationJpaEntity.fromDomain(participation, eventJpaEntity, memberJpaEntity)

@@ -28,7 +28,7 @@ class ContestParticipationRepositoryAdapter(
     override fun save(participation: ContestParticipation): ContestParticipation {
         val contestJpaEntity = contestJpaRepository.findById(participation.contestId.value)
             .orElseThrow { ContestException.contestNotFound() }
-        val memberJpaEntity = memberJpaRepository.findByMemberId(participation.memberId)
+        val memberJpaEntity = memberJpaRepository.findByMemberId(participation.memberId!!)
             ?: throw MemberException.memberNotFound()
         val feedJpaEntity = feedJpaRepository.findById(participation.feedId)
             .orElseThrow { FeedException.feedNotFound() }

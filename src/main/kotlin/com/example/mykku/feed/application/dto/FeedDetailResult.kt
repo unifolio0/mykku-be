@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 
 data class FeedDetailResult(
     val id: Long,
-    val author: AuthorResult,
+    val author: AuthorResult?,
     val boardId: Long,
     val boardTitle: String,
     val createdAt: LocalDateTime,

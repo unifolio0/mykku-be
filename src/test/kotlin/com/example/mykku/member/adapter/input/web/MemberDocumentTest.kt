@@ -9,6 +9,7 @@ import com.example.mykku.member.adapter.input.web.dto.CheckMemberIdRequest
 import com.example.mykku.member.adapter.input.web.dto.SetupProfileRequest
 import com.example.mykku.member.adapter.input.web.dto.UpdateProfileRequest
 import com.example.mykku.member.application.dto.MemberProfileResult
+import com.example.mykku.member.domain.vo.MemberId
 import com.example.mykku.member.exception.MemberErrorCode
 import com.example.mykku.member.exception.MemberException
 import com.example.mykku.role.application.dto.RoleResult
@@ -20,6 +21,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.eq
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import java.time.LocalDateTime
@@ -360,6 +362,35 @@ class MemberDocumentTest : BaseDocumentTest() {
                 .post("/api/v1/members/setup-profile")
                 .then()
                 .statusCode(409)
+        }
+    }
+
+    @Nested
+    @DisplayName("회원 탈퇴")
+    inner class Withdraw {
+
+        private val apiConfig = ApiRequestConfig(
+            tag = Tag.MEMBER_API,
+            summary = "회원 탈퇴",
+            description = "회원 탈퇴를 진행합니다. 작성한 콘텐츠(피드, 댓글 등)는 유지되며 작성자가 '탈퇴한 회원'으로 표시됩니다.",
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
+        )
+
+        @Test
+        fun `성공`() {
+            doNothing().whenever(withdrawMemberUseCase).execute(MemberId.of(TEST_MEMBER_ID))
+
+            val documentFilter = document("member/withdraw", 204)
+                .request(request().applyConfig(apiConfig))
+                .response(response())
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .`when`()
+                .delete("/api/v1/members/me")
+                .then()
+                .statusCode(204)
         }
     }
 

@@ -13,9 +13,11 @@ import com.example.mykku.member.application.port.input.CheckMemberIdUseCase
 import com.example.mykku.member.application.port.input.GetMemberProfileUseCase
 import com.example.mykku.member.application.port.input.SetupProfileUseCase
 import com.example.mykku.member.application.port.input.UpdateMemberProfileUseCase
+import com.example.mykku.member.application.port.input.WithdrawMemberUseCase
 import com.example.mykku.member.domain.entity.Member
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -31,7 +33,8 @@ class MemberController(
     private val updateMemberProfileUseCase: UpdateMemberProfileUseCase,
     private val changePasswordUseCase: ChangePasswordUseCase,
     private val setupProfileUseCase: SetupProfileUseCase,
-    private val checkMemberIdUseCase: CheckMemberIdUseCase
+    private val checkMemberIdUseCase: CheckMemberIdUseCase,
+    private val withdrawMemberUseCase: WithdrawMemberUseCase
 ) {
 
     @GetMapping("/me")
@@ -70,6 +73,14 @@ class MemberController(
         val result = setupProfileUseCase.setupProfile(member, request.toCommand())
         val response = MemberProfileResponse.from(result)
         return ResponseEntity.ok(ApiResponse("프로필 설정이 완료되었습니다", response))
+    }
+
+    @DeleteMapping("/me")
+    fun withdraw(
+        @CurrentMember member: Member
+    ): ResponseEntity<Unit> {
+        withdrawMemberUseCase.execute(member.id)
+        return ResponseEntity.noContent().build()
     }
 
     @PostMapping("/check-id")

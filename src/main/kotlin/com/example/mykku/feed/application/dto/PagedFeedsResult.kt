@@ -14,7 +14,7 @@ data class PagedFeedsResult(
 
 data class FeedResult(
     val id: Long,
-    val author: AuthorResult,
+    val author: AuthorResult?,
     val board: String,
     val createdAt: LocalDateTime,
     val title: String,
@@ -29,6 +29,6 @@ data class FeedResult(
 )
 
 data class CommentPreviewResult(
-    val profileImage: String,
+    val profileImage: String?,
     val content: String
 )

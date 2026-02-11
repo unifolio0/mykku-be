@@ -335,4 +335,32 @@ class MemberControllerTest : BaseControllerTest() {
             .body("data.memberId", equalTo("takenid2"))
             .body("data.available", equalTo(false))
     }
+
+    @Test
+    @DisplayName("회원 탈퇴 - 정상 케이스")
+    fun `withdraw - 정상적으로 회원을 탈퇴한다`() {
+        createAndSaveMember(
+            id = "withdrawMember",
+            nickname = "탈퇴유저",
+            email = "withdraw@example.com"
+        )
+        val authHeader = getBearerToken("withdrawMember")
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .`when`()
+            .delete("/api/v1/members/me")
+            .then()
+            .statusCode(204)
+    }
+
+    @Test
+    @DisplayName("회원 탈퇴 - 인증되지 않은 사용자")
+    fun `withdraw - 인증되지 않은 사용자는 탈퇴할 수 없다`() {
+        RestAssured.given()
+            .`when`()
+            .delete("/api/v1/members/me")
+            .then()
+            .statusCode(401)
+    }
 }

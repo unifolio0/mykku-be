@@ -37,7 +37,7 @@ class FeedCommentJpaEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    val member: MemberJpaEntity
+    val member: MemberJpaEntity? = null
 ) : BaseJpaEntity() {
 
     companion object {
@@ -72,7 +72,7 @@ class FeedCommentJpaEntity(
         likeCount = likeCount,
         feedId = feed.id!!,
         parentCommentId = parentComment?.id,
-        memberId = member.id,
+        memberId = member?.id,
         createdAt = createdAt,
         updatedAt = updatedAt
     )

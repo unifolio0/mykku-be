@@ -12,4 +12,5 @@ interface MemberRepository {
     fun findByEmail(email: String): Member?
     fun existsByMemberId(memberId: String): Boolean
     fun findByMemberId(memberId: String): Member?
+    fun deleteById(id: MemberId)
 }

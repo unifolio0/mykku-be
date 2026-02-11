@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 data class FeedCommentResponse(
     val id: Long,
     val content: String,
-    val author: CommentAuthorResponse,
+    val author: CommentAuthorResponse?,
     val likeCount: Int,
     val isLiked: Boolean,
     val replies: List<FeedCommentReplyResponse>,
@@ -19,13 +19,13 @@ data class FeedCommentResponse(
 data class CommentAuthorResponse(
     val memberId: String?,
     val nickname: String?,
-    val profileImage: String
+    val profileImage: String?
 )
 
 data class FeedCommentReplyResponse(
     val id: Long,
     val content: String,
-    val author: CommentAuthorResponse,
+    val author: CommentAuthorResponse?,
     val likeCount: Int,
     val isLiked: Boolean,
     val createdAt: LocalDateTime,
@@ -47,22 +47,26 @@ data class FeedCommentsResponse(
                     FeedCommentResponse(
                         id = commentResult.id,
                         content = commentResult.content,
-                        author = CommentAuthorResponse(
-                            memberId = commentResult.author.memberId,
-                            nickname = commentResult.author.nickname,
-                            profileImage = commentResult.author.profileImage
-                        ),
+                        author = commentResult.author?.let {
+                            CommentAuthorResponse(
+                                memberId = it.memberId,
+                                nickname = it.nickname,
+                                profileImage = it.profileImage
+                            )
+                        },
                         likeCount = commentResult.likeCount,
                         isLiked = commentResult.isLiked,
                         replies = commentResult.replies.map { replyResult ->
                             FeedCommentReplyResponse(
                                 id = replyResult.id,
                                 content = replyResult.content,
-                                author = CommentAuthorResponse(
-                                    memberId = replyResult.author.memberId,
-                                    nickname = replyResult.author.nickname,
-                                    profileImage = replyResult.author.profileImage
-                                ),
+                                author = replyResult.author?.let {
+                                    CommentAuthorResponse(
+                                        memberId = it.memberId,
+                                        nickname = it.nickname,
+                                        profileImage = it.profileImage
+                                    )
+                                },
                                 likeCount = replyResult.likeCount,
                                 isLiked = replyResult.isLiked,
                                 createdAt = replyResult.createdAt,
@@ -87,7 +91,7 @@ data class FeedCommentsResponse(
 data class SingleFeedCommentResponse(
     val id: Long,
     val content: String,
-    val author: CommentAuthorResponse,
+    val author: CommentAuthorResponse?,
     val likeCount: Int,
     val createdAt: LocalDateTime
 ) {
@@ -96,11 +100,13 @@ data class SingleFeedCommentResponse(
             return SingleFeedCommentResponse(
                 id = result.id,
                 content = result.content,
-                author = CommentAuthorResponse(
-                    memberId = result.author.memberId,
-                    nickname = result.author.nickname,
-                    profileImage = result.author.profileImage
-                ),
+                author = result.author?.let {
+                    CommentAuthorResponse(
+                        memberId = it.memberId,
+                        nickname = it.nickname,
+                        profileImage = it.profileImage
+                    )
+                },
                 likeCount = result.likeCount,
                 createdAt = result.createdAt
             )

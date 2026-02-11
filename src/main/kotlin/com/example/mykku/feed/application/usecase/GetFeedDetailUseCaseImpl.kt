@@ -17,7 +17,6 @@ import com.example.mykku.feed.application.port.output.FeedTagRepository
 import com.example.mykku.feed.domain.vo.FeedId
 import com.example.mykku.like.application.port.output.LikeFeedPort
 import com.example.mykku.member.application.port.output.MemberRepository
-import com.example.mykku.member.exception.MemberException
 import com.example.mykku.role.application.port.output.RoleRepository
 import com.example.mykku.role.domain.vo.RoleId
 import com.example.mykku.scrap.application.port.output.SaveFeedPort
@@ -46,10 +45,17 @@ class GetFeedDetailUseCaseImpl(
 
         val board = boardRepository.findById(BoardId(feed.boardId))
             ?: throw BoardException.boardNotFound()
-        val member = memberRepository.findByIdString(feed.memberId)
-            ?: throw MemberException.memberNotFound()
-        val role = member.roleId?.let { roleRepository.findById(RoleId.of(it)) }
-        val roleResult = role?.let { RoleResult(it.id.value, it.name, it.description) }
+        val member = feed.memberId?.let { memberRepository.findByIdString(it) }
+        val authorResult = member?.let {
+            val role = it.roleId?.let { roleId -> roleRepository.findById(RoleId.of(roleId)) }
+            val roleResult = role?.let { r -> RoleResult(r.id.value, r.name, r.description) }
+            AuthorResult(
+                memberId = it.memberId,
+                nickname = it.nickname,
+                profileImage = it.profileImage,
+                role = roleResult
+            )
+        }
 
         val contestTagTitles = getContestTagTitles(feedTags.map { it.title })
 
@@ -58,12 +64,7 @@ class GetFeedDetailUseCaseImpl(
 
         return FeedDetailResult(
             id = feed.id!!.value,
-            author = AuthorResult(
-                memberId = member.memberId,
-                nickname = member.nickname,
-                profileImage = member.profileImage,
-                role = roleResult
-            ),
+            author = authorResult,
             boardId = feed.boardId,
             boardTitle = board.title,
             createdAt = feed.createdAt,
