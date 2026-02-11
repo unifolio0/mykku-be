@@ -62,7 +62,8 @@ class JwtTokenProviderAdapter(
                 nickname = member.nickname,
                 profileImage = member.profileImage
             ),
-            isExistingUser = isExistingUser
+            isExistingUser = isExistingUser,
+            isProfileComplete = member.isProfileComplete
         )
     }
 

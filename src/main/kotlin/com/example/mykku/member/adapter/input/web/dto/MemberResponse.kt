@@ -4,9 +4,9 @@ import com.example.mykku.member.application.dto.MemberProfileResult
 import java.time.LocalDateTime
 
 data class MemberProfileResponse(
-    val memberId: String,
+    val memberId: String?,
     val email: String,
-    val nickname: String,
+    val nickname: String?,
     val profileImage: String,
     val role: String?,
     val provider: String?,
@@ -28,3 +28,8 @@ data class MemberProfileResponse(
         }
     }
 }
+
+data class CheckMemberIdResponse(
+    val memberId: String,
+    val available: Boolean
+)

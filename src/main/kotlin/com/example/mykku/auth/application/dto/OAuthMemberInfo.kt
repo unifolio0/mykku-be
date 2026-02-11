@@ -4,7 +4,6 @@ import com.example.mykku.member.domain.vo.SocialProvider
 
 data class OAuthMemberInfo(
     val memberId: String,
-    val nickname: String,
     val profileImage: String,
     val provider: SocialProvider,
     val socialId: String,

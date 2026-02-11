@@ -20,8 +20,8 @@ data class FeedDetailResult(
 )
 
 data class AuthorResult(
-    val memberId: String,
-    val nickname: String,
+    val memberId: String?,
+    val nickname: String?,
     val profileImage: String,
     val role: String
 )

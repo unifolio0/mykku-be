@@ -4,9 +4,9 @@ import com.example.mykku.member.domain.entity.Member
 import java.time.LocalDateTime
 
 data class MemberProfileResult(
-    val memberId: String,
+    val memberId: String?,
     val email: String,
-    val nickname: String,
+    val nickname: String?,
     val profileImage: String,
     val roleId: Long?,
     val roleName: String?,

@@ -61,7 +61,8 @@ class AuthDocumentTest : BaseDocumentTest() {
                     nickname = "홍길동",
                     profileImage = "https://lh3.googleusercontent.com/profile.jpg"
                 ),
-                isExistingUser = true
+                isExistingUser = true,
+                isProfileComplete = true
             )
 
             whenever(mobileLoginUseCase.login(any())).thenReturn(loginResult)
@@ -87,7 +88,9 @@ class AuthDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.member.profileImage").type(JsonFieldType.STRING)
                                 .description("프로필 이미지 URL").optional(),
                             fieldWithPath("data.isExistingUser").type(JsonFieldType.BOOLEAN)
-                                .description("기존 가입자 여부 (true: 기존 가입자, false: 신규 가입자)")
+                                .description("기존 가입자 여부 (true: 기존 가입자, false: 신규 가입자)"),
+                            fieldWithPath("data.isProfileComplete").type(JsonFieldType.BOOLEAN)
+                                .description("프로필 설정 완료 여부 (true: 완료, false: 미완료)")
                         )
                 )
                 .build()

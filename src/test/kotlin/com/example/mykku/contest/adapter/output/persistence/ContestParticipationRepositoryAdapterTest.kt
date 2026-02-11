@@ -237,7 +237,7 @@ class ContestParticipationRepositoryAdapterTest : BaseRepositoryTest() {
             createAndSaveParticipation(contest2, member, feed2)
 
             val page = contestParticipationRepository.findContestsByMemberId(
-                member.memberId,
+                member.memberId!!,
                 PageRequest.of(0, 10)
             )
 
@@ -272,7 +272,7 @@ class ContestParticipationRepositoryAdapterTest : BaseRepositoryTest() {
             createAndSaveParticipation(contest2, member, feed2)
 
             val participations = contestParticipationRepository.findByMemberIdAndContestIds(
-                member.memberId,
+                member.memberId!!,
                 listOf(ContestId(contest1.id!!), ContestId(contest2.id!!))
             )
 
@@ -285,7 +285,7 @@ class ContestParticipationRepositoryAdapterTest : BaseRepositoryTest() {
             val member = createAndSaveMember()
 
             val participations = contestParticipationRepository.findByMemberIdAndContestIds(
-                member.memberId,
+                member.memberId!!,
                 emptyList()
             )
 
@@ -306,7 +306,7 @@ class ContestParticipationRepositoryAdapterTest : BaseRepositoryTest() {
             createAndSaveParticipation(contest, member, feed)
 
             val exists = contestParticipationRepository.existsByMemberIdAndContestId(
-                member.memberId,
+                member.memberId!!,
                 ContestId(contest.id!!)
             )
 
@@ -320,7 +320,7 @@ class ContestParticipationRepositoryAdapterTest : BaseRepositoryTest() {
             val contest = createAndSaveContest()
 
             val exists = contestParticipationRepository.existsByMemberIdAndContestId(
-                member.memberId,
+                member.memberId!!,
                 ContestId(contest.id!!)
             )
 
@@ -341,7 +341,7 @@ class ContestParticipationRepositoryAdapterTest : BaseRepositoryTest() {
             createAndSaveParticipation(contest, member, feed)
 
             val exists = contestParticipationRepository.existsByMemberIdAndContestIdAndFeedId(
-                member.memberId,
+                member.memberId!!,
                 ContestId(contest.id!!),
                 feed.id!!
             )
@@ -357,7 +357,7 @@ class ContestParticipationRepositoryAdapterTest : BaseRepositoryTest() {
             val feed = createAndSaveFeed(member = member)
 
             val exists = contestParticipationRepository.existsByMemberIdAndContestIdAndFeedId(
-                member.memberId,
+                member.memberId!!,
                 ContestId(contest.id!!),
                 feed.id!!
             )

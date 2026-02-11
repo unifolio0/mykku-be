@@ -7,7 +7,6 @@ import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
 import com.example.mykku.docs.Tag
 import com.example.mykku.email.domain.VerificationPurpose
-import com.example.mykku.email.dto.CheckMemberIdRequest
 import com.example.mykku.email.dto.EmailLoginRequest
 import com.example.mykku.email.dto.ResetPasswordRequest
 import com.example.mykku.email.dto.SendTemporaryPasswordRequest
@@ -204,20 +203,16 @@ class EmailAuthDocumentTest : BaseDocumentTest() {
             summary = "이메일 회원가입",
             description = "이메일로 회원가입합니다.",
             requestBodyFields = listOf(
-                fieldWithPath("memberId").type(JsonFieldType.STRING).description("사용자 아이디 (영문+숫자, 최대 16자)"),
                 fieldWithPath("email").type(JsonFieldType.STRING).description("가입할 이메일 주소"),
-                fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호 (최소 8자, 영문/숫자/특수문자 포함)"),
-                fieldWithPath("nickname").type(JsonFieldType.STRING).description("닉네임 (최대 10자)")
+                fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호 (최소 8자, 영문/숫자/특수문자 포함)")
             )
         )
 
         @Test
         fun `성공`() {
             val request = SignupRequest(
-                memberId = "newuser123",
                 email = "newuser@example.com",
-                password = "password123!",
-                nickname = "신규유저"
+                password = "password123!"
             )
 
             val loginResponse = LoginResponse(
@@ -226,15 +221,16 @@ class EmailAuthDocumentTest : BaseDocumentTest() {
                 accessTokenExpiresIn = 86400000,
                 refreshTokenExpiresIn = 1209600000,
                 member = MemberInfo(
-                    memberId = "newUserId",
+                    memberId = null,
                     email = request.email,
-                    nickname = request.nickname,
+                    nickname = null,
                     profileImage = ""
                 ),
-                isExistingUser = false
+                isExistingUser = false,
+                isProfileComplete = false
             )
 
-            `when`(emailAuthService.signup(any(), any(), any(), any())).thenReturn(loginResponse)
+            `when`(emailAuthService.signup(any(), any())).thenReturn(loginResponse)
 
             val documentFilter = document("email-auth/signup", 200)
                 .request(request().applyConfig(apiConfig))
@@ -251,13 +247,14 @@ class EmailAuthDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.refreshTokenExpiresIn").type(JsonFieldType.NUMBER)
                                 .description("리프레시 토큰 만료 시간 (밀리초)"),
                             fieldWithPath("data.member").type(JsonFieldType.OBJECT).description("회원 정보"),
-                            fieldWithPath("data.member.memberId").type(JsonFieldType.STRING).description("회원 ID"),
+                            fieldWithPath("data.member.memberId").type(JsonFieldType.NULL).description("회원 ID (프로필 설정 전에는 null)").optional(),
                             fieldWithPath("data.member.email").type(JsonFieldType.STRING).description("회원 이메일"),
-                            fieldWithPath("data.member.nickname").type(JsonFieldType.STRING).description("회원 닉네임"),
+                            fieldWithPath("data.member.nickname").type(JsonFieldType.NULL).description("회원 닉네임 (프로필 설정 전에는 null)").optional(),
                             fieldWithPath("data.member.profileImage").type(JsonFieldType.STRING)
                                 .description("프로필 이미지 URL")
                                 .optional(),
-                            fieldWithPath("data.isExistingUser").type(JsonFieldType.BOOLEAN).description("기존 가입자 여부")
+                            fieldWithPath("data.isExistingUser").type(JsonFieldType.BOOLEAN).description("기존 가입자 여부"),
+                            fieldWithPath("data.isProfileComplete").type(JsonFieldType.BOOLEAN).description("프로필 설정 완료 여부")
                         )
                 )
                 .build()
@@ -274,13 +271,11 @@ class EmailAuthDocumentTest : BaseDocumentTest() {
         @Test
         fun `이미 존재하는 이메일`() {
             val request = SignupRequest(
-                memberId = "existinguser",
                 email = "existing@example.com",
-                password = "password123!",
-                nickname = "기존유저"
+                password = "password123!"
             )
 
-            `when`(emailAuthService.signup(any(), any(), any(), any()))
+            `when`(emailAuthService.signup(any(), any()))
                 .thenThrow(EmailAuthException(EmailAuthErrorCode.EMAIL_ALREADY_EXISTS))
 
             val documentFilter = document("email-auth/signup", "EMAIL_ALREADY_EXISTS")
@@ -330,7 +325,8 @@ class EmailAuthDocumentTest : BaseDocumentTest() {
                     nickname = "테스트유저",
                     profileImage = ""
                 ),
-                isExistingUser = true
+                isExistingUser = true,
+                isProfileComplete = true
             )
 
             `when`(emailAuthService.login(any(), any())).thenReturn(loginResponse)
@@ -350,13 +346,14 @@ class EmailAuthDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.refreshTokenExpiresIn").type(JsonFieldType.NUMBER)
                                 .description("리프레시 토큰 만료 시간 (밀리초)"),
                             fieldWithPath("data.member").type(JsonFieldType.OBJECT).description("회원 정보"),
-                            fieldWithPath("data.member.memberId").type(JsonFieldType.STRING).description("회원 ID"),
+                            fieldWithPath("data.member.memberId").type(JsonFieldType.STRING).description("회원 ID").optional(),
                             fieldWithPath("data.member.email").type(JsonFieldType.STRING).description("회원 이메일"),
-                            fieldWithPath("data.member.nickname").type(JsonFieldType.STRING).description("회원 닉네임"),
+                            fieldWithPath("data.member.nickname").type(JsonFieldType.STRING).description("회원 닉네임").optional(),
                             fieldWithPath("data.member.profileImage").type(JsonFieldType.STRING)
                                 .description("프로필 이미지 URL")
                                 .optional(),
-                            fieldWithPath("data.isExistingUser").type(JsonFieldType.BOOLEAN).description("기존 가입자 여부")
+                            fieldWithPath("data.isExistingUser").type(JsonFieldType.BOOLEAN).description("기존 가입자 여부"),
+                            fieldWithPath("data.isProfileComplete").type(JsonFieldType.BOOLEAN).description("프로필 설정 완료 여부")
                         )
                 )
                 .build()
@@ -481,71 +478,4 @@ class EmailAuthDocumentTest : BaseDocumentTest() {
         }
     }
 
-    @Nested
-    @DisplayName("아이디 중복 확인")
-    inner class CheckMemberId {
-
-        private val apiConfig = ApiRequestConfig(
-            tag = Tag.EMAIL_AUTH_API,
-            summary = "아이디 중복 확인",
-            description = "회원가입 전 아이디 사용 가능 여부를 확인합니다.",
-            requestBodyFields = listOf(
-                fieldWithPath("memberId").type(JsonFieldType.STRING).description("확인할 아이디 (영문+숫자, 최대 16자)")
-            )
-        )
-
-        @Test
-        fun `사용 가능한 아이디`() {
-            val request = CheckMemberIdRequest(memberId = "newuser123")
-
-            `when`(emailAuthService.checkMemberIdAvailability(any())).thenReturn(true)
-
-            val documentFilter = document("email-auth/check-member-id", 200)
-                .request(request().applyConfig(apiConfig))
-                .response(
-                    response()
-                        .responseBodyField(
-                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("확인한 아이디"),
-                            fieldWithPath("data.available").type(JsonFieldType.BOOLEAN).description("사용 가능 여부 (true: 사용 가능, false: 이미 사용 중)")
-                        )
-                )
-                .build()
-
-            given(documentFilter)
-                .contentType(ContentType.JSON)
-                .body(objectMapper.writeValueAsString(request))
-                .`when`()
-                .post("/api/v1/email-auth/check-member-id")
-                .then()
-                .statusCode(200)
-        }
-
-        @Test
-        fun `이미 사용 중인 아이디`() {
-            val request = CheckMemberIdRequest(memberId = "existinguser")
-
-            `when`(emailAuthService.checkMemberIdAvailability(any())).thenReturn(false)
-
-            val documentFilter = document("email-auth/check-member-id", "UNAVAILABLE")
-                .request(request().applyConfig(apiConfig))
-                .response(
-                    response()
-                        .responseBodyField(
-                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("확인한 아이디"),
-                            fieldWithPath("data.available").type(JsonFieldType.BOOLEAN).description("사용 가능 여부 (true: 사용 가능, false: 이미 사용 중)")
-                        )
-                )
-                .build()
-
-            given(documentFilter)
-                .contentType(ContentType.JSON)
-                .body(objectMapper.writeValueAsString(request))
-                .`when`()
-                .post("/api/v1/email-auth/check-member-id")
-                .then()
-                .statusCode(200)
-        }
-    }
 }

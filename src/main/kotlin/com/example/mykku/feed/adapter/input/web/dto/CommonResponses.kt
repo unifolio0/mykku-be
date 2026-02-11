@@ -1,8 +1,8 @@
 package com.example.mykku.feed.adapter.input.web.dto
 
 data class AuthorResponse(
-    val memberId: String,
-    val nickname: String,
+    val memberId: String?,
+    val nickname: String?,
     val profileImage: String,
     val role: String
 )

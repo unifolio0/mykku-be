@@ -2,6 +2,8 @@ package com.example.mykku.member.adapter.input.web
 
 import com.example.mykku.BaseControllerTest
 import com.example.mykku.member.adapter.input.web.dto.ChangePasswordRequest
+import com.example.mykku.member.adapter.input.web.dto.CheckMemberIdRequest
+import com.example.mykku.member.adapter.input.web.dto.SetupProfileRequest
 import com.example.mykku.member.adapter.input.web.dto.UpdateProfileRequest
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.member.domain.vo.SocialProvider
@@ -209,5 +211,128 @@ class MemberControllerTest : BaseControllerTest() {
             .put("/api/v1/members/password")
             .then()
             .statusCode(400)
+    }
+
+    private fun createMemberWithoutProfile(
+        id: String,
+        email: String = "noprofile@example.com"
+    ): MemberJpaEntity {
+        val member = MemberJpaEntity(
+            id = id,
+            memberId = null,
+            nickname = null,
+            email = email,
+            socialId = id,
+            provider = SocialProvider.GOOGLE,
+            role = null,
+            profileImage = ""
+        )
+        return memberJpaRepository.save(member)
+    }
+
+    @Test
+    @DisplayName("프로필 설정 - 정상 케이스")
+    fun `setupProfile - 정상적으로 프로필을 설정한다`() {
+        createMemberWithoutProfile(id = "setupMember1", email = "setup1@example.com")
+        val authHeader = getBearerToken("setupMember1")
+        val request = SetupProfileRequest(
+            memberId = "newuser1",
+            nickname = "새닉네임"
+        )
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .contentType(ContentType.JSON)
+            .body(request)
+            .`when`()
+            .post("/api/v1/members/setup-profile")
+            .then()
+            .statusCode(200)
+            .body("message", equalTo("프로필 설정이 완료되었습니다"))
+            .body("data.memberId", equalTo("newuser1"))
+            .body("data.nickname", equalTo("새닉네임"))
+    }
+
+    @Test
+    @DisplayName("프로필 설정 - 인증되지 않은 사용자")
+    fun `setupProfile - 인증되지 않은 사용자는 프로필을 설정할 수 없다`() {
+        val request = SetupProfileRequest(
+            memberId = "newuser2",
+            nickname = "새닉네임"
+        )
+
+        RestAssured.given()
+            .contentType(ContentType.JSON)
+            .body(request)
+            .`when`()
+            .post("/api/v1/members/setup-profile")
+            .then()
+            .statusCode(401)
+    }
+
+    @Test
+    @DisplayName("프로필 설정 - 아이디 중복")
+    fun `setupProfile - 이미 사용 중인 아이디로 설정할 수 없다`() {
+        createAndSaveMember(
+            id = "existingUser",
+            memberId = "takenid",
+            nickname = "기존유저",
+            email = "existing@example.com"
+        )
+        createMemberWithoutProfile(id = "setupMember2", email = "setup2@example.com")
+        val authHeader = getBearerToken("setupMember2")
+        val request = SetupProfileRequest(
+            memberId = "takenid",
+            nickname = "새닉네임2"
+        )
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .contentType(ContentType.JSON)
+            .body(request)
+            .`when`()
+            .post("/api/v1/members/setup-profile")
+            .then()
+            .statusCode(409)
+    }
+
+    @Test
+    @DisplayName("아이디 중복 확인 - 사용 가능")
+    fun `checkMemberId - 사용 가능한 아이디를 확인한다`() {
+        val request = CheckMemberIdRequest(memberId = "availableid")
+
+        RestAssured.given()
+            .contentType(ContentType.JSON)
+            .body(request)
+            .`when`()
+            .post("/api/v1/members/check-id")
+            .then()
+            .statusCode(200)
+            .body("message", equalTo("아이디 중복 확인 완료"))
+            .body("data.memberId", equalTo("availableid"))
+            .body("data.available", equalTo(true))
+    }
+
+    @Test
+    @DisplayName("아이디 중복 확인 - 이미 사용 중")
+    fun `checkMemberId - 이미 사용 중인 아이디를 확인한다`() {
+        createAndSaveMember(
+            id = "takenUser",
+            memberId = "takenid2",
+            nickname = "사용중유저",
+            email = "taken@example.com"
+        )
+        val request = CheckMemberIdRequest(memberId = "takenid2")
+
+        RestAssured.given()
+            .contentType(ContentType.JSON)
+            .body(request)
+            .`when`()
+            .post("/api/v1/members/check-id")
+            .then()
+            .statusCode(200)
+            .body("message", equalTo("아이디 중복 확인 완료"))
+            .body("data.memberId", equalTo("takenid2"))
+            .body("data.available", equalTo(false))
     }
 }

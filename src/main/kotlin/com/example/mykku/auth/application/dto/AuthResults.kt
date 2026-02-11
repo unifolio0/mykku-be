@@ -7,13 +7,14 @@ data class LoginResult(
     val accessTokenExpiresIn: Long,
     val refreshTokenExpiresIn: Long,
     val member: MemberInfoResult,
-    val isExistingUser: Boolean
+    val isExistingUser: Boolean,
+    val isProfileComplete: Boolean
 )
 
 data class MemberInfoResult(
-    val memberId: String,
+    val memberId: String?,
     val email: String,
-    val nickname: String,
+    val nickname: String?,
     val profileImage: String?
 )
 

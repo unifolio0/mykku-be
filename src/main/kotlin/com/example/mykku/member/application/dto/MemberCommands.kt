@@ -9,3 +9,8 @@ data class ChangePasswordCommand(
     val currentPassword: String,
     val newPassword: String
 )
+
+data class SetupProfileCommand(
+    val memberId: String,
+    val nickname: String
+)

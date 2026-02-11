@@ -7,14 +7,14 @@ import java.time.LocalDateTime
 data class MemberBlockResult(
     val id: Long,
     val blockedMemberId: String,
-    val blockedMemberNickname: String,
+    val blockedMemberNickname: String?,
     val blockedMemberProfileImage: String,
     val blockedAt: LocalDateTime
 ) {
     companion object {
         fun from(
             memberBlock: MemberBlock,
-            blockedMemberNickname: String,
+            blockedMemberNickname: String?,
             blockedMemberProfileImage: String
         ): MemberBlockResult {
             return MemberBlockResult(

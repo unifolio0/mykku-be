@@ -45,7 +45,7 @@ data class CommentResult(
     val id: Long,
     val content: String,
     val likeCount: Int,
-    val memberName: String,
+    val memberName: String?,
     val profileImage: String,
     val createdAt: LocalDateTime,
     val replies: List<ReplyResult>
@@ -69,7 +69,7 @@ data class ReplyResult(
     val id: Long,
     val content: String,
     val likeCount: Int,
-    val memberName: String,
+    val memberName: String?,
     val profileImage: String,
     val createdAt: LocalDateTime
 ) {

@@ -10,7 +10,7 @@ data class CreateCommentRequest(
     fun toCommand(
         dailyMessageId: Long,
         memberId: String,
-        memberNickname: String,
+        memberNickname: String?,
         memberProfileImage: String
     ): CreateCommentCommand {
         return CreateCommentCommand(

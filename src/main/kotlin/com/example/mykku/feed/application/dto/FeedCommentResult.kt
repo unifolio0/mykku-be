@@ -15,8 +15,8 @@ data class FeedCommentResult(
 )
 
 data class CommentAuthorResult(
-    val memberId: String,
-    val nickname: String,
+    val memberId: String?,
+    val nickname: String?,
     val profileImage: String
 )
 

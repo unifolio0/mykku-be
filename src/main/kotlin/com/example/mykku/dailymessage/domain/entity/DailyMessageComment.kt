@@ -9,7 +9,7 @@ class DailyMessageComment private constructor(
     val id: DailyMessageCommentId,
     val dailyMessageId: Long,
     val memberId: String,
-    val memberNickname: String,
+    val memberNickname: String?,
     val memberProfileImage: String,
     val content: String,
     val likeCount: Int,
@@ -23,7 +23,7 @@ class DailyMessageComment private constructor(
         fun create(
             dailyMessageId: Long,
             memberId: String,
-            memberNickname: String,
+            memberNickname: String?,
             memberProfileImage: String,
             content: String,
             parentCommentId: Long? = null
@@ -48,7 +48,7 @@ class DailyMessageComment private constructor(
             id: DailyMessageCommentId,
             dailyMessageId: Long,
             memberId: String,
-            memberNickname: String,
+            memberNickname: String?,
             memberProfileImage: String,
             content: String,
             likeCount: Int,
