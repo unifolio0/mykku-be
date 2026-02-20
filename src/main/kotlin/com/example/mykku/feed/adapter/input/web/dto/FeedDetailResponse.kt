@@ -1,11 +1,12 @@
 package com.example.mykku.feed.adapter.input.web.dto
 
 import com.example.mykku.feed.application.dto.FeedDetailResult
+import com.example.mykku.role.adapter.input.web.RoleResponse
 import java.time.LocalDateTime
 
 data class FeedDetailResponse(
     val id: Long,
-    val author: AuthorResponse,
+    val author: AuthorResponse?,
     val boardId: Long,
     val boardTitle: String,
     val createdAt: LocalDateTime,
@@ -22,12 +23,14 @@ data class FeedDetailResponse(
     companion object {
         fun from(result: FeedDetailResult): FeedDetailResponse = FeedDetailResponse(
             id = result.id,
-            author = AuthorResponse(
-                memberId = result.author.memberId,
-                nickname = result.author.nickname,
-                profileImage = result.author.profileImage,
-                role = result.author.role
-            ),
+            author = result.author?.let {
+                AuthorResponse(
+                    memberId = it.memberId,
+                    nickname = it.nickname,
+                    profileImage = it.profileImage,
+                    role = it.role?.let { role -> RoleResponse(role.id, role.name, role.description) }
+                )
+            },
             boardId = result.boardId,
             boardTitle = result.boardTitle,
             createdAt = result.createdAt,

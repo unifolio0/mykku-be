@@ -59,4 +59,8 @@ class MemberRepositoryAdapter(
     override fun findByMemberId(memberId: String): Member? {
         return memberJpaRepository.findByMemberId(memberId)?.toDomain()
     }
+
+    override fun deleteById(id: MemberId) {
+        memberJpaRepository.deleteById(id.value)
+    }
 }

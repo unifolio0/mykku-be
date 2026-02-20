@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 data class FeedCommentResult(
     val id: Long,
     val content: String,
-    val author: CommentAuthorResult,
+    val author: CommentAuthorResult?,
     val likeCount: Int,
     val isLiked: Boolean,
     val replies: List<FeedCommentReplyResult>,
@@ -15,15 +15,15 @@ data class FeedCommentResult(
 )
 
 data class CommentAuthorResult(
-    val memberId: String,
-    val nickname: String,
-    val profileImage: String
+    val memberId: String?,
+    val nickname: String?,
+    val profileImage: String?
 )
 
 data class FeedCommentReplyResult(
     val id: Long,
     val content: String,
-    val author: CommentAuthorResult,
+    val author: CommentAuthorResult?,
     val likeCount: Int,
     val isLiked: Boolean,
     val createdAt: LocalDateTime,
@@ -42,7 +42,7 @@ data class FeedCommentsResult(
 data class SingleFeedCommentResult(
     val id: Long,
     val content: String,
-    val author: CommentAuthorResult,
+    val author: CommentAuthorResult?,
     val likeCount: Int,
     val createdAt: LocalDateTime
 )

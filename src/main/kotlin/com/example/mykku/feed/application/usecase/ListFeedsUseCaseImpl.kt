@@ -18,9 +18,9 @@ import com.example.mykku.feed.application.port.output.FeedRepository
 import com.example.mykku.feed.application.port.output.FeedTagRepository
 import com.example.mykku.feed.domain.entity.Feed
 import com.example.mykku.feed.domain.entity.FeedTag
-import com.example.mykku.feed.domain.vo.FeedId
 import com.example.mykku.like.application.port.output.LikeFeedPort
 import com.example.mykku.member.application.port.output.MemberRepository
+import com.example.mykku.role.application.dto.RoleResult
 import com.example.mykku.role.application.port.output.RoleRepository
 import com.example.mykku.role.domain.vo.RoleId
 import com.example.mykku.scrap.application.port.output.SaveFeedPort
@@ -77,7 +77,7 @@ class ListFeedsUseCaseImpl(
         val allTags = feedTagsMap.values.flatten()
         val contestTagsMap = getContestTagsMap(allTags)
 
-        val memberIds = feeds.map { it.memberId }.distinct()
+        val memberIds = feeds.mapNotNull { it.memberId }.distinct()
         val membersMap = memberIds.mapNotNull { memberRepository.findByIdString(it) }
             .associateBy { it.id.value }
 
@@ -99,24 +99,28 @@ class ListFeedsUseCaseImpl(
             val images = feedImagesMap[feedId] ?: emptyList()
             val tags = feedTagsMap[feedId] ?: emptyList()
 
-            val member = membersMap[feed.memberId]
+            val member = feed.memberId?.let { membersMap[it] }
             val board = boardsMap[feed.boardId]
-            val roleName = member?.roleId?.let { roleRepository.findById(RoleId.of(it))?.name } ?: ""
+            val authorResult = member?.let {
+                val role = it.roleId?.let { roleId -> roleRepository.findById(RoleId.of(roleId)) }
+                val roleResult = role?.let { r -> RoleResult(r.id.value, r.name, r.description) }
+                AuthorResult(
+                    memberId = it.memberId,
+                    nickname = it.nickname,
+                    profileImage = it.profileImage,
+                    role = roleResult
+                )
+            }
 
             val firstComment = feedCommentRepository.findByFeedIdAndParentCommentIsNull(
                 feed.id!!, PageRequest.of(0, 1)
             ).content.firstOrNull()
 
-            val commentMember = firstComment?.let { memberRepository.findByIdString(it.memberId) }
+            val commentMember = firstComment?.memberId?.let { memberRepository.findByIdString(it) }
 
             FeedResult(
                 id = feedId,
-                author = AuthorResult(
-                    memberId = member?.memberId ?: "",
-                    nickname = member?.nickname ?: "",
-                    profileImage = member?.profileImage ?: "",
-                    role = roleName
-                ),
+                author = authorResult,
                 board = board?.title ?: "",
                 createdAt = feed.createdAt,
                 title = feed.title,
@@ -128,7 +132,7 @@ class ListFeedsUseCaseImpl(
                 isSaved = feedId in savedFeedIds,
                 commentCount = feed.commentCount,
                 comment = CommentPreviewResult(
-                    profileImage = commentMember?.profileImage ?: "",
+                    profileImage = commentMember?.profileImage,
                     content = firstComment?.content ?: ""
                 )
             )

@@ -11,7 +11,7 @@ class Feed private constructor(
     val likeCount: Int,
     val commentCount: Int,
     val boardId: Long,
-    val memberId: String,
+    val memberId: String?,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 ) {
@@ -48,7 +48,7 @@ class Feed private constructor(
             likeCount: Int,
             commentCount: Int,
             boardId: Long,
-            memberId: String,
+            memberId: String?,
             createdAt: LocalDateTime,
             updatedAt: LocalDateTime
         ): Feed {

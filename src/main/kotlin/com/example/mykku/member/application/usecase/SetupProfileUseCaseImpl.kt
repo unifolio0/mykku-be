@@ -1,8 +1,8 @@
 package com.example.mykku.member.application.usecase
 
 import com.example.mykku.member.application.dto.MemberProfileResult
-import com.example.mykku.member.application.dto.UpdateProfileCommand
-import com.example.mykku.member.application.port.input.UpdateMemberProfileUseCase
+import com.example.mykku.member.application.dto.SetupProfileCommand
+import com.example.mykku.member.application.port.input.SetupProfileUseCase
 import com.example.mykku.member.application.port.output.MemberRepository
 import com.example.mykku.member.domain.entity.Member
 import com.example.mykku.member.exception.MemberException
@@ -14,19 +14,17 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
-class UpdateMemberProfileUseCaseImpl(
+class SetupProfileUseCaseImpl(
     private val memberRepository: MemberRepository,
     private val roleRepository: RoleRepository
-) : UpdateMemberProfileUseCase {
+) : SetupProfileUseCase {
 
-    override fun updateProfile(member: Member, command: UpdateProfileCommand): MemberProfileResult {
-        command.nickname?.let { newNickname ->
-            if (newNickname != member.nickname && memberRepository.existsByNickname(newNickname)) {
-                throw MemberException.nicknameAlreadyExists()
-            }
+    override fun setupProfile(member: Member, command: SetupProfileCommand): MemberProfileResult {
+        if (memberRepository.existsByMemberId(command.memberId)) {
+            throw MemberException.memberIdAlreadyExists()
         }
 
-        member.updateProfile(command.nickname, command.profileImage)
+        member.setupProfile(command.memberId, command.nickname)
         val savedMember = memberRepository.save(member)
 
         val role = savedMember.roleId?.let { roleRepository.findById(RoleId.of(it)) }

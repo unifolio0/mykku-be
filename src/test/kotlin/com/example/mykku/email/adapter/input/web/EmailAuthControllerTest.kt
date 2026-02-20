@@ -178,10 +178,8 @@ class EmailAuthControllerTest : BaseControllerTest() {
     @DisplayName("회원가입 - 성공")
     fun `signup - 회원가입 성공 및 자동 로그인`() {
         val request = SignupRequest(
-            memberId = "newuser123",
             email = "newuser@example.com",
-            password = "password123!",
-            nickname = "신규유저"
+            password = "password123!"
         )
 
         RestAssured.given()
@@ -218,10 +216,8 @@ class EmailAuthControllerTest : BaseControllerTest() {
         memberJpaRepository.save(member)
 
         val request = SignupRequest(
-            memberId = "newuser456",
             email = existingEmail,
-            password = "password123!",
-            nickname = "신규유저"
+            password = "password123!"
         )
 
         RestAssured.given()
@@ -238,10 +234,8 @@ class EmailAuthControllerTest : BaseControllerTest() {
     @DisplayName("회원가입 - 잘못된 비밀번호 형식")
     fun `signup - 잘못된 비밀번호 형식으로 회원가입 시 실패`() {
         val request = SignupRequest(
-            memberId = "newuser789",
             email = "newuser@example.com",
-            password = "short",
-            nickname = "신규유저"
+            password = "short"
         )
 
         RestAssured.given()

@@ -1,6 +1,7 @@
 package com.example.mykku.feed.adapter.input.web.dto
 
 import com.example.mykku.feed.application.dto.PagedFeedsResult
+import com.example.mykku.role.adapter.input.web.RoleResponse
 import java.time.LocalDateTime
 
 data class PagedFeedsResponse(
@@ -17,12 +18,14 @@ data class PagedFeedsResponse(
             feeds = result.feeds.map { feedResult ->
                 FeedResponse(
                     id = feedResult.id,
-                    author = AuthorResponse(
-                        memberId = feedResult.author.memberId,
-                        nickname = feedResult.author.nickname,
-                        profileImage = feedResult.author.profileImage,
-                        role = feedResult.author.role
-                    ),
+                    author = feedResult.author?.let {
+                        AuthorResponse(
+                            memberId = it.memberId,
+                            nickname = it.nickname,
+                            profileImage = it.profileImage,
+                            role = it.role?.let { role -> RoleResponse(role.id, role.name, role.description) }
+                        )
+                    },
                     board = feedResult.board,
                     createdAt = feedResult.createdAt,
                     title = feedResult.title,
@@ -51,7 +54,7 @@ data class PagedFeedsResponse(
 
 data class FeedResponse(
     val id: Long,
-    val author: AuthorResponse,
+    val author: AuthorResponse?,
     val board: String,
     val createdAt: LocalDateTime,
     val title: String,
@@ -66,6 +69,6 @@ data class FeedResponse(
 )
 
 data class CommentPreviewResponse(
-    val profileImage: String,
+    val profileImage: String?,
     val content: String
 )

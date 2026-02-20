@@ -11,7 +11,8 @@ data class LoginResponse(
     val accessTokenExpiresIn: Long,
     val refreshTokenExpiresIn: Long,
     val member: MemberInfo,
-    val isExistingUser: Boolean
+    val isExistingUser: Boolean,
+    val isProfileComplete: Boolean
 ) {
     companion object {
         fun from(result: LoginResult): LoginResponse {
@@ -22,16 +23,17 @@ data class LoginResponse(
                 accessTokenExpiresIn = result.accessTokenExpiresIn,
                 refreshTokenExpiresIn = result.refreshTokenExpiresIn,
                 member = MemberInfo.from(result.member),
-                isExistingUser = result.isExistingUser
+                isExistingUser = result.isExistingUser,
+                isProfileComplete = result.isProfileComplete
             )
         }
     }
 }
 
 data class MemberInfo(
-    val memberId: String,
+    val memberId: String?,
     val email: String,
-    val nickname: String,
+    val nickname: String?,
     val profileImage: String?
 ) {
     companion object {

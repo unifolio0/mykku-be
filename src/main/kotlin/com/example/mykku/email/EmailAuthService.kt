@@ -4,7 +4,6 @@ import com.example.mykku.auth.adapter.input.web.dto.LoginResponse
 import com.example.mykku.auth.adapter.output.persistence.JwtTokenProviderAdapter
 import com.example.mykku.email.domain.VerificationPurpose
 import com.example.mykku.email.exception.EmailAuthException
-import com.example.mykku.member.exception.MemberException
 import com.example.mykku.email.tool.EmailSender
 import com.example.mykku.email.tool.RedisVerificationCodeManager
 import com.example.mykku.email.util.TemporaryPasswordGenerator
@@ -56,12 +55,9 @@ class EmailAuthService(
     }
 
     @Transactional
-    fun signup(email: String, password: String, nickname: String, userMemberId: String): LoginResponse {
+    fun signup(email: String, password: String): LoginResponse {
         if (memberRepository.existsByEmail(email)) {
             throw EmailAuthException.emailAlreadyExists()
-        }
-        if (memberRepository.existsByMemberId(userMemberId)) {
-            throw MemberException.memberIdAlreadyExists()
         }
 
         val encodedPassword = passwordEncoder.encode(password)
@@ -69,10 +65,8 @@ class EmailAuthService(
 
         val member = Member.createEmailMember(
             id = id,
-            memberId = userMemberId,
             email = email,
-            password = encodedPassword,
-            nickname = nickname
+            password = encodedPassword
         )
 
         memberRepository.save(member)
@@ -125,10 +119,5 @@ class EmailAuthService(
         } catch (e: Exception) {
             throw EmailAuthException.emailSendFailed(e)
         }
-    }
-
-    @Transactional(readOnly = true)
-    fun checkMemberIdAvailability(memberId: String): Boolean {
-        return !memberRepository.existsByMemberId(memberId)
     }
 }

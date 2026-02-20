@@ -24,7 +24,7 @@ class DailyMessageCommentRepositoryAdapter(
         val dailyMessageJpaEntity = dailyMessageJpaRepository.findById(comment.dailyMessageId)
             .orElseThrow { DailyMessageException.dailyMessageNotFound() }
 
-        val memberEntity = memberJpaRepository.findById(comment.memberId)
+        val memberEntity = memberJpaRepository.findById(comment.memberId!!)
             .orElseThrow { throw IllegalStateException("Member not found: ${comment.memberId}") }
 
         val parentCommentEntity = comment.parentCommentId?.let { parentId ->

@@ -1,16 +1,15 @@
 package com.example.mykku.dailymessage.domain.entity
 
 import com.example.mykku.dailymessage.domain.vo.DailyMessageCommentId
-import com.example.mykku.dailymessage.domain.vo.DailyMessageId
 import com.example.mykku.dailymessage.exception.DailyMessageException
 import java.time.LocalDateTime
 
 class DailyMessageComment private constructor(
     val id: DailyMessageCommentId,
     val dailyMessageId: Long,
-    val memberId: String,
-    val memberNickname: String,
-    val memberProfileImage: String,
+    val memberId: String?,
+    val memberNickname: String?,
+    val memberProfileImage: String?,
     val content: String,
     val likeCount: Int,
     val parentCommentId: Long?,
@@ -23,7 +22,7 @@ class DailyMessageComment private constructor(
         fun create(
             dailyMessageId: Long,
             memberId: String,
-            memberNickname: String,
+            memberNickname: String?,
             memberProfileImage: String,
             content: String,
             parentCommentId: Long? = null
@@ -47,9 +46,9 @@ class DailyMessageComment private constructor(
         fun reconstitute(
             id: DailyMessageCommentId,
             dailyMessageId: Long,
-            memberId: String,
-            memberNickname: String,
-            memberProfileImage: String,
+            memberId: String?,
+            memberNickname: String?,
+            memberProfileImage: String?,
             content: String,
             likeCount: Int,
             parentCommentId: Long?,

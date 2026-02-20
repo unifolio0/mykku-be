@@ -51,6 +51,9 @@ import com.example.mykku.like.application.port.input.LikeFeedUseCase
 import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.member.application.port.input.ChangePasswordUseCase
+import com.example.mykku.member.application.port.input.CheckMemberIdUseCase
+import com.example.mykku.member.application.port.input.WithdrawMemberUseCase
+import com.example.mykku.member.application.port.input.SetupProfileUseCase
 import com.example.mykku.member.application.port.input.GetMemberProfileUseCase
 import com.example.mykku.member.application.port.input.UpdateMemberProfileUseCase
 import com.example.mykku.event.application.port.input.GetMyParticipatedEventsUseCase
@@ -200,6 +203,15 @@ abstract class BaseDocumentTest {
 
     @MockitoBean
     protected lateinit var changePasswordUseCase: ChangePasswordUseCase
+
+    @MockitoBean
+    protected lateinit var setupProfileUseCase: SetupProfileUseCase
+
+    @MockitoBean
+    protected lateinit var checkMemberIdUseCase: CheckMemberIdUseCase
+
+    @MockitoBean
+    protected lateinit var withdrawMemberUseCase: WithdrawMemberUseCase
 
     @MockitoBean
     protected lateinit var getMyParticipatedContestsUseCase: GetMyParticipatedContestsUseCase

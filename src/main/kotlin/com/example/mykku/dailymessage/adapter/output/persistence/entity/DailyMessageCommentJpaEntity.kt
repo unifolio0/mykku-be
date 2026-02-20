@@ -37,16 +37,16 @@ class DailyMessageCommentJpaEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    val member: MemberJpaEntity
+    val member: MemberJpaEntity? = null
 ) : BaseJpaEntity() {
 
     fun toDomain(): DailyMessageComment {
         return DailyMessageComment.reconstitute(
             id = DailyMessageCommentId.of(id!!),
             dailyMessageId = dailyMessage.id!!,
-            memberId = member.id,
-            memberNickname = member.nickname,
-            memberProfileImage = member.profileImage,
+            memberId = member?.id,
+            memberNickname = member?.nickname,
+            memberProfileImage = member?.profileImage,
             content = content,
             likeCount = likeCount,
             parentCommentId = parentComment?.id,

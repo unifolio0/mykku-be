@@ -20,11 +20,11 @@ class MemberJpaEntity(
     @Id
     val id: String,
 
-    @Column(name = "member_id", unique = true, nullable = false, length = 16)
-    val memberId: String,
+    @Column(name = "member_id", unique = true, nullable = true, length = 16)
+    var memberId: String?,
 
     @Column(name = "nickname")
-    var nickname: String,
+    var nickname: String?,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
@@ -68,6 +68,7 @@ class MemberJpaEntity(
     }
 
     fun updateFromDomain(member: Member) {
+        this.memberId = member.memberId
         this.nickname = member.nickname
         this.profileImage = member.profileImage
         this.password = member.password

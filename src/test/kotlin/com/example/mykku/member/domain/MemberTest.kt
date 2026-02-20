@@ -23,16 +23,14 @@ class MemberTest {
         fun `이메일 회원 생성 - 정상 케이스`() {
             val member = Member.createEmailMember(
                 id = "uuid-1234",
-                memberId = "testuser1",
                 email = "test@example.com",
-                password = "encodedPassword",
-                nickname = "테스트닉네임"
+                password = "encodedPassword"
             )
 
             assertThat(member.id.value).isEqualTo("uuid-1234")
-            assertThat(member.memberId).isEqualTo("testuser1")
+            assertThat(member.memberId).isNull()
             assertThat(member.email).isEqualTo("test@example.com")
-            assertThat(member.nickname).isEqualTo("테스트닉네임")
+            assertThat(member.nickname).isNull()
             assertThat(member.provider).isEqualTo(SocialProvider.EMAIL)
         }
 
@@ -71,8 +69,6 @@ class MemberTest {
         fun `소셜 회원 생성 - 정상 케이스`() {
             val member = Member.createSocialMember(
                 id = "uuid-1234",
-                memberId = "kakaouser1",
-                nickname = "카카오유저",
                 profileImage = "https://example.com/profile.jpg",
                 provider = SocialProvider.KAKAO,
                 socialId = "kakao-12345",
@@ -172,6 +168,83 @@ class MemberTest {
     }
 
     @Nested
+    @DisplayName("setupProfile 메서드")
+    inner class SetupProfile {
+
+        @Test
+        @DisplayName("정상적으로 프로필을 설정한다")
+        fun `프로필 설정 - 정상 케이스`() {
+            val member = createSocialMember()
+            assertThat(member.memberId).isNull()
+            assertThat(member.nickname).isNull()
+
+            member.setupProfile("newuser1", "새닉네임")
+
+            assertThat(member.memberId).isEqualTo("newuser1")
+            assertThat(member.nickname).isEqualTo("새닉네임")
+        }
+
+        @Test
+        @DisplayName("프로필 설정 후 isProfileComplete가 true이다")
+        fun `프로필 설정 후 isProfileComplete가 true`() {
+            val member = createSocialMember()
+            assertThat(member.isProfileComplete).isFalse()
+
+            member.setupProfile("newuser1", "새닉네임")
+
+            assertThat(member.isProfileComplete).isTrue()
+        }
+
+        @Test
+        @DisplayName("프로필 설정시 updatedAt이 갱신된다")
+        fun `프로필 설정 - 시간 갱신`() {
+            val member = createSocialMember()
+            val originalUpdatedAt = member.updatedAt
+
+            Thread.sleep(10)
+            member.setupProfile("newuser1", "새닉네임")
+
+            assertThat(member.updatedAt).isAfter(originalUpdatedAt)
+        }
+    }
+
+    @Nested
+    @DisplayName("isProfileComplete 프로퍼티")
+    inner class IsProfileComplete {
+
+        @Test
+        @DisplayName("memberId와 nickname이 모두 있으면 true")
+        fun `프로필 완료 - true`() {
+            val member = Member.reconstitute(
+                id = "uuid-1234",
+                memberId = "testuser1",
+                nickname = "테스트닉네임",
+                roleId = null,
+                profileImage = "",
+                provider = SocialProvider.EMAIL,
+                socialId = null,
+                email = "test@example.com",
+                password = "encodedPassword",
+                emailVerified = false,
+                createdAt = LocalDateTime.now(),
+                updatedAt = LocalDateTime.now()
+            )
+
+            assertThat(member.isProfileComplete).isTrue()
+        }
+
+        @Test
+        @DisplayName("memberId 또는 nickname이 null이면 false")
+        fun `프로필 미완료 - false`() {
+            val member = createSocialMember()
+
+            assertThat(member.memberId).isNull()
+            assertThat(member.nickname).isNull()
+            assertThat(member.isProfileComplete).isFalse()
+        }
+    }
+
+    @Nested
     @DisplayName("닉네임 검증")
     inner class NicknameValidation {
 
@@ -179,15 +252,10 @@ class MemberTest {
         @DisplayName("닉네임이 10자를 초과하면 예외가 발생한다")
         fun `닉네임 검증 - 길이 초과`() {
             val longNickname = "가".repeat(Member.NICKNAME_MAX_LENGTH + 1)
+            val member = createEmailMember()
 
             val exception = assertThrows<MemberException> {
-                Member.createEmailMember(
-                    id = "uuid-1234",
-                    memberId = "testuser1",
-                    email = "test@example.com",
-                    password = "encodedPassword",
-                    nickname = longNickname
-                )
+                member.setupProfile("testuser1", longNickname)
             }
 
             assertThat(exception.errorCode).isEqualTo(MemberErrorCode.MEMBER_NICKNAME_TOO_LONG)
@@ -197,29 +265,20 @@ class MemberTest {
         @DisplayName("닉네임이 정확히 10자일 때는 통과한다")
         fun `닉네임 검증 - 길이 경계값`() {
             val exactNickname = "가".repeat(Member.NICKNAME_MAX_LENGTH)
+            val member = createEmailMember()
 
-            val member = Member.createEmailMember(
-                id = "uuid-1234",
-                memberId = "testuser1",
-                email = "test@example.com",
-                password = "encodedPassword",
-                nickname = exactNickname
-            )
+            member.setupProfile("testuser1", exactNickname)
 
-            assertThat(member.nickname.length).isEqualTo(Member.NICKNAME_MAX_LENGTH)
+            assertThat(member.nickname!!.length).isEqualTo(Member.NICKNAME_MAX_LENGTH)
         }
 
         @Test
         @DisplayName("닉네임에 특수문자가 포함되면 예외가 발생한다")
         fun `닉네임 검증 - 특수문자 포함`() {
+            val member = createEmailMember()
+
             val exception = assertThrows<MemberException> {
-                Member.createEmailMember(
-                    id = "uuid-1234",
-                    memberId = "testuser1",
-                    email = "test@example.com",
-                    password = "encodedPassword",
-                    nickname = "닉네임@특수"
-                )
+                member.setupProfile("testuser1", "닉네임@특수")
             }
 
             assertThat(exception.errorCode).isEqualTo(MemberErrorCode.MEMBER_NICKNAME_INVALID_FORMAT)
@@ -228,13 +287,9 @@ class MemberTest {
         @Test
         @DisplayName("한글, 영문, 숫자, 공백으로 구성된 닉네임은 통과한다")
         fun `닉네임 검증 - 정상 케이스`() {
-            val member = Member.createEmailMember(
-                id = "uuid-1234",
-                memberId = "testuser1",
-                email = "test@example.com",
-                password = "encodedPassword",
-                nickname = "테스트 User1"
-            )
+            val member = createEmailMember()
+
+            member.setupProfile("testuser1", "테스트 User1")
 
             assertThat(member.nickname).isEqualTo("테스트 User1")
         }
@@ -403,20 +458,25 @@ class MemberTest {
     }
 
     private fun createEmailMember(): Member {
-        return Member.createEmailMember(
+        return Member.reconstitute(
             id = "uuid-1234",
             memberId = "testuser1",
+            nickname = "테스트닉네임",
+            roleId = null,
+            profileImage = "",
+            provider = SocialProvider.EMAIL,
+            socialId = null,
             email = "test@example.com",
             password = "encodedPassword",
-            nickname = "테스트닉네임"
+            emailVerified = false,
+            createdAt = LocalDateTime.now(),
+            updatedAt = LocalDateTime.now()
         )
     }
 
     private fun createSocialMember(): Member {
         return Member.createSocialMember(
             id = "uuid-5678",
-            memberId = "socialuser1",
-            nickname = "소셜유저",
             profileImage = "https://example.com/profile.jpg",
             provider = SocialProvider.GOOGLE,
             socialId = "google-12345",

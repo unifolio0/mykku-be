@@ -7,8 +7,8 @@ import java.time.LocalDateTime
 
 class Member private constructor(
     val id: MemberId,
-    val memberId: String,
-    var nickname: String,
+    var memberId: String?,
+    var nickname: String?,
     var roleId: Long?,
     var profileImage: String,
     val provider: SocialProvider?,
@@ -19,6 +19,9 @@ class Member private constructor(
     val createdAt: LocalDateTime,
     var updatedAt: LocalDateTime
 ) {
+    val isProfileComplete: Boolean
+        get() = memberId != null && nickname != null
+
     companion object {
         const val NICKNAME_MAX_LENGTH = 10
         val VALID_NICKNAME_PATTERN = Regex("^[가-힣a-zA-Z0-9\\s]+$")
@@ -40,19 +43,15 @@ class Member private constructor(
 
         fun createEmailMember(
             id: String,
-            memberId: String,
             email: String,
             password: String,
-            nickname: String,
             profileImage: String = ""
         ): Member {
-            validateMemberId(memberId)
-            validateNickname(nickname)
             val now = LocalDateTime.now()
             return Member(
                 id = MemberId.of(id),
-                memberId = memberId,
-                nickname = nickname,
+                memberId = null,
+                nickname = null,
                 roleId = null,
                 profileImage = profileImage,
                 provider = SocialProvider.EMAIL,
@@ -67,20 +66,16 @@ class Member private constructor(
 
         fun createSocialMember(
             id: String,
-            memberId: String,
-            nickname: String,
             profileImage: String,
             provider: SocialProvider,
             socialId: String,
             email: String
         ): Member {
-            validateMemberId(memberId)
-            validateNickname(nickname)
             val now = LocalDateTime.now()
             return Member(
                 id = MemberId.of(id),
-                memberId = memberId,
-                nickname = nickname,
+                memberId = null,
+                nickname = null,
                 roleId = null,
                 profileImage = profileImage,
                 provider = provider,
@@ -95,8 +90,8 @@ class Member private constructor(
 
         fun reconstitute(
             id: String,
-            memberId: String,
-            nickname: String,
+            memberId: String?,
+            nickname: String?,
             roleId: Long?,
             profileImage: String,
             provider: SocialProvider?,
@@ -131,6 +126,14 @@ class Member private constructor(
                 throw MemberException.memberNicknameInvalidFormat()
             }
         }
+    }
+
+    fun setupProfile(newMemberId: String, newNickname: String) {
+        validateMemberId(newMemberId)
+        validateNickname(newNickname)
+        this.memberId = newMemberId
+        this.nickname = newNickname
+        this.updatedAt = LocalDateTime.now()
     }
 
     fun updateProfile(newNickname: String?, newProfileImage: String?) {

@@ -8,8 +8,6 @@ import com.example.mykku.feed.application.dto.GetFeedCommentsQuery
 import com.example.mykku.feed.application.port.input.GetFeedCommentsUseCase
 import com.example.mykku.feed.application.port.output.FeedCommentRepository
 import com.example.mykku.feed.application.port.output.FeedRepository
-import com.example.mykku.feed.domain.entity.FeedComment
-import com.example.mykku.feed.domain.vo.FeedCommentId
 import com.example.mykku.feed.domain.vo.FeedId
 import com.example.mykku.like.application.port.output.LikeFeedCommentPort
 import com.example.mykku.member.application.port.output.MemberRepository
@@ -38,24 +36,27 @@ class GetFeedCommentsUseCaseImpl(
         }
 
         val allComments = commentsPage.content + repliesMap.values.flatten()
-        val memberIds = allComments.map { it.memberId }.distinct()
+        val memberIds = allComments.mapNotNull { it.memberId }.distinct()
         val membersMap = memberIds.mapNotNull { memberRepository.findByIdString(it) }
             .associateBy { it.id.value }
 
         val commentResponses = commentsPage.content.map { comment ->
             val replies = repliesMap[comment.id?.value] ?: emptyList()
-            val commentMember = membersMap[comment.memberId]
+            val commentMember = comment.memberId?.let { membersMap[it] }
 
             val replyResponses = replies.map { reply ->
-                val replyMember = membersMap[reply.memberId]
+                val replyMember = reply.memberId?.let { membersMap[it] }
+                val replyAuthor = replyMember?.let {
+                    CommentAuthorResult(
+                        memberId = it.memberId,
+                        nickname = it.nickname,
+                        profileImage = it.profileImage
+                    )
+                }
                 FeedCommentReplyResult(
                     id = reply.id!!.value,
                     content = reply.content,
-                    author = CommentAuthorResult(
-                        memberId = replyMember?.memberId ?: "",
-                        nickname = replyMember?.nickname ?: "",
-                        profileImage = replyMember?.profileImage ?: ""
-                    ),
+                    author = replyAuthor,
                     likeCount = reply.likeCount,
                     isLiked = query.memberId?.let { likeFeedCommentPort.existsByMemberIdAndFeedCommentId(it, reply.id!!.value) } ?: false,
                     createdAt = reply.createdAt,
@@ -63,14 +64,18 @@ class GetFeedCommentsUseCaseImpl(
                 )
             }
 
+            val commentAuthor = commentMember?.let {
+                CommentAuthorResult(
+                    memberId = it.memberId,
+                    nickname = it.nickname,
+                    profileImage = it.profileImage
+                )
+            }
+
             FeedCommentResult(
                 id = comment.id!!.value,
                 content = comment.content,
-                author = CommentAuthorResult(
-                    memberId = commentMember?.memberId ?: "",
-                    nickname = commentMember?.nickname ?: "",
-                    profileImage = commentMember?.profileImage ?: ""
-                ),
+                author = commentAuthor,
                 likeCount = comment.likeCount,
                 isLiked = query.memberId?.let { likeFeedCommentPort.existsByMemberIdAndFeedCommentId(it, comment.id!!.value) } ?: false,
                 replies = replyResponses,

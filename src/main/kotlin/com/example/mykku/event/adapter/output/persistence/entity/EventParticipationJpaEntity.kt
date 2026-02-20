@@ -23,7 +23,7 @@ class EventParticipationJpaEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    val member: MemberJpaEntity,
+    val member: MemberJpaEntity? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
@@ -34,7 +34,7 @@ class EventParticipationJpaEntity(
         return EventParticipation.reconstitute(
             id = EventParticipationId.of(id!!),
             eventId = EventId.of(event.id!!),
-            memberId = member.id,
+            memberId = member?.id,
             createdAt = createdAt,
             updatedAt = updatedAt
         )

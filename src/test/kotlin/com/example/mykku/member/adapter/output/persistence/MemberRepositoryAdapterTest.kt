@@ -5,6 +5,7 @@ import com.example.mykku.member.application.port.output.MemberRepository
 import com.example.mykku.member.domain.entity.Member
 import com.example.mykku.member.domain.vo.MemberId
 import com.example.mykku.member.domain.vo.SocialProvider
+import java.time.LocalDateTime
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -26,14 +27,20 @@ class MemberRepositoryAdapterTest : BaseRepositoryTest() {
         socialId: String = "socialId123",
         profileImage: String = "profile.png"
     ): Member {
-        return Member.createSocialMember(
+        val now = LocalDateTime.now()
+        return Member.reconstitute(
             id = id,
             memberId = memberId,
             nickname = nickname,
+            roleId = null,
             profileImage = profileImage,
             provider = provider,
             socialId = socialId,
-            email = email
+            email = email,
+            password = null,
+            emailVerified = true,
+            createdAt = now,
+            updatedAt = now
         )
     }
 
@@ -62,10 +69,8 @@ class MemberRepositoryAdapterTest : BaseRepositoryTest() {
         fun saveEmailMember() {
             val member = Member.createEmailMember(
                 id = "emailUser123",
-                memberId = "emailMember1",
                 email = "email@example.com",
                 password = "encodedPassword123",
-                nickname = "emailNick",
                 profileImage = "profile.png"
             )
 

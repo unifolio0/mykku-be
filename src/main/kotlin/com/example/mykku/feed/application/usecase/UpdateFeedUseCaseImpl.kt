@@ -9,6 +9,7 @@ import com.example.mykku.feed.application.dto.FeedDetailResult
 import com.example.mykku.feed.application.dto.FeedImageResult
 import com.example.mykku.feed.application.dto.TagResult
 import com.example.mykku.feed.application.dto.UpdateFeedCommand
+import com.example.mykku.role.application.dto.RoleResult
 import com.example.mykku.feed.application.port.input.UpdateFeedUseCase
 import com.example.mykku.feed.application.port.output.FeedImageRepository
 import com.example.mykku.feed.application.port.output.FeedRepository
@@ -60,7 +61,8 @@ class UpdateFeedUseCaseImpl(
 
         val board = boardRepository.findById(BoardId(savedFeed.boardId))
             ?: throw BoardException.boardNotFound()
-        val roleName = member.roleId?.let { roleRepository.findById(RoleId.of(it))?.name } ?: ""
+        val role = member.roleId?.let { roleRepository.findById(RoleId.of(it)) }
+        val roleResult = role?.let { RoleResult(it.id.value, it.name, it.description) }
 
         val contestTagTitles = getContestTagTitles(updatedTags.map { it.title })
         val isLiked = likeFeedPort.existsByMemberIdAndFeedId(member.id.value, savedFeed.id!!.value)
@@ -72,7 +74,7 @@ class UpdateFeedUseCaseImpl(
                 memberId = member.memberId,
                 nickname = member.nickname,
                 profileImage = member.profileImage,
-                role = roleName
+                role = roleResult
             ),
             boardId = savedFeed.boardId,
             boardTitle = board.title,

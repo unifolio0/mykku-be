@@ -34,7 +34,7 @@ class BlockFilterService(
     override fun <T> filterContent(
         items: List<T>,
         memberId: String?,
-        memberIdExtractor: (T) -> String,
+        memberIdExtractor: (T) -> String?,
         contentExtractors: List<(T) -> String?>
     ): List<T> {
         if (memberId == null || items.isEmpty()) return items
@@ -44,7 +44,7 @@ class BlockFilterService(
 
         return items.filter { item ->
             val authorId = memberIdExtractor(item)
-            if (authorId in blockedMemberIds) return@filter false
+            if (authorId != null && authorId in blockedMemberIds) return@filter false
 
             val hasBlockedKeyword = contentExtractors.any { extractor ->
                 val content = extractor(item)?.lowercase() ?: return@any false
@@ -58,7 +58,7 @@ class BlockFilterService(
     override fun <T> filterByBlockedMembers(
         items: List<T>,
         memberId: String?,
-        memberIdExtractor: (T) -> String
+        memberIdExtractor: (T) -> String?
     ): List<T> {
         if (memberId == null || items.isEmpty()) return items
 
@@ -66,7 +66,7 @@ class BlockFilterService(
 
         return items.filter { item ->
             val authorId = memberIdExtractor(item)
-            authorId !in blockedMemberIds
+            authorId == null || authorId !in blockedMemberIds
         }
     }
 

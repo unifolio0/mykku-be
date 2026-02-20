@@ -9,14 +9,14 @@ interface BlockFilterUseCase {
     fun <T> filterContent(
         items: List<T>,
         memberId: String?,
-        memberIdExtractor: (T) -> String,
+        memberIdExtractor: (T) -> String?,
         contentExtractors: List<(T) -> String?>
     ): List<T>
 
     fun <T> filterByBlockedMembers(
         items: List<T>,
         memberId: String?,
-        memberIdExtractor: (T) -> String
+        memberIdExtractor: (T) -> String?
     ): List<T>
 
     fun <T> filterByBlockedKeywords(
