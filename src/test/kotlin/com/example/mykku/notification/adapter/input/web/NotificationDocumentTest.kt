@@ -5,6 +5,7 @@ import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
 import com.example.mykku.docs.Tag
 import com.example.mykku.notification.application.dto.NotificationResult
+import com.example.mykku.notification.domain.vo.NotificationDisplayColor
 import com.example.mykku.notification.domain.vo.NotificationType
 import com.example.mykku.notification.exception.NotificationErrorCode
 import com.example.mykku.notification.exception.NotificationException
@@ -46,6 +47,7 @@ class NotificationDocumentTest : BaseDocumentTest() {
                 NotificationResult(
                     id = 1L,
                     type = NotificationType.FEED_LIKE,
+                    displayColor = NotificationDisplayColor.BLACK,
                     senderId = "sender1",
                     senderNickname = "홍길동",
                     senderProfileImage = "https://example.com/profile.jpg",
@@ -58,6 +60,7 @@ class NotificationDocumentTest : BaseDocumentTest() {
                 NotificationResult(
                     id = 2L,
                     type = NotificationType.FEED_COMMENT,
+                    displayColor = NotificationDisplayColor.BLACK,
                     senderId = "sender2",
                     senderNickname = "김철수",
                     senderProfileImage = null,
@@ -82,6 +85,8 @@ class NotificationDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.content[]").type(JsonFieldType.ARRAY).description("알림 목록"),
                             fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("알림 ID"),
                             fieldWithPath("data.content[].type").type(JsonFieldType.STRING).description("알림 타입"),
+                            fieldWithPath("data.content[].displayColor").type(JsonFieldType.STRING)
+                                .description("표시 색상 (RED, GREEN, BLACK)"),
                             fieldWithPath("data.content[].senderId").type(JsonFieldType.STRING).description("발신자 ID")
                                 .optional(),
                             fieldWithPath("data.content[].senderNickname").type(JsonFieldType.STRING).description("발신자 닉네임")
@@ -156,6 +161,7 @@ class NotificationDocumentTest : BaseDocumentTest() {
                 NotificationResult(
                     id = 1L,
                     type = NotificationType.FEED_LIKE,
+                    displayColor = NotificationDisplayColor.BLACK,
                     senderId = "sender1",
                     senderNickname = "홍길동",
                     senderProfileImage = "https://example.com/profile.jpg",
@@ -168,6 +174,7 @@ class NotificationDocumentTest : BaseDocumentTest() {
                 NotificationResult(
                     id = 2L,
                     type = NotificationType.FEED_COMMENT,
+                    displayColor = NotificationDisplayColor.BLACK,
                     senderId = "sender2",
                     senderNickname = "김철수",
                     senderProfileImage = null,
@@ -192,6 +199,8 @@ class NotificationDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.content[]").type(JsonFieldType.ARRAY).description("읽지 않은 알림 목록"),
                             fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("알림 ID"),
                             fieldWithPath("data.content[].type").type(JsonFieldType.STRING).description("알림 타입"),
+                            fieldWithPath("data.content[].displayColor").type(JsonFieldType.STRING)
+                                .description("표시 색상 (RED, GREEN, BLACK)"),
                             fieldWithPath("data.content[].senderId").type(JsonFieldType.STRING).description("발신자 ID")
                                 .optional(),
                             fieldWithPath("data.content[].senderNickname").type(JsonFieldType.STRING).description("발신자 닉네임")

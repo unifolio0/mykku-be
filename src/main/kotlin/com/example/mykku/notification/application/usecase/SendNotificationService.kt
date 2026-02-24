@@ -42,7 +42,8 @@ class SendNotificationService(
             receiverId = command.receiverId,
             content = command.content,
             relatedResourceId = command.relatedResourceId,
-            relatedResourceType = command.relatedResourceType
+            relatedResourceType = command.relatedResourceType,
+            displayColor = command.displayColor
         )
 
         val savedNotification = notificationRepository.save(notification)

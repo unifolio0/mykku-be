@@ -4,12 +4,14 @@ import com.example.mykku.notification.application.dto.FcmTokenResult
 import com.example.mykku.notification.application.dto.NotificationResult
 import com.example.mykku.notification.application.dto.NotificationSettingResult
 import com.example.mykku.notification.domain.vo.NotificationCategory
+import com.example.mykku.notification.domain.vo.NotificationDisplayColor
 import com.example.mykku.notification.domain.vo.NotificationType
 import java.time.LocalDateTime
 
 data class NotificationResponse(
     val id: Long,
     val type: NotificationType,
+    val displayColor: NotificationDisplayColor,
     val senderNickname: String?,
     val senderProfileImage: String?,
     val content: String,
@@ -23,6 +25,7 @@ data class NotificationResponse(
             return NotificationResponse(
                 id = result.id,
                 type = result.type,
+                displayColor = result.displayColor,
                 senderNickname = result.senderNickname,
                 senderProfileImage = result.senderProfileImage,
                 content = result.content,

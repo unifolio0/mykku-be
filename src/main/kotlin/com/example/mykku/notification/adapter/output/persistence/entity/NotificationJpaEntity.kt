@@ -3,6 +3,7 @@ package com.example.mykku.notification.adapter.output.persistence.entity
 import com.example.mykku.common.adapter.persistence.BaseJpaEntity
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.notification.domain.entity.Notification
+import com.example.mykku.notification.domain.vo.NotificationDisplayColor
 import com.example.mykku.notification.domain.vo.NotificationId
 import com.example.mykku.notification.domain.vo.NotificationType
 import jakarta.persistence.Column
@@ -23,6 +24,10 @@ class NotificationJpaEntity(
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     val type: NotificationType,
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 10)
+    val displayColor: NotificationDisplayColor = NotificationDisplayColor.BLACK,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id")
@@ -57,6 +62,7 @@ class NotificationJpaEntity(
         return Notification.reconstitute(
             id = NotificationId.of(id!!),
             type = type,
+            displayColor = displayColor,
             senderId = sender?.id,
             receiverId = receiver.id,
             content = content,
@@ -76,6 +82,7 @@ class NotificationJpaEntity(
         ): NotificationJpaEntity {
             return NotificationJpaEntity(
                 type = notification.type,
+                displayColor = notification.displayColor,
                 sender = sender,
                 receiver = receiver,
                 content = notification.content,
