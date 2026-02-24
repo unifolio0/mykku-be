@@ -4,6 +4,7 @@ import com.example.mykku.BaseDocumentTest
 import com.example.mykku.contest.application.dto.ContestWinnerDetailResult
 import com.example.mykku.contest.application.dto.ContestWinnerPreviewResult
 import com.example.mykku.contest.application.dto.ContestWinnersListResult
+import com.example.mykku.contest.application.dto.MyWinnerStatusResult
 import com.example.mykku.contest.application.dto.UpdateAcceptanceSpeechResult
 import com.example.mykku.contest.application.dto.WinnerDetailResult
 import com.example.mykku.contest.application.dto.WinnerThumbnailResult
@@ -207,6 +208,97 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                 .get("/api/v1/contests/{contestId}/winners", contestId)
                 .then()
                 .statusCode(404)
+        }
+    }
+
+    @Nested
+    @DisplayName("수상 여부 조회")
+    inner class GetMyWinnerStatus {
+
+        private val apiConfig = ApiRequestConfig(
+            tag = Tag.CONTEST_WINNER_API,
+            summary = "내 수상 여부 조회",
+            description = "특정 콘테스트에서 인증된 사용자의 수상 여부를 조회합니다.",
+            pathParameters = listOf(
+                parameterWithName("contestId").description("콘테스트 ID")
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
+        )
+
+        @Test
+        fun `성공 - 수상자`() {
+            val contestId = 1L
+            val result = MyWinnerStatusResult(
+                isWinner = true,
+                winnerId = 5L,
+                winnerRank = 1
+            )
+
+            `when`(getMyWinnerStatusUseCase.execute(any())).thenReturn(result)
+
+            val documentFilter = document("contest-winner/my-status", 200)
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
+                            fieldWithPath("data.isWinner").type(JsonFieldType.BOOLEAN).description("수상 여부"),
+                            fieldWithPath("data.winnerId").type(JsonFieldType.NUMBER).description("수상자 ID").optional(),
+                            fieldWithPath("data.winnerRank").type(JsonFieldType.NUMBER).description("수상 순위").optional()
+                        )
+                )
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .get("/api/v1/contests/{contestId}/my-winner-status", contestId)
+                .then()
+                .statusCode(200)
+        }
+
+        @Test
+        fun `콘테스트 없음`() {
+            val contestId = 999L
+
+            `when`(getMyWinnerStatusUseCase.execute(any()))
+                .thenThrow(ContestException(ContestErrorCode.CONTEST_NOT_FOUND))
+
+            val documentFilter = document("contest-winner/my-status", "CONTEST_NOT_FOUND")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .get("/api/v1/contests/{contestId}/my-winner-status", contestId)
+                .then()
+                .statusCode(404)
+        }
+
+        @Test
+        fun `수상자 미발표`() {
+            val contestId = 1L
+
+            `when`(getMyWinnerStatusUseCase.execute(any()))
+                .thenThrow(ContestException(ContestErrorCode.WINNER_NOT_ANNOUNCED))
+
+            val documentFilter = document("contest-winner/my-status", "WINNER_NOT_ANNOUNCED")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .get("/api/v1/contests/{contestId}/my-winner-status", contestId)
+                .then()
+                .statusCode(400)
         }
     }
 

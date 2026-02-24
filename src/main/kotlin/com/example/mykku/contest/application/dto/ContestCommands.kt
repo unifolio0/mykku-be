@@ -42,3 +42,8 @@ data class UpdateAcceptanceSpeechCommand(
     val memberId: String?,
     val acceptanceSpeech: String
 )
+
+data class GetMyWinnerStatusQuery(
+    val contestId: Long,
+    val memberId: String
+)

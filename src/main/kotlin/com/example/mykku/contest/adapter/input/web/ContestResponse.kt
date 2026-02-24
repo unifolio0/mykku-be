@@ -10,6 +10,7 @@ import com.example.mykku.contest.application.dto.ContestWinnersListResult
 import com.example.mykku.contest.application.dto.CreateContestResult
 import com.example.mykku.contest.application.dto.PagedContestsResult
 import com.example.mykku.contest.application.dto.SetContestWinnersResult
+import com.example.mykku.contest.application.dto.MyWinnerStatusResult
 import com.example.mykku.contest.application.dto.UpdateAcceptanceSpeechResult
 import com.example.mykku.contest.application.dto.WinnerDetailResult
 import com.example.mykku.contest.application.dto.WinnerInfoResult
@@ -284,6 +285,22 @@ data class UpdateAcceptanceSpeechResponse(
             return UpdateAcceptanceSpeechResponse(
                 winnerId = result.winnerId,
                 acceptanceSpeech = result.acceptanceSpeech
+            )
+        }
+    }
+}
+
+data class MyWinnerStatusResponse(
+    val isWinner: Boolean,
+    val winnerId: Long?,
+    val winnerRank: Int?
+) {
+    companion object {
+        fun from(result: MyWinnerStatusResult): MyWinnerStatusResponse {
+            return MyWinnerStatusResponse(
+                isWinner = result.isWinner,
+                winnerId = result.winnerId,
+                winnerRank = result.winnerRank
             )
         }
     }

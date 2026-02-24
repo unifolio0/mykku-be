@@ -110,3 +110,9 @@ data class UpdateAcceptanceSpeechResult(
     val winnerId: Long,
     val acceptanceSpeech: String
 )
+
+data class MyWinnerStatusResult(
+    val isWinner: Boolean,
+    val winnerId: Long?,
+    val winnerRank: Int?
+)

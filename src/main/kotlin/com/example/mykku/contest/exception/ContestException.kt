@@ -38,5 +38,7 @@ class ContestException(
         fun notWinnerOwner(): ContestException = ContestException(ContestErrorCode.NOT_WINNER_OWNER)
 
         fun contestNotExpired(): ContestException = ContestException(ContestErrorCode.CONTEST_NOT_EXPIRED)
+
+        fun winnerNotAnnounced(): ContestException = ContestException(ContestErrorCode.WINNER_NOT_ANNOUNCED)
     }
 }

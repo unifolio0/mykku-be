@@ -27,5 +27,6 @@ enum class ContestErrorCode(
     PARTICIPATION_NOT_FOUND(HttpStatus.NOT_FOUND, "콘테스트 참여 정보를 찾을 수 없습니다"),
     PARTICIPATION_NOT_BELONG_TO_CONTEST(HttpStatus.BAD_REQUEST, "해당 참여작은 이 콘테스트에 속하지 않습니다"),
     NOT_WINNER_OWNER(HttpStatus.FORBIDDEN, "수상 소감을 수정할 권한이 없습니다"),
-    CONTEST_NOT_EXPIRED(HttpStatus.BAD_REQUEST, "종료되지 않은 콘테스트입니다")
+    CONTEST_NOT_EXPIRED(HttpStatus.BAD_REQUEST, "종료되지 않은 콘테스트입니다"),
+    WINNER_NOT_ANNOUNCED(HttpStatus.BAD_REQUEST, "아직 수상자가 발표되지 않았습니다")
 }
