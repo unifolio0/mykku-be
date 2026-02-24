@@ -69,6 +69,46 @@ class NotificationControllerTest : BaseControllerTest() {
     }
 
     @Test
+    @DisplayName("알림 목록 조회 - 카테고리 필터링")
+    fun `getNotifications - 카테고리로 필터링하여 조회한다`() {
+        val sender = createAndSaveMember(id = "sender1", nickname = "Sender")
+        val receiver = createAndSaveMember(id = "receiver1", nickname = "Receiver")
+
+        createNotification(
+            type = NotificationType.FEED_LIKE,
+            sender = sender,
+            receiver = receiver,
+            content = "sender1님이 회원님의 피드를 좋아합니다"
+        )
+        createNotification(
+            type = NotificationType.SYSTEM_NOTICE,
+            sender = sender,
+            receiver = receiver,
+            content = "시스템 공지사항"
+        )
+
+        val authHeader = TestTokenGenerator.getBearerToken("receiver1")
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .queryParam("category", "COMMUNITY")
+            .`when`()
+            .get("/api/v1/notifications")
+            .then()
+            .statusCode(200)
+            .body("data.content", hasSize<Any>(1))
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .queryParam("category", "NOTICE")
+            .`when`()
+            .get("/api/v1/notifications")
+            .then()
+            .statusCode(200)
+            .body("data.content", hasSize<Any>(1))
+    }
+
+    @Test
     @DisplayName("알림 목록 조회 - 인증되지 않은 사용자")
     fun `getNotifications - 인증되지 않은 사용자는 조회할 수 없다`() {
         RestAssured.given()

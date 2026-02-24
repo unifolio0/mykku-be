@@ -229,7 +229,7 @@ class NotificationSettingTest {
         }
 
         @Test
-        @DisplayName("기본 설정은 FEED_LIKE, FEED_COMMENT, SYSTEM_NOTICE 타입을 포함한다")
+        @DisplayName("기본 설정은 모든 NotificationType 타입을 포함한다")
         fun `기본 설정 생성 - 타입 검증`() {
             val settings = NotificationSetting.createDefaultSettings("member1")
             val types = settings.map { it.notificationType }
@@ -237,7 +237,10 @@ class NotificationSettingTest {
             assertThat(types).containsExactlyInAnyOrder(
                 NotificationType.FEED_LIKE,
                 NotificationType.FEED_COMMENT,
-                NotificationType.SYSTEM_NOTICE
+                NotificationType.SYSTEM_NOTICE,
+                NotificationType.ROLE_EARNED,
+                NotificationType.CONTEST,
+                NotificationType.EVENT
             )
         }
 
@@ -402,9 +405,9 @@ class NotificationSettingTest {
         }
 
         @Test
-        @DisplayName("NotificationType은 3개의 항목을 가진다")
+        @DisplayName("NotificationType은 6개의 항목을 가진다")
         fun `타입 검증 - 항목 수`() {
-            assertThat(NotificationType.entries).hasSize(3)
+            assertThat(NotificationType.entries).hasSize(6)
         }
     }
 

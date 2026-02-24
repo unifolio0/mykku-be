@@ -13,6 +13,7 @@ import com.example.mykku.notification.application.dto.MarkAsReadCommand
 import com.example.mykku.notification.application.port.input.DeleteNotificationUseCase
 import com.example.mykku.notification.application.port.input.GetNotificationsUseCase
 import com.example.mykku.notification.application.port.input.MarkNotificationReadUseCase
+import com.example.mykku.notification.domain.vo.NotificationCategory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
@@ -36,7 +37,8 @@ class NotificationController(
     fun getNotifications(
         @CurrentMember member: Member,
         @RequestParam(defaultValue = "0") page: Int,
-        @RequestParam(defaultValue = "20") size: Int
+        @RequestParam(defaultValue = "20") size: Int,
+        @RequestParam(required = false) category: NotificationCategory?
     ): ResponseEntity<ApiResponse<Page<NotificationResponse>>> {
         val pageable = PageableValidator.validateAndCreate(
             page,
@@ -45,7 +47,7 @@ class NotificationController(
             Sort.Direction.DESC
         )
 
-        val query = GetNotificationsQuery(member.id.value, pageable)
+        val query = GetNotificationsQuery(member.id.value, pageable, category)
         val notifications = getNotificationsUseCase.getNotifications(query)
 
         return ResponseEntity.ok(
@@ -60,7 +62,8 @@ class NotificationController(
     fun getUnreadNotifications(
         @CurrentMember member: Member,
         @RequestParam(defaultValue = "0") page: Int,
-        @RequestParam(defaultValue = "20") size: Int
+        @RequestParam(defaultValue = "20") size: Int,
+        @RequestParam(required = false) category: NotificationCategory?
     ): ResponseEntity<ApiResponse<Page<NotificationResponse>>> {
         val pageable = PageableValidator.validateAndCreate(
             page,
@@ -69,7 +72,7 @@ class NotificationController(
             Sort.Direction.DESC
         )
 
-        val query = GetUnreadNotificationsQuery(member.id.value, pageable)
+        val query = GetUnreadNotificationsQuery(member.id.value, pageable, category)
         val notifications = getNotificationsUseCase.getUnreadNotifications(query)
 
         return ResponseEntity.ok(
@@ -82,9 +85,10 @@ class NotificationController(
 
     @GetMapping("/unread/count")
     fun getUnreadCount(
-        @CurrentMember member: Member
+        @CurrentMember member: Member,
+        @RequestParam(required = false) category: NotificationCategory?
     ): ResponseEntity<ApiResponse<Long>> {
-        val query = GetUnreadCountQuery(member.id.value)
+        val query = GetUnreadCountQuery(member.id.value, category)
         val count = getNotificationsUseCase.getUnreadCount(query)
 
         return ResponseEntity.ok(

@@ -3,6 +3,7 @@ package com.example.mykku.notification.adapter.input.web
 import com.example.mykku.notification.application.dto.FcmTokenResult
 import com.example.mykku.notification.application.dto.NotificationResult
 import com.example.mykku.notification.application.dto.NotificationSettingResult
+import com.example.mykku.notification.domain.vo.NotificationCategory
 import com.example.mykku.notification.domain.vo.NotificationType
 import java.time.LocalDateTime
 
@@ -55,6 +56,7 @@ data class FcmTokenResponse(
 data class NotificationSettingResponse(
     val id: Long,
     val notificationType: NotificationType,
+    val category: NotificationCategory,
     val isEnabled: Boolean
 ) {
     companion object {
@@ -62,6 +64,7 @@ data class NotificationSettingResponse(
             return NotificationSettingResponse(
                 id = result.id,
                 notificationType = result.notificationType,
+                category = result.category,
                 isEnabled = result.isEnabled
             )
         }

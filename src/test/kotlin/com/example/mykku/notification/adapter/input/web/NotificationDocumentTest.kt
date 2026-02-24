@@ -31,10 +31,11 @@ class NotificationDocumentTest : BaseDocumentTest() {
         private val apiConfig = ApiRequestConfig(
             tag = Tag.NOTIFICATION_API,
             summary = "알림 목록 조회",
-            description = "사용자의 알림 목록을 페이지네이션으로 조회합니다.",
+            description = "사용자의 알림 목록을 페이지네이션으로 조회합니다. category 파라미터로 탭별 필터링이 가능합니다.",
             queryParameters = listOf(
                 parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
-                parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
+                parameterWithName("size").description("페이지 크기 (기본값: 20)").optional(),
+                parameterWithName("category").description("알림 카테고리 필터 (NOTICE, COMMUNITY, CONTENTS)").optional()
             ),
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
@@ -140,10 +141,11 @@ class NotificationDocumentTest : BaseDocumentTest() {
         private val apiConfig = ApiRequestConfig(
             tag = Tag.NOTIFICATION_API,
             summary = "읽지 않은 알림 목록 조회",
-            description = "읽지 않은 알림 목록을 페이지네이션으로 조회합니다.",
+            description = "읽지 않은 알림 목록을 페이지네이션으로 조회합니다. category 파라미터로 탭별 필터링이 가능합니다.",
             queryParameters = listOf(
                 parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
-                parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
+                parameterWithName("size").description("페이지 크기 (기본값: 20)").optional(),
+                parameterWithName("category").description("알림 카테고리 필터 (NOTICE, COMMUNITY, CONTENTS)").optional()
             ),
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
@@ -249,7 +251,10 @@ class NotificationDocumentTest : BaseDocumentTest() {
         private val apiConfig = ApiRequestConfig(
             tag = Tag.NOTIFICATION_API,
             summary = "읽지 않은 알림 개수 조회",
-            description = "읽지 않은 알림의 개수를 조회합니다.",
+            description = "읽지 않은 알림의 개수를 조회합니다. category 파라미터로 탭별 필터링이 가능합니다.",
+            queryParameters = listOf(
+                parameterWithName("category").description("알림 카테고리 필터 (NOTICE, COMMUNITY, CONTENTS)").optional()
+            ),
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
