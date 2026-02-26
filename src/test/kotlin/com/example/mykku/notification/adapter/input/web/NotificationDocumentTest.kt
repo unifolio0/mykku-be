@@ -338,7 +338,10 @@ class NotificationDocumentTest : BaseDocumentTest() {
         private val apiConfig = ApiRequestConfig(
             tag = Tag.NOTIFICATION_API,
             summary = "모든 알림 읽음 처리",
-            description = "모든 알림을 읽음 처리합니다.",
+            description = "모든 알림을 읽음 처리합니다. category 파라미터로 특정 카테고리의 알림만 읽음 처리할 수 있습니다.",
+            queryParameters = listOf(
+                parameterWithName("category").description("알림 카테고리 필터 (NOTICE, COMMUNITY, CONTENTS)").optional()
+            ),
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 

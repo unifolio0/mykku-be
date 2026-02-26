@@ -1,5 +1,6 @@
 package com.example.mykku.notification.application.dto
 
+import com.example.mykku.notification.domain.vo.NotificationCategory
 import com.example.mykku.notification.domain.vo.NotificationDisplayColor
 import com.example.mykku.notification.domain.vo.NotificationType
 
@@ -19,7 +20,8 @@ data class MarkAsReadCommand(
 )
 
 data class MarkAllAsReadCommand(
-    val memberId: String
+    val memberId: String,
+    val category: NotificationCategory? = null
 )
 
 data class DeleteNotificationCommand(

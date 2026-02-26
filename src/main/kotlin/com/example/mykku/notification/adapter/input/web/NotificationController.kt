@@ -114,9 +114,10 @@ class NotificationController(
 
     @PatchMapping("/read-all")
     fun markAllAsRead(
-        @CurrentMember member: Member
+        @CurrentMember member: Member,
+        @RequestParam(required = false) category: NotificationCategory?
     ): ResponseEntity<ApiResponse<Unit>> {
-        val command = MarkAllAsReadCommand(member.id.value)
+        val command = MarkAllAsReadCommand(member.id.value, category)
         markNotificationReadUseCase.markAllAsRead(command)
 
         return ResponseEntity.ok(

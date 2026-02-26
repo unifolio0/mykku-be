@@ -17,6 +17,7 @@ interface NotificationRepository {
     fun countByReceiverIdAndIsRead(receiverId: String, isRead: Boolean): Long
     fun countByReceiverIdAndIsReadAndTypeIn(receiverId: String, isRead: Boolean, types: List<NotificationType>): Long
     fun markAllAsReadByReceiverId(receiverId: String): Int
+    fun markAllAsReadByReceiverIdAndTypeIn(receiverId: String, types: List<NotificationType>): Int
     fun delete(notification: Notification)
     fun deleteAllByReceiverId(receiverId: String)
 }

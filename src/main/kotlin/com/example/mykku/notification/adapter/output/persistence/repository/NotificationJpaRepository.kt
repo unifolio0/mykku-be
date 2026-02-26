@@ -60,6 +60,10 @@ interface NotificationJpaRepository : JpaRepository<NotificationJpaEntity, Long>
     fun markAllAsReadByReceiverId(@Param("receiverId") receiverId: String): Int
 
     @Modifying
+    @Query("UPDATE NotificationJpaEntity n SET n.isRead = true WHERE n.receiver.id = :receiverId AND n.type IN :types AND n.isRead = false")
+    fun markAllAsReadByReceiverIdAndTypeIn(@Param("receiverId") receiverId: String, @Param("types") types: List<NotificationType>): Int
+
+    @Modifying
     @Query("DELETE FROM NotificationJpaEntity n WHERE n.receiver.id = :receiverId")
     fun deleteAllByReceiverId(@Param("receiverId") receiverId: String)
 }

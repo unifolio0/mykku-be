@@ -450,6 +450,71 @@ class NotificationRepositoryAdapterTest : BaseRepositoryTest() {
     }
 
     @Nested
+    @DisplayName("markAllAsReadByReceiverIdAndTypeIn 메서드")
+    inner class MarkAllAsReadByReceiverIdAndTypeIn {
+
+        @Test
+        @DisplayName("특정 타입의 알림만 읽음 처리할 수 있다")
+        fun `카테고리별 전체 읽음 처리 - 정상 케이스`() {
+            notificationRepository.save(
+                Notification.create(
+                    type = NotificationType.FEED_LIKE,
+                    senderId = senderId,
+                    receiverId = receiverId,
+                    content = "좋아요 알림"
+                )
+            )
+            notificationRepository.save(
+                Notification.create(
+                    type = NotificationType.FEED_COMMENT,
+                    senderId = senderId,
+                    receiverId = receiverId,
+                    content = "댓글 알림"
+                )
+            )
+            notificationRepository.save(
+                Notification.create(
+                    type = NotificationType.SYSTEM_NOTICE,
+                    senderId = null,
+                    receiverId = receiverId,
+                    content = "시스템 공지"
+                )
+            )
+
+            val updatedCount = notificationRepository.markAllAsReadByReceiverIdAndTypeIn(
+                receiverId,
+                listOf(NotificationType.FEED_LIKE, NotificationType.FEED_COMMENT)
+            )
+
+            assertThat(updatedCount).isEqualTo(2)
+            val pageable = PageRequest.of(0, 10)
+            val unreadNotice = notificationRepository.findAllByReceiverIdAndIsRead(receiverId, false, pageable)
+            assertThat(unreadNotice.content).hasSize(1)
+            assertThat(unreadNotice.content[0].type).isEqualTo(NotificationType.SYSTEM_NOTICE)
+        }
+
+        @Test
+        @DisplayName("해당 타입의 알림이 없으면 0을 반환한다")
+        fun `카테고리별 전체 읽음 처리 - 해당 타입 없음`() {
+            notificationRepository.save(
+                Notification.create(
+                    type = NotificationType.SYSTEM_NOTICE,
+                    senderId = null,
+                    receiverId = receiverId,
+                    content = "시스템 공지"
+                )
+            )
+
+            val updatedCount = notificationRepository.markAllAsReadByReceiverIdAndTypeIn(
+                receiverId,
+                listOf(NotificationType.FEED_LIKE, NotificationType.FEED_COMMENT)
+            )
+
+            assertThat(updatedCount).isEqualTo(0)
+        }
+    }
+
+    @Nested
     @DisplayName("delete 메서드")
     inner class Delete {
 

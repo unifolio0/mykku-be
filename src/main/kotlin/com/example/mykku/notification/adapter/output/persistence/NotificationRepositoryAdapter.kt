@@ -82,6 +82,10 @@ class NotificationRepositoryAdapter(
         return notificationJpaRepository.markAllAsReadByReceiverId(receiverId)
     }
 
+    override fun markAllAsReadByReceiverIdAndTypeIn(receiverId: String, types: List<NotificationType>): Int {
+        return notificationJpaRepository.markAllAsReadByReceiverIdAndTypeIn(receiverId, types)
+    }
+
     override fun delete(notification: Notification) {
         notification.id?.let { id ->
             notificationJpaRepository.deleteById(id.value)

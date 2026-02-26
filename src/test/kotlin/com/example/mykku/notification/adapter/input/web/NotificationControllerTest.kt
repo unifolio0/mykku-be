@@ -268,6 +268,50 @@ class NotificationControllerTest : BaseControllerTest() {
     }
 
     @Test
+    @DisplayName("카테고리별 전체 읽음 처리 - 정상 케이스")
+    fun `markAllAsRead - 카테고리별로 읽음 처리한다`() {
+        val sender = createAndSaveMember(id = "sender1")
+        val receiver = createAndSaveMember(id = "receiver1")
+
+        createNotification(
+            type = NotificationType.FEED_LIKE,
+            sender = sender,
+            receiver = receiver,
+            content = "좋아요 알림"
+        )
+        createNotification(
+            type = NotificationType.SYSTEM_NOTICE,
+            sender = sender,
+            receiver = receiver,
+            content = "시스템 공지"
+        )
+
+        val authHeader = TestTokenGenerator.getBearerToken("receiver1")
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .queryParam("category", "COMMUNITY")
+            .`when`()
+            .patch("/api/v1/notifications/read-all")
+            .then()
+            .statusCode(200)
+
+        val communityUnread = notificationJpaRepository.countByReceiverIdAndIsReadAndTypeIn(
+            receiver.id,
+            false,
+            listOf(NotificationType.FEED_LIKE, NotificationType.FEED_COMMENT, NotificationType.ROLE_EARNED)
+        )
+        assert(communityUnread == 0L)
+
+        val noticeUnread = notificationJpaRepository.countByReceiverIdAndIsReadAndTypeIn(
+            receiver.id,
+            false,
+            listOf(NotificationType.SYSTEM_NOTICE)
+        )
+        assert(noticeUnread == 1L)
+    }
+
+    @Test
     @DisplayName("알림 삭제 - 정상 케이스")
     fun `deleteNotification - 알림을 삭제한다`() {
         val sender = createAndSaveMember(id = "sender1")
