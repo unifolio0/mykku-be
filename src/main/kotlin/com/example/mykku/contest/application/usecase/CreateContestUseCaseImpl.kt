@@ -58,7 +58,8 @@ class CreateContestUseCaseImpl(
             title = command.title,
             description = command.description,
             startedAt = command.startedAt,
-            expiredAt = command.expiredAt
+            expiredAt = command.expiredAt,
+            thumbnailUrl = command.thumbnailUrl
         )
         return contestRepository.save(contest)
     }
@@ -92,6 +93,7 @@ class CreateContestUseCaseImpl(
             description = contest.description,
             startedAt = contest.startedAt,
             expiredAt = contest.expiredAt,
+            thumbnailUrl = contest.thumbnailUrl,
             images = images.sortedBy { it.orderIndex }.map {
                 ContestImageResult(url = it.url, orderIndex = it.orderIndex)
             },

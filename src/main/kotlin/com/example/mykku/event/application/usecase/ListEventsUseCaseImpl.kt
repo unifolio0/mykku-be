@@ -51,15 +51,13 @@ class ListEventsUseCaseImpl(
         event: Event,
         imagesByEventId: Map<Long, List<com.example.mykku.event.domain.entity.EventImage>>
     ): EventListResult {
-        val images = imagesByEventId[event.id.value] ?: emptyList()
-
         return EventListResult(
             id = event.id.value,
             title = event.title,
             startedAt = event.startedAt,
             expiredAt = event.expiredAt,
             status = event.status,
-            thumbnailUrl = images.sortedBy { it.orderIndex }.firstOrNull()?.url,
+            thumbnailUrl = event.thumbnailUrl,
             isSaved = false
         )
     }

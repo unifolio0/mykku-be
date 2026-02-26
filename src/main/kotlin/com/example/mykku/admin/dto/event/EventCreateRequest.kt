@@ -1,0 +1,26 @@
+package com.example.mykku.admin.dto.event
+
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
+import org.springframework.format.annotation.DateTimeFormat
+import org.springframework.web.multipart.MultipartFile
+import java.time.LocalDateTime
+
+data class EventCreateRequest(
+    @field:NotBlank(message = "제목은 필수입니다")
+    val title: String,
+
+    val description: String?,
+
+    @field:NotNull(message = "시작일은 필수입니다")
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    val startedAt: LocalDateTime,
+
+    @field:NotNull(message = "종료일은 필수입니다")
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    val expiredAt: LocalDateTime,
+
+    val thumbnailImage: MultipartFile,
+
+    val images: List<MultipartFile>?
+)

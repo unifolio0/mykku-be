@@ -30,6 +30,7 @@ class GetEventUseCaseImpl(
             startedAt = event.startedAt,
             expiredAt = event.expiredAt,
             status = event.status,
+            thumbnailUrl = event.thumbnailUrl,
             images = images.sortedBy { it.orderIndex }.map {
                 EventImageResult(url = it.url, orderIndex = it.orderIndex)
             },

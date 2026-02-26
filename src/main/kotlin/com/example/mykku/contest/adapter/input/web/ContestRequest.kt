@@ -1,7 +1,5 @@
 package com.example.mykku.contest.adapter.input.web
 
-import com.example.mykku.contest.application.dto.ContestImageCommand
-import com.example.mykku.contest.application.dto.CreateContestCommand
 import com.example.mykku.contest.application.dto.SetContestWinnersCommand
 import com.example.mykku.contest.application.dto.UpdateAcceptanceSpeechCommand
 import com.example.mykku.contest.application.dto.WinnerSelectionCommand
@@ -11,32 +9,6 @@ import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.Size
-import java.time.LocalDateTime
-
-data class CreateContestRequest(
-    val title: String,
-    val description: String? = null,
-    val startedAt: LocalDateTime,
-    val expiredAt: LocalDateTime,
-    val images: List<ContestImageRequest> = emptyList(),
-    val tags: List<String> = emptyList()
-) {
-    fun toCommand(): CreateContestCommand {
-        return CreateContestCommand(
-            title = title,
-            description = description,
-            startedAt = startedAt,
-            expiredAt = expiredAt,
-            images = images.map { ContestImageCommand(url = it.url, orderIndex = it.orderIndex) },
-            tags = tags
-        )
-    }
-}
-
-data class ContestImageRequest(
-    val url: String,
-    val orderIndex: Int
-)
 
 data class SetContestWinnersRequest(
     @field:NotEmpty(message = "수상자 목록은 필수입니다")

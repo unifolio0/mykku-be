@@ -39,14 +39,16 @@ class MemberContestControllerTest : BaseControllerTest() {
             ContestJpaEntity(
                 title = "콘테스트1",
                 startedAt = LocalDateTime.now(),
-                expiredAt = LocalDateTime.now().plusDays(7)
+                expiredAt = LocalDateTime.now().plusDays(7),
+                thumbnailUrl = "https://example.com/thumbnail.jpg"
             )
         )
         val contest2 = contestJpaRepository.save(
             ContestJpaEntity(
                 title = "콘테스트2",
                 startedAt = LocalDateTime.now(),
-                expiredAt = LocalDateTime.now().plusDays(7)
+                expiredAt = LocalDateTime.now().plusDays(7),
+                thumbnailUrl = "https://example.com/thumbnail.jpg"
             )
         )
 
@@ -108,7 +110,8 @@ class MemberContestControllerTest : BaseControllerTest() {
                 ContestJpaEntity(
                     title = "콘테스트${index + 1}",
                     startedAt = LocalDateTime.now(),
-                    expiredAt = LocalDateTime.now().plusDays(7)
+                    expiredAt = LocalDateTime.now().plusDays(7),
+                    thumbnailUrl = "https://example.com/thumbnail.jpg"
                 )
             )
             val feed = feedJpaRepository.save(

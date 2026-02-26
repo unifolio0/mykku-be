@@ -3,7 +3,6 @@ package com.example.mykku.event.adapter.input.web
 import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.event.application.dto.EventListQuery
-import com.example.mykku.event.application.port.input.CreateEventUseCase
 import com.example.mykku.event.application.port.input.GetEventUseCase
 import com.example.mykku.event.application.port.input.ListEventsUseCase
 import com.example.mykku.event.domain.vo.EventSortType
@@ -12,8 +11,6 @@ import com.example.mykku.member.domain.entity.Member
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -21,23 +18,9 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/v1/events")
 class EventController(
-    private val createEventUseCase: CreateEventUseCase,
     private val getEventUseCase: GetEventUseCase,
     private val listEventsUseCase: ListEventsUseCase
 ) {
-
-    @PostMapping
-    fun createEvent(
-        @RequestBody request: CreateEventRequest
-    ): ResponseEntity<ApiResponse<CreateEventResponse>> {
-        val result = createEventUseCase.execute(request.toCommand())
-        return ResponseEntity.ok(
-            ApiResponse(
-                message = "이벤트가 성공적으로 생성되었습니다.",
-                data = CreateEventResponse.from(result)
-            )
-        )
-    }
 
     @GetMapping
     fun getEvents(

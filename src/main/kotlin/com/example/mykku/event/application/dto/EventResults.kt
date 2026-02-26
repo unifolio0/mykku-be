@@ -9,6 +9,7 @@ data class CreateEventResult(
     val description: String?,
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
+    val thumbnailUrl: String,
     val images: List<EventImageResult>,
     val createdAt: LocalDateTime
 )
@@ -24,7 +25,7 @@ data class EventListResult(
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
     val status: EventStatusType,
-    val thumbnailUrl: String?,
+    val thumbnailUrl: String,
     val isSaved: Boolean
 )
 
@@ -44,6 +45,7 @@ data class EventDetailResult(
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
     val status: EventStatusType,
+    val thumbnailUrl: String,
     val images: List<EventImageResult>,
     val isSaved: Boolean,
     val createdAt: LocalDateTime
@@ -51,5 +53,6 @@ data class EventDetailResult(
 
 data class EventPreviewResult(
     val id: Long,
+    val thumbnailUrl: String,
     val images: List<String>
 )

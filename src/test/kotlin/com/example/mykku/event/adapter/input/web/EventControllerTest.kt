@@ -5,7 +5,6 @@ import com.example.mykku.event.adapter.output.persistence.entity.EventJpaEntity
 import com.example.mykku.event.adapter.output.persistence.repository.EventJpaRepository
 import com.example.mykku.event.domain.vo.EventStatusType
 import io.restassured.RestAssured
-import io.restassured.http.ContentType
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.DisplayName
@@ -18,31 +17,6 @@ class EventControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var eventJpaRepository: EventJpaRepository
-
-    @Test
-    @DisplayName("이벤트 생성 - 정상 케이스")
-    fun `createEvent - 정상적으로 이벤트를 생성한다`() {
-        val request = mapOf(
-            "title" to "테스트 이벤트",
-            "description" to "테스트 이벤트 설명입니다.",
-            "startedAt" to "2025-01-01T00:00:00",
-            "expiredAt" to "2025-12-31T23:59:59",
-            "images" to listOf(
-                mapOf("url" to "https://example.com/image1.jpg", "orderIndex" to 0)
-            )
-        )
-
-        RestAssured.given()
-            .contentType(ContentType.JSON)
-            .body(request)
-            .`when`()
-            .post("/api/v1/events")
-            .then()
-            .statusCode(200)
-            .body("message", equalTo("이벤트가 성공적으로 생성되었습니다."))
-            .body("data.id", notNullValue())
-            .body("data.title", equalTo("테스트 이벤트"))
-    }
 
     @Test
     @DisplayName("이벤트 목록 조회 - 정상 케이스")
@@ -132,6 +106,7 @@ class EventControllerTest : BaseControllerTest() {
             description = description,
             startedAt = startedAt,
             expiredAt = expiredAt,
+            thumbnailUrl = "https://example.com/thumbnail.jpg",
             status = status
         )
         return eventJpaRepository.save(event)

@@ -33,6 +33,7 @@ class GetContestUseCaseImpl(
             startedAt = contest.startedAt,
             expiredAt = contest.expiredAt,
             status = contest.status,
+            thumbnailUrl = contest.thumbnailUrl,
             images = images.sortedBy { it.orderIndex }.map {
                 ContestImageResult(url = it.url, orderIndex = it.orderIndex)
             },

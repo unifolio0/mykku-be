@@ -59,7 +59,8 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
                 title = "테스트 이벤트",
                 description = null,
                 startedAt = LocalDateTime.now(),
-                expiredAt = LocalDateTime.now().plusDays(7)
+                expiredAt = LocalDateTime.now().plusDays(7),
+                thumbnailUrl = "https://example.com/thumbnail.jpg"
             )
 
             val savedEvent = eventRepository.save(event)
@@ -309,7 +310,8 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
             title = "테스트 이벤트",
             description = "테스트 이벤트 설명",
             startedAt = LocalDateTime.now(),
-            expiredAt = LocalDateTime.now().plusDays(7)
+            expiredAt = LocalDateTime.now().plusDays(7),
+            thumbnailUrl = "https://example.com/thumbnail.jpg"
         )
     }
 
@@ -318,7 +320,8 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
             title = "테스트 이벤트",
             description = "테스트 이벤트 설명",
             startedAt = LocalDateTime.now().minusDays(1),
-            expiredAt = expiredAt
+            expiredAt = expiredAt,
+            thumbnailUrl = "https://example.com/thumbnail.jpg"
         )
     }
 
@@ -328,6 +331,7 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
             description = "테스트 이벤트 설명",
             startedAt = LocalDateTime.now().minusDays(1),
             expiredAt = expiredAt,
+            thumbnailUrl = "https://example.com/thumbnail.jpg",
             scrapCount = scrapCount,
             status = EventStatusType.ACTIVE
         )

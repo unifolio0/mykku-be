@@ -24,6 +24,7 @@ data class CreateContestResponse(
     val description: String?,
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
+    val thumbnailUrl: String,
     val images: List<ContestImageResponse>,
     val tags: List<String>,
     val createdAt: LocalDateTime
@@ -36,6 +37,7 @@ data class CreateContestResponse(
                 description = result.description,
                 startedAt = result.startedAt,
                 expiredAt = result.expiredAt,
+                thumbnailUrl = result.thumbnailUrl,
                 images = result.images.map { ContestImageResponse.from(it) },
                 tags = result.tags,
                 createdAt = result.createdAt
@@ -64,7 +66,7 @@ data class ContestListResponse(
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
     val status: ContestStatusType,
-    val thumbnailUrl: String?,
+    val thumbnailUrl: String,
     val tags: List<String>,
     val isSaved: Boolean
 ) {
@@ -113,6 +115,7 @@ data class ContestDetailResponse(
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
     val status: ContestStatusType,
+    val thumbnailUrl: String,
     val images: List<ContestImageResponse>,
     val tags: List<String>,
     val isSaved: Boolean,
@@ -127,6 +130,7 @@ data class ContestDetailResponse(
                 startedAt = result.startedAt,
                 expiredAt = result.expiredAt,
                 status = result.status,
+                thumbnailUrl = result.thumbnailUrl,
                 images = result.images.map { ContestImageResponse.from(it) },
                 tags = result.tags,
                 isSaved = result.isSaved,
@@ -139,7 +143,7 @@ data class ContestDetailResponse(
 data class ContestPreviewResponse(
     val id: Long,
     val title: String,
-    val thumbnailUrl: String?
+    val thumbnailUrl: String
 ) {
     companion object {
         fun from(result: ContestPreviewResult): ContestPreviewResponse {

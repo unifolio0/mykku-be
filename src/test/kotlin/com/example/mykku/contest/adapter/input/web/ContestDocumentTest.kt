@@ -4,7 +4,6 @@ import com.example.mykku.BaseDocumentTest
 import com.example.mykku.contest.application.dto.ContestDetailResult
 import com.example.mykku.contest.application.dto.ContestImageResult
 import com.example.mykku.contest.application.dto.ContestListResult
-import com.example.mykku.contest.application.dto.CreateContestResult
 import com.example.mykku.contest.application.dto.PagedContestsResult
 import com.example.mykku.contest.domain.vo.ContestStatusType
 import com.example.mykku.docs.ApiRequestConfig
@@ -24,205 +23,6 @@ import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
 
 class ContestDocumentTest : BaseDocumentTest() {
-
-    @Nested
-    @DisplayName("공모전 생성")
-    inner class CreateContest {
-
-        private val apiConfig = ApiRequestConfig(
-            tag = Tag.CONTEST_API,
-            summary = "공모전 생성",
-            description = "새로운 공모전을 생성합니다.",
-            requestBodyFields = listOf(
-                fieldWithPath("title").type(JsonFieldType.STRING).description("공모전 제목"),
-                fieldWithPath("description").type(JsonFieldType.STRING).description("공모전 설명").optional(),
-                fieldWithPath("expiredAt").type(JsonFieldType.STRING)
-                    .description("공모전 만료일 (yyyy-MM-dd'T'HH:mm:ss)"),
-                fieldWithPath("startedAt").type(JsonFieldType.STRING)
-                    .description("공모전 시작일 (yyyy-MM-dd'T'HH:mm:ss)"),
-                fieldWithPath("images[]").type(JsonFieldType.ARRAY).description("공모전 이미지 목록 (최대 10개)"),
-                fieldWithPath("images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
-                fieldWithPath("images[].orderIndex").type(JsonFieldType.NUMBER).description("이미지 순서"),
-                fieldWithPath("tags[]").type(JsonFieldType.ARRAY).description("공모전 태그 목록 (최대 7개)")
-            )
-        )
-
-        @Test
-        fun `성공`() {
-            val request = CreateContestRequest(
-                title = "신규 공모전",
-                description = "공모전 상세 설명입니다.",
-                startedAt = LocalDateTime.now(),
-                expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
-                images = listOf(
-                    ContestImageRequest(url = "https://example.com/image1.jpg", orderIndex = 0),
-                    ContestImageRequest(url = "https://example.com/image2.jpg", orderIndex = 1)
-                ),
-                tags = listOf("디자인", "개발", "기획")
-            )
-
-            val result = CreateContestResult(
-                id = 1L,
-                title = "신규 공모전",
-                description = "공모전 상세 설명입니다.",
-                startedAt = LocalDateTime.of(2024, 6, 1, 0, 0, 0),
-                expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
-                images = listOf(
-                    ContestImageResult(url = "https://example.com/image1.jpg", orderIndex = 0),
-                    ContestImageResult(url = "https://example.com/image2.jpg", orderIndex = 1)
-                ),
-                tags = listOf("디자인", "개발", "기획"),
-                createdAt = LocalDateTime.now()
-            )
-
-            `when`(createContestUseCase.execute(any())).thenReturn(result)
-
-            val documentFilter = document("contest/create", 200)
-                .request(request().applyConfig(apiConfig))
-                .response(
-                    response()
-                        .responseBodyField(
-                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
-                            fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("생성된 공모전 ID"),
-                            fieldWithPath("data.title").type(JsonFieldType.STRING).description("공모전 제목"),
-                            fieldWithPath("data.description").type(JsonFieldType.STRING).description("공모전 설명")
-                                .optional(),
-                            fieldWithPath("data.expiredAt").type(JsonFieldType.STRING).description("공모전 만료일"),
-                            fieldWithPath("data.images[]").type(JsonFieldType.ARRAY).description("공모전 이미지 목록"),
-                            fieldWithPath("data.images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
-                            fieldWithPath("data.images[].orderIndex").type(JsonFieldType.NUMBER).description("이미지 순서"),
-                            fieldWithPath("data.tags[]").type(JsonFieldType.ARRAY).description("공모전 태그 목록"),
-                            fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성일시"),
-                            fieldWithPath("data.startedAt").type(JsonFieldType.STRING).description("시작일시")
-                        )
-                )
-                .build()
-
-            given(documentFilter)
-                .contentType(ContentType.JSON)
-                .body(objectMapper.writeValueAsString(request))
-                .`when`()
-                .post("/api/v1/contests")
-                .then()
-                .statusCode(200)
-        }
-
-        @Test
-        fun `이미지 개수 초과`() {
-            val images = (0..10).map { i ->
-                ContestImageRequest(url = "https://example.com/image$i.jpg", orderIndex = i)
-            }
-            val request = CreateContestRequest(
-                title = "신규 공모전",
-                description = "공모전 상세 설명입니다.",
-                startedAt = LocalDateTime.now(),
-                expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
-                images = images,
-                tags = listOf("디자인")
-            )
-
-            `when`(createContestUseCase.execute(any()))
-                .thenThrow(ContestException(ContestErrorCode.CONTEST_IMAGE_LIMIT_EXCEEDED))
-
-            val documentFilter = document("contest/create", "CONTEST_IMAGE_LIMIT_EXCEEDED")
-                .request(request().applyConfig(apiConfig))
-                .response(RestDocumentationResponse.ERROR_RESPONSE)
-                .build()
-
-            given(documentFilter)
-                .contentType(ContentType.JSON)
-                .body(objectMapper.writeValueAsString(request))
-                .`when`()
-                .post("/api/v1/contests")
-                .then()
-                .statusCode(400)
-        }
-
-        @Test
-        fun `태그 개수 초과`() {
-            val request = CreateContestRequest(
-                title = "신규 공모전",
-                description = "공모전 상세 설명입니다.",
-                startedAt = LocalDateTime.now(),
-                expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
-                images = listOf(ContestImageRequest(url = "https://example.com/image1.jpg", orderIndex = 0)),
-                tags = listOf("태그1", "태그2", "태그3", "태그4", "태그5", "태그6", "태그7", "태그8")
-            )
-
-            `when`(createContestUseCase.execute(any()))
-                .thenThrow(ContestException(ContestErrorCode.CONTEST_TAG_LIMIT_EXCEEDED))
-
-            val documentFilter = document("contest/create", "CONTEST_TAG_LIMIT_EXCEEDED")
-                .request(request().applyConfig(apiConfig))
-                .response(RestDocumentationResponse.ERROR_RESPONSE)
-                .build()
-
-            given(documentFilter)
-                .contentType(ContentType.JSON)
-                .body(objectMapper.writeValueAsString(request))
-                .`when`()
-                .post("/api/v1/contests")
-                .then()
-                .statusCode(400)
-        }
-
-        @Test
-        fun `태그 길이 초과`() {
-            val request = CreateContestRequest(
-                title = "신규 공모전",
-                description = "공모전 상세 설명입니다.",
-                startedAt = LocalDateTime.now(),
-                expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
-                images = listOf(ContestImageRequest(url = "https://example.com/image1.jpg", orderIndex = 0)),
-                tags = listOf("가".repeat(21))
-            )
-
-            `when`(createContestUseCase.execute(any()))
-                .thenThrow(ContestException(ContestErrorCode.TAG_TITLE_TOO_LONG))
-
-            val documentFilter = document("contest/create", "TAG_TITLE_TOO_LONG")
-                .request(request().applyConfig(apiConfig))
-                .response(RestDocumentationResponse.ERROR_RESPONSE)
-                .build()
-
-            given(documentFilter)
-                .contentType(ContentType.JSON)
-                .body(objectMapper.writeValueAsString(request))
-                .`when`()
-                .post("/api/v1/contests")
-                .then()
-                .statusCode(400)
-        }
-
-        @Test
-        fun `태그 형식 오류`() {
-            val request = CreateContestRequest(
-                title = "신규 공모전",
-                description = "공모전 상세 설명입니다.",
-                startedAt = LocalDateTime.now(),
-                expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
-                images = listOf(ContestImageRequest(url = "https://example.com/image1.jpg", orderIndex = 0)),
-                tags = listOf("태그!@#")
-            )
-
-            `when`(createContestUseCase.execute(any()))
-                .thenThrow(ContestException(ContestErrorCode.TAG_INVALID_FORMAT))
-
-            val documentFilter = document("contest/create", "TAG_INVALID_FORMAT")
-                .request(request().applyConfig(apiConfig))
-                .response(RestDocumentationResponse.ERROR_RESPONSE)
-                .build()
-
-            given(documentFilter)
-                .contentType(ContentType.JSON)
-                .body(objectMapper.writeValueAsString(request))
-                .`when`()
-                .post("/api/v1/contests")
-                .then()
-                .statusCode(400)
-        }
-    }
 
     @Nested
     @DisplayName("공모전 목록 조회")
@@ -292,7 +92,7 @@ class ContestDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.content[].status").type(JsonFieldType.STRING).description("공모전 상태"),
                             fieldWithPath("data.content[].startedAt").type(JsonFieldType.STRING).description("시작일"),
                             fieldWithPath("data.content[].thumbnailUrl").type(JsonFieldType.STRING)
-                                .description("썸네일 이미지 URL").optional(),
+                                .description("썸네일 이미지 URL"),
                             fieldWithPath("data.content[].tags[]").type(JsonFieldType.ARRAY).description("태그 목록"),
                             fieldWithPath("data.content[].isSaved").type(JsonFieldType.BOOLEAN).description("저장 여부"),
                             fieldWithPath("data.page").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
@@ -340,6 +140,7 @@ class ContestDocumentTest : BaseDocumentTest() {
                 startedAt = LocalDateTime.now(),
                 expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
                 status = ContestStatusType.ACTIVE,
+                thumbnailUrl = "https://example.com/thumbnail.jpg",
                 images = listOf(
                     ContestImageResult(url = "https://example.com/image1.jpg", orderIndex = 0),
                     ContestImageResult(url = "https://example.com/image2.jpg", orderIndex = 1)
@@ -370,7 +171,8 @@ class ContestDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.isSaved").type(JsonFieldType.BOOLEAN).description("저장 여부"),
                             fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성일시"),
                             fieldWithPath("data.startedAt").type(JsonFieldType.STRING).description("시작일시"),
-                            fieldWithPath("data.status").type(JsonFieldType.STRING).description("공모전 상태")
+                            fieldWithPath("data.status").type(JsonFieldType.STRING).description("공모전 상태"),
+                            fieldWithPath("data.thumbnailUrl").type(JsonFieldType.STRING).description("썸네일 이미지 URL")
                         )
                 )
                 .build()

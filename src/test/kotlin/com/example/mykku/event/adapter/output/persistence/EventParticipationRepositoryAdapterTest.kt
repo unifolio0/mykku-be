@@ -357,6 +357,7 @@ class EventParticipationRepositoryAdapterTest : BaseRepositoryTest() {
             description = "테스트 이벤트 설명",
             startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7),
+            thumbnailUrl = "https://example.com/thumbnail.jpg",
             scrapCount = 0,
             status = EventStatusType.ACTIVE
         )

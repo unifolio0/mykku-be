@@ -1,6 +1,7 @@
 package com.example.mykku.image
 
 import com.example.mykku.config.S3Properties
+import com.example.mykku.image.dto.EntityImagesUploadResult
 import com.example.mykku.image.dto.FanNoteImagesUploadResult
 import com.example.mykku.image.dto.ImageUploadResult
 import com.example.mykku.image.exception.ImageException
@@ -187,5 +188,62 @@ class S3ImageUploadService(
         val extension = getFileExtension(originalFilename)
         val date = LocalDate.now().format(FILENAME_DATE_FORMATTER)
         return "$date-$pageNumber.$extension"
+    }
+
+    override fun uploadEntityImages(
+        thumbnailImage: MultipartFile,
+        images: List<MultipartFile>?,
+        pathPrefix: String
+    ): EntityImagesUploadResult {
+        val folderName = createEntityFolder()
+
+        val thumbnailUrl = uploadImageToS3(thumbnailImage, pathPrefix, folderName, "thumbnail")
+
+        val imageUrls = images?.filterNot { it.isEmpty }?.mapIndexed { index, file ->
+            uploadImageToS3(file, pathPrefix, folderName, "$index")
+        } ?: emptyList()
+
+        return EntityImagesUploadResult(thumbnailUrl, imageUrls)
+    }
+
+    private fun createEntityFolder(): String {
+        val date = LocalDate.now().format(DATE_FORMATTER)
+        val uuid = UUID.randomUUID().toString().replace("-", "").substring(0, 8)
+        return "$date-$uuid"
+    }
+
+    private fun uploadImageToS3(
+        image: MultipartFile,
+        pathPrefix: String,
+        folderName: String,
+        fileLabel: String
+    ): String {
+        validateImage(image)
+
+        val imageBytes = image.bytes
+        val extension = getFileExtension(image.originalFilename)
+        val key = "$pathPrefix/$folderName/$fileLabel.$extension"
+        val contentType = resolveContentType(image, extension)
+
+        val putObjectRequest = PutObjectRequest.builder()
+            .bucket(s3Properties.bucketName)
+            .key(key)
+            .contentType(contentType)
+            .contentLength(imageBytes.size.toLong())
+            .build()
+
+        s3Client.putObject(putObjectRequest, RequestBody.fromBytes(imageBytes))
+
+        return buildImageUrl(key)
+    }
+
+    private fun resolveContentType(image: MultipartFile, extension: String): String {
+        return image.contentType ?: when (extension) {
+            "jpg", "jpeg" -> "image/jpeg"
+            "png" -> "image/png"
+            "gif" -> "image/gif"
+            "webp" -> "image/webp"
+            else -> "application/octet-stream"
+        }
     }
 }
