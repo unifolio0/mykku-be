@@ -9,7 +9,6 @@ import com.example.mykku.contest.application.port.output.ContestImageRepository
 import com.example.mykku.contest.application.port.output.ContestRepository
 import com.example.mykku.contest.application.port.output.ContestTagRepository
 import com.example.mykku.contest.domain.entity.Contest
-import com.example.mykku.contest.domain.entity.ContestImage
 import com.example.mykku.contest.domain.entity.ContestTag
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -34,13 +33,13 @@ class ListContestsUseCaseImpl(
         )
 
         val contestIds = contestPage.content.map { it.id }
-        val imagesByContestId = contestImageRepository.findByContestIds(contestIds)
+        contestImageRepository.findByContestIds(contestIds)
             .groupBy { it.contestId.value }
         val tagsByContestId = contestTagRepository.findByContestIds(contestIds)
             .groupBy { it.contestId.value }
 
         val contestListResults = contestPage.content.map { contest ->
-            toContestListResult(contest, imagesByContestId, tagsByContestId)
+            toContestListResult(contest, tagsByContestId)
         }
 
         return PagedContestsResult(
@@ -55,7 +54,6 @@ class ListContestsUseCaseImpl(
 
     private fun toContestListResult(
         contest: Contest,
-        imagesByContestId: Map<Long, List<ContestImage>>,
         tagsByContestId: Map<Long, List<ContestTag>>
     ): ContestListResult {
         val tags = tagsByContestId[contest.id.value] ?: emptyList()
