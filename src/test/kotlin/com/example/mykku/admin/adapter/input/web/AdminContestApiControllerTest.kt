@@ -139,7 +139,8 @@ class AdminContestApiControllerTest : BaseControllerTest() {
             description = "테스트 공모전 설명",
             startedAt = LocalDateTime.now().minusDays(30),
             expiredAt = LocalDateTime.now().minusDays(1),
-            status = status
+            status = status,
+            thumbnailUrl = "https://example.com/thumbnail.jpg"
         )
         return contestJpaRepository.save(contest)
     }

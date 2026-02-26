@@ -15,6 +15,7 @@ data class CreateEventResponse(
     val description: String?,
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
+    val thumbnailUrl: String,
     val images: List<EventImageResponse>,
     val createdAt: LocalDateTime
 ) {
@@ -26,6 +27,7 @@ data class CreateEventResponse(
                 description = result.description,
                 startedAt = result.startedAt,
                 expiredAt = result.expiredAt,
+                thumbnailUrl = result.thumbnailUrl,
                 images = result.images.map { EventImageResponse.from(it) },
                 createdAt = result.createdAt
             )
@@ -53,7 +55,7 @@ data class EventListResponse(
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
     val status: EventStatusType,
-    val thumbnailUrl: String?,
+    val thumbnailUrl: String,
     val isSaved: Boolean
 ) {
     companion object {
@@ -100,6 +102,7 @@ data class EventDetailResponse(
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
     val status: EventStatusType,
+    val thumbnailUrl: String,
     val images: List<EventImageResponse>,
     val isSaved: Boolean,
     val createdAt: LocalDateTime
@@ -113,6 +116,7 @@ data class EventDetailResponse(
                 startedAt = result.startedAt,
                 expiredAt = result.expiredAt,
                 status = result.status,
+                thumbnailUrl = result.thumbnailUrl,
                 images = result.images.map { EventImageResponse.from(it) },
                 isSaved = result.isSaved,
                 createdAt = result.createdAt
@@ -123,12 +127,14 @@ data class EventDetailResponse(
 
 data class EventPreviewResponse(
     val id: Long,
+    val thumbnailUrl: String,
     val images: List<String>
 ) {
     companion object {
         fun from(result: EventPreviewResult): EventPreviewResponse {
             return EventPreviewResponse(
                 id = result.id,
+                thumbnailUrl = result.thumbnailUrl,
                 images = result.images
             )
         }

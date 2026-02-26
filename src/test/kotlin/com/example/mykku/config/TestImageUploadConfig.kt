@@ -49,6 +49,22 @@ class TestImageUploadConfig {
                     pageImageUrls = pageImageUrls
                 )
             }
+
+            override fun uploadEntityImages(
+                thumbnailImage: MultipartFile,
+                images: List<MultipartFile>?,
+                pathPrefix: String
+            ): com.example.mykku.image.dto.EntityImagesUploadResult {
+                val thumbnailUrl = "https://test-bucket.s3.amazonaws.com/$pathPrefix/thumbnail-${System.currentTimeMillis()}.jpg"
+                val imageUrls = images?.mapIndexed { index, _ ->
+                    "https://test-bucket.s3.amazonaws.com/$pathPrefix/image-$index-${System.currentTimeMillis()}.jpg"
+                } ?: emptyList()
+
+                return com.example.mykku.image.dto.EntityImagesUploadResult(
+                    thumbnailUrl = thumbnailUrl,
+                    imageUrls = imageUrls
+                )
+            }
         }
     }
 }

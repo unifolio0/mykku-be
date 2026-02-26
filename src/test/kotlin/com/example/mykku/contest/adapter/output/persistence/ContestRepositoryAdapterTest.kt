@@ -39,7 +39,8 @@ class ContestRepositoryAdapterTest : BaseRepositoryTest() {
             startedAt = startedAt,
             expiredAt = expiredAt,
             scrapCount = scrapCount,
-            status = status
+            status = status,
+            thumbnailUrl = "https://example.com/thumbnail.jpg"
         )
         return contestJpaRepository.save(contest)
     }
@@ -55,7 +56,8 @@ class ContestRepositoryAdapterTest : BaseRepositoryTest() {
                 title = "새 콘테스트",
                 description = "콘테스트 설명",
                 startedAt = LocalDateTime.now(),
-                expiredAt = LocalDateTime.now().plusDays(7)
+                expiredAt = LocalDateTime.now().plusDays(7),
+                thumbnailUrl = "https://example.com/thumbnail.jpg"
             )
 
             val saved = contestRepository.save(contest)

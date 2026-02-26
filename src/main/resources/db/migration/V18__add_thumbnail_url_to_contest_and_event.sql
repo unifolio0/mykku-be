@@ -1,0 +1,2 @@
+ALTER TABLE contest ADD COLUMN thumbnail_url VARCHAR(500) NOT NULL;
+ALTER TABLE event ADD COLUMN thumbnail_url VARCHAR(500) NOT NULL;

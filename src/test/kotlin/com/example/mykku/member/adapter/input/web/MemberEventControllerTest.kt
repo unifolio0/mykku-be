@@ -33,14 +33,16 @@ class MemberEventControllerTest : BaseControllerTest() {
             EventJpaEntity(
                 title = "이벤트1",
                 startedAt = LocalDateTime.now(),
-                expiredAt = LocalDateTime.now().plusDays(7)
+                expiredAt = LocalDateTime.now().plusDays(7),
+                thumbnailUrl = "https://example.com/thumbnail.jpg"
             )
         )
         val event2 = eventJpaRepository.save(
             EventJpaEntity(
                 title = "이벤트2",
                 startedAt = LocalDateTime.now(),
-                expiredAt = LocalDateTime.now().plusDays(7)
+                expiredAt = LocalDateTime.now().plusDays(7),
+                thumbnailUrl = "https://example.com/thumbnail.jpg"
             )
         )
 
@@ -94,7 +96,8 @@ class MemberEventControllerTest : BaseControllerTest() {
                 EventJpaEntity(
                     title = "이벤트${index + 1}",
                     startedAt = LocalDateTime.now(),
-                    expiredAt = LocalDateTime.now().plusDays(7)
+                    expiredAt = LocalDateTime.now().plusDays(7),
+                    thumbnailUrl = "https://example.com/thumbnail.jpg"
                 )
             )
             eventParticipationJpaRepository.save(EventParticipationJpaEntity(member = member, event = event))

@@ -49,7 +49,6 @@ class GetMyParticipatedContestsUseCaseImpl(
         imagesByContestId: Map<Long, List<com.example.mykku.contest.domain.entity.ContestImage>>,
         tagsByContestId: Map<Long, List<com.example.mykku.contest.domain.entity.ContestTag>>
     ): ContestListResult {
-        val images = imagesByContestId[contest.id.value] ?: emptyList()
         val tags = tagsByContestId[contest.id.value] ?: emptyList()
 
         return ContestListResult(
@@ -58,7 +57,7 @@ class GetMyParticipatedContestsUseCaseImpl(
             startedAt = contest.startedAt,
             expiredAt = contest.expiredAt,
             status = contest.status,
-            thumbnailUrl = images.sortedBy { it.orderIndex }.firstOrNull()?.url,
+            thumbnailUrl = contest.thumbnailUrl,
             tags = tags.map { it.title },
             isSaved = false
         )

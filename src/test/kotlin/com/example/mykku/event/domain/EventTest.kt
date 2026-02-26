@@ -26,7 +26,8 @@ class EventTest {
                 title = "테스트 이벤트",
                 description = "이벤트 설명",
                 startedAt = startedAt,
-                expiredAt = expiredAt
+                expiredAt = expiredAt,
+                thumbnailUrl = "https://example.com/thumbnail.jpg"
             )
 
             assertThat(event.id.value).isEqualTo(0L)
@@ -68,7 +69,8 @@ class EventTest {
                 title = "테스트 이벤트",
                 description = null,
                 startedAt = LocalDateTime.now().plusDays(1),
-                expiredAt = LocalDateTime.now().plusDays(7)
+                expiredAt = LocalDateTime.now().plusDays(7),
+                thumbnailUrl = "https://example.com/thumbnail.jpg"
             )
 
             assertThat(event.description).isNull()
@@ -139,6 +141,7 @@ class EventTest {
                 startedAt = startedAt,
                 expiredAt = expiredAt,
                 scrapCount = 10,
+                thumbnailUrl = "https://example.com/thumbnail.jpg",
                 status = EventStatusType.EXPIRED,
                 createdAt = now,
                 updatedAt = now
@@ -162,6 +165,7 @@ class EventTest {
                 startedAt = now,
                 expiredAt = now.plusDays(7),
                 scrapCount = 0,
+                thumbnailUrl = "https://example.com/thumbnail.jpg",
                 status = EventStatusType.ACTIVE,
                 createdAt = now,
                 updatedAt = now
@@ -174,6 +178,7 @@ class EventTest {
                 startedAt = now,
                 expiredAt = now.plusDays(7),
                 scrapCount = 0,
+                thumbnailUrl = "https://example.com/thumbnail.jpg",
                 status = EventStatusType.WINNER_SELECTED,
                 createdAt = now,
                 updatedAt = now
@@ -195,6 +200,7 @@ class EventTest {
                 startedAt = now,
                 expiredAt = now.plusDays(7),
                 scrapCount = 5,
+                thumbnailUrl = "https://example.com/thumbnail.jpg",
                 status = EventStatusType.ACTIVE,
                 createdAt = now,
                 updatedAt = now
@@ -220,7 +226,8 @@ class EventTest {
             title = "테스트 이벤트",
             description = "이벤트 설명",
             startedAt = LocalDateTime.now().plusDays(1),
-            expiredAt = LocalDateTime.now().plusDays(7)
+            expiredAt = LocalDateTime.now().plusDays(7),
+            thumbnailUrl = "https://example.com/thumbnail.jpg"
         )
     }
 }

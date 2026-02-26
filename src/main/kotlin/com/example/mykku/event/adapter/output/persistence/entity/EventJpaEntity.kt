@@ -38,7 +38,10 @@ class EventJpaEntity(
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    var status: EventStatusType = EventStatusType.ACTIVE
+    var status: EventStatusType = EventStatusType.ACTIVE,
+
+    @Column(name = "thumbnail_url", nullable = false)
+    var thumbnailUrl: String
 ) : BaseJpaEntity() {
 
     fun toDomain(): Event {
@@ -49,6 +52,7 @@ class EventJpaEntity(
             startedAt = startedAt,
             expiredAt = expiredAt,
             scrapCount = scrapCount,
+            thumbnailUrl = thumbnailUrl,
             status = status,
             createdAt = createdAt,
             updatedAt = updatedAt
@@ -66,7 +70,8 @@ class EventJpaEntity(
                 startedAt = event.startedAt,
                 expiredAt = event.expiredAt,
                 scrapCount = event.scrapCount,
-                status = event.status
+                status = event.status,
+                thumbnailUrl = event.thumbnailUrl
             )
         }
     }

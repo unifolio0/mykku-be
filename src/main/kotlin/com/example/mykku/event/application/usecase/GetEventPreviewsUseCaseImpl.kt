@@ -30,6 +30,7 @@ class GetEventPreviewsUseCaseImpl(
             val images = imagesByEventId[event.id.value] ?: emptyList()
             EventPreviewResult(
                 id = event.id.value,
+                thumbnailUrl = event.thumbnailUrl,
                 images = images.map { it.url }
             )
         }

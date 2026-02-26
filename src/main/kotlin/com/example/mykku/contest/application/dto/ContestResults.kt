@@ -9,6 +9,7 @@ data class CreateContestResult(
     val description: String?,
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
+    val thumbnailUrl: String,
     val images: List<ContestImageResult>,
     val tags: List<String>,
     val createdAt: LocalDateTime
@@ -25,7 +26,7 @@ data class ContestListResult(
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
     val status: ContestStatusType,
-    val thumbnailUrl: String?,
+    val thumbnailUrl: String,
     val tags: List<String>,
     val isSaved: Boolean
 )
@@ -46,6 +47,7 @@ data class ContestDetailResult(
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
     val status: ContestStatusType,
+    val thumbnailUrl: String,
     val images: List<ContestImageResult>,
     val tags: List<String>,
     val isSaved: Boolean,
@@ -55,7 +57,7 @@ data class ContestDetailResult(
 data class ContestPreviewResult(
     val id: Long,
     val title: String,
-    val thumbnailUrl: String?
+    val thumbnailUrl: String
 )
 
 data class SetContestWinnersResult(

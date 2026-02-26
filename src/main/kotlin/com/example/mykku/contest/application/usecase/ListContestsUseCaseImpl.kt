@@ -58,7 +58,6 @@ class ListContestsUseCaseImpl(
         imagesByContestId: Map<Long, List<ContestImage>>,
         tagsByContestId: Map<Long, List<ContestTag>>
     ): ContestListResult {
-        val images = imagesByContestId[contest.id.value] ?: emptyList()
         val tags = tagsByContestId[contest.id.value] ?: emptyList()
 
         return ContestListResult(
@@ -67,7 +66,7 @@ class ListContestsUseCaseImpl(
             startedAt = contest.startedAt,
             expiredAt = contest.expiredAt,
             status = contest.status,
-            thumbnailUrl = images.sortedBy { it.orderIndex }.firstOrNull()?.url,
+            thumbnailUrl = contest.thumbnailUrl,
             tags = tags.map { it.title },
             isSaved = false
         )

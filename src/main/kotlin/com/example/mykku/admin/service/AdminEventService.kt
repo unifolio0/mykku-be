@@ -1,0 +1,41 @@
+package com.example.mykku.admin.service
+
+import com.example.mykku.admin.dto.event.EventCreateRequest
+import com.example.mykku.event.adapter.input.web.CreateEventResponse
+import com.example.mykku.event.application.dto.CreateEventCommand
+import com.example.mykku.event.application.dto.EventImageCommand
+import com.example.mykku.event.application.port.input.CreateEventUseCase
+import com.example.mykku.image.ImageUploadService
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+
+@Service
+@Transactional(readOnly = true)
+class AdminEventService(
+    private val createEventUseCase: CreateEventUseCase,
+    private val imageUploadService: ImageUploadService
+) {
+
+    @Transactional
+    fun create(request: EventCreateRequest): CreateEventResponse {
+        val uploadResult = imageUploadService.uploadEntityImages(
+            request.thumbnailImage,
+            request.images,
+            "event-images"
+        )
+
+        val command = CreateEventCommand(
+            title = request.title,
+            description = request.description,
+            startedAt = request.startedAt,
+            expiredAt = request.expiredAt,
+            thumbnailUrl = uploadResult.thumbnailUrl,
+            images = uploadResult.imageUrls.mapIndexed { index, url ->
+                EventImageCommand(url = url, orderIndex = index)
+            }
+        )
+
+        val result = createEventUseCase.execute(command)
+        return CreateEventResponse.from(result)
+    }
+}

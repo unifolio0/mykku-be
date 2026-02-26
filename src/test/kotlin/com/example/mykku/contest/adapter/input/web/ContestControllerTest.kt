@@ -5,7 +5,6 @@ import com.example.mykku.contest.adapter.output.persistence.entity.ContestJpaEnt
 import com.example.mykku.contest.adapter.output.persistence.repository.ContestJpaRepository
 import com.example.mykku.contest.domain.vo.ContestStatusType
 import io.restassured.RestAssured
-import io.restassured.http.ContentType
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.DisplayName
@@ -18,32 +17,6 @@ class ContestControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var contestJpaRepository: ContestJpaRepository
-
-    @Test
-    @DisplayName("공모전 생성 - 정상 케이스")
-    fun `createContest - 정상적으로 공모전을 생성한다`() {
-        val request = mapOf(
-            "title" to "테스트 공모전",
-            "description" to "테스트 공모전 설명입니다.",
-            "startedAt" to "2025-01-01T00:00:00",
-            "expiredAt" to "2025-12-31T23:59:59",
-            "images" to listOf(
-                mapOf("url" to "https://example.com/image1.jpg", "orderIndex" to 0)
-            ),
-            "tags" to listOf("테스트", "공모전")
-        )
-
-        RestAssured.given()
-            .contentType(ContentType.JSON)
-            .body(request)
-            .`when`()
-            .post("/api/v1/contests")
-            .then()
-            .statusCode(200)
-            .body("message", equalTo("공모전이 성공적으로 생성되었습니다."))
-            .body("data.id", notNullValue())
-            .body("data.title", equalTo("테스트 공모전"))
-    }
 
     @Test
     @DisplayName("공모전 목록 조회 - 정상 케이스")
@@ -133,7 +106,8 @@ class ContestControllerTest : BaseControllerTest() {
             description = description,
             startedAt = startedAt,
             expiredAt = expiredAt,
-            status = status
+            status = status,
+            thumbnailUrl = "https://example.com/thumbnail.jpg"
         )
         return contestJpaRepository.save(contest)
     }

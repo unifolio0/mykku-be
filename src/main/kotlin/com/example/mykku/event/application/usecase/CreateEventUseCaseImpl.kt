@@ -39,7 +39,8 @@ class CreateEventUseCaseImpl(
             title = command.title,
             description = command.description,
             startedAt = command.startedAt,
-            expiredAt = command.expiredAt
+            expiredAt = command.expiredAt,
+            thumbnailUrl = command.thumbnailUrl
         )
         return eventRepository.save(event)
     }
@@ -65,6 +66,7 @@ class CreateEventUseCaseImpl(
             description = event.description,
             startedAt = event.startedAt,
             expiredAt = event.expiredAt,
+            thumbnailUrl = event.thumbnailUrl,
             images = images.sortedBy { it.orderIndex }.map {
                 EventImageResult(url = it.url, orderIndex = it.orderIndex)
             },

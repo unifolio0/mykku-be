@@ -11,6 +11,7 @@ class Contest private constructor(
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
     val scrapCount: Int,
+    val thumbnailUrl: String,
     private var _status: ContestStatusType,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
@@ -30,7 +31,8 @@ class Contest private constructor(
             title: String,
             description: String?,
             startedAt: LocalDateTime,
-            expiredAt: LocalDateTime
+            expiredAt: LocalDateTime,
+            thumbnailUrl: String
         ): Contest {
             val now = LocalDateTime.now()
             return Contest(
@@ -40,6 +42,7 @@ class Contest private constructor(
                 startedAt = startedAt,
                 expiredAt = expiredAt,
                 scrapCount = 0,
+                thumbnailUrl = thumbnailUrl,
                 _status = ContestStatusType.ACTIVE,
                 createdAt = now,
                 updatedAt = now
@@ -53,6 +56,7 @@ class Contest private constructor(
             startedAt: LocalDateTime,
             expiredAt: LocalDateTime,
             scrapCount: Int,
+            thumbnailUrl: String,
             status: ContestStatusType,
             createdAt: LocalDateTime,
             updatedAt: LocalDateTime
@@ -64,6 +68,7 @@ class Contest private constructor(
                 startedAt = startedAt,
                 expiredAt = expiredAt,
                 scrapCount = scrapCount,
+                thumbnailUrl = thumbnailUrl,
                 _status = status,
                 createdAt = createdAt,
                 updatedAt = updatedAt

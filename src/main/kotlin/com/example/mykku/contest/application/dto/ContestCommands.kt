@@ -9,6 +9,7 @@ data class CreateContestCommand(
     val description: String?,
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
+    val thumbnailUrl: String,
     val images: List<ContestImageCommand>,
     val tags: List<String>
 )

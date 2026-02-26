@@ -9,6 +9,7 @@ data class CreateEventCommand(
     val description: String?,
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
+    val thumbnailUrl: String,
     val images: List<EventImageCommand>
 )
 

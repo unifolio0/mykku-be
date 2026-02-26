@@ -39,7 +39,8 @@ class ContestTagRepositoryAdapterTest : BaseRepositoryTest() {
             startedAt = startedAt,
             expiredAt = expiredAt,
             scrapCount = scrapCount,
-            status = status
+            status = status,
+            thumbnailUrl = "https://example.com/thumbnail.jpg"
         )
         return contestJpaRepository.save(contest)
     }

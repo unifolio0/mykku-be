@@ -38,7 +38,10 @@ class ContestJpaEntity(
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    var status: ContestStatusType = ContestStatusType.ACTIVE
+    var status: ContestStatusType = ContestStatusType.ACTIVE,
+
+    @Column(name = "thumbnail_url", nullable = false)
+    var thumbnailUrl: String
 ) : BaseJpaEntity() {
 
     fun toDomain(): Contest {
@@ -49,6 +52,7 @@ class ContestJpaEntity(
             startedAt = startedAt,
             expiredAt = expiredAt,
             scrapCount = scrapCount,
+            thumbnailUrl = thumbnailUrl,
             status = status,
             createdAt = createdAt,
             updatedAt = updatedAt
@@ -67,7 +71,8 @@ class ContestJpaEntity(
                 startedAt = contest.startedAt,
                 expiredAt = contest.expiredAt,
                 scrapCount = contest.scrapCount,
-                status = contest.status
+                status = contest.status,
+                thumbnailUrl = contest.thumbnailUrl
             )
         }
     }

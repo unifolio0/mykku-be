@@ -11,6 +11,7 @@ class Event private constructor(
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
     val scrapCount: Int,
+    val thumbnailUrl: String,
     private var _status: EventStatusType,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
@@ -29,7 +30,8 @@ class Event private constructor(
             title: String,
             description: String?,
             startedAt: LocalDateTime,
-            expiredAt: LocalDateTime
+            expiredAt: LocalDateTime,
+            thumbnailUrl: String
         ): Event {
             val now = LocalDateTime.now()
             return Event(
@@ -39,6 +41,7 @@ class Event private constructor(
                 startedAt = startedAt,
                 expiredAt = expiredAt,
                 scrapCount = 0,
+                thumbnailUrl = thumbnailUrl,
                 _status = EventStatusType.ACTIVE,
                 createdAt = now,
                 updatedAt = now
@@ -52,6 +55,7 @@ class Event private constructor(
             startedAt: LocalDateTime,
             expiredAt: LocalDateTime,
             scrapCount: Int,
+            thumbnailUrl: String,
             status: EventStatusType,
             createdAt: LocalDateTime,
             updatedAt: LocalDateTime
@@ -63,6 +67,7 @@ class Event private constructor(
                 startedAt = startedAt,
                 expiredAt = expiredAt,
                 scrapCount = scrapCount,
+                thumbnailUrl = thumbnailUrl,
                 _status = status,
                 createdAt = createdAt,
                 updatedAt = updatedAt

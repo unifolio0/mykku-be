@@ -1,5 +1,6 @@
 package com.example.mykku.image
 
+import com.example.mykku.image.dto.EntityImagesUploadResult
 import com.example.mykku.image.dto.FanNoteImagesUploadResult
 import com.example.mykku.image.dto.ImageUploadResult
 import com.example.mykku.image.exception.ImageException
@@ -23,6 +24,14 @@ class NoOpImageUploadService : ImageUploadService {
         coverImage: MultipartFile?,
         pageImages: List<MultipartFile>?
     ): FanNoteImagesUploadResult {
+        throw ImageException.imageUploadServiceUnavailable()
+    }
+
+    override fun uploadEntityImages(
+        thumbnailImage: MultipartFile,
+        images: List<MultipartFile>?,
+        pathPrefix: String
+    ): EntityImagesUploadResult {
         throw ImageException.imageUploadServiceUnavailable()
     }
 }

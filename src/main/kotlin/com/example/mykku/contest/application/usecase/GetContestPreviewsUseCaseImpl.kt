@@ -27,11 +27,10 @@ class GetContestPreviewsUseCaseImpl(
             .groupBy { it.contestId.value }
 
         return contests.map { contest ->
-            val images = imagesByContestId[contest.id.value] ?: emptyList()
             ContestPreviewResult(
                 id = contest.id.value,
                 title = contest.title,
-                thumbnailUrl = images.sortedBy { it.orderIndex }.firstOrNull()?.url
+                thumbnailUrl = contest.thumbnailUrl
             )
         }
     }

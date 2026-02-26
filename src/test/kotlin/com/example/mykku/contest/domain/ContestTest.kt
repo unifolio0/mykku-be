@@ -26,7 +26,8 @@ class ContestTest {
                 title = "테스트 콘테스트",
                 description = "콘테스트 설명",
                 startedAt = startedAt,
-                expiredAt = expiredAt
+                expiredAt = expiredAt,
+                thumbnailUrl = "https://example.com/thumbnail.jpg"
             )
 
             assertThat(contest.id.value).isEqualTo(0L)
@@ -68,7 +69,8 @@ class ContestTest {
                 title = "테스트 콘테스트",
                 description = null,
                 startedAt = LocalDateTime.now().plusDays(1),
-                expiredAt = LocalDateTime.now().plusDays(7)
+                expiredAt = LocalDateTime.now().plusDays(7),
+                thumbnailUrl = "https://example.com/thumbnail.jpg"
             )
 
             assertThat(contest.description).isNull()
@@ -139,6 +141,7 @@ class ContestTest {
                 startedAt = startedAt,
                 expiredAt = expiredAt,
                 scrapCount = 10,
+                thumbnailUrl = "https://example.com/thumbnail.jpg",
                 status = ContestStatusType.EXPIRED,
                 createdAt = now,
                 updatedAt = now
@@ -162,6 +165,7 @@ class ContestTest {
                 startedAt = now,
                 expiredAt = now.plusDays(7),
                 scrapCount = 0,
+                thumbnailUrl = "https://example.com/thumbnail.jpg",
                 status = ContestStatusType.ACTIVE,
                 createdAt = now,
                 updatedAt = now
@@ -174,6 +178,7 @@ class ContestTest {
                 startedAt = now,
                 expiredAt = now.plusDays(7),
                 scrapCount = 0,
+                thumbnailUrl = "https://example.com/thumbnail.jpg",
                 status = ContestStatusType.WINNER_SELECTED,
                 createdAt = now,
                 updatedAt = now
@@ -206,7 +211,8 @@ class ContestTest {
             title = "테스트 콘테스트",
             description = "콘테스트 설명",
             startedAt = LocalDateTime.now().plusDays(1),
-            expiredAt = LocalDateTime.now().plusDays(7)
+            expiredAt = LocalDateTime.now().plusDays(7),
+            thumbnailUrl = "https://example.com/thumbnail.jpg"
         )
     }
 }
