@@ -1,5 +1,6 @@
 package com.example.mykku.notification.domain.entity
 
+import com.example.mykku.notification.domain.vo.NotificationDisplayColor
 import com.example.mykku.notification.domain.vo.NotificationId
 import com.example.mykku.notification.domain.vo.NotificationType
 import java.time.LocalDateTime
@@ -7,6 +8,7 @@ import java.time.LocalDateTime
 class Notification private constructor(
     val id: NotificationId?,
     val type: NotificationType,
+    val displayColor: NotificationDisplayColor,
     val senderId: String?,
     val receiverId: String,
     val content: String,
@@ -32,7 +34,8 @@ class Notification private constructor(
             receiverId: String,
             content: String,
             relatedResourceId: Long? = null,
-            relatedResourceType: String? = null
+            relatedResourceType: String? = null,
+            displayColor: NotificationDisplayColor? = null
         ): Notification {
             require(content.length <= MAX_CONTENT_LENGTH) {
                 "Notification content exceeds maximum length of $MAX_CONTENT_LENGTH characters"
@@ -42,6 +45,7 @@ class Notification private constructor(
             return Notification(
                 id = null,
                 type = type,
+                displayColor = displayColor ?: NotificationDisplayColor.defaultFor(type),
                 senderId = senderId,
                 receiverId = receiverId,
                 content = content,
@@ -56,6 +60,7 @@ class Notification private constructor(
         fun reconstitute(
             id: NotificationId,
             type: NotificationType,
+            displayColor: NotificationDisplayColor,
             senderId: String?,
             receiverId: String,
             content: String,
@@ -68,6 +73,7 @@ class Notification private constructor(
             return Notification(
                 id = id,
                 type = type,
+                displayColor = displayColor,
                 senderId = senderId,
                 receiverId = receiverId,
                 content = content,

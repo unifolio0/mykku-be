@@ -28,6 +28,10 @@ class MarkNotificationReadService(
     }
 
     override fun markAllAsRead(command: MarkAllAsReadCommand) {
-        notificationRepository.markAllAsReadByReceiverId(command.memberId)
+        if (command.category != null) {
+            notificationRepository.markAllAsReadByReceiverIdAndTypeIn(command.memberId, command.category.types)
+        } else {
+            notificationRepository.markAllAsReadByReceiverId(command.memberId)
+        }
     }
 }

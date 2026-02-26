@@ -35,8 +35,8 @@ class NotificationSettingControllerTest : BaseControllerTest() {
     }
 
     @Test
-    @DisplayName("알림 설정 목록 조회 - 정상 케이스 (설정이 이미 존재하는 경우)")
-    fun `getSettings - 정상적으로 알림 설정 목록을 조회한다`() {
+    @DisplayName("알림 설정 목록 조회 - 기존 유저 설정 보충 (3개 → 6개)")
+    fun `getSettings - 기존 유저의 누락된 설정을 보충한다`() {
         val member = createAndSaveMember(id = "user1")
 
         createNotificationSetting(
@@ -49,6 +49,11 @@ class NotificationSettingControllerTest : BaseControllerTest() {
             notificationType = NotificationType.FEED_COMMENT,
             isEnabled = false
         )
+        createNotificationSetting(
+            member = member,
+            notificationType = NotificationType.SYSTEM_NOTICE,
+            isEnabled = true
+        )
 
         val authHeader = TestTokenGenerator.getBearerToken("user1")
 
@@ -59,7 +64,7 @@ class NotificationSettingControllerTest : BaseControllerTest() {
             .then()
             .statusCode(200)
             .body("message", equalTo("알림 설정을 성공적으로 조회했습니다."))
-            .body("data", hasSize<Any>(2))
+            .body("data", hasSize<Any>(6))
     }
 
     @Test
@@ -76,7 +81,7 @@ class NotificationSettingControllerTest : BaseControllerTest() {
             .then()
             .statusCode(200)
             .body("message", equalTo("알림 설정을 성공적으로 조회했습니다."))
-            .body("data", hasSize<Any>(3))
+            .body("data", hasSize<Any>(6))
     }
 
     @Test

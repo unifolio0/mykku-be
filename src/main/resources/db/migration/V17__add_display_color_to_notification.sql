@@ -1,0 +1,1 @@
+ALTER TABLE notification ADD COLUMN display_color VARCHAR(10) NOT NULL DEFAULT 'BLACK';

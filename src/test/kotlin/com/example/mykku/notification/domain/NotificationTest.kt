@@ -1,6 +1,7 @@
 package com.example.mykku.notification.domain
 
 import com.example.mykku.notification.domain.entity.Notification
+import com.example.mykku.notification.domain.vo.NotificationDisplayColor
 import com.example.mykku.notification.domain.vo.NotificationId
 import com.example.mykku.notification.domain.vo.NotificationType
 import org.assertj.core.api.Assertions.assertThat
@@ -153,6 +154,7 @@ class NotificationTest {
             val notification = Notification.reconstitute(
                 id = NotificationId(1L),
                 type = NotificationType.FEED_LIKE,
+                displayColor = NotificationDisplayColor.BLACK,
                 senderId = "sender1",
                 receiverId = "receiver1",
                 content = "알림 내용",
@@ -165,6 +167,7 @@ class NotificationTest {
 
             assertThat(notification.id?.value).isEqualTo(1L)
             assertThat(notification.type).isEqualTo(NotificationType.FEED_LIKE)
+            assertThat(notification.displayColor).isEqualTo(NotificationDisplayColor.BLACK)
             assertThat(notification.isRead).isTrue()
             assertThat(notification.relatedResourceId).isEqualTo(100L)
         }
@@ -177,6 +180,7 @@ class NotificationTest {
             val notification = Notification.reconstitute(
                 id = NotificationId(1L),
                 type = NotificationType.FEED_COMMENT,
+                displayColor = NotificationDisplayColor.BLACK,
                 senderId = "sender1",
                 receiverId = "receiver1",
                 content = "댓글 알림",

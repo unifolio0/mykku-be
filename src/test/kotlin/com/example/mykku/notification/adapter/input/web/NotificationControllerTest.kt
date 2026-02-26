@@ -7,6 +7,7 @@ import com.example.mykku.notification.adapter.output.persistence.repository.Noti
 import com.example.mykku.notification.domain.vo.NotificationType
 import com.example.mykku.util.TestTokenGenerator
 import io.restassured.RestAssured
+import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.DisplayName
@@ -66,6 +67,46 @@ class NotificationControllerTest : BaseControllerTest() {
             .statusCode(200)
             .body("message", equalTo("알림 목록을 성공적으로 조회했습니다."))
             .body("data.content", hasSize<Any>(2))
+    }
+
+    @Test
+    @DisplayName("알림 목록 조회 - 카테고리 필터링")
+    fun `getNotifications - 카테고리로 필터링하여 조회한다`() {
+        val sender = createAndSaveMember(id = "sender1", nickname = "Sender")
+        val receiver = createAndSaveMember(id = "receiver1", nickname = "Receiver")
+
+        createNotification(
+            type = NotificationType.FEED_LIKE,
+            sender = sender,
+            receiver = receiver,
+            content = "sender1님이 회원님의 피드를 좋아합니다"
+        )
+        createNotification(
+            type = NotificationType.SYSTEM_NOTICE,
+            sender = sender,
+            receiver = receiver,
+            content = "시스템 공지사항"
+        )
+
+        val authHeader = TestTokenGenerator.getBearerToken("receiver1")
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .queryParam("category", "COMMUNITY")
+            .`when`()
+            .get("/api/v1/notifications")
+            .then()
+            .statusCode(200)
+            .body("data.content", hasSize<Any>(1))
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .queryParam("category", "NOTICE")
+            .`when`()
+            .get("/api/v1/notifications")
+            .then()
+            .statusCode(200)
+            .body("data.content", hasSize<Any>(1))
     }
 
     @Test
@@ -167,7 +208,7 @@ class NotificationControllerTest : BaseControllerTest() {
             .body("message", equalTo("알림을 읽음 처리했습니다."))
 
         val updatedNotification = notificationJpaRepository.findById(notification.id!!).get()
-        assert(updatedNotification.isRead)
+        assertThat(updatedNotification.isRead).isTrue()
     }
 
     @Test
@@ -224,7 +265,51 @@ class NotificationControllerTest : BaseControllerTest() {
             .body("message", equalTo("모든 알림을 읽음 처리했습니다."))
 
         val unreadCount = notificationJpaRepository.countByReceiverIdAndIsRead(receiver.id, false)
-        assert(unreadCount == 0L)
+        assertThat(unreadCount).isEqualTo(0L)
+    }
+
+    @Test
+    @DisplayName("카테고리별 전체 읽음 처리 - 정상 케이스")
+    fun `markAllAsRead - 카테고리별로 읽음 처리한다`() {
+        val sender = createAndSaveMember(id = "sender1")
+        val receiver = createAndSaveMember(id = "receiver1")
+
+        createNotification(
+            type = NotificationType.FEED_LIKE,
+            sender = sender,
+            receiver = receiver,
+            content = "좋아요 알림"
+        )
+        createNotification(
+            type = NotificationType.SYSTEM_NOTICE,
+            sender = sender,
+            receiver = receiver,
+            content = "시스템 공지"
+        )
+
+        val authHeader = TestTokenGenerator.getBearerToken("receiver1")
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .queryParam("category", "COMMUNITY")
+            .`when`()
+            .patch("/api/v1/notifications/read-all")
+            .then()
+            .statusCode(200)
+
+        val communityUnread = notificationJpaRepository.countByReceiverIdAndIsReadAndTypeIn(
+            receiver.id,
+            false,
+            listOf(NotificationType.FEED_LIKE, NotificationType.FEED_COMMENT, NotificationType.ROLE_EARNED)
+        )
+        assertThat(communityUnread).isEqualTo(0L)
+
+        val noticeUnread = notificationJpaRepository.countByReceiverIdAndIsReadAndTypeIn(
+            receiver.id,
+            false,
+            listOf(NotificationType.SYSTEM_NOTICE)
+        )
+        assertThat(noticeUnread).isEqualTo(1L)
     }
 
     @Test
@@ -250,7 +335,7 @@ class NotificationControllerTest : BaseControllerTest() {
             .statusCode(200)
             .body("message", equalTo("알림을 삭제했습니다."))
 
-        assert(!notificationJpaRepository.existsById(notification.id!!))
+        assertThat(notificationJpaRepository.existsById(notification.id!!)).isFalse()
     }
 
     @Test

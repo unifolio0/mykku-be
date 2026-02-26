@@ -9,6 +9,8 @@ import com.example.mykku.contest.application.port.output.ContestImageRepository
 import com.example.mykku.contest.application.port.output.ContestRepository
 import com.example.mykku.contest.application.port.output.ContestTagRepository
 import com.example.mykku.contest.domain.entity.Contest
+import com.example.mykku.contest.domain.entity.ContestImage
+import com.example.mykku.contest.domain.entity.ContestTag
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -53,8 +55,8 @@ class ListContestsUseCaseImpl(
 
     private fun toContestListResult(
         contest: Contest,
-        imagesByContestId: Map<Long, List<com.example.mykku.contest.domain.entity.ContestImage>>,
-        tagsByContestId: Map<Long, List<com.example.mykku.contest.domain.entity.ContestTag>>
+        imagesByContestId: Map<Long, List<ContestImage>>,
+        tagsByContestId: Map<Long, List<ContestTag>>
     ): ContestListResult {
         val images = imagesByContestId[contest.id.value] ?: emptyList()
         val tags = tagsByContestId[contest.id.value] ?: emptyList()

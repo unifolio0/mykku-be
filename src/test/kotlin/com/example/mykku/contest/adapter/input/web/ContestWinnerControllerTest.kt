@@ -15,6 +15,7 @@ import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -119,6 +120,64 @@ class ContestWinnerControllerTest : BaseControllerTest() {
             .body(request)
             .`when`()
             .patch("/api/v1/contests/winners/{winnerId}/acceptance-speech", winner.id)
+            .then()
+            .statusCode(401)
+    }
+
+    @Test
+    @DisplayName("수상 여부 조회 - 수상자인 경우")
+    fun `getMyWinnerStatus - 수상자인 경우 정상적으로 조회한다`() {
+        val member = createAndSaveMember(id = "winner1")
+        val authHeader = getBearerToken("winner1")
+        val board = createAndSaveBoard()
+        val contest = createAndSaveContest(status = ContestStatusType.WINNER_SELECTED)
+        val feed = createAndSaveFeed(member, board)
+        val participation = createAndSaveParticipation(member, contest, feed)
+        val winner = createAndSaveWinner(contest, participation, winnerRank = 1)
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .`when`()
+            .get("/api/v1/contests/{contestId}/my-winner-status", contest.id)
+            .then()
+            .statusCode(200)
+            .body("message", equalTo("수상 여부를 성공적으로 조회했습니다."))
+            .body("data.isWinner", equalTo(true))
+            .body("data.winnerId", equalTo(winner.id!!.toInt()))
+            .body("data.winnerRank", equalTo(1))
+    }
+
+    @Test
+    @DisplayName("수상 여부 조회 - 수상자가 아닌 경우")
+    fun `getMyWinnerStatus - 수상자가 아닌 경우 false를 반환한다`() {
+        val winnerMember = createAndSaveMember(id = "winner2")
+        val nonWinner = createAndSaveMember(id = "nonwinner1", nickname = "비수상자", email = "nonwinner@example.com", socialId = "99999")
+        val authHeader = getBearerToken("nonwinner1")
+        val board = createAndSaveBoard()
+        val contest = createAndSaveContest(status = ContestStatusType.WINNER_SELECTED)
+        val feed = createAndSaveFeed(winnerMember, board)
+        val participation = createAndSaveParticipation(winnerMember, contest, feed)
+        createAndSaveWinner(contest, participation, winnerRank = 1)
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .`when`()
+            .get("/api/v1/contests/{contestId}/my-winner-status", contest.id)
+            .then()
+            .statusCode(200)
+            .body("data.isWinner", equalTo(false))
+            .body("data.winnerId", nullValue())
+            .body("data.winnerRank", nullValue())
+    }
+
+    @Test
+    @DisplayName("수상 여부 조회 - 인증되지 않은 사용자")
+    fun `getMyWinnerStatus - 인증되지 않은 사용자는 조회할 수 없다`() {
+        val contest = createAndSaveContest(status = ContestStatusType.WINNER_SELECTED)
+
+        RestAssured.given()
+            .`when`()
+            .get("/api/v1/contests/{contestId}/my-winner-status", contest.id)
             .then()
             .statusCode(401)
     }
