@@ -3,8 +3,13 @@ package com.example.mykku.admin.service
 import com.example.mykku.admin.dto.contest.ContestCreateRequest
 import com.example.mykku.contest.adapter.input.web.CreateContestResponse
 import com.example.mykku.contest.application.dto.ContestImageCommand
+import com.example.mykku.contest.application.dto.ContestListQuery
 import com.example.mykku.contest.application.dto.CreateContestCommand
+import com.example.mykku.contest.application.dto.PagedContestsResult
 import com.example.mykku.contest.application.port.input.CreateContestUseCase
+import com.example.mykku.contest.application.port.input.ListContestsUseCase
+import com.example.mykku.contest.domain.vo.ContestSortType
+import com.example.mykku.contest.domain.vo.ContestStatusType
 import com.example.mykku.image.ImageUploadService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -13,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 class AdminContestService(
     private val createContestUseCase: CreateContestUseCase,
+    private val listContestsUseCase: ListContestsUseCase,
     private val imageUploadService: ImageUploadService
 ) {
 
@@ -38,5 +44,16 @@ class AdminContestService(
 
         val result = createContestUseCase.execute(command)
         return CreateContestResponse.from(result)
+    }
+
+    fun findAll(page: Int, size: Int, status: ContestStatusType): PagedContestsResult {
+        val query = ContestListQuery(
+            status = status,
+            sortType = ContestSortType.LATEST,
+            page = page,
+            size = size,
+            memberId = ""
+        )
+        return listContestsUseCase.execute(query)
     }
 }

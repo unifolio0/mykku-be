@@ -55,7 +55,7 @@ class AdminDailyMessageApiControllerTest : BaseControllerTest() {
             .contentType(ContentType.JSON)
             .body(request)
             .`when`()
-            .post("/admin/dailymessage/api")
+            .post("/admin/api/v1/dailymessages")
             .then()
             .statusCode(200)
             .body("message", equalTo("데일리 메시지가 생성되었습니다"))
@@ -77,7 +77,7 @@ class AdminDailyMessageApiControllerTest : BaseControllerTest() {
             .contentType(ContentType.JSON)
             .body(request)
             .`when`()
-            .post("/admin/dailymessage/api")
+            .post("/admin/api/v1/dailymessages")
             .then()
             .statusCode(302)
     }
@@ -94,7 +94,7 @@ class AdminDailyMessageApiControllerTest : BaseControllerTest() {
         RestAssured.given()
             .sessionId(adminSessionId)
             .`when`()
-            .delete("/admin/dailymessage/api/${dailyMessage.id}")
+            .delete("/admin/api/v1/dailymessages/${dailyMessage.id}")
             .then()
             .statusCode(200)
             .body("message", equalTo("데일리 메시지가 삭제되었습니다"))
@@ -107,7 +107,7 @@ class AdminDailyMessageApiControllerTest : BaseControllerTest() {
 
         RestAssured.given()
             .`when`()
-            .delete("/admin/dailymessage/api/${dailyMessage.id}")
+            .delete("/admin/api/v1/dailymessages/${dailyMessage.id}")
             .then()
             .statusCode(302)
     }
@@ -120,7 +120,7 @@ class AdminDailyMessageApiControllerTest : BaseControllerTest() {
         RestAssured.given()
             .sessionId(adminSessionId)
             .`when`()
-            .delete("/admin/dailymessage/api/$nonExistentId")
+            .delete("/admin/api/v1/dailymessages/$nonExistentId")
             .then()
             .statusCode(404)
     }

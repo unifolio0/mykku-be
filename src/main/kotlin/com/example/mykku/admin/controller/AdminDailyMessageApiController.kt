@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/admin/dailymessage/api")
+@RequestMapping("/admin/api/v1/dailymessages")
 class AdminDailyMessageApiController(
     private val adminDailyMessageService: AdminDailyMessageService
 ) {
