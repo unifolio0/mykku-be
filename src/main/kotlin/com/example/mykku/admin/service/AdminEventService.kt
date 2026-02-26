@@ -4,7 +4,12 @@ import com.example.mykku.admin.dto.event.EventCreateRequest
 import com.example.mykku.event.adapter.input.web.CreateEventResponse
 import com.example.mykku.event.application.dto.CreateEventCommand
 import com.example.mykku.event.application.dto.EventImageCommand
+import com.example.mykku.event.application.dto.EventListQuery
+import com.example.mykku.event.application.dto.PagedEventsResult
 import com.example.mykku.event.application.port.input.CreateEventUseCase
+import com.example.mykku.event.application.port.input.ListEventsUseCase
+import com.example.mykku.event.domain.vo.EventSortType
+import com.example.mykku.event.domain.vo.EventStatusType
 import com.example.mykku.image.ImageUploadService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -13,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 class AdminEventService(
     private val createEventUseCase: CreateEventUseCase,
+    private val listEventsUseCase: ListEventsUseCase,
     private val imageUploadService: ImageUploadService
 ) {
 
@@ -37,5 +43,16 @@ class AdminEventService(
 
         val result = createEventUseCase.execute(command)
         return CreateEventResponse.from(result)
+    }
+
+    fun findAll(page: Int, size: Int, status: EventStatusType): PagedEventsResult {
+        val query = EventListQuery(
+            status = status,
+            sortType = EventSortType.LATEST,
+            page = page,
+            size = size,
+            memberId = ""
+        )
+        return listEventsUseCase.execute(query)
     }
 }

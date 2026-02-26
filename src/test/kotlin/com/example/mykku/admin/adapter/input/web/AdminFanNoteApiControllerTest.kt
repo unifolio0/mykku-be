@@ -53,7 +53,7 @@ class AdminFanNoteApiControllerTest : BaseControllerTest() {
             .multiPart("content", "FanNote Content")
             .multiPart("productionDate", "2025-01-22")
             .`when`()
-            .post("/admin/fannote/api")
+            .post("/admin/api/v1/fannotes")
             .then()
             .statusCode(200)
             .body("message", equalTo("팬노트가 생성되었습니다"))
@@ -70,7 +70,7 @@ class AdminFanNoteApiControllerTest : BaseControllerTest() {
             .multiPart("title", "Required Fields Only")
             .multiPart("productionDate", "2025-01-22")
             .`when`()
-            .post("/admin/fannote/api")
+            .post("/admin/api/v1/fannotes")
             .then()
             .statusCode(200)
             .body("message", equalTo("팬노트가 생성되었습니다"))
@@ -85,7 +85,7 @@ class AdminFanNoteApiControllerTest : BaseControllerTest() {
             .multiPart("title", "새로운 팬노트")
             .multiPart("productionDate", "2025-01-22")
             .`when`()
-            .post("/admin/fannote/api")
+            .post("/admin/api/v1/fannotes")
             .then()
             .statusCode(302)
     }
@@ -101,7 +101,7 @@ class AdminFanNoteApiControllerTest : BaseControllerTest() {
         RestAssured.given()
             .sessionId(adminSessionId)
             .`when`()
-            .delete("/admin/fannote/api/${fanNote.id}")
+            .delete("/admin/api/v1/fannotes/${fanNote.id}")
             .then()
             .statusCode(200)
             .body("message", equalTo("팬노트가 삭제되었습니다"))
@@ -114,7 +114,7 @@ class AdminFanNoteApiControllerTest : BaseControllerTest() {
 
         RestAssured.given()
             .`when`()
-            .delete("/admin/fannote/api/${fanNote.id}")
+            .delete("/admin/api/v1/fannotes/${fanNote.id}")
             .then()
             .statusCode(302)
     }
@@ -127,7 +127,7 @@ class AdminFanNoteApiControllerTest : BaseControllerTest() {
         RestAssured.given()
             .sessionId(adminSessionId)
             .`when`()
-            .delete("/admin/fannote/api/$nonExistentId")
+            .delete("/admin/api/v1/fannotes/$nonExistentId")
             .then()
             .statusCode(404)
     }
