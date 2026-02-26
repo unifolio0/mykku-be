@@ -33,8 +33,6 @@ class ListContestsUseCaseImpl(
         )
 
         val contestIds = contestPage.content.map { it.id }
-        contestImageRepository.findByContestIds(contestIds)
-            .groupBy { it.contestId.value }
         val tagsByContestId = contestTagRepository.findByContestIds(contestIds)
             .groupBy { it.contestId.value }
 
