@@ -173,8 +173,6 @@ class ContestWinnerControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("수상 여부 조회 - 인증되지 않은 사용자")
     fun `getMyWinnerStatus - 인증되지 않은 사용자는 조회할 수 없다`() {
-        val member = createAndSaveMember(id = "member2")
-        val board = createAndSaveBoard()
         val contest = createAndSaveContest(status = ContestStatusType.WINNER_SELECTED)
 
         RestAssured.given()

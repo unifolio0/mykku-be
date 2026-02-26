@@ -167,6 +167,7 @@ class NotificationTest {
 
             assertThat(notification.id?.value).isEqualTo(1L)
             assertThat(notification.type).isEqualTo(NotificationType.FEED_LIKE)
+            assertThat(notification.displayColor).isEqualTo(NotificationDisplayColor.BLACK)
             assertThat(notification.isRead).isTrue()
             assertThat(notification.relatedResourceId).isEqualTo(100L)
         }

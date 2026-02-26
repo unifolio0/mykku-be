@@ -66,6 +66,13 @@ class ContestWinnerRepositoryAdapter(
             .map { it.toDomain() }
     }
 
+    override fun findByContestIdAndMemberId(contestId: ContestId, memberId: String): ContestWinner? {
+        val contestJpaEntity = contestJpaRepository.findById(contestId.value).orElse(null)
+            ?: return null
+        return contestWinnerJpaRepository.findByContestAndMemberId(contestJpaEntity, memberId)
+            ?.toDomain()
+    }
+
     override fun findByContestIds(contestIds: List<ContestId>): List<ContestWinner> {
         if (contestIds.isEmpty()) return emptyList()
 

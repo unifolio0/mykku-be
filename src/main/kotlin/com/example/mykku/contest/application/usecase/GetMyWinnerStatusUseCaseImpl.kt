@@ -3,7 +3,6 @@ package com.example.mykku.contest.application.usecase
 import com.example.mykku.contest.application.dto.GetMyWinnerStatusQuery
 import com.example.mykku.contest.application.dto.MyWinnerStatusResult
 import com.example.mykku.contest.application.port.input.GetMyWinnerStatusUseCase
-import com.example.mykku.contest.application.port.output.ContestParticipationRepository
 import com.example.mykku.contest.application.port.output.ContestRepository
 import com.example.mykku.contest.application.port.output.ContestWinnerRepository
 import com.example.mykku.contest.domain.vo.ContestId
@@ -15,8 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class GetMyWinnerStatusUseCaseImpl(
     private val contestRepository: ContestRepository,
-    private val contestWinnerRepository: ContestWinnerRepository,
-    private val contestParticipationRepository: ContestParticipationRepository
+    private val contestWinnerRepository: ContestWinnerRepository
 ) : GetMyWinnerStatusUseCase {
 
     @Transactional(readOnly = true)
@@ -29,16 +27,7 @@ class GetMyWinnerStatusUseCaseImpl(
             throw ContestException.winnerNotAnnounced()
         }
 
-        val myParticipations = contestParticipationRepository.findByMemberIdAndContestIds(
-            query.memberId, listOf(contestId)
-        )
-        if (myParticipations.isEmpty()) {
-            return notWinnerResult()
-        }
-
-        val winners = contestWinnerRepository.findByContestId(contestId)
-        val myParticipationIds = myParticipations.map { it.id }.toSet()
-        val myWinner = winners.find { it.participationId in myParticipationIds }
+        val myWinner = contestWinnerRepository.findByContestIdAndMemberId(contestId, query.memberId)
             ?: return notWinnerResult()
 
         return MyWinnerStatusResult(

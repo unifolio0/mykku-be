@@ -14,7 +14,8 @@ enum class NotificationCategory(val description: String) {
 
     companion object {
         fun fromType(type: NotificationType): NotificationCategory {
-            return entries.first { type in it.types }
+            return entries.firstOrNull { type in it.types }
+                ?: throw IllegalArgumentException("Unmapped NotificationType: $type")
         }
     }
 }

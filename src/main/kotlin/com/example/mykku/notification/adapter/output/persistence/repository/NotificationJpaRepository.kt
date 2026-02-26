@@ -13,31 +13,54 @@ import org.springframework.stereotype.Repository
 @Repository
 interface NotificationJpaRepository : JpaRepository<NotificationJpaEntity, Long> {
 
-    @Query("SELECT n FROM NotificationJpaEntity n WHERE n.receiver.id = :receiverId ORDER BY n.createdAt DESC")
-    fun findAllByReceiverId(@Param("receiverId") receiverId: String, pageable: Pageable): Page<NotificationJpaEntity>
+    @Query(
+        "SELECT n FROM NotificationJpaEntity n " +
+        "WHERE n.receiver.id = :receiverId " +
+        "ORDER BY n.createdAt DESC"
+    )
+    fun findAllByReceiverId(
+        @Param("receiverId") receiverId: String,
+        pageable: Pageable
+    ): Page<NotificationJpaEntity>
 
-    @Query("SELECT n FROM NotificationJpaEntity n WHERE n.receiver.id = :receiverId AND n.isRead = :isRead ORDER BY n.createdAt DESC")
+    @Query(
+        "SELECT n FROM NotificationJpaEntity n " +
+        "WHERE n.receiver.id = :receiverId AND n.isRead = :isRead " +
+        "ORDER BY n.createdAt DESC"
+    )
     fun findAllByReceiverIdAndIsRead(
         @Param("receiverId") receiverId: String,
         @Param("isRead") isRead: Boolean,
         pageable: Pageable
     ): Page<NotificationJpaEntity>
 
-    @Query("SELECT n FROM NotificationJpaEntity n WHERE n.receiver.id = :receiverId AND n.type = :type ORDER BY n.createdAt DESC")
+    @Query(
+        "SELECT n FROM NotificationJpaEntity n " +
+        "WHERE n.receiver.id = :receiverId AND n.type = :type " +
+        "ORDER BY n.createdAt DESC"
+    )
     fun findAllByReceiverIdAndType(
         @Param("receiverId") receiverId: String,
         @Param("type") type: NotificationType,
         pageable: Pageable
     ): Page<NotificationJpaEntity>
 
-    @Query("SELECT n FROM NotificationJpaEntity n WHERE n.receiver.id = :receiverId AND n.type IN :types ORDER BY n.createdAt DESC")
+    @Query(
+        "SELECT n FROM NotificationJpaEntity n " +
+        "WHERE n.receiver.id = :receiverId AND n.type IN :types " +
+        "ORDER BY n.createdAt DESC"
+    )
     fun findAllByReceiverIdAndTypeIn(
         @Param("receiverId") receiverId: String,
         @Param("types") types: List<NotificationType>,
         pageable: Pageable
     ): Page<NotificationJpaEntity>
 
-    @Query("SELECT n FROM NotificationJpaEntity n WHERE n.receiver.id = :receiverId AND n.isRead = :isRead AND n.type IN :types ORDER BY n.createdAt DESC")
+    @Query(
+        "SELECT n FROM NotificationJpaEntity n " +
+        "WHERE n.receiver.id = :receiverId AND n.isRead = :isRead AND n.type IN :types " +
+        "ORDER BY n.createdAt DESC"
+    )
     fun findAllByReceiverIdAndIsReadAndTypeIn(
         @Param("receiverId") receiverId: String,
         @Param("isRead") isRead: Boolean,
@@ -45,10 +68,19 @@ interface NotificationJpaRepository : JpaRepository<NotificationJpaEntity, Long>
         pageable: Pageable
     ): Page<NotificationJpaEntity>
 
-    @Query("SELECT COUNT(n) FROM NotificationJpaEntity n WHERE n.receiver.id = :receiverId AND n.isRead = :isRead")
-    fun countByReceiverIdAndIsRead(@Param("receiverId") receiverId: String, @Param("isRead") isRead: Boolean): Long
+    @Query(
+        "SELECT COUNT(n) FROM NotificationJpaEntity n " +
+        "WHERE n.receiver.id = :receiverId AND n.isRead = :isRead"
+    )
+    fun countByReceiverIdAndIsRead(
+        @Param("receiverId") receiverId: String,
+        @Param("isRead") isRead: Boolean
+    ): Long
 
-    @Query("SELECT COUNT(n) FROM NotificationJpaEntity n WHERE n.receiver.id = :receiverId AND n.isRead = :isRead AND n.type IN :types")
+    @Query(
+        "SELECT COUNT(n) FROM NotificationJpaEntity n " +
+        "WHERE n.receiver.id = :receiverId AND n.isRead = :isRead AND n.type IN :types"
+    )
     fun countByReceiverIdAndIsReadAndTypeIn(
         @Param("receiverId") receiverId: String,
         @Param("isRead") isRead: Boolean,
@@ -56,12 +88,21 @@ interface NotificationJpaRepository : JpaRepository<NotificationJpaEntity, Long>
     ): Long
 
     @Modifying
-    @Query("UPDATE NotificationJpaEntity n SET n.isRead = true WHERE n.receiver.id = :receiverId AND n.isRead = false")
+    @Query(
+        "UPDATE NotificationJpaEntity n SET n.isRead = true " +
+        "WHERE n.receiver.id = :receiverId AND n.isRead = false"
+    )
     fun markAllAsReadByReceiverId(@Param("receiverId") receiverId: String): Int
 
     @Modifying
-    @Query("UPDATE NotificationJpaEntity n SET n.isRead = true WHERE n.receiver.id = :receiverId AND n.type IN :types AND n.isRead = false")
-    fun markAllAsReadByReceiverIdAndTypeIn(@Param("receiverId") receiverId: String, @Param("types") types: List<NotificationType>): Int
+    @Query(
+        "UPDATE NotificationJpaEntity n SET n.isRead = true " +
+        "WHERE n.receiver.id = :receiverId AND n.type IN :types AND n.isRead = false"
+    )
+    fun markAllAsReadByReceiverIdAndTypeIn(
+        @Param("receiverId") receiverId: String,
+        @Param("types") types: List<NotificationType>
+    ): Int
 
     @Modifying
     @Query("DELETE FROM NotificationJpaEntity n WHERE n.receiver.id = :receiverId")

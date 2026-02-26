@@ -10,6 +10,7 @@ interface ContestWinnerRepository {
     fun saveAll(winners: List<ContestWinner>): List<ContestWinner>
     fun findById(id: ContestWinnerId): ContestWinner?
     fun findByContestId(contestId: ContestId): List<ContestWinner>
+    fun findByContestIdAndMemberId(contestId: ContestId, memberId: String): ContestWinner?
     fun findByContestIds(contestIds: List<ContestId>): List<ContestWinner>
     fun existsByContestId(contestId: ContestId): Boolean
     fun deleteAllByContestId(contestId: ContestId)

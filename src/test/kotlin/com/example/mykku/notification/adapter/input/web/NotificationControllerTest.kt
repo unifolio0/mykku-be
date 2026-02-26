@@ -7,6 +7,7 @@ import com.example.mykku.notification.adapter.output.persistence.repository.Noti
 import com.example.mykku.notification.domain.vo.NotificationType
 import com.example.mykku.util.TestTokenGenerator
 import io.restassured.RestAssured
+import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.DisplayName
@@ -207,7 +208,7 @@ class NotificationControllerTest : BaseControllerTest() {
             .body("message", equalTo("알림을 읽음 처리했습니다."))
 
         val updatedNotification = notificationJpaRepository.findById(notification.id!!).get()
-        assert(updatedNotification.isRead)
+        assertThat(updatedNotification.isRead).isTrue()
     }
 
     @Test
@@ -264,7 +265,7 @@ class NotificationControllerTest : BaseControllerTest() {
             .body("message", equalTo("모든 알림을 읽음 처리했습니다."))
 
         val unreadCount = notificationJpaRepository.countByReceiverIdAndIsRead(receiver.id, false)
-        assert(unreadCount == 0L)
+        assertThat(unreadCount).isEqualTo(0L)
     }
 
     @Test
@@ -301,14 +302,14 @@ class NotificationControllerTest : BaseControllerTest() {
             false,
             listOf(NotificationType.FEED_LIKE, NotificationType.FEED_COMMENT, NotificationType.ROLE_EARNED)
         )
-        assert(communityUnread == 0L)
+        assertThat(communityUnread).isEqualTo(0L)
 
         val noticeUnread = notificationJpaRepository.countByReceiverIdAndIsReadAndTypeIn(
             receiver.id,
             false,
             listOf(NotificationType.SYSTEM_NOTICE)
         )
-        assert(noticeUnread == 1L)
+        assertThat(noticeUnread).isEqualTo(1L)
     }
 
     @Test
@@ -334,7 +335,7 @@ class NotificationControllerTest : BaseControllerTest() {
             .statusCode(200)
             .body("message", equalTo("알림을 삭제했습니다."))
 
-        assert(!notificationJpaRepository.existsById(notification.id!!))
+        assertThat(notificationJpaRepository.existsById(notification.id!!)).isFalse()
     }
 
     @Test
