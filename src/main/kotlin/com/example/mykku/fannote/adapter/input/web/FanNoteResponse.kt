@@ -3,13 +3,14 @@ package com.example.mykku.fannote.adapter.input.web
 import com.example.mykku.fannote.application.dto.FanNoteDetailResult
 import com.example.mykku.fannote.application.dto.FanNoteListResult
 import com.example.mykku.fannote.application.dto.FanNotePageResult
+import java.time.LocalDate
 
 data class FanNoteListResponse(
     val id: Long,
     val title: String,
     val subtitle: String?,
     val content: String?,
-    val productionDate: String,
+    val productionDate: LocalDate,
     val coverImageUrl: String?
 ) {
     companion object {
@@ -19,7 +20,7 @@ data class FanNoteListResponse(
                 title = result.title,
                 subtitle = result.subtitle,
                 content = result.content,
-                productionDate = result.productionDate.toString(),
+                productionDate = result.productionDate,
                 coverImageUrl = result.coverImageUrl
             )
         }
@@ -31,7 +32,7 @@ data class FanNoteDetailResponse(
     val title: String,
     val subtitle: String?,
     val content: String?,
-    val productionDate: String,
+    val productionDate: LocalDate,
     val coverImageUrl: String?,
     val pages: List<FanNotePageResponse>
 ) {
@@ -42,7 +43,7 @@ data class FanNoteDetailResponse(
                 title = result.title,
                 subtitle = result.subtitle,
                 content = result.content,
-                productionDate = result.productionDate.toString(),
+                productionDate = result.productionDate,
                 coverImageUrl = result.coverImageUrl,
                 pages = result.pages.map { FanNotePageResponse.from(it) }
             )
