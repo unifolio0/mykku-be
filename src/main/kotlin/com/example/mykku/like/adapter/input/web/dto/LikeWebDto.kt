@@ -8,14 +8,14 @@ import com.example.mykku.like.application.dto.LikeFeedResult
 
 data class LikeFeedWebResponse(
     val id: Long,
-    val memberId: Long,
+    val memberId: String?,
     val feedId: Long
 ) {
     companion object {
-        fun from(result: LikeFeedResult): LikeFeedWebResponse {
+        fun from(result: LikeFeedResult, memberId: String?): LikeFeedWebResponse {
             return LikeFeedWebResponse(
                 id = result.id,
-                memberId = result.memberId,
+                memberId = memberId,
                 feedId = result.feedId
             )
         }
@@ -24,14 +24,14 @@ data class LikeFeedWebResponse(
 
 data class LikeFeedCommentWebResponse(
     val id: Long,
-    val memberId: Long,
+    val memberId: String?,
     val feedCommentId: Long
 ) {
     companion object {
-        fun from(result: LikeFeedCommentResult): LikeFeedCommentWebResponse {
+        fun from(result: LikeFeedCommentResult, memberId: String?): LikeFeedCommentWebResponse {
             return LikeFeedCommentWebResponse(
                 id = result.id,
-                memberId = result.memberId,
+                memberId = memberId,
                 feedCommentId = result.feedCommentId
             )
         }
@@ -40,14 +40,14 @@ data class LikeFeedCommentWebResponse(
 
 data class LikeBoardWebResponse(
     val id: Long,
-    val memberId: Long,
+    val memberId: String?,
     val boardId: Long
 ) {
     companion object {
-        fun from(result: LikeBoardResult): LikeBoardWebResponse {
+        fun from(result: LikeBoardResult, memberId: String?): LikeBoardWebResponse {
             return LikeBoardWebResponse(
                 id = result.id,
-                memberId = result.memberId,
+                memberId = memberId,
                 boardId = result.boardId
             )
         }
@@ -72,14 +72,14 @@ data class LikeBoardInfoWebResponse(
 
 data class LikeDailyMessageCommentWebResponse(
     val id: Long,
-    val memberId: Long,
+    val memberId: String?,
     val dailyMessageCommentId: Long
 ) {
     companion object {
-        fun from(result: LikeDailyMessageCommentResult): LikeDailyMessageCommentWebResponse {
+        fun from(result: LikeDailyMessageCommentResult, memberId: String?): LikeDailyMessageCommentWebResponse {
             return LikeDailyMessageCommentWebResponse(
                 id = result.id,
-                memberId = result.memberId,
+                memberId = memberId,
                 dailyMessageCommentId = result.dailyMessageCommentId
             )
         }

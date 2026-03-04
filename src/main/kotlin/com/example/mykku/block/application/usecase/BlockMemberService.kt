@@ -39,6 +39,7 @@ class BlockMemberService(
 
         return MemberBlockResult.from(
             savedBlock,
+            blockedMember.memberId,
             blockedMember.nickname,
             blockedMember.profileImage
         )

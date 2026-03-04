@@ -24,6 +24,7 @@ class GetMemberBlocksService(
             val blockedMember = memberRepository.findById(MemberPk.of(memberBlock.blockedId))
             MemberBlockResult.from(
                 memberBlock,
+                blockedMember?.memberId,
                 blockedMember?.nickname ?: "",
                 blockedMember?.profileImage ?: ""
             )

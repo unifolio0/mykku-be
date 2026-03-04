@@ -51,7 +51,7 @@ class BlockControllerTest : BaseControllerTest() {
             .then()
             .statusCode(201)
             .body("message", equalTo("사용자를 차단했습니다."))
-            .body("data.blockedMemberId", equalTo(blocked.id.toInt()))
+            .body("data.blockedMemberId", equalTo(blocked.memberId))
             .body("data.blockedMemberNickname", equalTo("차단대상"))
     }
 
