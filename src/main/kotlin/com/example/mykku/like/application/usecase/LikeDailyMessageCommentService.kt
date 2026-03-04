@@ -42,13 +42,13 @@ class LikeDailyMessageCommentService(
         )
     }
 
-    private fun validateNotAlreadyLiked(memberId: String, dailyMessageCommentId: Long) {
+    private fun validateNotAlreadyLiked(memberId: Long, dailyMessageCommentId: Long) {
         if (likeDailyMessageCommentPort.existsByMemberIdAndDailyMessageCommentId(memberId, dailyMessageCommentId)) {
             throw LikeException.likeDailyMessageCommentAlreadyLiked()
         }
     }
 
-    private fun validateAlreadyLiked(memberId: String, dailyMessageCommentId: Long) {
+    private fun validateAlreadyLiked(memberId: Long, dailyMessageCommentId: Long) {
         if (!likeDailyMessageCommentPort.existsByMemberIdAndDailyMessageCommentId(memberId, dailyMessageCommentId)) {
             throw LikeException.likeDailyMessageCommentNotFound()
         }

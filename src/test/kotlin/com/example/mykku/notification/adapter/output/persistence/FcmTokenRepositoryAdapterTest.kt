@@ -18,12 +18,12 @@ class FcmTokenRepositoryAdapterTest : BaseRepositoryTest() {
     @Autowired
     private lateinit var fcmTokenRepository: FcmTokenRepository
 
-    private lateinit var memberId: String
+    private var memberId: Long = 0
 
     @BeforeEach
     fun setUp() {
         val member = createAndSaveMember(
-            id = "member1",
+            memberId = "fcm_member",
             nickname = "테스트유저",
             email = "test@example.com",
             socialId = "test123"
@@ -137,7 +137,7 @@ class FcmTokenRepositoryAdapterTest : BaseRepositoryTest() {
         fun `회원별 조회 - 다른 회원`() {
             fcmTokenRepository.save(createFcmToken())
             val otherMember = createAndSaveMember(
-                id = "other",
+                memberId = "fcm_other",
                 nickname = "다른유저",
                 email = "other@example.com",
                 socialId = "other123"
@@ -188,7 +188,7 @@ class FcmTokenRepositoryAdapterTest : BaseRepositoryTest() {
         fun `회원ID_디바이스ID로 조회 - 다른 회원`() {
             fcmTokenRepository.save(createFcmToken())
             val otherMember = createAndSaveMember(
-                id = "other",
+                memberId = "fcm_other",
                 nickname = "다른유저",
                 email = "other@example.com",
                 socialId = "other123"
@@ -251,7 +251,7 @@ class FcmTokenRepositoryAdapterTest : BaseRepositoryTest() {
         fun `존재 여부 확인 - 다른 회원`() {
             fcmTokenRepository.save(createFcmToken())
             val otherMember = createAndSaveMember(
-                id = "other",
+                memberId = "fcm_other",
                 nickname = "다른유저",
                 email = "other@example.com",
                 socialId = "other123"
@@ -356,7 +356,7 @@ class FcmTokenRepositoryAdapterTest : BaseRepositoryTest() {
         @DisplayName("다른 회원의 토큰은 삭제되지 않는다")
         fun `회원별 전체 삭제 - 다른 회원`() {
             val otherMember = createAndSaveMember(
-                id = "other",
+                memberId = "fcm_other",
                 nickname = "다른유저",
                 email = "other@example.com",
                 socialId = "other123"

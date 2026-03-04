@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable
 
 interface SaveDailyMessagePort {
     fun save(saveDailyMessage: SaveDailyMessageEntity): SaveDailyMessageEntity
-    fun existsByMemberIdAndDailyMessageId(memberId: String, dailyMessageId: Long): Boolean
-    fun findByMemberId(memberId: String, pageable: Pageable): Page<SaveDailyMessageResult>
-    fun deleteByMemberIdAndDailyMessageId(memberId: String, dailyMessageId: Long)
+    fun existsByMemberIdAndDailyMessageId(memberId: Long, dailyMessageId: Long): Boolean
+    fun findByMemberId(memberId: Long, pageable: Pageable): Page<SaveDailyMessageResult>
+    fun deleteByMemberIdAndDailyMessageId(memberId: Long, dailyMessageId: Long)
 }

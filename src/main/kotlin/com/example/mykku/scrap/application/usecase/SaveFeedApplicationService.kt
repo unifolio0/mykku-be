@@ -74,12 +74,12 @@ class SaveFeedApplicationService(
     }
 
     @Transactional(readOnly = true)
-    override fun isSaved(memberId: String, feedId: Long): Boolean {
+    override fun isSaved(memberId: Long, feedId: Long): Boolean {
         return saveFeedPort.existsByMemberIdAndFeedId(memberId, feedId)
     }
 
     @Transactional(readOnly = true)
-    override fun getSavedFeedIds(memberId: String, feedIds: List<Long>): Set<Long> {
+    override fun getSavedFeedIds(memberId: Long, feedIds: List<Long>): Set<Long> {
         return saveFeedPort.findByMemberIdAndFeedIdIn(memberId, feedIds)
             .map { it.feedId }
             .toSet()
@@ -90,7 +90,7 @@ class SaveFeedApplicationService(
         saveFeedPort.deleteAllByFeedId(feedId)
     }
 
-    private fun validateFolderOwnership(memberId: String, folderId: Long) {
+    private fun validateFolderOwnership(memberId: Long, folderId: Long) {
         folderPort.findByMemberIdAndId(memberId, folderId)
             ?: throw ScrapException.folderNotFound()
     }

@@ -536,6 +536,46 @@ fun processData(data: List<Item>) {
 
 ---
 
+## Member ID 사용 규칙
+
+Member는 두 가지 식별자를 가집니다:
+- `id: MemberPk` (Long) - 내부 DB PK
+- `memberId: String?` - 클라이언트 대면 사용자 ID
+
+### 규칙
+- **클라이언트 응답(Response DTO)**: 반드시 `memberId`(String) 사용
+- **DB FK, 내부 Command/Query**: `id`(Long PK) 사용
+- **`1L.toString()` 등 Long → String 변환 패턴 금지**: 클라이언트에는 실제 String `memberId` 필드를 전달
+
+```kotlin
+// ❌ 잘못된 예시 - Long PK를 클라이언트에 노출
+data class SomeResponse(
+    val memberId: Long  // DB PK 노출
+)
+
+// ❌ 잘못된 예시 - Long PK를 String으로 변환
+val memberId = member.id.value.toString()
+
+// ✅ 올바른 예시 - String memberId 사용
+data class SomeResponse(
+    val memberId: String?  // 클라이언트 대면 ID
+)
+val memberId = member.memberId  // String? 필드 직접 사용
+```
+
+### 테스트에서의 적용
+```kotlin
+// ❌ 잘못된 예시
+.body("data.memberId", equalTo(member.id.toInt()))
+fieldWithPath("data.memberId").type(JsonFieldType.NUMBER)
+
+// ✅ 올바른 예시
+.body("data.memberId", equalTo(member.memberId))
+fieldWithPath("data.memberId").type(JsonFieldType.STRING)
+```
+
+---
+
 ## Important Notes
 
 - **Controller는 UseCase 인터페이스(Port/Input)에만 의존하세요**

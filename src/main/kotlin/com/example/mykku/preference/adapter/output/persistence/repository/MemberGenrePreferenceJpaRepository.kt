@@ -9,9 +9,9 @@ import org.springframework.stereotype.Repository
 @Repository
 interface MemberGenrePreferenceJpaRepository : JpaRepository<MemberGenrePreferenceJpaEntity, Long> {
     fun findByMember(member: MemberJpaEntity): List<MemberGenrePreferenceJpaEntity>
-    fun findByMemberId(memberId: String): List<MemberGenrePreferenceJpaEntity>
+    fun findByMemberId(memberId: Long): List<MemberGenrePreferenceJpaEntity>
     fun deleteByMember(member: MemberJpaEntity)
-    fun deleteByMemberId(memberId: String)
+    fun deleteByMemberId(memberId: Long)
     fun existsByMemberAndGenreType(member: MemberJpaEntity, genreType: GenreType): Boolean
-    fun existsByMemberIdAndGenreType(memberId: String, genreType: GenreType): Boolean
+    fun existsByMemberIdAndGenreType(memberId: Long, genreType: GenreType): Boolean
 }

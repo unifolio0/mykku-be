@@ -19,13 +19,13 @@ class FcmTokenTest {
         @DisplayName("정상적으로 FCM 토큰을 생성한다")
         fun `FCM 토큰 생성 - 정상 케이스`() {
             val fcmToken = FcmToken.create(
-                memberId = "member1",
+                memberId = 1L,
                 token = "fcm-token-value",
                 deviceId = "device-123"
             )
 
             assertThat(fcmToken.id).isNull()
-            assertThat(fcmToken.memberId).isEqualTo("member1")
+            assertThat(fcmToken.memberId).isEqualTo(1L)
             assertThat(fcmToken.token).isEqualTo("fcm-token-value")
             assertThat(fcmToken.deviceId).isEqualTo("device-123")
             assertThat(fcmToken.deviceType).isNull()
@@ -35,7 +35,7 @@ class FcmTokenTest {
         @DisplayName("deviceType과 함께 FCM 토큰을 생성할 수 있다")
         fun `FCM 토큰 생성 - deviceType 포함`() {
             val fcmToken = FcmToken.create(
-                memberId = "member1",
+                memberId = 1L,
                 token = "fcm-token-value",
                 deviceId = "device-123",
                 deviceType = "ANDROID"
@@ -48,7 +48,7 @@ class FcmTokenTest {
         @DisplayName("iOS 디바이스 타입으로 FCM 토큰을 생성할 수 있다")
         fun `FCM 토큰 생성 - iOS 디바이스`() {
             val fcmToken = FcmToken.create(
-                memberId = "member1",
+                memberId = 1L,
                 token = "apns-token-value",
                 deviceId = "ios-device-456",
                 deviceType = "IOS"
@@ -100,7 +100,7 @@ class FcmTokenTest {
         @DisplayName("동일한 값으로 토큰을 업데이트해도 문제없다")
         fun `토큰 업데이트 - 동일한 값`() {
             val fcmToken = FcmToken.create(
-                memberId = "member1",
+                memberId = 1L,
                 token = "same-token",
                 deviceId = "device-123"
             )
@@ -129,7 +129,7 @@ class FcmTokenTest {
         @DisplayName("토큰 업데이트 후에도 다른 필드는 변경되지 않는다")
         fun `토큰 업데이트 - 다른 필드 불변성`() {
             val fcmToken = FcmToken.create(
-                memberId = "member1",
+                memberId = 1L,
                 token = "original-token",
                 deviceId = "device-123",
                 deviceType = "ANDROID"
@@ -157,7 +157,7 @@ class FcmTokenTest {
 
             val fcmToken = FcmToken.reconstitute(
                 id = FcmTokenId(1L),
-                memberId = "member1",
+                memberId = 1L,
                 token = "restored-token",
                 deviceId = "device-123",
                 deviceType = "ANDROID",
@@ -166,7 +166,7 @@ class FcmTokenTest {
             )
 
             assertThat(fcmToken.id?.value).isEqualTo(1L)
-            assertThat(fcmToken.memberId).isEqualTo("member1")
+            assertThat(fcmToken.memberId).isEqualTo(1L)
             assertThat(fcmToken.token).isEqualTo("restored-token")
             assertThat(fcmToken.deviceId).isEqualTo("device-123")
             assertThat(fcmToken.deviceType).isEqualTo("ANDROID")
@@ -181,7 +181,7 @@ class FcmTokenTest {
 
             val fcmToken = FcmToken.reconstitute(
                 id = FcmTokenId(1L),
-                memberId = "member1",
+                memberId = 1L,
                 token = "restored-token",
                 deviceId = "device-123",
                 deviceType = null,
@@ -198,7 +198,7 @@ class FcmTokenTest {
             val now = LocalDateTime.now()
             val fcmToken = FcmToken.reconstitute(
                 id = FcmTokenId(1L),
-                memberId = "member1",
+                memberId = 1L,
                 token = "old-token",
                 deviceId = "device-123",
                 deviceType = "IOS",
@@ -220,7 +220,7 @@ class FcmTokenTest {
 
             val fcmToken = FcmToken.reconstitute(
                 id = FcmTokenId(100L),
-                memberId = "member1",
+                memberId = 1L,
                 token = "token",
                 deviceId = "device",
                 deviceType = null,
@@ -259,7 +259,7 @@ class FcmTokenTest {
 
     private fun createFcmToken(): FcmToken {
         return FcmToken.create(
-            memberId = "member1",
+            memberId = 1L,
             token = "test-fcm-token",
             deviceId = "test-device-id"
         )

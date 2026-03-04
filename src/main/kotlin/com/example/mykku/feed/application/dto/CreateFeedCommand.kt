@@ -6,7 +6,7 @@ data class CreateFeedCommand(
     val title: String,
     val content: String,
     val boardId: Long,
-    val memberId: String?,
+    val memberId: Long?,
     val images: List<MultipartFile>,
     val tags: List<String>
 )

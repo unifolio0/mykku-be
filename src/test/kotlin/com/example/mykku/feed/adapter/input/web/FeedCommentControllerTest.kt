@@ -36,7 +36,6 @@ class FeedCommentControllerTest : BaseControllerTest() {
     fun `createComment - 정상적으로 댓글을 생성한다`() {
         val member = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member1",
                 memberId = "member1",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
@@ -60,7 +59,7 @@ class FeedCommentControllerTest : BaseControllerTest() {
                 board = board
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken("member1")
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
         val request = CreateFeedCommentRequest(
             content = "테스트 댓글",
             parentCommentId = null
@@ -85,7 +84,6 @@ class FeedCommentControllerTest : BaseControllerTest() {
     fun `createComment - 정상적으로 답글을 생성한다`() {
         val member = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member1",
                 memberId = "testmemberid2",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
@@ -116,7 +114,7 @@ class FeedCommentControllerTest : BaseControllerTest() {
                 member = member
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken("member1")
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
         val request = CreateFeedCommentRequest(
             content = "답글입니다",
             parentCommentId = parentComment.id
@@ -140,7 +138,6 @@ class FeedCommentControllerTest : BaseControllerTest() {
     fun `createComment - 인증되지 않은 사용자는 댓글을 생성할 수 없다`() {
         val member = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member1",
                 memberId = "testmemberid3",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
@@ -184,7 +181,6 @@ class FeedCommentControllerTest : BaseControllerTest() {
     fun `updateComment - 정상적으로 댓글을 수정한다`() {
         val member = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member1",
                 memberId = "testmemberid4",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
@@ -215,7 +211,7 @@ class FeedCommentControllerTest : BaseControllerTest() {
                 member = member
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken("member1")
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
         val request = UpdateFeedCommentRequest(content = "수정된 댓글")
         val requestJson = objectMapper.writeValueAsString(request)
 
@@ -236,7 +232,6 @@ class FeedCommentControllerTest : BaseControllerTest() {
     fun `updateComment - 다른 사용자의 댓글은 수정할 수 없다`() {
         val member1 = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member1",
                 memberId = "testmemberid5",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
@@ -246,9 +241,8 @@ class FeedCommentControllerTest : BaseControllerTest() {
                 profileImage = ""
             )
         )
-        memberJpaRepository.save(
+        val member2 = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member2",
                 memberId = "testmemberid6",
                 socialId = "member2",
                 provider = SocialProvider.GOOGLE,
@@ -279,7 +273,7 @@ class FeedCommentControllerTest : BaseControllerTest() {
                 member = member1
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken("member2")
+        val authHeader = TestTokenGenerator.getBearerToken(member2.id)
         val request = UpdateFeedCommentRequest(content = "수정된 댓글")
         val requestJson = objectMapper.writeValueAsString(request)
 
@@ -298,7 +292,6 @@ class FeedCommentControllerTest : BaseControllerTest() {
     fun `deleteComment - 정상적으로 댓글을 삭제한다`() {
         val member = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member1",
                 memberId = "testmemberid7",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
@@ -329,7 +322,7 @@ class FeedCommentControllerTest : BaseControllerTest() {
                 member = member
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken("member1")
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -345,7 +338,6 @@ class FeedCommentControllerTest : BaseControllerTest() {
     fun `deleteComment - 다른 사용자의 댓글은 삭제할 수 없다`() {
         val member1 = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member1",
                 memberId = "testmemberid8",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
@@ -355,9 +347,8 @@ class FeedCommentControllerTest : BaseControllerTest() {
                 profileImage = ""
             )
         )
-        memberJpaRepository.save(
+        val member2 = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member2",
                 memberId = "testmemberid9",
                 socialId = "member2",
                 provider = SocialProvider.GOOGLE,
@@ -388,7 +379,7 @@ class FeedCommentControllerTest : BaseControllerTest() {
                 member = member1
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken("member2")
+        val authHeader = TestTokenGenerator.getBearerToken(member2.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -403,7 +394,6 @@ class FeedCommentControllerTest : BaseControllerTest() {
     fun `deleteComment - 인증되지 않은 사용자는 삭제할 수 없다`() {
         val member = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member1",
                 memberId = "testmemberid10",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,

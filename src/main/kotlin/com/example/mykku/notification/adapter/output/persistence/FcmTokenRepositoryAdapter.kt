@@ -36,11 +36,11 @@ class FcmTokenRepositoryAdapter(
             .orElse(null)
     }
 
-    override fun findAllByMemberId(memberId: String): List<FcmToken> {
+    override fun findAllByMemberId(memberId: Long): List<FcmToken> {
         return fcmTokenJpaRepository.findAllByMemberId(memberId).map { it.toDomain() }
     }
 
-    override fun findByMemberIdAndDeviceId(memberId: String, deviceId: String): FcmToken? {
+    override fun findByMemberIdAndDeviceId(memberId: Long, deviceId: String): FcmToken? {
         return fcmTokenJpaRepository.findByMemberIdAndDeviceId(memberId, deviceId)
             .map { it.toDomain() }
             .orElse(null)
@@ -52,7 +52,7 @@ class FcmTokenRepositoryAdapter(
             .orElse(null)
     }
 
-    override fun existsByMemberIdAndDeviceId(memberId: String, deviceId: String): Boolean {
+    override fun existsByMemberIdAndDeviceId(memberId: Long, deviceId: String): Boolean {
         return fcmTokenJpaRepository.existsByMemberIdAndDeviceId(memberId, deviceId)
     }
 
@@ -62,11 +62,11 @@ class FcmTokenRepositoryAdapter(
         }
     }
 
-    override fun deleteByMemberIdAndDeviceId(memberId: String, deviceId: String) {
+    override fun deleteByMemberIdAndDeviceId(memberId: Long, deviceId: String) {
         fcmTokenJpaRepository.deleteByMemberIdAndDeviceId(memberId, deviceId)
     }
 
-    override fun deleteAllByMemberId(memberId: String) {
+    override fun deleteAllByMemberId(memberId: Long) {
         fcmTokenJpaRepository.deleteAllByMemberId(memberId)
     }
 

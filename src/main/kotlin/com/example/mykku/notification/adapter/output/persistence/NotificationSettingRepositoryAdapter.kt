@@ -41,17 +41,17 @@ class NotificationSettingRepositoryAdapter(
             .orElse(null)
     }
 
-    override fun findAllByMemberId(memberId: String): List<NotificationSetting> {
+    override fun findAllByMemberId(memberId: Long): List<NotificationSetting> {
         return notificationSettingJpaRepository.findAllByMemberId(memberId).map { it.toDomain() }
     }
 
-    override fun findByMemberIdAndNotificationType(memberId: String, notificationType: NotificationType): NotificationSetting? {
+    override fun findByMemberIdAndNotificationType(memberId: Long, notificationType: NotificationType): NotificationSetting? {
         return notificationSettingJpaRepository.findByMemberIdAndNotificationType(memberId, notificationType)
             .map { it.toDomain() }
             .orElse(null)
     }
 
-    override fun existsByMemberIdAndNotificationType(memberId: String, notificationType: NotificationType): Boolean {
+    override fun existsByMemberIdAndNotificationType(memberId: Long, notificationType: NotificationType): Boolean {
         return notificationSettingJpaRepository.existsByMemberIdAndNotificationType(memberId, notificationType)
     }
 
@@ -61,7 +61,7 @@ class NotificationSettingRepositoryAdapter(
         }
     }
 
-    override fun deleteAllByMemberId(memberId: String) {
+    override fun deleteAllByMemberId(memberId: Long) {
         notificationSettingJpaRepository.deleteAllByMemberId(memberId)
     }
 }

@@ -9,7 +9,7 @@ data class CreateCommentRequest(
 ) {
     fun toCommand(
         dailyMessageId: Long,
-        memberId: String,
+        memberId: Long,
         memberNickname: String?,
         memberProfileImage: String
     ): CreateCommentCommand {
@@ -27,7 +27,7 @@ data class CreateCommentRequest(
 data class UpdateCommentRequest(
     val content: String
 ) {
-    fun toCommand(commentId: Long, memberId: String): UpdateCommentCommand {
+    fun toCommand(commentId: Long, memberId: Long): UpdateCommentCommand {
         return UpdateCommentCommand(
             commentId = commentId,
             memberId = memberId,

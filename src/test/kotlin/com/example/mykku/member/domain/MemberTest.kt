@@ -22,12 +22,11 @@ class MemberTest {
         @DisplayName("정상적으로 이메일 회원을 생성한다")
         fun `이메일 회원 생성 - 정상 케이스`() {
             val member = Member.createEmailMember(
-                id = "uuid-1234",
                 email = "test@example.com",
                 password = "encodedPassword"
             )
 
-            assertThat(member.id.value).isEqualTo("uuid-1234")
+            assertThat(member.id.value).isEqualTo(0L)
             assertThat(member.memberId).isNull()
             assertThat(member.email).isEqualTo("test@example.com")
             assertThat(member.nickname).isNull()
@@ -68,7 +67,6 @@ class MemberTest {
         @DisplayName("정상적으로 소셜 회원을 생성한다")
         fun `소셜 회원 생성 - 정상 케이스`() {
             val member = Member.createSocialMember(
-                id = "uuid-1234",
                 profileImage = "https://example.com/profile.jpg",
                 provider = SocialProvider.KAKAO,
                 socialId = "kakao-12345",
@@ -216,7 +214,7 @@ class MemberTest {
         @DisplayName("memberId와 nickname이 모두 있으면 true")
         fun `프로필 완료 - true`() {
             val member = Member.reconstitute(
-                id = "uuid-1234",
+                id = 1L,
                 memberId = "testuser1",
                 nickname = "테스트닉네임",
                 roleId = null,
@@ -436,7 +434,7 @@ class MemberTest {
         fun `복원 - 정상 케이스`() {
             val now = LocalDateTime.now()
             val member = Member.reconstitute(
-                id = "uuid-1234",
+                id = 1L,
                 memberId = "testuser1",
                 nickname = "테스트닉네임",
                 roleId = 1L,
@@ -450,7 +448,7 @@ class MemberTest {
                 updatedAt = now
             )
 
-            assertThat(member.id.value).isEqualTo("uuid-1234")
+            assertThat(member.id.value).isEqualTo(1L)
             assertThat(member.memberId).isEqualTo("testuser1")
             assertThat(member.roleId).isEqualTo(1L)
             assertThat(member.emailVerified).isTrue()
@@ -459,7 +457,7 @@ class MemberTest {
 
     private fun createEmailMember(): Member {
         return Member.reconstitute(
-            id = "uuid-1234",
+            id = 1L,
             memberId = "testuser1",
             nickname = "테스트닉네임",
             roleId = null,
@@ -476,7 +474,6 @@ class MemberTest {
 
     private fun createSocialMember(): Member {
         return Member.createSocialMember(
-            id = "uuid-5678",
             profileImage = "https://example.com/profile.jpg",
             provider = SocialProvider.GOOGLE,
             socialId = "google-12345",

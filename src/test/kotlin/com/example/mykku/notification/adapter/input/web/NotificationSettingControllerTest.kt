@@ -37,7 +37,7 @@ class NotificationSettingControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("알림 설정 목록 조회 - 기존 유저 설정 보충 (3개 → 6개)")
     fun `getSettings - 기존 유저의 누락된 설정을 보충한다`() {
-        val member = createAndSaveMember(id = "user1")
+        val member = createAndSaveMember()
 
         createNotificationSetting(
             member = member,
@@ -55,7 +55,7 @@ class NotificationSettingControllerTest : BaseControllerTest() {
             isEnabled = true
         )
 
-        val authHeader = TestTokenGenerator.getBearerToken("user1")
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -70,9 +70,9 @@ class NotificationSettingControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("알림 설정 목록 조회 - 설정이 없으면 기본 설정 생성 후 반환")
     fun `getSettings - 설정이 없으면 기본 설정을 생성한다`() {
-        createAndSaveMember(id = "user1")
+        val member = createAndSaveMember()
 
-        val authHeader = TestTokenGenerator.getBearerToken("user1")
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -97,7 +97,7 @@ class NotificationSettingControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("알림 설정 변경 - 정상 케이스 (기존 설정 업데이트)")
     fun `updateSetting - 기존 설정을 업데이트한다`() {
-        val member = createAndSaveMember(id = "user1")
+        val member = createAndSaveMember()
 
         createNotificationSetting(
             member = member,
@@ -110,7 +110,7 @@ class NotificationSettingControllerTest : BaseControllerTest() {
             isEnabled = false
         )
 
-        val authHeader = TestTokenGenerator.getBearerToken("user1")
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -128,14 +128,14 @@ class NotificationSettingControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("알림 설정 변경 - 정상 케이스 (새 설정 생성)")
     fun `updateSetting - 새 설정을 생성한다`() {
-        createAndSaveMember(id = "user1")
+        val member = createAndSaveMember()
 
         val request = UpdateNotificationSettingRequest(
             notificationType = NotificationType.SYSTEM_NOTICE,
             isEnabled = false
         )
 
-        val authHeader = TestTokenGenerator.getBearerToken("user1")
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -170,9 +170,9 @@ class NotificationSettingControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("알림 설정 변경 - 유효하지 않은 요청")
     fun `updateSetting - 유효하지 않은 요청은 거부된다`() {
-        createAndSaveMember(id = "user1")
+        val member = createAndSaveMember()
 
-        val authHeader = TestTokenGenerator.getBearerToken("user1")
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)

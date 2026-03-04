@@ -32,7 +32,7 @@ class DailyMessageCommentRepositoryAdapterTest : BaseRepositoryTest() {
     @BeforeEach
     fun setUp() {
         savedMember = createAndSaveMember(
-            id = "testMember",
+            memberId = "testMember",
             nickname = "테스트유저",
             email = "test@example.com"
         )

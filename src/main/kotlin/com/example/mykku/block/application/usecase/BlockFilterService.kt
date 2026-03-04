@@ -13,28 +13,28 @@ class BlockFilterService(
     private val keywordBlockRepository: KeywordBlockRepository
 ) : BlockFilterUseCase {
 
-    override fun getBlockedMemberIds(memberId: String): Set<String> {
+    override fun getBlockedMemberIds(memberId: Long): Set<Long> {
         return memberBlockRepository.findBlockedIdsByBlockerId(memberId).toSet()
     }
 
-    override fun getBlockerMemberIds(memberId: String): Set<String> {
+    override fun getBlockerMemberIds(memberId: Long): Set<Long> {
         return memberBlockRepository.findBlockerIdsByBlockedId(memberId).toSet()
     }
 
-    override fun getAllBlockRelatedMemberIds(memberId: String): Set<String> {
+    override fun getAllBlockRelatedMemberIds(memberId: Long): Set<Long> {
         val blockedByMe = getBlockedMemberIds(memberId)
         val blockedMe = getBlockerMemberIds(memberId)
         return blockedByMe + blockedMe
     }
 
-    override fun getBlockedKeywords(memberId: String): List<String> {
+    override fun getBlockedKeywords(memberId: Long): List<String> {
         return keywordBlockRepository.findKeywordsByMemberId(memberId)
     }
 
     override fun <T> filterContent(
         items: List<T>,
-        memberId: String?,
-        memberIdExtractor: (T) -> String?,
+        memberId: Long?,
+        memberIdExtractor: (T) -> Long?,
         contentExtractors: List<(T) -> String?>
     ): List<T> {
         if (memberId == null || items.isEmpty()) return items
@@ -57,8 +57,8 @@ class BlockFilterService(
 
     override fun <T> filterByBlockedMembers(
         items: List<T>,
-        memberId: String?,
-        memberIdExtractor: (T) -> String?
+        memberId: Long?,
+        memberIdExtractor: (T) -> Long?
     ): List<T> {
         if (memberId == null || items.isEmpty()) return items
 
@@ -72,7 +72,7 @@ class BlockFilterService(
 
     override fun <T> filterByBlockedKeywords(
         items: List<T>,
-        memberId: String?,
+        memberId: Long?,
         contentExtractors: List<(T) -> String?>
     ): List<T> {
         if (memberId == null || items.isEmpty()) return items

@@ -37,7 +37,7 @@ class EventParticipationRepositoryAdapterTest : BaseRepositoryTest() {
     @BeforeEach
     fun setUp() {
         savedEvent = eventJpaRepository.save(createEventJpaEntity())
-        savedMember = createAndSaveMember(id = "testMember1", memberId = "testMember1")
+        savedMember = createAndSaveMember(memberId = "testMember1")
     }
 
     @Nested
@@ -78,7 +78,7 @@ class EventParticipationRepositoryAdapterTest : BaseRepositoryTest() {
         fun `이벤트 참여 저장 - 존재하지 않는 회원`() {
             val participation = createEventParticipation(
                 eventId = EventId(savedEvent.id!!),
-                memberId = "nonExistentMember"
+                memberId = 999999L
             )
 
             assertThatThrownBy {
@@ -108,8 +108,8 @@ class EventParticipationRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("여러 참여자를 페이징으로 조회한다")
         fun `이벤트 참여 조회 - 여러 참여자`() {
-            val member2 = createAndSaveMember(id = "testMember2", memberId = "testMember2", email = "test2@example.com", socialId = "22222")
-            val member3 = createAndSaveMember(id = "testMember3", memberId = "testMember3", email = "test3@example.com", socialId = "33333")
+            val member2 = createAndSaveMember(memberId = "testMember2", email = "test2@example.com", socialId = "22222")
+            val member3 = createAndSaveMember(memberId = "testMember3", email = "test3@example.com", socialId = "33333")
             saveParticipation(savedEvent, savedMember)
             saveParticipation(savedEvent, member2)
             saveParticipation(savedEvent, member3)
@@ -183,7 +183,7 @@ class EventParticipationRepositoryAdapterTest : BaseRepositoryTest() {
             val pageable = PageRequest.of(0, 10)
 
             assertThatThrownBy {
-                eventParticipationRepository.findEventsByMemberId("nonExistentMember", pageable)
+                eventParticipationRepository.findEventsByMemberId(999999L, pageable)
             }.isInstanceOf(MemberException::class.java)
                 .extracting("errorCode")
                 .isEqualTo(MemberErrorCode.MEMBER_NOT_FOUND)
@@ -248,7 +248,7 @@ class EventParticipationRepositoryAdapterTest : BaseRepositoryTest() {
         @DisplayName("존재하지 않는 회원 ID로 조회하면 빈 리스트를 반환한다")
         fun `회원과 이벤트로 참여 조회 - 존재하지 않는 회원`() {
             val participations = eventParticipationRepository.findByMemberIdAndEventIds(
-                "nonExistentMember",
+                999999L,
                 listOf(EventId(savedEvent.id!!))
             )
 
@@ -299,7 +299,7 @@ class EventParticipationRepositoryAdapterTest : BaseRepositoryTest() {
         @DisplayName("존재하지 않는 회원 ID로 확인하면 false를 반환한다")
         fun `참여 여부 확인 - 존재하지 않는 회원`() {
             val exists = eventParticipationRepository.existsByMemberIdAndEventId(
-                "nonExistentMember",
+                999999L,
                 EventId(savedEvent.id!!)
             )
 
@@ -325,7 +325,7 @@ class EventParticipationRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("이벤트의 참여자 수를 반환한다")
         fun `참여자 수 조회 - 정상 케이스`() {
-            val member2 = createAndSaveMember(id = "testMember2", memberId = "testMember2", email = "test2@example.com", socialId = "22222")
+            val member2 = createAndSaveMember(memberId = "testMember2", email = "test2@example.com", socialId = "22222")
             saveParticipation(savedEvent, savedMember)
             saveParticipation(savedEvent, member2)
 
@@ -363,7 +363,7 @@ class EventParticipationRepositoryAdapterTest : BaseRepositoryTest() {
         )
     }
 
-    private fun createEventParticipation(eventId: EventId, memberId: String): EventParticipation {
+    private fun createEventParticipation(eventId: EventId, memberId: Long): EventParticipation {
         return EventParticipation.create(
             eventId = eventId,
             memberId = memberId

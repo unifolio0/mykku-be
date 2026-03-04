@@ -53,7 +53,7 @@ class RoleDocumentTest : BaseDocumentTest() {
                 )
             )
 
-            `when`(getMyRolesUseCase.getMyRoles(any<String>(), anyOrNull())).thenReturn(memberRoles)
+            `when`(getMyRolesUseCase.getMyRoles(any<Long>(), anyOrNull())).thenReturn(memberRoles)
 
             val documentFilter = document("role/my-roles", 200)
                 .request(request().applyConfig(apiConfig))

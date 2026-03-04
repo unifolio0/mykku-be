@@ -37,9 +37,9 @@ class BlockControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("사용자 차단 - 정상 케이스")
     fun `blockMember - 정상적으로 사용자를 차단한다`() {
-        val blocker = createAndSaveMember(id = "blocker")
-        val blocked = createAndSaveMember(id = "blocked", nickname = "차단대상")
-        val authHeader = getBearerToken("blocker")
+        val blocker = createAndSaveMember(memberId = "blocker", socialId = "blocker1")
+        val blocked = createAndSaveMember(memberId = "blocked", nickname = "차단대상", email = "blocked@example.com", socialId = "blocked1")
+        val authHeader = getBearerToken(blocker.id)
         val request = BlockMemberRequest(memberId = "blocked")
 
         RestAssured.given()
@@ -51,15 +51,15 @@ class BlockControllerTest : BaseControllerTest() {
             .then()
             .statusCode(201)
             .body("message", equalTo("사용자를 차단했습니다."))
-            .body("data.blockedMemberId", equalTo("blocked"))
+            .body("data.blockedMemberId", equalTo(blocked.memberId))
             .body("data.blockedMemberNickname", equalTo("차단대상"))
     }
 
     @Test
     @DisplayName("사용자 차단 - 자기 자신 차단 불가")
     fun `blockMember - 자기 자신을 차단할 수 없다`() {
-        val member = createAndSaveMember(id = "member")
-        val authHeader = getBearerToken("member")
+        val member = createAndSaveMember(memberId = "member", socialId = "member1")
+        val authHeader = getBearerToken(member.id)
         val request = BlockMemberRequest(memberId = "member")
 
         RestAssured.given()
@@ -89,10 +89,10 @@ class BlockControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("사용자 차단 해제 - 정상 케이스")
     fun `unblockMember - 정상적으로 차단을 해제한다`() {
-        val blocker = createAndSaveMember(id = "blocker")
-        val blocked = createAndSaveMember(id = "blocked")
+        val blocker = createAndSaveMember(memberId = "blocker", socialId = "blocker1")
+        val blocked = createAndSaveMember(memberId = "blocked", email = "blocked@example.com", socialId = "blocked1")
         createMemberBlock(blocker = blocker, blocked = blocked)
-        val authHeader = getBearerToken("blocker")
+        val authHeader = getBearerToken(blocker.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -106,12 +106,12 @@ class BlockControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("차단 사용자 목록 조회 - 정상 케이스")
     fun `getMemberBlocks - 차단한 사용자 목록을 조회한다`() {
-        val blocker = createAndSaveMember(id = "blocker")
-        val blocked1 = createAndSaveMember(id = "blocked1", nickname = "유저1")
-        val blocked2 = createAndSaveMember(id = "blocked2", nickname = "유저2")
+        val blocker = createAndSaveMember(memberId = "blocker", socialId = "blocker1")
+        val blocked1 = createAndSaveMember(memberId = "blocked1", nickname = "유저1", email = "blocked1@example.com", socialId = "blocked1")
+        val blocked2 = createAndSaveMember(memberId = "blocked2", nickname = "유저2", email = "blocked2@example.com", socialId = "blocked2")
         createMemberBlock(blocker = blocker, blocked = blocked1)
         createMemberBlock(blocker = blocker, blocked = blocked2)
-        val authHeader = getBearerToken("blocker")
+        val authHeader = getBearerToken(blocker.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -126,8 +126,8 @@ class BlockControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("키워드 차단 - 정상 케이스")
     fun `blockKeyword - 정상적으로 키워드를 차단한다`() {
-        val member = createAndSaveMember(id = "member")
-        val authHeader = getBearerToken("member")
+        val member = createAndSaveMember(memberId = "member", socialId = "member1")
+        val authHeader = getBearerToken(member.id)
         val request = BlockKeywordRequest(keyword = "스포일러")
 
         RestAssured.given()
@@ -145,8 +145,8 @@ class BlockControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("키워드 차단 - 빈 키워드 에러")
     fun `blockKeyword - 빈 키워드는 차단할 수 없다`() {
-        val member = createAndSaveMember(id = "member")
-        val authHeader = getBearerToken("member")
+        val member = createAndSaveMember(memberId = "member", socialId = "member1")
+        val authHeader = getBearerToken(member.id)
         val request = BlockKeywordRequest(keyword = "   ")
 
         RestAssured.given()
@@ -162,9 +162,9 @@ class BlockControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("키워드 차단 해제 - 정상 케이스")
     fun `unblockKeyword - 정상적으로 키워드 차단을 해제한다`() {
-        val member = createAndSaveMember(id = "member")
+        val member = createAndSaveMember(memberId = "member", socialId = "member1")
         createKeywordBlock(member = member, keyword = "스포일러")
-        val authHeader = getBearerToken("member")
+        val authHeader = getBearerToken(member.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -178,10 +178,10 @@ class BlockControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("차단 키워드 목록 조회 - 정상 케이스")
     fun `getKeywordBlocks - 차단한 키워드 목록을 조회한다`() {
-        val member = createAndSaveMember(id = "member")
+        val member = createAndSaveMember(memberId = "member", socialId = "member1")
         createKeywordBlock(member = member, keyword = "스포일러")
         createKeywordBlock(member = member, keyword = "광고")
-        val authHeader = getBearerToken("member")
+        val authHeader = getBearerToken(member.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)

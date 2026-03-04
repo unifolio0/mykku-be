@@ -30,11 +30,11 @@ class SaveDailyMessagePersistenceAdapter(
         return saveDailyMessageJpaRepository.save(jpaEntity).toDomain()
     }
 
-    override fun existsByMemberIdAndDailyMessageId(memberId: String, dailyMessageId: Long): Boolean {
+    override fun existsByMemberIdAndDailyMessageId(memberId: Long, dailyMessageId: Long): Boolean {
         return saveDailyMessageJpaRepository.existsByMemberIdAndDailyMessageId(memberId, dailyMessageId)
     }
 
-    override fun findByMemberId(memberId: String, pageable: Pageable): Page<SaveDailyMessageResult> {
+    override fun findByMemberId(memberId: Long, pageable: Pageable): Page<SaveDailyMessageResult> {
         return saveDailyMessageJpaRepository.findByMemberId(memberId, pageable)
             .map { jpaEntity ->
                 SaveDailyMessageResult(
@@ -44,7 +44,7 @@ class SaveDailyMessagePersistenceAdapter(
             }
     }
 
-    override fun deleteByMemberIdAndDailyMessageId(memberId: String, dailyMessageId: Long) {
+    override fun deleteByMemberIdAndDailyMessageId(memberId: Long, dailyMessageId: Long) {
         saveDailyMessageJpaRepository.deleteByMemberIdAndDailyMessageId(memberId, dailyMessageId)
     }
 }

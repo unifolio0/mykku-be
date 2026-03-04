@@ -5,14 +5,14 @@ import java.time.LocalDateTime
 
 class LikeFeedCommentEntity private constructor(
     val id: LikeFeedCommentId?,
-    val memberId: String,
+    val memberId: Long,
     val feedCommentId: Long,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 ) {
     companion object {
         fun create(
-            memberId: String,
+            memberId: Long,
             feedCommentId: Long
         ): LikeFeedCommentEntity {
             val now = LocalDateTime.now()
@@ -27,7 +27,7 @@ class LikeFeedCommentEntity private constructor(
 
         fun reconstitute(
             id: Long,
-            memberId: String,
+            memberId: Long,
             feedCommentId: Long,
             createdAt: LocalDateTime,
             updatedAt: LocalDateTime

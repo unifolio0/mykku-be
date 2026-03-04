@@ -13,7 +13,6 @@ class OAuthMemberExtractor {
 
     fun extractFromGoogle(userInfo: GoogleUserInfo): OAuthMemberInfo {
         return OAuthMemberInfo(
-            memberId = "google_${userInfo.id}",
             profileImage = userInfo.picture ?: "",
             provider = SocialProvider.GOOGLE,
             socialId = userInfo.id,
@@ -23,7 +22,6 @@ class OAuthMemberExtractor {
 
     fun extractFromKakao(userInfo: KakaoUserInfo): OAuthMemberInfo {
         return OAuthMemberInfo(
-            memberId = "kakao_${userInfo.id}",
             profileImage = userInfo.properties?.profileImage
                 ?: userInfo.kakaoAccount?.profile?.profileImageUrl
                 ?: "",
@@ -35,7 +33,6 @@ class OAuthMemberExtractor {
 
     fun extractFromApple(userInfo: AppleUserInfo): OAuthMemberInfo {
         return OAuthMemberInfo(
-            memberId = "apple_${userInfo.sub}",
             profileImage = "",
             provider = SocialProvider.APPLE,
             socialId = userInfo.sub,
@@ -45,7 +42,6 @@ class OAuthMemberExtractor {
 
     fun extractFromNaver(userInfo: NaverUserInfo): OAuthMemberInfo {
         return OAuthMemberInfo(
-            memberId = "naver_${userInfo.response.id}",
             profileImage = userInfo.response.profileImage ?: "",
             provider = SocialProvider.NAVER,
             socialId = userInfo.response.id,

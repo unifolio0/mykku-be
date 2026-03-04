@@ -1,6 +1,7 @@
 package com.example.mykku.role.application.usecase
 
 import com.example.mykku.member.application.port.output.MemberRepository
+import com.example.mykku.member.domain.vo.MemberPk
 import com.example.mykku.member.exception.MemberException
 import com.example.mykku.role.application.dto.ChangeRepresentativeRoleCommand
 import com.example.mykku.role.application.dto.MemberRoleResult
@@ -22,7 +23,7 @@ class RoleService(
     private val memberRepository: MemberRepository
 ) : GetMyRolesUseCase, ChangeRepresentativeRoleUseCase {
 
-    override fun getMyRoles(memberId: String, representativeRoleId: Long?): List<MemberRoleResult> {
+    override fun getMyRoles(memberId: Long, representativeRoleId: Long?): List<MemberRoleResult> {
         val memberRolesWithRole = memberRoleRepository.findByMemberIdWithRole(memberId)
 
         return memberRolesWithRole.map { (memberRole, role) ->
@@ -51,7 +52,7 @@ class RoleService(
         val role = roleRepository.findById(memberRole.roleId)
             ?: throw RoleException.roleNotFound()
 
-        val member = memberRepository.findByIdString(command.memberId)
+        val member = memberRepository.findById(MemberPk.of(command.memberId))
             ?: throw MemberException.memberNotFound()
 
         member.assignRole(role.id.value)

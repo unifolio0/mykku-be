@@ -177,8 +177,8 @@ class ContestWinnerRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("여러 우승자를 한번에 저장할 수 있다")
         fun saveAllWinners() {
-            val member1 = createAndSaveMember(id = "member1", memberId = "member1")
-            val member2 = createAndSaveMember(id = "member2", memberId = "member2")
+            val member1 = createAndSaveMember(memberId = "member1")
+            val member2 = createAndSaveMember(memberId = "member2")
             val contest = createAndSaveContest()
             val feed1 = createAndSaveFeed(title = "피드1", member = member1)
             val feed2 = createAndSaveFeed(title = "피드2", member = member2)
@@ -250,8 +250,8 @@ class ContestWinnerRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("콘테스트 ID로 우승자 목록을 조회할 수 있다")
         fun findByContestId() {
-            val member1 = createAndSaveMember(id = "member1", memberId = "member1")
-            val member2 = createAndSaveMember(id = "member2", memberId = "member2")
+            val member1 = createAndSaveMember(memberId = "member1")
+            val member2 = createAndSaveMember(memberId = "member2")
             val contest = createAndSaveContest()
             val feed1 = createAndSaveFeed(title = "피드1", member = member1)
             val feed2 = createAndSaveFeed(title = "피드2", member = member2)
@@ -343,8 +343,8 @@ class ContestWinnerRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("콘테스트의 모든 우승자를 삭제할 수 있다")
         fun deleteAllByContestId() {
-            val member1 = createAndSaveMember(id = "member1", memberId = "member1")
-            val member2 = createAndSaveMember(id = "member2", memberId = "member2")
+            val member1 = createAndSaveMember(memberId = "member1")
+            val member2 = createAndSaveMember(memberId = "member2")
             val contest = createAndSaveContest()
             val feed1 = createAndSaveFeed(title = "피드1", member = member1)
             val feed2 = createAndSaveFeed(title = "피드2", member = member2)
@@ -373,8 +373,8 @@ class ContestWinnerRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("참여 ID 목록으로 우승자를 삭제할 수 있다")
         fun deleteAllByParticipationIds() {
-            val member1 = createAndSaveMember(id = "member1", memberId = "member1")
-            val member2 = createAndSaveMember(id = "member2", memberId = "member2")
+            val member1 = createAndSaveMember(memberId = "member1")
+            val member2 = createAndSaveMember(memberId = "member2")
             val contest = createAndSaveContest()
             val feed1 = createAndSaveFeed(title = "피드1", member = member1)
             val feed2 = createAndSaveFeed(title = "피드2", member = member2)

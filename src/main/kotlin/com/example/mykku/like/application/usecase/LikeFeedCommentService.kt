@@ -40,7 +40,7 @@ class LikeFeedCommentService(
     }
 
     @Transactional(readOnly = true)
-    override fun isLiked(memberId: String, feedCommentId: Long): Boolean {
+    override fun isLiked(memberId: Long, feedCommentId: Long): Boolean {
         return likeFeedCommentPort.existsByMemberIdAndFeedCommentId(memberId, feedCommentId)
     }
 
@@ -51,13 +51,13 @@ class LikeFeedCommentService(
         }
     }
 
-    private fun validateNotAlreadyLiked(memberId: String, feedCommentId: Long) {
+    private fun validateNotAlreadyLiked(memberId: Long, feedCommentId: Long) {
         if (likeFeedCommentPort.existsByMemberIdAndFeedCommentId(memberId, feedCommentId)) {
             throw LikeException.likeFeedCommentAlreadyLiked()
         }
     }
 
-    private fun validateAlreadyLiked(memberId: String, feedCommentId: Long) {
+    private fun validateAlreadyLiked(memberId: Long, feedCommentId: Long) {
         if (!likeFeedCommentPort.existsByMemberIdAndFeedCommentId(memberId, feedCommentId)) {
             throw LikeException.likeFeedCommentNotFound()
         }

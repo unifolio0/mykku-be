@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 
 class SaveFeedEntity private constructor(
     val id: SaveFeedId?,
-    val memberId: String,
+    val memberId: Long,
     val feedId: Long,
     var folderId: Long,
     val createdAt: LocalDateTime,
@@ -13,7 +13,7 @@ class SaveFeedEntity private constructor(
 ) {
     companion object {
         fun create(
-            memberId: String,
+            memberId: Long,
             feedId: Long,
             folderId: Long
         ): SaveFeedEntity {
@@ -30,7 +30,7 @@ class SaveFeedEntity private constructor(
 
         fun reconstitute(
             id: Long,
-            memberId: String,
+            memberId: Long,
             feedId: Long,
             folderId: Long,
             createdAt: LocalDateTime,

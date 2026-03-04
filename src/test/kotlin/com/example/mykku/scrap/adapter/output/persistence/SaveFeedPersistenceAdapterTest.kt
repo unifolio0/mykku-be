@@ -47,7 +47,7 @@ class SaveFeedPersistenceAdapterTest : BaseRepositoryTest() {
 
     @BeforeEach
     fun setUp() {
-        savedMember = createAndSaveMember(id = "testMember1", memberId = "testMember1")
+        savedMember = createAndSaveMember(memberId = "testMember1")
         savedBoard = createAndSaveBoard()
         savedFeed = feedJpaRepository.save(createFeedJpaEntity(savedBoard, savedMember))
         savedFolder = folderPort.save(FolderEntity.create(savedMember.id, "테스트 폴더", null))
@@ -78,7 +78,7 @@ class SaveFeedPersistenceAdapterTest : BaseRepositoryTest() {
         @DisplayName("존재하지 않는 회원이 저장하면 예외가 발생한다")
         fun `피드 저장 - 존재하지 않는 회원`() {
             val saveFeed = SaveFeedEntity.create(
-                memberId = "nonExistentMember",
+                memberId = 999999L,
                 feedId = savedFeed.id!!,
                 folderId = savedFolder.id!!.value
             )
@@ -310,7 +310,7 @@ class SaveFeedPersistenceAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("피드의 모든 저장을 삭제한다")
         fun `피드 저장 전체 삭제 - 정상 케이스`() {
-            val member2 = createAndSaveMember(id = "testMember2", memberId = "testMember2", email = "test2@example.com", socialId = "22222")
+            val member2 = createAndSaveMember(memberId = "testMember2", email = "test2@example.com", socialId = "22222")
             val folder2 = folderPort.save(FolderEntity.create(member2.id, "폴더2", null))
             saveFeedPort.save(SaveFeedEntity.create(savedMember.id, savedFeed.id!!, savedFolder.id!!.value))
             saveFeedPort.save(SaveFeedEntity.create(member2.id, savedFeed.id!!, folder2.id!!.value))

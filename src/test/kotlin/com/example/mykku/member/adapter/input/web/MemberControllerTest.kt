@@ -21,17 +21,16 @@ class MemberControllerTest : BaseControllerTest() {
     private val passwordEncoder = BCryptPasswordEncoder()
 
     private fun createMemberWithPassword(
-        id: String,
+        memberId: String = "testuser",
         nickname: String = "테스트유저",
         email: String = "test@example.com",
         password: String = "oldPassword123!"
     ): MemberJpaEntity {
         val member = MemberJpaEntity(
-            id = id,
-            memberId = id,
+            memberId = memberId,
             nickname = nickname,
             email = email,
-            socialId = id,
+            socialId = email,
             provider = SocialProvider.EMAIL,
             role = null,
             profileImage = "",
@@ -45,12 +44,11 @@ class MemberControllerTest : BaseControllerTest() {
     fun `getMyProfile - 정상적으로 내 프로필을 조회한다`() {
         val role = roleJpaRepository.save(RoleJpaEntity(name = "일반 덕후", description = "테스트용 칭호"))
         val member = createAndSaveMember(
-            id = "member1",
             nickname = "테스터",
             email = "test@example.com",
             role = role
         )
-        val authHeader = getBearerToken("member1")
+        val authHeader = getBearerToken(member.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -77,11 +75,10 @@ class MemberControllerTest : BaseControllerTest() {
     @DisplayName("프로필 수정 - 정상 케이스")
     fun `updateProfile - 정상적으로 프로필을 수정한다`() {
         val member = createAndSaveMember(
-            id = "member2",
             nickname = "원래닉네임",
             email = "member2@example.com"
         )
-        val authHeader = getBearerToken("member2")
+        val authHeader = getBearerToken(member.id)
         val request = UpdateProfileRequest(
             nickname = "새닉네임",
             profileImage = "https://example.com/new-image.jpg"
@@ -120,16 +117,18 @@ class MemberControllerTest : BaseControllerTest() {
     @DisplayName("프로필 수정 - 닉네임 중복")
     fun `updateProfile - 이미 존재하는 닉네임으로 수정할 수 없다`() {
         createAndSaveMember(
-            id = "existingMember",
+            memberId = "existing",
             nickname = "중복닉네임",
-            email = "existing@example.com"
+            email = "existing@example.com",
+            socialId = "existing123"
         )
         val member = createAndSaveMember(
-            id = "member3",
+            memberId = "member3",
             nickname = "원래닉네임",
-            email = "member3@example.com"
+            email = "member3@example.com",
+            socialId = "member3123"
         )
-        val authHeader = getBearerToken("member3")
+        val authHeader = getBearerToken(member.id)
         val request = UpdateProfileRequest(
             nickname = "중복닉네임",
             profileImage = null
@@ -149,12 +148,12 @@ class MemberControllerTest : BaseControllerTest() {
     @DisplayName("비밀번호 변경 - 정상 케이스")
     fun `changePassword - 정상적으로 비밀번호를 변경한다`() {
         val member = createMemberWithPassword(
-            id = "member4",
+            memberId = "pwdtester1",
             nickname = "비밀번호테스터",
             email = "member4@example.com",
             password = "oldPassword123!"
         )
-        val authHeader = getBearerToken("member4")
+        val authHeader = getBearerToken(member.id)
         val request = ChangePasswordRequest(
             currentPassword = "oldPassword123!",
             newPassword = "newPassword123!"
@@ -192,12 +191,12 @@ class MemberControllerTest : BaseControllerTest() {
     @DisplayName("비밀번호 변경 - 현재 비밀번호 불일치")
     fun `changePassword - 현재 비밀번호가 일치하지 않으면 변경할 수 없다`() {
         val member = createMemberWithPassword(
-            id = "member5",
+            memberId = "pwdtester2",
             nickname = "비밀번호테스터2",
             email = "member5@example.com",
             password = "oldPassword123!"
         )
-        val authHeader = getBearerToken("member5")
+        val authHeader = getBearerToken(member.id)
         val request = ChangePasswordRequest(
             currentPassword = "wrongPassword123!",
             newPassword = "newPassword123!"
@@ -214,15 +213,13 @@ class MemberControllerTest : BaseControllerTest() {
     }
 
     private fun createMemberWithoutProfile(
-        id: String,
         email: String = "noprofile@example.com"
     ): MemberJpaEntity {
         val member = MemberJpaEntity(
-            id = id,
             memberId = null,
             nickname = null,
             email = email,
-            socialId = id,
+            socialId = email,
             provider = SocialProvider.GOOGLE,
             role = null,
             profileImage = ""
@@ -233,8 +230,8 @@ class MemberControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("프로필 설정 - 정상 케이스")
     fun `setupProfile - 정상적으로 프로필을 설정한다`() {
-        createMemberWithoutProfile(id = "setupMember1", email = "setup1@example.com")
-        val authHeader = getBearerToken("setupMember1")
+        val member = createMemberWithoutProfile(email = "setup1@example.com")
+        val authHeader = getBearerToken(member.id)
         val request = SetupProfileRequest(
             memberId = "newuser1",
             nickname = "새닉네임"
@@ -274,13 +271,13 @@ class MemberControllerTest : BaseControllerTest() {
     @DisplayName("프로필 설정 - 아이디 중복")
     fun `setupProfile - 이미 사용 중인 아이디로 설정할 수 없다`() {
         createAndSaveMember(
-            id = "existingUser",
             memberId = "takenid",
             nickname = "기존유저",
-            email = "existing@example.com"
+            email = "existing@example.com",
+            socialId = "existing123"
         )
-        createMemberWithoutProfile(id = "setupMember2", email = "setup2@example.com")
-        val authHeader = getBearerToken("setupMember2")
+        val member = createMemberWithoutProfile(email = "setup2@example.com")
+        val authHeader = getBearerToken(member.id)
         val request = SetupProfileRequest(
             memberId = "takenid",
             nickname = "새닉네임2"
@@ -317,7 +314,6 @@ class MemberControllerTest : BaseControllerTest() {
     @DisplayName("아이디 중복 확인 - 이미 사용 중")
     fun `checkMemberId - 이미 사용 중인 아이디를 확인한다`() {
         createAndSaveMember(
-            id = "takenUser",
             memberId = "takenid2",
             nickname = "사용중유저",
             email = "taken@example.com"
@@ -339,12 +335,11 @@ class MemberControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("회원 탈퇴 - 정상 케이스")
     fun `withdraw - 정상적으로 회원을 탈퇴한다`() {
-        createAndSaveMember(
-            id = "withdrawMember",
+        val member = createAndSaveMember(
             nickname = "탈퇴유저",
             email = "withdraw@example.com"
         )
-        val authHeader = getBearerToken("withdrawMember")
+        val authHeader = getBearerToken(member.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)

@@ -34,7 +34,7 @@ class SaveFanNotePersistenceAdapterTest : BaseRepositoryTest() {
 
     @BeforeEach
     fun setUp() {
-        savedMember = createAndSaveMember(id = "testMember1", memberId = "testMember1")
+        savedMember = createAndSaveMember(memberId = "testMember1")
         savedFanNote = fanNoteJpaRepository.save(createFanNoteJpaEntity())
     }
 
@@ -61,7 +61,7 @@ class SaveFanNotePersistenceAdapterTest : BaseRepositoryTest() {
         @DisplayName("존재하지 않는 회원이 저장하면 예외가 발생한다")
         fun `덕질노트 저장 - 존재하지 않는 회원`() {
             val saveFanNote = SaveFanNoteEntity.create(
-                memberId = "nonExistentMember",
+                memberId = 999999L,
                 fanNoteId = savedFanNote.id!!
             )
 

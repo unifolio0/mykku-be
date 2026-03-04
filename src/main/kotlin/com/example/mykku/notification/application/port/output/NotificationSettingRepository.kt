@@ -8,9 +8,9 @@ interface NotificationSettingRepository {
     fun save(setting: NotificationSetting): NotificationSetting
     fun saveAll(settings: List<NotificationSetting>): List<NotificationSetting>
     fun findById(id: NotificationSettingId): NotificationSetting?
-    fun findAllByMemberId(memberId: String): List<NotificationSetting>
-    fun findByMemberIdAndNotificationType(memberId: String, notificationType: NotificationType): NotificationSetting?
-    fun existsByMemberIdAndNotificationType(memberId: String, notificationType: NotificationType): Boolean
+    fun findAllByMemberId(memberId: Long): List<NotificationSetting>
+    fun findByMemberIdAndNotificationType(memberId: Long, notificationType: NotificationType): NotificationSetting?
+    fun existsByMemberIdAndNotificationType(memberId: Long, notificationType: NotificationType): Boolean
     fun delete(setting: NotificationSetting)
-    fun deleteAllByMemberId(memberId: String)
+    fun deleteAllByMemberId(memberId: Long)
 }

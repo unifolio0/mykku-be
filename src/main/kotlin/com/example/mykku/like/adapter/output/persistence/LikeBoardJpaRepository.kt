@@ -10,11 +10,11 @@ import org.springframework.stereotype.Repository
 @Repository
 interface LikeBoardJpaRepository : JpaRepository<LikeBoardJpaEntity, Long> {
     @EntityGraph(attributePaths = ["member", "board"])
-    fun findAllByMemberId(memberId: String): List<LikeBoardJpaEntity>
+    fun findAllByMemberId(memberId: Long): List<LikeBoardJpaEntity>
 
     @EntityGraph(attributePaths = ["member", "board"])
-    fun findAllByMemberId(memberId: String, pageable: Pageable): Page<LikeBoardJpaEntity>
+    fun findAllByMemberId(memberId: Long, pageable: Pageable): Page<LikeBoardJpaEntity>
 
-    fun existsByMemberIdAndBoardId(memberId: String, boardId: Long): Boolean
-    fun deleteByMemberIdAndBoardId(memberId: String, boardId: Long)
+    fun existsByMemberIdAndBoardId(memberId: Long, boardId: Long): Boolean
+    fun deleteByMemberIdAndBoardId(memberId: Long, boardId: Long)
 }

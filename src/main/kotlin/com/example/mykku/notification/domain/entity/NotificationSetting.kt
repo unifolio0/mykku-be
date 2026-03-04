@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 
 class NotificationSetting private constructor(
     val id: NotificationSettingId?,
-    val memberId: String,
+    val memberId: Long,
     val notificationType: NotificationType,
     private var _isEnabled: Boolean,
     val createdAt: LocalDateTime,
@@ -29,7 +29,7 @@ class NotificationSetting private constructor(
 
     companion object {
         fun create(
-            memberId: String,
+            memberId: Long,
             notificationType: NotificationType,
             isEnabled: Boolean = true
         ): NotificationSetting {
@@ -46,7 +46,7 @@ class NotificationSetting private constructor(
 
         fun reconstitute(
             id: NotificationSettingId,
-            memberId: String,
+            memberId: Long,
             notificationType: NotificationType,
             isEnabled: Boolean,
             createdAt: LocalDateTime,
@@ -62,7 +62,7 @@ class NotificationSetting private constructor(
             )
         }
 
-        fun createDefaultSettings(memberId: String): List<NotificationSetting> {
+        fun createDefaultSettings(memberId: Long): List<NotificationSetting> {
             return NotificationType.entries.map { type ->
                 create(memberId, type, true)
             }

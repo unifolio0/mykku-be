@@ -59,7 +59,6 @@ class EmailAuthControllerTest : BaseControllerTest() {
         val role = roleJpaRepository.findByName("일반 덕후")
             ?: roleJpaRepository.save(RoleJpaEntity(name = "일반 덕후", description = "테스트용 칭호"))
         val member = MemberJpaEntity(
-            id = "existingMember",
             memberId = "existingmember",
             email = existingEmail,
             password = "password",
@@ -202,7 +201,6 @@ class EmailAuthControllerTest : BaseControllerTest() {
         val role = roleJpaRepository.findByName("일반 덕후")
             ?: roleJpaRepository.save(RoleJpaEntity(name = "일반 덕후", description = "테스트용 칭호"))
         val member = MemberJpaEntity(
-            id = "existingMember",
             memberId = "existingmember2",
             email = existingEmail,
             password = "password",
@@ -255,7 +253,6 @@ class EmailAuthControllerTest : BaseControllerTest() {
         val role = roleJpaRepository.findByName("일반 덕후")
             ?: roleJpaRepository.save(RoleJpaEntity(name = "일반 덕후", description = "테스트용 칭호"))
         val member = MemberJpaEntity(
-            id = "loginMember",
             memberId = "loginmember1",
             email = email,
             password = passwordEncoder.encode(password),
@@ -310,7 +307,6 @@ class EmailAuthControllerTest : BaseControllerTest() {
         val role = roleJpaRepository.findByName("일반 덕후")
             ?: roleJpaRepository.save(RoleJpaEntity(name = "일반 덕후", description = "테스트용 칭호"))
         val member = MemberJpaEntity(
-            id = "wrongPasswordMember",
             memberId = "wrongpassword1",
             email = email,
             password = passwordEncoder.encode("correctPassword123!"),
@@ -345,7 +341,6 @@ class EmailAuthControllerTest : BaseControllerTest() {
         val role = roleJpaRepository.findByName("일반 덕후")
             ?: roleJpaRepository.save(RoleJpaEntity(name = "일반 덕후", description = "테스트용 칭호"))
         val member = MemberJpaEntity(
-            id = "resetMember",
             memberId = "resetmember1",
             email = email,
             password = passwordEncoder.encode("oldPassword123!"),

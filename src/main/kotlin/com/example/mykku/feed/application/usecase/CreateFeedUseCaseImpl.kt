@@ -134,12 +134,12 @@ class CreateFeedUseCaseImpl(
         activeContests.forEach { contest ->
             val requiredTags = contestTagsMap[contest.id]?.map { it.title }?.toSet() ?: emptySet()
             if (requiredTags.isNotEmpty() && feedTagTitles.containsAll(requiredTags)) {
-                val memberIdStr = member.id.value
-                if (!contestParticipationRepository.existsByMemberIdAndContestIdAndFeedId(memberIdStr, contest.id, feed.id!!.value)) {
+                val memberPk = member.id.value
+                if (!contestParticipationRepository.existsByMemberIdAndContestIdAndFeedId(memberPk, contest.id, feed.id!!.value)) {
                     val participation = com.example.mykku.contest.domain.entity.ContestParticipation.create(
                         contestId = contest.id,
                         feedId = feed.id!!.value,
-                        memberId = memberIdStr
+                        memberId = memberPk
                     )
                     contestParticipationRepository.save(participation)
                 }

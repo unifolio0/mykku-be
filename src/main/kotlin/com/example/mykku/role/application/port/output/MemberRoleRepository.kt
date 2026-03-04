@@ -7,9 +7,9 @@ import com.example.mykku.role.domain.vo.RoleId
 interface MemberRoleRepository {
     fun save(memberRole: MemberRole): MemberRole
     fun findById(id: MemberRoleId): MemberRole?
-    fun findByMemberId(memberId: String): List<MemberRole>
-    fun findByMemberIdWithRole(memberId: String): List<MemberRoleWithRole>
-    fun existsByMemberIdAndRoleId(memberId: String, roleId: RoleId): Boolean
+    fun findByMemberId(memberId: Long): List<MemberRole>
+    fun findByMemberIdWithRole(memberId: Long): List<MemberRoleWithRole>
+    fun existsByMemberIdAndRoleId(memberId: Long, roleId: RoleId): Boolean
     fun existsByRoleId(roleId: RoleId): Boolean
     fun delete(memberRole: MemberRole)
 }

@@ -21,7 +21,7 @@ class ContestParticipationTest {
         fun `콘테스트 참여 생성 - 정상 케이스`() {
             val contestId = ContestId(1L)
             val feedId = 100L
-            val memberId = "member200"
+            val memberId = 200L
 
             val participation = ContestParticipation.create(
                 contestId = contestId,
@@ -71,7 +71,7 @@ class ContestParticipationTest {
             val id = ContestParticipationId(1L)
             val contestId = ContestId(10L)
             val feedId = 100L
-            val memberId = "member200"
+            val memberId = 200L
 
             val participation = ContestParticipation.reconstitute(
                 id = id,
@@ -100,7 +100,7 @@ class ContestParticipationTest {
                 id = ContestParticipationId(1L),
                 contestId = ContestId(10L),
                 feedId = 100L,
-                memberId = "member200",
+                memberId = 200L,
                 createdAt = createdAt,
                 updatedAt = updatedAt
             )
@@ -120,7 +120,7 @@ class ContestParticipationTest {
                 id = specificId,
                 contestId = ContestId(10L),
                 feedId = 100L,
-                memberId = "member200",
+                memberId = 200L,
                 createdAt = now,
                 updatedAt = now
             )
@@ -133,7 +133,7 @@ class ContestParticipationTest {
         return ContestParticipation.create(
             contestId = ContestId(1L),
             feedId = 100L,
-            memberId = "member200"
+            memberId = 200L
         )
     }
 }

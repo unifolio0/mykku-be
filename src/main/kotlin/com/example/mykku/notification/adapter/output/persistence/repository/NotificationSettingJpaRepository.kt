@@ -13,21 +13,21 @@ import java.util.Optional
 interface NotificationSettingJpaRepository : JpaRepository<NotificationSettingJpaEntity, Long> {
 
     @Query("SELECT s FROM NotificationSettingJpaEntity s WHERE s.member.id = :memberId")
-    fun findAllByMemberId(@Param("memberId") memberId: String): List<NotificationSettingJpaEntity>
+    fun findAllByMemberId(@Param("memberId") memberId: Long): List<NotificationSettingJpaEntity>
 
     @Query("SELECT s FROM NotificationSettingJpaEntity s WHERE s.member.id = :memberId AND s.notificationType = :notificationType")
     fun findByMemberIdAndNotificationType(
-        @Param("memberId") memberId: String,
+        @Param("memberId") memberId: Long,
         @Param("notificationType") notificationType: NotificationType
     ): Optional<NotificationSettingJpaEntity>
 
     @Query("SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END FROM NotificationSettingJpaEntity s WHERE s.member.id = :memberId AND s.notificationType = :notificationType")
     fun existsByMemberIdAndNotificationType(
-        @Param("memberId") memberId: String,
+        @Param("memberId") memberId: Long,
         @Param("notificationType") notificationType: NotificationType
     ): Boolean
 
     @Modifying
     @Query("DELETE FROM NotificationSettingJpaEntity s WHERE s.member.id = :memberId")
-    fun deleteAllByMemberId(@Param("memberId") memberId: String)
+    fun deleteAllByMemberId(@Param("memberId") memberId: Long)
 }

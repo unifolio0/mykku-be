@@ -15,7 +15,7 @@ class MoodPreferenceService(
 ) : GetMoodPreferenceUseCase, UpdateMoodPreferenceUseCase {
 
     @Transactional(readOnly = true)
-    override fun getMoodPreferences(memberId: String): MoodPreferenceResult {
+    override fun getMoodPreferences(memberId: Long): MoodPreferenceResult {
         val preferences = moodPreferenceRepository.findByMemberId(memberId)
         return MoodPreferenceResult(
             moodTypes = preferences.map { it.moodType }

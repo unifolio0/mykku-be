@@ -17,6 +17,7 @@ import com.example.mykku.feed.application.port.output.FeedTagRepository
 import com.example.mykku.feed.domain.vo.FeedId
 import com.example.mykku.like.application.port.output.LikeFeedPort
 import com.example.mykku.member.application.port.output.MemberRepository
+import com.example.mykku.member.domain.vo.MemberPk
 import com.example.mykku.role.application.port.output.RoleRepository
 import com.example.mykku.role.domain.vo.RoleId
 import com.example.mykku.scrap.application.port.output.SaveFeedPort
@@ -45,7 +46,7 @@ class GetFeedDetailUseCaseImpl(
 
         val board = boardRepository.findById(BoardId(feed.boardId))
             ?: throw BoardException.boardNotFound()
-        val member = feed.memberId?.let { memberRepository.findByIdString(it) }
+        val member = feed.memberId?.let { memberRepository.findById(MemberPk.of(it)) }
         val authorResult = member?.let {
             val role = it.roleId?.let { roleId -> roleRepository.findById(RoleId.of(roleId)) }
             val roleResult = role?.let { r -> RoleResult(r.id.value, r.name, r.description) }

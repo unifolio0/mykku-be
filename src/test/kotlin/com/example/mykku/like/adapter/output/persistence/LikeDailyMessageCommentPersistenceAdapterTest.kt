@@ -39,7 +39,7 @@ class LikeDailyMessageCommentPersistenceAdapterTest : BaseRepositoryTest() {
 
     @BeforeEach
     fun setUp() {
-        savedMember = createAndSaveMember(id = "testMember1", memberId = "testMember1")
+        savedMember = createAndSaveMember(memberId = "testMember1")
         savedDailyMessage = dailyMessageJpaRepository.save(createDailyMessageJpaEntity())
         savedComment = dailyMessageCommentJpaRepository.save(createDailyMessageCommentJpaEntity(savedDailyMessage, savedMember))
     }
@@ -67,7 +67,7 @@ class LikeDailyMessageCommentPersistenceAdapterTest : BaseRepositoryTest() {
         @DisplayName("존재하지 않는 회원이 좋아요하면 예외가 발생한다")
         fun `하루덕담 댓글 좋아요 저장 - 존재하지 않는 회원`() {
             val likeComment = LikeDailyMessageCommentEntity.create(
-                memberId = "nonExistentMember",
+                memberId = 999999L,
                 dailyMessageCommentId = savedComment.id!!
             )
 

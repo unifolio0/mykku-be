@@ -15,7 +15,7 @@ class GoodsPreferenceService(
 ) : GetGoodsPreferenceUseCase, UpdateGoodsPreferenceUseCase {
 
     @Transactional(readOnly = true)
-    override fun getGoodsPreferences(memberId: String): GoodsPreferenceResult {
+    override fun getGoodsPreferences(memberId: Long): GoodsPreferenceResult {
         val preferences = goodsPreferenceRepository.findByMemberId(memberId)
         return GoodsPreferenceResult(
             goodsTypes = preferences.map { it.goodsType }

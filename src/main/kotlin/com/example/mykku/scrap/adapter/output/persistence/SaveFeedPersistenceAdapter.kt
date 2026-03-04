@@ -42,16 +42,16 @@ class SaveFeedPersistenceAdapter(
         return saveFeedJpaRepository.save(jpaEntity).toDomain()
     }
 
-    override fun existsByMemberIdAndFeedId(memberId: String, feedId: Long): Boolean {
+    override fun existsByMemberIdAndFeedId(memberId: Long, feedId: Long): Boolean {
         return saveFeedJpaRepository.existsByMemberIdAndFeedId(memberId, feedId)
     }
 
-    override fun findByMemberIdAndFeedIdIn(memberId: String, feedIds: List<Long>): List<SaveFeedEntity> {
+    override fun findByMemberIdAndFeedIdIn(memberId: Long, feedIds: List<Long>): List<SaveFeedEntity> {
         return saveFeedJpaRepository.findByMemberIdAndFeedIdIn(memberId, feedIds)
             .map { it.toDomain() }
     }
 
-    override fun findByMemberIdAndFolderId(memberId: String, folderId: Long?, pageable: Pageable): Page<SaveFeedResult> {
+    override fun findByMemberIdAndFolderId(memberId: Long, folderId: Long?, pageable: Pageable): Page<SaveFeedResult> {
         return saveFeedJpaRepository.findByMemberIdAndFolderId(memberId, folderId, pageable)
             .map { jpaEntity ->
                 SaveFeedResult(
@@ -63,11 +63,11 @@ class SaveFeedPersistenceAdapter(
             }
     }
 
-    override fun findByMemberIdAndFeedId(memberId: String, feedId: Long): SaveFeedEntity? {
+    override fun findByMemberIdAndFeedId(memberId: Long, feedId: Long): SaveFeedEntity? {
         return saveFeedJpaRepository.findByMemberIdAndFeedId(memberId, feedId)?.toDomain()
     }
 
-    override fun deleteByMemberIdAndFeedId(memberId: String, feedId: Long) {
+    override fun deleteByMemberIdAndFeedId(memberId: Long, feedId: Long) {
         saveFeedJpaRepository.deleteByMemberIdAndFeedId(memberId, feedId)
     }
 

@@ -238,7 +238,7 @@ class ContestParticipationRepositoryAdapterTest : BaseRepositoryTest() {
             createAndSaveParticipation(contest2, member, feed2)
 
             val page = contestParticipationRepository.findContestsByMemberId(
-                member.memberId!!,
+                member.id,
                 PageRequest.of(0, 10)
             )
 
@@ -249,7 +249,7 @@ class ContestParticipationRepositoryAdapterTest : BaseRepositoryTest() {
         @DisplayName("존재하지 않는 회원 ID로 조회하면 빈 페이지를 반환한다")
         fun findContestsByMemberIdNotFound() {
             val page = contestParticipationRepository.findContestsByMemberId(
-                "nonexistent",
+                999999L,
                 PageRequest.of(0, 10)
             )
 
@@ -273,7 +273,7 @@ class ContestParticipationRepositoryAdapterTest : BaseRepositoryTest() {
             createAndSaveParticipation(contest2, member, feed2)
 
             val participations = contestParticipationRepository.findByMemberIdAndContestIds(
-                member.memberId!!,
+                member.id,
                 listOf(ContestId(contest1.id!!), ContestId(contest2.id!!))
             )
 
@@ -286,7 +286,7 @@ class ContestParticipationRepositoryAdapterTest : BaseRepositoryTest() {
             val member = createAndSaveMember()
 
             val participations = contestParticipationRepository.findByMemberIdAndContestIds(
-                member.memberId!!,
+                member.id,
                 emptyList()
             )
 
@@ -307,7 +307,7 @@ class ContestParticipationRepositoryAdapterTest : BaseRepositoryTest() {
             createAndSaveParticipation(contest, member, feed)
 
             val exists = contestParticipationRepository.existsByMemberIdAndContestId(
-                member.memberId!!,
+                member.id,
                 ContestId(contest.id!!)
             )
 
@@ -321,7 +321,7 @@ class ContestParticipationRepositoryAdapterTest : BaseRepositoryTest() {
             val contest = createAndSaveContest()
 
             val exists = contestParticipationRepository.existsByMemberIdAndContestId(
-                member.memberId!!,
+                member.id,
                 ContestId(contest.id!!)
             )
 
@@ -342,7 +342,7 @@ class ContestParticipationRepositoryAdapterTest : BaseRepositoryTest() {
             createAndSaveParticipation(contest, member, feed)
 
             val exists = contestParticipationRepository.existsByMemberIdAndContestIdAndFeedId(
-                member.memberId!!,
+                member.id,
                 ContestId(contest.id!!),
                 feed.id!!
             )
@@ -358,7 +358,7 @@ class ContestParticipationRepositoryAdapterTest : BaseRepositoryTest() {
             val feed = createAndSaveFeed(member = member)
 
             val exists = contestParticipationRepository.existsByMemberIdAndContestIdAndFeedId(
-                member.memberId!!,
+                member.id,
                 ContestId(contest.id!!),
                 feed.id!!
             )
@@ -374,8 +374,8 @@ class ContestParticipationRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("콘테스트의 참여 수를 조회할 수 있다")
         fun countByContestId() {
-            val member1 = createAndSaveMember(id = "member1", memberId = "member1")
-            val member2 = createAndSaveMember(id = "member2", memberId = "member2")
+            val member1 = createAndSaveMember(memberId = "member1", email = "member1@test.com", socialId = "member1_s")
+            val member2 = createAndSaveMember(memberId = "member2", email = "member2@test.com", socialId = "member2_s")
             val contest = createAndSaveContest()
             val feed1 = createAndSaveFeed(title = "피드1", member = member1)
             val feed2 = createAndSaveFeed(title = "피드2", member = member2)

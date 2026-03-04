@@ -30,24 +30,24 @@ class KeywordBlockRepositoryAdapter(
             .orElse(null)
     }
 
-    override fun findByMemberIdAndKeyword(memberId: String, keyword: String): KeywordBlock? {
+    override fun findByMemberIdAndKeyword(memberId: Long, keyword: String): KeywordBlock? {
         return keywordBlockJpaRepository.findByMemberIdAndKeyword(memberId, keyword)?.toDomain()
     }
 
-    override fun existsByMemberIdAndKeyword(memberId: String, keyword: String): Boolean {
+    override fun existsByMemberIdAndKeyword(memberId: Long, keyword: String): Boolean {
         return keywordBlockJpaRepository.existsByMemberIdAndKeyword(memberId, keyword)
     }
 
-    override fun findAllByMemberId(memberId: String, pageable: Pageable): Page<KeywordBlock> {
+    override fun findAllByMemberId(memberId: Long, pageable: Pageable): Page<KeywordBlock> {
         return keywordBlockJpaRepository.findAllByMemberId(memberId, pageable)
             .map { it.toDomain() }
     }
 
-    override fun findKeywordsByMemberId(memberId: String): List<String> {
+    override fun findKeywordsByMemberId(memberId: Long): List<String> {
         return keywordBlockJpaRepository.findKeywordsByMemberId(memberId)
     }
 
-    override fun countByMemberId(memberId: String): Long {
+    override fun countByMemberId(memberId: Long): Long {
         return keywordBlockJpaRepository.countByMemberId(memberId)
     }
 
@@ -57,7 +57,7 @@ class KeywordBlockRepositoryAdapter(
         }
     }
 
-    override fun deleteByMemberIdAndKeyword(memberId: String, keyword: String) {
+    override fun deleteByMemberIdAndKeyword(memberId: Long, keyword: String) {
         keywordBlockJpaRepository.deleteByMemberIdAndKeyword(memberId, keyword)
     }
 }

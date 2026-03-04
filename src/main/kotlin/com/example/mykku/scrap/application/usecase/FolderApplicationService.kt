@@ -32,7 +32,7 @@ class FolderApplicationService(
     }
 
     @Transactional(readOnly = true)
-    override fun getFolders(memberId: String): FoldersResult {
+    override fun getFolders(memberId: Long): FoldersResult {
         val folders = folderPort.findByMemberId(memberId)
         return FoldersResult(
             folders = folders.map { toResult(it) }
@@ -60,7 +60,7 @@ class FolderApplicationService(
         folderPort.delete(folder)
     }
 
-    private fun validateFolderName(memberId: String, name: String) {
+    private fun validateFolderName(memberId: Long, name: String) {
         if (name.length > 50) {
             throw ScrapException.folderNameTooLong()
         }

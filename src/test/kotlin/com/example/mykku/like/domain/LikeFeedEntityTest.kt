@@ -19,12 +19,12 @@ class LikeFeedEntityTest {
         @DisplayName("정상적으로 좋아요를 생성한다")
         fun `좋아요 생성 - 정상 케이스`() {
             val likeFeed = LikeFeedEntity.create(
-                memberId = "member1",
+                memberId = 1L,
                 feedId = 1L
             )
 
             assertThat(likeFeed.id).isNull()
-            assertThat(likeFeed.memberId).isEqualTo("member1")
+            assertThat(likeFeed.memberId).isEqualTo(1L)
             assertThat(likeFeed.feedId).isEqualTo(1L)
         }
 
@@ -34,7 +34,7 @@ class LikeFeedEntityTest {
             val beforeCreate = LocalDateTime.now()
 
             val likeFeed = LikeFeedEntity.create(
-                memberId = "member1",
+                memberId = 1L,
                 feedId = 1L
             )
 
@@ -59,14 +59,14 @@ class LikeFeedEntityTest {
 
             val likeFeed = LikeFeedEntity.reconstitute(
                 id = 1L,
-                memberId = "member1",
+                memberId = 1L,
                 feedId = 100L,
                 createdAt = createdAt,
                 updatedAt = updatedAt
             )
 
             assertThat(likeFeed.id).isEqualTo(LikeFeedId.of(1L))
-            assertThat(likeFeed.memberId).isEqualTo("member1")
+            assertThat(likeFeed.memberId).isEqualTo(1L)
             assertThat(likeFeed.feedId).isEqualTo(100L)
             assertThat(likeFeed.createdAt).isEqualTo(createdAt)
             assertThat(likeFeed.updatedAt).isEqualTo(updatedAt)
@@ -77,7 +77,7 @@ class LikeFeedEntityTest {
         fun `복원 - id Value Object 검증`() {
             val likeFeed = LikeFeedEntity.reconstitute(
                 id = 42L,
-                memberId = "member1",
+                memberId = 1L,
                 feedId = 1L,
                 createdAt = LocalDateTime.now(),
                 updatedAt = LocalDateTime.now()

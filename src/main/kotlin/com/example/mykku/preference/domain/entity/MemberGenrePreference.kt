@@ -6,14 +6,14 @@ import java.time.LocalDateTime
 
 class MemberGenrePreference private constructor(
     val id: PreferenceId,
-    val memberId: String,
+    val memberId: Long,
     val genreType: GenreType,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 ) {
     companion object {
         fun create(
-            memberId: String,
+            memberId: Long,
             genreType: GenreType
         ): MemberGenrePreference {
             val now = LocalDateTime.now()
@@ -28,7 +28,7 @@ class MemberGenrePreference private constructor(
 
         fun reconstitute(
             id: PreferenceId,
-            memberId: String,
+            memberId: Long,
             genreType: GenreType,
             createdAt: LocalDateTime,
             updatedAt: LocalDateTime

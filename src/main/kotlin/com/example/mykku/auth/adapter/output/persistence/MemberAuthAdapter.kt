@@ -4,6 +4,7 @@ import com.example.mykku.auth.application.dto.OAuthMemberInfo
 import com.example.mykku.auth.application.port.output.MemberAuthPort
 import com.example.mykku.member.application.port.output.MemberRepository
 import com.example.mykku.member.domain.entity.Member
+import com.example.mykku.member.domain.vo.MemberPk
 import org.springframework.stereotype.Component
 
 @Component
@@ -12,7 +13,7 @@ class MemberAuthAdapter(
 ) : MemberAuthPort {
 
     override fun findOrCreate(memberInfo: OAuthMemberInfo): Pair<Member, Boolean> {
-        val existingMember = memberRepository.findByIdString(memberInfo.memberId)
+        val existingMember = memberRepository.findByProviderAndSocialId(memberInfo.provider, memberInfo.socialId)
 
         return if (existingMember != null) {
             Pair(existingMember, true)
@@ -22,13 +23,12 @@ class MemberAuthAdapter(
         }
     }
 
-    override fun findById(memberId: String): Member? {
-        return memberRepository.findByIdString(memberId)
+    override fun findById(memberId: Long): Member? {
+        return memberRepository.findById(MemberPk(memberId))
     }
 
     private fun createMember(memberInfo: OAuthMemberInfo): Member {
         val member = Member.createSocialMember(
-            id = memberInfo.memberId,
             profileImage = memberInfo.profileImage,
             provider = memberInfo.provider,
             socialId = memberInfo.socialId,

@@ -37,7 +37,7 @@ class ManageFcmTokenService(
     }
 
     @Transactional(readOnly = true)
-    override fun getTokens(memberId: String): List<FcmTokenResult> {
+    override fun getTokens(memberId: Long): List<FcmTokenResult> {
         return fcmTokenRepository.findAllByMemberId(memberId).map { FcmTokenResult.from(it) }
     }
 
@@ -45,7 +45,7 @@ class ManageFcmTokenService(
         fcmTokenRepository.deleteByMemberIdAndDeviceId(command.memberId, command.deviceId)
     }
 
-    private fun releaseTokenFromPreviousOwner(token: String, currentMemberId: String) {
+    private fun releaseTokenFromPreviousOwner(token: String, currentMemberId: Long) {
         fcmTokenRepository.findByToken(token)?.let { existingToken ->
             if (existingToken.memberId != currentMemberId) {
                 fcmTokenRepository.deleteByToken(token)

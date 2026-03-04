@@ -52,7 +52,7 @@ class AdminContestService(
             sortType = ContestSortType.LATEST,
             page = page,
             size = size,
-            memberId = ""
+            memberId = 0L
         )
         return listContestsUseCase.execute(query)
     }

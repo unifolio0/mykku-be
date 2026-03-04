@@ -19,12 +19,12 @@ class BlockMemberService(
 ) : BlockMemberUseCase {
 
     override fun blockMember(command: BlockMemberCommand): MemberBlockResult {
-        if (command.blockerId == command.blockedMemberId) {
-            throw BlockException.cannotBlockSelf()
-        }
-
         val blockedMember = memberRepository.findByMemberId(command.blockedMemberId)
             ?: throw MemberException.memberNotFound()
+
+        if (command.blockerId == blockedMember.id.value) {
+            throw BlockException.cannotBlockSelf()
+        }
 
         if (memberBlockRepository.existsByBlockerIdAndBlockedId(command.blockerId, blockedMember.id.value)) {
             throw BlockException.memberAlreadyBlocked()
@@ -39,6 +39,7 @@ class BlockMemberService(
 
         return MemberBlockResult.from(
             savedBlock,
+            blockedMember.memberId,
             blockedMember.nickname,
             blockedMember.profileImage
         )

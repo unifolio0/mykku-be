@@ -21,8 +21,8 @@ class EventControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("이벤트 목록 조회 - 정상 케이스")
     fun `getEvents - 정상적으로 이벤트 목록을 조회한다`() {
-        createAndSaveMember(id = "member1")
-        val authHeader = getBearerToken("member1")
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
 
         createAndSaveEvent(
             title = "진행중인 이벤트",
@@ -47,8 +47,8 @@ class EventControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("이벤트 상세 조회 - 정상 케이스")
     fun `getEventDetail - 정상적으로 이벤트 상세를 조회한다`() {
-        createAndSaveMember(id = "member1")
-        val authHeader = getBearerToken("member1")
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
 
         val event = createAndSaveEvent(
             title = "상세 조회 테스트 이벤트",

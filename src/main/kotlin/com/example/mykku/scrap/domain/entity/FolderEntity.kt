@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 
 class FolderEntity private constructor(
     val id: FolderId?,
-    val memberId: String,
+    val memberId: Long,
     var name: String,
     var description: String?,
     val createdAt: LocalDateTime,
@@ -13,7 +13,7 @@ class FolderEntity private constructor(
 ) {
     companion object {
         fun create(
-            memberId: String,
+            memberId: Long,
             name: String,
             description: String?
         ): FolderEntity {
@@ -30,7 +30,7 @@ class FolderEntity private constructor(
 
         fun reconstitute(
             id: Long,
-            memberId: String,
+            memberId: Long,
             name: String,
             description: String?,
             createdAt: LocalDateTime,

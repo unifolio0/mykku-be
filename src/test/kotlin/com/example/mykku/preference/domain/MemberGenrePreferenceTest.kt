@@ -19,12 +19,12 @@ class MemberGenrePreferenceTest {
         @Test
         fun `정상적으로 장르 선호도를 생성한다`() {
             val preference = MemberGenrePreference.create(
-                memberId = "member-123",
+                memberId = 1L,
                 genreType = GenreType.KPOP
             )
 
             assertThat(preference.id).isEqualTo(PreferenceId(0))
-            assertThat(preference.memberId).isEqualTo("member-123")
+            assertThat(preference.memberId).isEqualTo(1L)
             assertThat(preference.genreType).isEqualTo(GenreType.KPOP)
         }
 
@@ -33,7 +33,7 @@ class MemberGenrePreferenceTest {
             val beforeCreate = LocalDateTime.now()
 
             val preference = MemberGenrePreference.create(
-                memberId = "member-123",
+                memberId = 1L,
                 genreType = GenreType.WEBTOON_WEBNOVEL
             )
 
@@ -48,7 +48,7 @@ class MemberGenrePreferenceTest {
         @Test
         fun `장르 선호도 생성시 createdAt과 updatedAt이 동일하다`() {
             val preference = MemberGenrePreference.create(
-                memberId = "member-456",
+                memberId = 2L,
                 genreType = GenreType.MANGA_ANIME
             )
 
@@ -59,7 +59,7 @@ class MemberGenrePreferenceTest {
         fun `모든 장르 타입으로 생성할 수 있다`() {
             GenreType.entries.forEach { genreType ->
                 val preference = MemberGenrePreference.create(
-                    memberId = "member-test",
+                    memberId = 3L,
                     genreType = genreType
                 )
 
@@ -79,14 +79,14 @@ class MemberGenrePreferenceTest {
 
             val preference = MemberGenrePreference.reconstitute(
                 id = PreferenceId(1L),
-                memberId = "member-123",
+                memberId = 1L,
                 genreType = GenreType.GAME_ESPORTS,
                 createdAt = createdAt,
                 updatedAt = updatedAt
             )
 
             assertThat(preference.id).isEqualTo(PreferenceId(1L))
-            assertThat(preference.memberId).isEqualTo("member-123")
+            assertThat(preference.memberId).isEqualTo(1L)
             assertThat(preference.genreType).isEqualTo(GenreType.GAME_ESPORTS)
             assertThat(preference.createdAt).isEqualTo(createdAt)
             assertThat(preference.updatedAt).isEqualTo(updatedAt)
@@ -96,7 +96,7 @@ class MemberGenrePreferenceTest {
         fun `복원된 엔티티의 id는 PreferenceId Value Object로 래핑된다`() {
             val preference = MemberGenrePreference.reconstitute(
                 id = PreferenceId(42L),
-                memberId = "member-123",
+                memberId = 1L,
                 genreType = GenreType.DRAMA_MOVIE,
                 createdAt = LocalDateTime.now(),
                 updatedAt = LocalDateTime.now()
@@ -112,7 +112,7 @@ class MemberGenrePreferenceTest {
 
             val preference = MemberGenrePreference.reconstitute(
                 id = PreferenceId(999L),
-                memberId = "member-999",
+                memberId = 999L,
                 genreType = GenreType.THEATER_MUSICAL,
                 createdAt = now,
                 updatedAt = now
@@ -128,7 +128,7 @@ class MemberGenrePreferenceTest {
             GenreType.entries.forEachIndexed { index, genreType ->
                 val preference = MemberGenrePreference.reconstitute(
                     id = PreferenceId(index.toLong()),
-                    memberId = "member-$index",
+                    memberId = index.toLong(),
                     genreType = genreType,
                     createdAt = now,
                     updatedAt = now
@@ -145,7 +145,7 @@ class MemberGenrePreferenceTest {
 
             val preference = MemberGenrePreference.reconstitute(
                 id = PreferenceId(1L),
-                memberId = "member-123",
+                memberId = 1L,
                 genreType = GenreType.BAND_ROCK,
                 createdAt = createdAt,
                 updatedAt = updatedAt

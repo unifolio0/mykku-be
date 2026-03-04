@@ -12,26 +12,26 @@ import java.util.Optional
 interface FcmTokenJpaRepository : JpaRepository<FcmTokenJpaEntity, Long> {
 
     @Query("SELECT f FROM FcmTokenJpaEntity f WHERE f.member.id = :memberId")
-    fun findAllByMemberId(@Param("memberId") memberId: String): List<FcmTokenJpaEntity>
+    fun findAllByMemberId(@Param("memberId") memberId: Long): List<FcmTokenJpaEntity>
 
     @Query("SELECT f FROM FcmTokenJpaEntity f WHERE f.member.id = :memberId AND f.deviceId = :deviceId")
     fun findByMemberIdAndDeviceId(
-        @Param("memberId") memberId: String,
+        @Param("memberId") memberId: Long,
         @Param("deviceId") deviceId: String
     ): Optional<FcmTokenJpaEntity>
 
     fun findByToken(token: String): Optional<FcmTokenJpaEntity>
 
     @Query("SELECT CASE WHEN COUNT(f) > 0 THEN true ELSE false END FROM FcmTokenJpaEntity f WHERE f.member.id = :memberId AND f.deviceId = :deviceId")
-    fun existsByMemberIdAndDeviceId(@Param("memberId") memberId: String, @Param("deviceId") deviceId: String): Boolean
+    fun existsByMemberIdAndDeviceId(@Param("memberId") memberId: Long, @Param("deviceId") deviceId: String): Boolean
 
     @Modifying
     @Query("DELETE FROM FcmTokenJpaEntity f WHERE f.member.id = :memberId AND f.deviceId = :deviceId")
-    fun deleteByMemberIdAndDeviceId(@Param("memberId") memberId: String, @Param("deviceId") deviceId: String)
+    fun deleteByMemberIdAndDeviceId(@Param("memberId") memberId: Long, @Param("deviceId") deviceId: String)
 
     @Modifying
     @Query("DELETE FROM FcmTokenJpaEntity f WHERE f.member.id = :memberId")
-    fun deleteAllByMemberId(@Param("memberId") memberId: String)
+    fun deleteAllByMemberId(@Param("memberId") memberId: Long)
 
     @Modifying
     fun deleteByToken(token: String)

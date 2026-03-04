@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface SaveDailyMessageJpaRepository : JpaRepository<SaveDailyMessageJpaEntity, Long> {
-    fun existsByMemberIdAndDailyMessageId(memberId: String, dailyMessageId: Long): Boolean
-    fun findByMemberId(memberId: String, pageable: Pageable): Page<SaveDailyMessageJpaEntity>
-    fun deleteByMemberIdAndDailyMessageId(memberId: String, dailyMessageId: Long)
+    fun existsByMemberIdAndDailyMessageId(memberId: Long, dailyMessageId: Long): Boolean
+    fun findByMemberId(memberId: Long, pageable: Pageable): Page<SaveDailyMessageJpaEntity>
+    fun deleteByMemberIdAndDailyMessageId(memberId: Long, dailyMessageId: Long)
 }

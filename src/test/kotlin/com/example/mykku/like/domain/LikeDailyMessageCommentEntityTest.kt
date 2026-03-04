@@ -19,12 +19,12 @@ class LikeDailyMessageCommentEntityTest {
         @DisplayName("정상적으로 일일 메시지 댓글 좋아요를 생성한다")
         fun `좋아요 생성 - 정상 케이스`() {
             val likeDailyMessageComment = LikeDailyMessageCommentEntity.create(
-                memberId = "member1",
+                memberId = 1L,
                 dailyMessageCommentId = 1L
             )
 
             assertThat(likeDailyMessageComment.id).isNull()
-            assertThat(likeDailyMessageComment.memberId).isEqualTo("member1")
+            assertThat(likeDailyMessageComment.memberId).isEqualTo(1L)
             assertThat(likeDailyMessageComment.dailyMessageCommentId).isEqualTo(1L)
         }
 
@@ -34,7 +34,7 @@ class LikeDailyMessageCommentEntityTest {
             val beforeCreate = LocalDateTime.now()
 
             val likeDailyMessageComment = LikeDailyMessageCommentEntity.create(
-                memberId = "member1",
+                memberId = 1L,
                 dailyMessageCommentId = 1L
             )
 
@@ -59,14 +59,14 @@ class LikeDailyMessageCommentEntityTest {
 
             val likeDailyMessageComment = LikeDailyMessageCommentEntity.reconstitute(
                 id = 1L,
-                memberId = "member1",
+                memberId = 1L,
                 dailyMessageCommentId = 100L,
                 createdAt = createdAt,
                 updatedAt = updatedAt
             )
 
             assertThat(likeDailyMessageComment.id).isEqualTo(LikeDailyMessageCommentId.of(1L))
-            assertThat(likeDailyMessageComment.memberId).isEqualTo("member1")
+            assertThat(likeDailyMessageComment.memberId).isEqualTo(1L)
             assertThat(likeDailyMessageComment.dailyMessageCommentId).isEqualTo(100L)
             assertThat(likeDailyMessageComment.createdAt).isEqualTo(createdAt)
             assertThat(likeDailyMessageComment.updatedAt).isEqualTo(updatedAt)
@@ -77,7 +77,7 @@ class LikeDailyMessageCommentEntityTest {
         fun `복원 - id Value Object 검증`() {
             val likeDailyMessageComment = LikeDailyMessageCommentEntity.reconstitute(
                 id = 42L,
-                memberId = "member1",
+                memberId = 1L,
                 dailyMessageCommentId = 1L,
                 createdAt = LocalDateTime.now(),
                 updatedAt = LocalDateTime.now()

@@ -54,13 +54,13 @@ class LikeBoardService(
         return likeBoardPort.findAllByMemberIdWithBoardInfo(query.memberId, pageable)
     }
 
-    private fun validateNotAlreadyLiked(memberId: String, boardId: Long) {
+    private fun validateNotAlreadyLiked(memberId: Long, boardId: Long) {
         if (likeBoardPort.existsByMemberIdAndBoardId(memberId, boardId)) {
             throw LikeException.likeBoardAlreadyLiked()
         }
     }
 
-    private fun validateAlreadyLiked(memberId: String, boardId: Long) {
+    private fun validateAlreadyLiked(memberId: Long, boardId: Long) {
         if (!likeBoardPort.existsByMemberIdAndBoardId(memberId, boardId)) {
             throw LikeException.likeBoardNotFound()
         }

@@ -8,7 +8,7 @@ class ContestParticipation private constructor(
     val id: ContestParticipationId,
     val contestId: ContestId,
     val feedId: Long,
-    val memberId: String?,
+    val memberId: Long?,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 ) {
@@ -16,7 +16,7 @@ class ContestParticipation private constructor(
         fun create(
             contestId: ContestId,
             feedId: Long,
-            memberId: String
+            memberId: Long
         ): ContestParticipation {
             val now = LocalDateTime.now()
             return ContestParticipation(
@@ -33,7 +33,7 @@ class ContestParticipation private constructor(
             id: ContestParticipationId,
             contestId: ContestId,
             feedId: Long,
-            memberId: String?,
+            memberId: Long?,
             createdAt: LocalDateTime,
             updatedAt: LocalDateTime
         ): ContestParticipation {

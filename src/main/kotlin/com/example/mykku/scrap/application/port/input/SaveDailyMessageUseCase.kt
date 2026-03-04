@@ -10,5 +10,5 @@ interface SaveDailyMessageUseCase {
     fun saveDailyMessage(command: SaveDailyMessageCommand)
     fun unsaveDailyMessage(command: UnsaveDailyMessageCommand)
     fun getSavedDailyMessages(query: GetSavedDailyMessagesQuery): Page<SaveDailyMessageResult>
-    fun isSaved(memberId: String, dailyMessageId: Long): Boolean
+    fun isSaved(memberId: Long, dailyMessageId: Long): Boolean
 }

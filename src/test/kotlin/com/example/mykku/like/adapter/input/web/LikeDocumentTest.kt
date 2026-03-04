@@ -121,7 +121,7 @@ class LikeDocumentTest : BaseDocumentTest() {
         @Test
         fun `성공`() {
             val boardId = 1L
-            val response = LikeBoardResult(id = 1L, memberId = "member123", boardId = boardId)
+            val response = LikeBoardResult(id = 1L, memberId = testMember.id, boardId = boardId)
 
             `when`(likeBoardUseCase.likeBoard(any())).thenReturn(response)
 
@@ -249,7 +249,7 @@ class LikeDocumentTest : BaseDocumentTest() {
         @Test
         fun `성공`() {
             val feedId = 10L
-            val response = LikeFeedResult(id = 1L, memberId = "member123", feedId = feedId)
+            val response = LikeFeedResult(id = 1L, memberId = testMember.id, feedId = feedId)
 
             `when`(likeFeedUseCase.likeFeed(any())).thenReturn(response)
 
@@ -377,7 +377,7 @@ class LikeDocumentTest : BaseDocumentTest() {
         @Test
         fun `성공`() {
             val feedCommentId = 20L
-            val response = LikeFeedCommentResult(id = 1L, memberId = "member123", feedCommentId = feedCommentId)
+            val response = LikeFeedCommentResult(id = 1L, memberId = testMember.id, feedCommentId = feedCommentId)
 
             `when`(likeFeedCommentUseCase.likeFeedComment(any())).thenReturn(response)
 
@@ -505,7 +505,7 @@ class LikeDocumentTest : BaseDocumentTest() {
         @Test
         fun `성공`() {
             val dailyMessageCommentId = 30L
-            val response = LikeDailyMessageCommentResult(id = 1L, memberId = "member123", dailyMessageCommentId = dailyMessageCommentId)
+            val response = LikeDailyMessageCommentResult(id = 1L, memberId = testMember.id, dailyMessageCommentId = dailyMessageCommentId)
 
             `when`(likeDailyMessageCommentUseCase.likeDailyMessageComment(any())).thenReturn(response)
 

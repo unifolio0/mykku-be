@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 
 data class MemberBlockResult(
     val id: Long,
-    val blockedMemberId: String,
+    val blockedMemberId: String?,
     val blockedMemberNickname: String?,
     val blockedMemberProfileImage: String,
     val blockedAt: LocalDateTime
@@ -14,12 +14,13 @@ data class MemberBlockResult(
     companion object {
         fun from(
             memberBlock: MemberBlock,
+            blockedMemberId: String?,
             blockedMemberNickname: String?,
             blockedMemberProfileImage: String
         ): MemberBlockResult {
             return MemberBlockResult(
                 id = memberBlock.id!!.value,
-                blockedMemberId = memberBlock.blockedId,
+                blockedMemberId = blockedMemberId,
                 blockedMemberNickname = blockedMemberNickname,
                 blockedMemberProfileImage = blockedMemberProfileImage,
                 blockedAt = memberBlock.createdAt

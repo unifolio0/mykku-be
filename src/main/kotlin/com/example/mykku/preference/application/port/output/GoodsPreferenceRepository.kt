@@ -5,7 +5,7 @@ import com.example.mykku.preference.domain.vo.GoodsType
 
 interface GoodsPreferenceRepository {
     fun saveAll(preferences: List<MemberGoodsPreference>): List<MemberGoodsPreference>
-    fun findByMemberId(memberId: String): List<MemberGoodsPreference>
-    fun deleteByMemberId(memberId: String)
-    fun existsByMemberIdAndGoodsType(memberId: String, goodsType: GoodsType): Boolean
+    fun findByMemberId(memberId: Long): List<MemberGoodsPreference>
+    fun deleteByMemberId(memberId: Long)
+    fun existsByMemberIdAndGoodsType(memberId: Long, goodsType: GoodsType): Boolean
 }

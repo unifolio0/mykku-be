@@ -17,7 +17,7 @@ class GetEventUseCaseImpl(
 ) : GetEventUseCase {
 
     @Transactional(readOnly = true)
-    override fun execute(eventId: Long, memberId: String): EventDetailResult {
+    override fun execute(eventId: Long, memberId: Long): EventDetailResult {
         val event = eventRepository.findById(EventId.of(eventId))
             ?: throw EventException.eventNotFound()
 

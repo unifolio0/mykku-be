@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface FolderJpaRepository : JpaRepository<FolderJpaEntity, Long> {
-    fun findByMemberIdAndId(memberId: String, id: Long): FolderJpaEntity?
-    fun findByMemberId(memberId: String): List<FolderJpaEntity>
-    fun existsByMemberIdAndName(memberId: String, name: String): Boolean
+    fun findByMemberIdAndId(memberId: Long, id: Long): FolderJpaEntity?
+    fun findByMemberId(memberId: Long): List<FolderJpaEntity>
+    fun existsByMemberIdAndName(memberId: Long, name: String): Boolean
 }

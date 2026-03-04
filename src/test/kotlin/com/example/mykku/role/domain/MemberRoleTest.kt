@@ -20,12 +20,12 @@ class MemberRoleTest {
         @DisplayName("memberId와 roleId로 MemberRole을 생성한다")
         fun `MemberRole 생성 - 정상 케이스`() {
             val memberRole = MemberRole.create(
-                memberId = "member-123",
+                memberId = 1L,
                 roleId = RoleId(1)
             )
 
             assertThat(memberRole.id).isEqualTo(MemberRoleId(0))
-            assertThat(memberRole.memberId).isEqualTo("member-123")
+            assertThat(memberRole.memberId).isEqualTo(1L)
             assertThat(memberRole.roleId).isEqualTo(RoleId(1))
         }
 
@@ -34,7 +34,7 @@ class MemberRoleTest {
         fun `MemberRole 생성 - 시간 설정 검증`() {
             val beforeCreate = LocalDateTime.now()
             val memberRole = MemberRole.create(
-                memberId = "member-456",
+                memberId = 2L,
                 roleId = RoleId(2)
             )
             val afterCreate = LocalDateTime.now()
@@ -49,7 +49,7 @@ class MemberRoleTest {
         @DisplayName("MemberRole 생성시 createdAt과 updatedAt이 동일하다")
         fun `MemberRole 생성 - 생성시간과 수정시간 동일`() {
             val memberRole = MemberRole.create(
-                memberId = "member-789",
+                memberId = 3L,
                 roleId = RoleId(3)
             )
 
@@ -60,7 +60,7 @@ class MemberRoleTest {
         @DisplayName("MemberRole 생성시 id는 0으로 설정된다")
         fun `MemberRole 생성 - id 초기값 검증`() {
             val memberRole = MemberRole.create(
-                memberId = "member-abc",
+                memberId = 4L,
                 roleId = RoleId(4)
             )
 
@@ -71,7 +71,7 @@ class MemberRoleTest {
         @DisplayName("다양한 roleId로 MemberRole을 생성할 수 있다")
         fun `MemberRole 생성 - 다양한 roleId`() {
             val memberRole = MemberRole.create(
-                memberId = "member-def",
+                memberId = 5L,
                 roleId = RoleId(999)
             )
 
@@ -91,14 +91,14 @@ class MemberRoleTest {
 
             val memberRole = MemberRole.reconstitute(
                 id = MemberRoleId(1),
-                memberId = "member-123",
+                memberId = 1L,
                 roleId = RoleId(5),
                 createdAt = createdAt,
                 updatedAt = updatedAt
             )
 
             assertThat(memberRole.id).isEqualTo(MemberRoleId(1))
-            assertThat(memberRole.memberId).isEqualTo("member-123")
+            assertThat(memberRole.memberId).isEqualTo(1L)
             assertThat(memberRole.roleId).isEqualTo(RoleId(5))
             assertThat(memberRole.createdAt).isEqualTo(createdAt)
             assertThat(memberRole.updatedAt).isEqualTo(updatedAt)
@@ -111,7 +111,7 @@ class MemberRoleTest {
 
             val memberRole = MemberRole.reconstitute(
                 id = MemberRoleId(999),
-                memberId = "member-special",
+                memberId = 6L,
                 roleId = RoleId(10),
                 createdAt = now,
                 updatedAt = now
@@ -128,7 +128,7 @@ class MemberRoleTest {
 
             val memberRole = MemberRole.reconstitute(
                 id = MemberRoleId(2),
-                memberId = "member-time",
+                memberId = 7L,
                 roleId = RoleId(6),
                 createdAt = createdAt,
                 updatedAt = updatedAt
@@ -140,26 +140,26 @@ class MemberRoleTest {
         }
 
         @Test
-        @DisplayName("빈 문자열 memberId로 복원할 수 있다")
-        fun `복원 - 빈 memberId`() {
+        @DisplayName("0L memberId로 복원할 수 있다")
+        fun `복원 - 0L memberId`() {
             val now = LocalDateTime.now()
 
             val memberRole = MemberRole.reconstitute(
                 id = MemberRoleId(3),
-                memberId = "",
+                memberId = 0L,
                 roleId = RoleId(7),
                 createdAt = now,
                 updatedAt = now
             )
 
-            assertThat(memberRole.memberId).isEmpty()
+            assertThat(memberRole.memberId).isEqualTo(0L)
         }
 
         @Test
         @DisplayName("모든 필드가 정확히 복원된다")
         fun `복원 - 모든 필드 검증`() {
             val id = MemberRoleId(100)
-            val memberId = "test-member-id"
+            val memberId = 100L
             val roleId = RoleId(200)
             val createdAt = LocalDateTime.of(2023, 5, 15, 12, 30, 45)
             val updatedAt = LocalDateTime.of(2023, 10, 20, 18, 0, 0)

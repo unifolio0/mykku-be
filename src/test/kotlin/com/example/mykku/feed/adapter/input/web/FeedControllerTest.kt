@@ -29,7 +29,6 @@ class FeedControllerTest : BaseControllerTest() {
         // given
         val member = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member1",
                 memberId = "testmemberid1",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
@@ -45,7 +44,7 @@ class FeedControllerTest : BaseControllerTest() {
                 logo = "test_logo.png"
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken("member1")
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
         val request = CreateFeedRequestDto(
             title = "테스트 피드",
             content = "테스트 내용",
@@ -104,7 +103,6 @@ class FeedControllerTest : BaseControllerTest() {
         // given
         val member = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member1",
                 memberId = "testmemberid2",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
@@ -128,7 +126,7 @@ class FeedControllerTest : BaseControllerTest() {
                 board = board
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken("member1")
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
 
         // when & then
         RestAssured.given()
@@ -150,7 +148,6 @@ class FeedControllerTest : BaseControllerTest() {
         // given
         val member = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member1",
                 memberId = "testmemberid3",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
@@ -193,7 +190,6 @@ class FeedControllerTest : BaseControllerTest() {
         // given
         val member = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member1",
                 memberId = "testmemberid4",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
@@ -217,7 +213,7 @@ class FeedControllerTest : BaseControllerTest() {
                 board = board
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken("member1")
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
 
         // when & then
         RestAssured.given()
@@ -239,7 +235,6 @@ class FeedControllerTest : BaseControllerTest() {
         // given
         val member = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member1",
                 memberId = "testmemberid5",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
@@ -283,7 +278,6 @@ class FeedControllerTest : BaseControllerTest() {
         // given
         val member = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member1",
                 memberId = "testmemberid6",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
@@ -307,7 +301,7 @@ class FeedControllerTest : BaseControllerTest() {
                 board = board
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken("member1")
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
 
         // when & then
         RestAssured.given()
@@ -325,7 +319,6 @@ class FeedControllerTest : BaseControllerTest() {
         // given
         val member = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member1",
                 memberId = "testmemberid7",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
@@ -364,7 +357,6 @@ class FeedControllerTest : BaseControllerTest() {
         // given
         val owner = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "owner-id",
                 memberId = "testmemberid8",
                 socialId = "owner-social",
                 provider = SocialProvider.GOOGLE,
@@ -374,9 +366,8 @@ class FeedControllerTest : BaseControllerTest() {
                 profileImage = ""
             )
         )
-        memberJpaRepository.save(
+        val otherMember = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "other-member",
                 memberId = "testmemberid9",
                 socialId = "other-social",
                 provider = SocialProvider.GOOGLE,
@@ -400,7 +391,7 @@ class FeedControllerTest : BaseControllerTest() {
                 board = board
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken("other-member")
+        val authHeader = TestTokenGenerator.getBearerToken(otherMember.id)
 
         // when & then
         RestAssured.given()
@@ -415,9 +406,8 @@ class FeedControllerTest : BaseControllerTest() {
     @DisplayName("피드 삭제 - 존재하지 않는 피드")
     fun `deleteFeed - 존재하지 않는 피드는 삭제할 수 없다`() {
         // given
-        memberJpaRepository.save(
+        val member = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member1",
                 memberId = "testmemberid10",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
@@ -427,7 +417,7 @@ class FeedControllerTest : BaseControllerTest() {
                 profileImage = ""
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken("member1")
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
         val nonExistentFeedId = 99999L
 
         // when & then

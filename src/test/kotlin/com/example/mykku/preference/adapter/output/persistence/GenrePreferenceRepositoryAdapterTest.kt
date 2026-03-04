@@ -23,7 +23,7 @@ class GenrePreferenceRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("장르 선호도 목록을 저장한다")
         fun `장르 선호도 목록 저장 - 정상 케이스`() {
-            val member = createAndSaveMember(id = "member1")
+            val member = createAndSaveMember()
             val preferences = listOf(
                 MemberGenrePreference.create(member.id, GenreType.KPOP),
                 MemberGenrePreference.create(member.id, GenreType.DRAMA_MOVIE)
@@ -51,7 +51,7 @@ class GenrePreferenceRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("모든 장르 타입을 저장할 수 있다")
         fun `모든 장르 타입 저장 - 정상 케이스`() {
-            val member = createAndSaveMember(id = "member1")
+            val member = createAndSaveMember()
             val preferences = GenreType.entries.map { genreType ->
                 MemberGenrePreference.create(member.id, genreType)
             }
@@ -70,7 +70,7 @@ class GenrePreferenceRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("회원의 장르 선호도 목록을 조회한다")
         fun `회원별 장르 선호도 조회 - 정상 케이스`() {
-            val member = createAndSaveMember(id = "member1")
+            val member = createAndSaveMember()
             val preferences = listOf(
                 MemberGenrePreference.create(member.id, GenreType.KPOP),
                 MemberGenrePreference.create(member.id, GenreType.GAME_ESPORTS),
@@ -91,7 +91,7 @@ class GenrePreferenceRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("선호도가 없는 회원 조회 시 빈 목록을 반환한다")
         fun `선호도 없는 회원 조회 - 빈 목록 반환`() {
-            val member = createAndSaveMember(id = "member1")
+            val member = createAndSaveMember()
 
             val found = genrePreferenceRepository.findByMemberId(member.id)
 
@@ -101,8 +101,8 @@ class GenrePreferenceRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("다른 회원의 선호도는 조회되지 않는다")
         fun `다른 회원 선호도 조회 불가 - 격리 검증`() {
-            val member1 = createAndSaveMember(id = "member1", email = "member1@test.com")
-            val member2 = createAndSaveMember(id = "member2", email = "member2@test.com")
+            val member1 = createAndSaveMember(memberId = "genre_m1", email = "member1@test.com", socialId = "member1_s")
+            val member2 = createAndSaveMember(memberId = "genre_m2", email = "member2@test.com", socialId = "member2_s")
             genrePreferenceRepository.saveAll(listOf(
                 MemberGenrePreference.create(member1.id, GenreType.KPOP)
             ))
@@ -124,7 +124,7 @@ class GenrePreferenceRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("회원의 모든 장르 선호도를 삭제한다")
         fun `회원별 장르 선호도 삭제 - 정상 케이스`() {
-            val member = createAndSaveMember(id = "member1")
+            val member = createAndSaveMember()
             genrePreferenceRepository.saveAll(listOf(
                 MemberGenrePreference.create(member.id, GenreType.KPOP),
                 MemberGenrePreference.create(member.id, GenreType.DRAMA_MOVIE)
@@ -139,7 +139,7 @@ class GenrePreferenceRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("선호도가 없는 회원 삭제 시 예외가 발생하지 않는다")
         fun `선호도 없는 회원 삭제 - 예외 없음`() {
-            val member = createAndSaveMember(id = "member1")
+            val member = createAndSaveMember()
 
             genrePreferenceRepository.deleteByMemberId(member.id)
 
@@ -150,8 +150,8 @@ class GenrePreferenceRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("다른 회원의 선호도는 삭제되지 않는다")
         fun `다른 회원 선호도 삭제 불가 - 격리 검증`() {
-            val member1 = createAndSaveMember(id = "member1", email = "member1@test.com")
-            val member2 = createAndSaveMember(id = "member2", email = "member2@test.com")
+            val member1 = createAndSaveMember(memberId = "genre_m1", email = "member1@test.com", socialId = "member1_s")
+            val member2 = createAndSaveMember(memberId = "genre_m2", email = "member2@test.com", socialId = "member2_s")
             genrePreferenceRepository.saveAll(listOf(
                 MemberGenrePreference.create(member1.id, GenreType.KPOP)
             ))
@@ -175,7 +175,7 @@ class GenrePreferenceRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("회원의 특정 장르 선호도가 존재하면 true를 반환한다")
         fun `선호도 존재 확인 - true 반환`() {
-            val member = createAndSaveMember(id = "member1")
+            val member = createAndSaveMember()
             genrePreferenceRepository.saveAll(listOf(
                 MemberGenrePreference.create(member.id, GenreType.KPOP)
             ))
@@ -188,7 +188,7 @@ class GenrePreferenceRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("회원의 특정 장르 선호도가 없으면 false를 반환한다")
         fun `선호도 미존재 확인 - false 반환`() {
-            val member = createAndSaveMember(id = "member1")
+            val member = createAndSaveMember()
             genrePreferenceRepository.saveAll(listOf(
                 MemberGenrePreference.create(member.id, GenreType.KPOP)
             ))
@@ -201,7 +201,7 @@ class GenrePreferenceRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("선호도가 없는 회원 확인 시 false를 반환한다")
         fun `선호도 없는 회원 확인 - false 반환`() {
-            val member = createAndSaveMember(id = "member1")
+            val member = createAndSaveMember()
 
             val exists = genrePreferenceRepository.existsByMemberIdAndGenreType(member.id, GenreType.KPOP)
 
@@ -211,8 +211,8 @@ class GenrePreferenceRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("다른 회원의 선호도는 확인되지 않는다")
         fun `다른 회원 선호도 확인 불가 - 격리 검증`() {
-            val member1 = createAndSaveMember(id = "member1", email = "member1@test.com")
-            val member2 = createAndSaveMember(id = "member2", email = "member2@test.com")
+            val member1 = createAndSaveMember(memberId = "genre_m1", email = "member1@test.com", socialId = "member1_s")
+            val member2 = createAndSaveMember(memberId = "genre_m2", email = "member2@test.com", socialId = "member2_s")
             genrePreferenceRepository.saveAll(listOf(
                 MemberGenrePreference.create(member1.id, GenreType.KPOP)
             ))

@@ -22,19 +22,19 @@ class NotificationRepositoryAdapterTest : BaseRepositoryTest() {
     @Autowired
     private lateinit var notificationRepository: NotificationRepository
 
-    private lateinit var receiverId: String
-    private lateinit var senderId: String
+    private var receiverId: Long = 0
+    private var senderId: Long = 0
 
     @BeforeEach
     fun setUp() {
         val receiver = createAndSaveMember(
-            id = "receiver1",
+            memberId = "receiver1",
             nickname = "수신자",
             email = "receiver@example.com",
             socialId = "receiver123"
         )
         val sender = createAndSaveMember(
-            id = "sender1",
+            memberId = "sender1",
             nickname = "발신자",
             email = "sender@example.com",
             socialId = "sender123"
@@ -145,7 +145,7 @@ class NotificationRepositoryAdapterTest : BaseRepositoryTest() {
         fun `수신자별 조회 - 다른 수신자`() {
             notificationRepository.save(createNotification())
             val otherReceiver = createAndSaveMember(
-                id = "other",
+                memberId = "other",
                 nickname = "다른유저",
                 email = "other@example.com",
                 socialId = "other123"
@@ -427,7 +427,7 @@ class NotificationRepositoryAdapterTest : BaseRepositoryTest() {
         @DisplayName("다른 수신자의 알림은 영향을 받지 않는다")
         fun `전체 읽음 처리 - 다른 수신자`() {
             val otherReceiver = createAndSaveMember(
-                id = "other",
+                memberId = "other",
                 nickname = "다른유저",
                 email = "other@example.com",
                 socialId = "other123"
@@ -552,7 +552,7 @@ class NotificationRepositoryAdapterTest : BaseRepositoryTest() {
         @DisplayName("다른 수신자의 알림은 삭제되지 않는다")
         fun `전체 삭제 - 다른 수신자`() {
             val otherReceiver = createAndSaveMember(
-                id = "other",
+                memberId = "other",
                 nickname = "다른유저",
                 email = "other@example.com",
                 socialId = "other123"

@@ -20,12 +20,12 @@ class JwtTokenProviderAdapter(
     private val logger = LoggerFactory.getLogger(JwtTokenProviderAdapter::class.java)
     private val secretKey = Keys.hmacShaKeyFor(jwtProperties.secret.toByteArray())
 
-    override fun generateAccessToken(memberId: String, email: String): String {
+    override fun generateAccessToken(memberId: Long, email: String): String {
         val now = Date()
         val expiryDate = Date(now.time + jwtProperties.accessTokenExpiration)
 
         return Jwts.builder()
-            .subject(memberId)
+            .subject(memberId.toString())
             .claim("email", email)
             .claim("tokenType", "access")
             .issuedAt(now)
@@ -34,12 +34,12 @@ class JwtTokenProviderAdapter(
             .compact()
     }
 
-    override fun generateRefreshToken(memberId: String): String {
+    override fun generateRefreshToken(memberId: Long): String {
         val now = Date()
         val expiryDate = Date(now.time + jwtProperties.refreshTokenExpiration)
 
         return Jwts.builder()
-            .subject(memberId)
+            .subject(memberId.toString())
             .claim("tokenType", "refresh")
             .issuedAt(now)
             .expiration(expiryDate)
@@ -77,9 +77,9 @@ class JwtTokenProviderAdapter(
         }
     }
 
-    override fun getMemberIdFromToken(token: String): String {
+    override fun getMemberIdFromToken(token: String): Long {
         val claims = parseToken(token)
-        return claims.subject
+        return claims.subject.toLong()
     }
 
     override fun getEmailFromToken(token: String): String {

@@ -19,12 +19,12 @@ class LikeBoardEntityTest {
         @DisplayName("정상적으로 게시글 좋아요를 생성한다")
         fun `좋아요 생성 - 정상 케이스`() {
             val likeBoard = LikeBoardEntity.create(
-                memberId = "member1",
+                memberId = 1L,
                 boardId = 1L
             )
 
             assertThat(likeBoard.id).isNull()
-            assertThat(likeBoard.memberId).isEqualTo("member1")
+            assertThat(likeBoard.memberId).isEqualTo(1L)
             assertThat(likeBoard.boardId).isEqualTo(1L)
         }
 
@@ -34,7 +34,7 @@ class LikeBoardEntityTest {
             val beforeCreate = LocalDateTime.now()
 
             val likeBoard = LikeBoardEntity.create(
-                memberId = "member1",
+                memberId = 1L,
                 boardId = 1L
             )
 
@@ -59,14 +59,14 @@ class LikeBoardEntityTest {
 
             val likeBoard = LikeBoardEntity.reconstitute(
                 id = 1L,
-                memberId = "member1",
+                memberId = 1L,
                 boardId = 100L,
                 createdAt = createdAt,
                 updatedAt = updatedAt
             )
 
             assertThat(likeBoard.id).isEqualTo(LikeBoardId.of(1L))
-            assertThat(likeBoard.memberId).isEqualTo("member1")
+            assertThat(likeBoard.memberId).isEqualTo(1L)
             assertThat(likeBoard.boardId).isEqualTo(100L)
             assertThat(likeBoard.createdAt).isEqualTo(createdAt)
             assertThat(likeBoard.updatedAt).isEqualTo(updatedAt)
@@ -77,7 +77,7 @@ class LikeBoardEntityTest {
         fun `복원 - id Value Object 검증`() {
             val likeBoard = LikeBoardEntity.reconstitute(
                 id = 42L,
-                memberId = "member1",
+                memberId = 1L,
                 boardId = 1L,
                 createdAt = LocalDateTime.now(),
                 updatedAt = LocalDateTime.now()

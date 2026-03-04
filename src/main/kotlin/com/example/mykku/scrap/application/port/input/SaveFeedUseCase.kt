@@ -12,7 +12,7 @@ interface SaveFeedUseCase {
     fun unsaveFeed(command: UnsaveFeedCommand)
     fun updateSaveFeedFolder(command: UpdateSaveFeedFolderCommand)
     fun getSavedFeeds(query: GetSavedFeedsQuery): Page<SaveFeedResult>
-    fun isSaved(memberId: String, feedId: Long): Boolean
-    fun getSavedFeedIds(memberId: String, feedIds: List<Long>): Set<Long>
+    fun isSaved(memberId: Long, feedId: Long): Boolean
+    fun getSavedFeedIds(memberId: Long, feedIds: List<Long>): Set<Long>
     fun deleteAllByFeedId(feedId: Long)
 }

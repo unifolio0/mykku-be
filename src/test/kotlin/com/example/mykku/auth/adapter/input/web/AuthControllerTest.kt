@@ -27,7 +27,6 @@ class AuthControllerTest : BaseControllerTest() {
         val role = roleJpaRepository.save(RoleJpaEntity(name = "일반 덕후", description = "테스트용 칭호"))
         val member = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member1",
                 memberId = "testmemberid1",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
@@ -79,7 +78,6 @@ class AuthControllerTest : BaseControllerTest() {
         val role = roleJpaRepository.save(RoleJpaEntity(name = "일반 덕후", description = "테스트용 칭호"))
         val member = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member2",
                 memberId = "testmemberid2",
                 socialId = "member2",
                 provider = SocialProvider.GOOGLE,
@@ -112,7 +110,6 @@ class AuthControllerTest : BaseControllerTest() {
         val role = roleJpaRepository.save(RoleJpaEntity(name = "일반 덕후", description = "테스트용 칭호"))
         val member = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member_to_delete",
                 memberId = "testmemberid3",
                 socialId = "member_to_delete",
                 provider = SocialProvider.GOOGLE,

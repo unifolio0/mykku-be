@@ -34,7 +34,6 @@ class RoleControllerTest : BaseControllerTest() {
     fun `getMyRoles - 내 칭호 목록을 조회한다`() {
         // given
         val member = createAndSaveMember(
-            id = "test-member",
             nickname = "테스터",
             role = role1
         )
@@ -61,7 +60,6 @@ class RoleControllerTest : BaseControllerTest() {
     fun `changeRepresentativeRole - 대표 칭호를 변경한다`() {
         // given
         val member = createAndSaveMember(
-            id = "test-member",
             nickname = "테스터",
             role = role1
         )

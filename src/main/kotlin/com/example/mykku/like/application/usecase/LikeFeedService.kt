@@ -40,12 +40,12 @@ class LikeFeedService(
     }
 
     @Transactional(readOnly = true)
-    override fun isLiked(memberId: String, feedId: Long): Boolean {
+    override fun isLiked(memberId: Long, feedId: Long): Boolean {
         return likeFeedPort.existsByMemberIdAndFeedId(memberId, feedId)
     }
 
     @Transactional(readOnly = true)
-    override fun getLikedFeedIds(memberId: String, feedIds: List<Long>): Set<Long> {
+    override fun getLikedFeedIds(memberId: Long, feedIds: List<Long>): Set<Long> {
         return likeFeedPort.findByMemberIdAndFeedIdIn(memberId, feedIds)
             .map { it.feedId }
             .toSet()
@@ -56,13 +56,13 @@ class LikeFeedService(
         likeFeedPort.deleteAllByFeedId(feedId)
     }
 
-    private fun validateNotAlreadyLiked(memberId: String, feedId: Long) {
+    private fun validateNotAlreadyLiked(memberId: Long, feedId: Long) {
         if (likeFeedPort.existsByMemberIdAndFeedId(memberId, feedId)) {
             throw LikeException.likeFeedAlreadyLiked()
         }
     }
 
-    private fun validateAlreadyLiked(memberId: String, feedId: Long) {
+    private fun validateAlreadyLiked(memberId: Long, feedId: Long) {
         if (!likeFeedPort.existsByMemberIdAndFeedId(memberId, feedId)) {
             throw LikeException.likeFeedNotFound()
         }

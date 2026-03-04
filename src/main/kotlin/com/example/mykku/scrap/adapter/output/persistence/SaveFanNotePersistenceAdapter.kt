@@ -30,11 +30,11 @@ class SaveFanNotePersistenceAdapter(
         return saveFanNoteJpaRepository.save(jpaEntity).toDomain()
     }
 
-    override fun existsByMemberIdAndFanNoteId(memberId: String, fanNoteId: Long): Boolean {
+    override fun existsByMemberIdAndFanNoteId(memberId: Long, fanNoteId: Long): Boolean {
         return saveFanNoteJpaRepository.existsByMemberIdAndFanNoteId(memberId, fanNoteId)
     }
 
-    override fun findByMemberId(memberId: String, pageable: Pageable): Page<SaveFanNoteResult> {
+    override fun findByMemberId(memberId: Long, pageable: Pageable): Page<SaveFanNoteResult> {
         return saveFanNoteJpaRepository.findByMemberId(memberId, pageable)
             .map { jpaEntity ->
                 SaveFanNoteResult(
@@ -44,7 +44,7 @@ class SaveFanNotePersistenceAdapter(
             }
     }
 
-    override fun deleteByMemberIdAndFanNoteId(memberId: String, fanNoteId: Long) {
+    override fun deleteByMemberIdAndFanNoteId(memberId: Long, fanNoteId: Long) {
         saveFanNoteJpaRepository.deleteByMemberIdAndFanNoteId(memberId, fanNoteId)
     }
 }

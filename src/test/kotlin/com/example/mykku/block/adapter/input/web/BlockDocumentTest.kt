@@ -78,7 +78,7 @@ class BlockDocumentTest : BaseDocumentTest() {
 
         @Test
         fun `자기 자신 차단 에러`() {
-            val request = BlockMemberRequest(memberId = TEST_MEMBER_ID)
+            val request = BlockMemberRequest(memberId = testMember.memberId!!)
 
             `when`(blockMemberUseCase.blockMember(any()))
                 .thenThrow(BlockException(BlockErrorCode.CANNOT_BLOCK_SELF))
@@ -200,14 +200,14 @@ class BlockDocumentTest : BaseDocumentTest() {
                 blocks = listOf(
                     MemberBlockResult(
                         id = 1L,
-                        blockedMemberId = "user1",
+                        blockedMemberId = "blocked1",
                         blockedMemberNickname = "유저1",
                         blockedMemberProfileImage = "https://example.com/profile1.jpg",
                         blockedAt = LocalDateTime.now()
                     ),
                     MemberBlockResult(
                         id = 2L,
-                        blockedMemberId = "user2",
+                        blockedMemberId = "blocked2",
                         blockedMemberNickname = "유저2",
                         blockedMemberProfileImage = "",
                         blockedAt = LocalDateTime.now()

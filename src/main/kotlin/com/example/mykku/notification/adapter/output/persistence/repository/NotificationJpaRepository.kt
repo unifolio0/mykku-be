@@ -19,7 +19,7 @@ interface NotificationJpaRepository : JpaRepository<NotificationJpaEntity, Long>
         "ORDER BY n.createdAt DESC"
     )
     fun findAllByReceiverId(
-        @Param("receiverId") receiverId: String,
+        @Param("receiverId") receiverId: Long,
         pageable: Pageable
     ): Page<NotificationJpaEntity>
 
@@ -29,7 +29,7 @@ interface NotificationJpaRepository : JpaRepository<NotificationJpaEntity, Long>
         "ORDER BY n.createdAt DESC"
     )
     fun findAllByReceiverIdAndIsRead(
-        @Param("receiverId") receiverId: String,
+        @Param("receiverId") receiverId: Long,
         @Param("isRead") isRead: Boolean,
         pageable: Pageable
     ): Page<NotificationJpaEntity>
@@ -40,7 +40,7 @@ interface NotificationJpaRepository : JpaRepository<NotificationJpaEntity, Long>
         "ORDER BY n.createdAt DESC"
     )
     fun findAllByReceiverIdAndType(
-        @Param("receiverId") receiverId: String,
+        @Param("receiverId") receiverId: Long,
         @Param("type") type: NotificationType,
         pageable: Pageable
     ): Page<NotificationJpaEntity>
@@ -51,7 +51,7 @@ interface NotificationJpaRepository : JpaRepository<NotificationJpaEntity, Long>
         "ORDER BY n.createdAt DESC"
     )
     fun findAllByReceiverIdAndTypeIn(
-        @Param("receiverId") receiverId: String,
+        @Param("receiverId") receiverId: Long,
         @Param("types") types: List<NotificationType>,
         pageable: Pageable
     ): Page<NotificationJpaEntity>
@@ -62,7 +62,7 @@ interface NotificationJpaRepository : JpaRepository<NotificationJpaEntity, Long>
         "ORDER BY n.createdAt DESC"
     )
     fun findAllByReceiverIdAndIsReadAndTypeIn(
-        @Param("receiverId") receiverId: String,
+        @Param("receiverId") receiverId: Long,
         @Param("isRead") isRead: Boolean,
         @Param("types") types: List<NotificationType>,
         pageable: Pageable
@@ -73,7 +73,7 @@ interface NotificationJpaRepository : JpaRepository<NotificationJpaEntity, Long>
         "WHERE n.receiver.id = :receiverId AND n.isRead = :isRead"
     )
     fun countByReceiverIdAndIsRead(
-        @Param("receiverId") receiverId: String,
+        @Param("receiverId") receiverId: Long,
         @Param("isRead") isRead: Boolean
     ): Long
 
@@ -82,7 +82,7 @@ interface NotificationJpaRepository : JpaRepository<NotificationJpaEntity, Long>
         "WHERE n.receiver.id = :receiverId AND n.isRead = :isRead AND n.type IN :types"
     )
     fun countByReceiverIdAndIsReadAndTypeIn(
-        @Param("receiverId") receiverId: String,
+        @Param("receiverId") receiverId: Long,
         @Param("isRead") isRead: Boolean,
         @Param("types") types: List<NotificationType>
     ): Long
@@ -92,7 +92,7 @@ interface NotificationJpaRepository : JpaRepository<NotificationJpaEntity, Long>
         "UPDATE NotificationJpaEntity n SET n.isRead = true " +
         "WHERE n.receiver.id = :receiverId AND n.isRead = false"
     )
-    fun markAllAsReadByReceiverId(@Param("receiverId") receiverId: String): Int
+    fun markAllAsReadByReceiverId(@Param("receiverId") receiverId: Long): Int
 
     @Modifying
     @Query(
@@ -100,11 +100,11 @@ interface NotificationJpaRepository : JpaRepository<NotificationJpaEntity, Long>
         "WHERE n.receiver.id = :receiverId AND n.type IN :types AND n.isRead = false"
     )
     fun markAllAsReadByReceiverIdAndTypeIn(
-        @Param("receiverId") receiverId: String,
+        @Param("receiverId") receiverId: Long,
         @Param("types") types: List<NotificationType>
     ): Int
 
     @Modifying
     @Query("DELETE FROM NotificationJpaEntity n WHERE n.receiver.id = :receiverId")
-    fun deleteAllByReceiverId(@Param("receiverId") receiverId: String)
+    fun deleteAllByReceiverId(@Param("receiverId") receiverId: Long)
 }

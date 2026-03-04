@@ -1,27 +1,27 @@
 package com.example.mykku.block.application.port.input
 
 interface BlockFilterUseCase {
-    fun getBlockedMemberIds(memberId: String): Set<String>
-    fun getBlockerMemberIds(memberId: String): Set<String>
-    fun getAllBlockRelatedMemberIds(memberId: String): Set<String>
-    fun getBlockedKeywords(memberId: String): List<String>
+    fun getBlockedMemberIds(memberId: Long): Set<Long>
+    fun getBlockerMemberIds(memberId: Long): Set<Long>
+    fun getAllBlockRelatedMemberIds(memberId: Long): Set<Long>
+    fun getBlockedKeywords(memberId: Long): List<String>
 
     fun <T> filterContent(
         items: List<T>,
-        memberId: String?,
-        memberIdExtractor: (T) -> String?,
+        memberId: Long?,
+        memberIdExtractor: (T) -> Long?,
         contentExtractors: List<(T) -> String?>
     ): List<T>
 
     fun <T> filterByBlockedMembers(
         items: List<T>,
-        memberId: String?,
-        memberIdExtractor: (T) -> String?
+        memberId: Long?,
+        memberIdExtractor: (T) -> Long?
     ): List<T>
 
     fun <T> filterByBlockedKeywords(
         items: List<T>,
-        memberId: String?,
+        memberId: Long?,
         contentExtractors: List<(T) -> String?>
     ): List<T>
 }

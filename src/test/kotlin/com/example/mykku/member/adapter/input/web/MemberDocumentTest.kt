@@ -9,7 +9,7 @@ import com.example.mykku.member.adapter.input.web.dto.CheckMemberIdRequest
 import com.example.mykku.member.adapter.input.web.dto.SetupProfileRequest
 import com.example.mykku.member.adapter.input.web.dto.UpdateProfileRequest
 import com.example.mykku.member.application.dto.MemberProfileResult
-import com.example.mykku.member.domain.vo.MemberId
+import com.example.mykku.member.domain.vo.MemberPk
 import com.example.mykku.member.exception.MemberErrorCode
 import com.example.mykku.member.exception.MemberException
 import com.example.mykku.role.application.dto.RoleResult
@@ -378,7 +378,7 @@ class MemberDocumentTest : BaseDocumentTest() {
 
         @Test
         fun `성공`() {
-            doNothing().whenever(withdrawMemberUseCase).execute(MemberId.of(TEST_MEMBER_ID))
+            doNothing().whenever(withdrawMemberUseCase).execute(MemberPk.of(testMember.id))
 
             val documentFilter = document("member/withdraw", 204)
                 .request(request().applyConfig(apiConfig))

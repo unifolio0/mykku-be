@@ -36,7 +36,7 @@ class FeedCommentRepositoryAdapterTest : BaseRepositoryTest() {
 
     @BeforeEach
     fun setUp() {
-        member = createAndSaveMember(id = "test-member", nickname = "테스트유저")
+        member = createAndSaveMember(memberId = "test-member", nickname = "테스트유저")
         board = createAndSaveBoard(title = "테스트 게시판")
         feed = feedJpaRepository.save(
             FeedJpaEntity(

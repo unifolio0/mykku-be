@@ -19,7 +19,7 @@ class GetContestUseCaseImpl(
 ) : GetContestUseCase {
 
     @Transactional(readOnly = true)
-    override fun execute(contestId: Long, memberId: String): ContestDetailResult {
+    override fun execute(contestId: Long, memberId: Long): ContestDetailResult {
         val contest = contestRepository.findById(ContestId.of(contestId))
             ?: throw ContestException.contestNotFound()
 

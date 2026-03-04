@@ -29,15 +29,15 @@ class GoodsPreferenceRepositoryAdapter(
         return jpaRepository.saveAll(entities).map { it.toDomain() }
     }
 
-    override fun findByMemberId(memberId: String): List<MemberGoodsPreference> {
+    override fun findByMemberId(memberId: Long): List<MemberGoodsPreference> {
         return jpaRepository.findByMemberId(memberId).map { it.toDomain() }
     }
 
-    override fun deleteByMemberId(memberId: String) {
+    override fun deleteByMemberId(memberId: Long) {
         jpaRepository.deleteByMemberId(memberId)
     }
 
-    override fun existsByMemberIdAndGoodsType(memberId: String, goodsType: GoodsType): Boolean {
+    override fun existsByMemberIdAndGoodsType(memberId: Long, goodsType: GoodsType): Boolean {
         return jpaRepository.existsByMemberIdAndGoodsType(memberId, goodsType)
     }
 }

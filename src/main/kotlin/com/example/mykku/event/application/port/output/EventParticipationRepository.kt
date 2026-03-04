@@ -9,8 +9,8 @@ import org.springframework.data.domain.Pageable
 interface EventParticipationRepository {
     fun save(participation: EventParticipation): EventParticipation
     fun findByEventId(eventId: EventId, pageable: Pageable): Page<EventParticipation>
-    fun findEventsByMemberId(memberId: String, pageable: Pageable): Page<Event>
-    fun findByMemberIdAndEventIds(memberId: String, eventIds: List<EventId>): List<EventParticipation>
-    fun existsByMemberIdAndEventId(memberId: String, eventId: EventId): Boolean
+    fun findEventsByMemberId(memberId: Long, pageable: Pageable): Page<Event>
+    fun findByMemberIdAndEventIds(memberId: Long, eventIds: List<EventId>): List<EventParticipation>
+    fun existsByMemberIdAndEventId(memberId: Long, eventId: EventId): Boolean
     fun countByEventId(eventId: EventId): Long
 }

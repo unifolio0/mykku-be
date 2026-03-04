@@ -58,7 +58,7 @@ class FeedController(
             title = request.title,
             content = request.content,
             boardId = request.boardId,
-            memberId = member.memberId,
+            memberId = member.id.value,
             images = request.images,
             tags = request.tags
         )

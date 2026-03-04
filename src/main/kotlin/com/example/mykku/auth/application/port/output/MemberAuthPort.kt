@@ -5,5 +5,5 @@ import com.example.mykku.member.domain.entity.Member
 
 interface MemberAuthPort {
     fun findOrCreate(memberInfo: OAuthMemberInfo): Pair<Member, Boolean>
-    fun findById(memberId: String): Member?
+    fun findById(memberId: Long): Member?
 }

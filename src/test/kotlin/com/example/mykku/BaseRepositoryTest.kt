@@ -10,8 +10,6 @@ import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntit
 import com.example.mykku.member.domain.vo.SocialProvider
 import com.example.mykku.role.adapter.output.persistence.entity.RoleJpaEntity
 import com.example.mykku.role.adapter.output.persistence.repository.RoleJpaRepository
-import com.example.mykku.util.DatabaseCleaner
-import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
@@ -21,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional
 @SpringBootTest
 @ActiveProfiles("test")
 @Import(TestEmailConfig::class, TestEmailSenderConfig::class, TestImageUploadConfig::class)
-@ExtendWith(DatabaseCleaner::class)
 @Transactional
 abstract class BaseRepositoryTest {
 
@@ -35,8 +32,7 @@ abstract class BaseRepositoryTest {
     protected lateinit var roleJpaRepository: RoleJpaRepository
 
     protected fun createAndSaveMember(
-        id: String = "testMember",
-        memberId: String? = null,
+        memberId: String? = "testmember",
         nickname: String = "테스트유저",
         email: String = "test@example.com",
         socialId: String = "12345",
@@ -45,8 +41,7 @@ abstract class BaseRepositoryTest {
         profileImage: String = ""
     ): MemberJpaEntity {
         val member = MemberJpaEntity(
-            id = id,
-            memberId = memberId ?: id,
+            memberId = memberId,
             nickname = nickname,
             email = email,
             socialId = socialId,

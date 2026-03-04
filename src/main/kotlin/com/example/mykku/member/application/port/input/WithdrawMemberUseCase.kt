@@ -1,7 +1,7 @@
 package com.example.mykku.member.application.port.input
 
-import com.example.mykku.member.domain.vo.MemberId
+import com.example.mykku.member.domain.vo.MemberPk
 
 interface WithdrawMemberUseCase {
-    fun execute(memberId: MemberId)
+    fun execute(memberId: MemberPk)
 }

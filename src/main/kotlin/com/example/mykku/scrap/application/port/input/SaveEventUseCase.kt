@@ -10,6 +10,6 @@ interface SaveEventUseCase {
     fun saveEvent(command: SaveEventCommand)
     fun unsaveEvent(command: UnsaveEventCommand)
     fun getSavedEvents(query: GetSavedEventsQuery): Page<SaveEventResult>
-    fun isSaved(memberId: String, eventId: Long): Boolean
-    fun getSavedEventIds(memberId: String, eventIds: List<Long>): Set<Long>
+    fun isSaved(memberId: Long, eventId: Long): Boolean
+    fun getSavedEventIds(memberId: Long, eventIds: List<Long>): Set<Long>
 }

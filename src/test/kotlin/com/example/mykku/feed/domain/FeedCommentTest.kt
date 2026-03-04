@@ -25,13 +25,13 @@ class FeedCommentTest {
             val comment = FeedComment.create(
                 content = "테스트 댓글",
                 feedId = FeedId.of(1L),
-                memberId = "member1"
+                memberId = 1L
             )
 
             assertThat(comment.id).isNull()
             assertThat(comment.content).isEqualTo("테스트 댓글")
             assertThat(comment.feedId.value).isEqualTo(1L)
-            assertThat(comment.memberId).isEqualTo("member1")
+            assertThat(comment.memberId).isEqualTo(1L)
             assertThat(comment.parentCommentId).isNull()
         }
 
@@ -41,7 +41,7 @@ class FeedCommentTest {
             val comment = FeedComment.create(
                 content = "테스트 댓글",
                 feedId = FeedId.of(1L),
-                memberId = "member1"
+                memberId = 1L
             )
 
             assertThat(comment.likeCount).isEqualTo(0)
@@ -53,7 +53,7 @@ class FeedCommentTest {
             val comment = FeedComment.create(
                 content = "테스트 댓글",
                 feedId = FeedId.of(1L),
-                memberId = "member1"
+                memberId = 1L
             )
 
             assertThat(comment.createdAt).isNotNull()
@@ -69,7 +69,7 @@ class FeedCommentTest {
             val comment = FeedComment.create(
                 content = "대댓글",
                 feedId = FeedId.of(1L),
-                memberId = "member1",
+                memberId = 1L,
                 parentCommentId = parentCommentId
             )
 
@@ -86,7 +86,7 @@ class FeedCommentTest {
                 FeedComment.create(
                     content = longContent,
                     feedId = FeedId.of(1L),
-                    memberId = "member1"
+                    memberId = 1L
                 )
             }
 
@@ -101,7 +101,7 @@ class FeedCommentTest {
             val comment = FeedComment.create(
                 content = exactContent,
                 feedId = FeedId.of(1L),
-                memberId = "member1"
+                memberId = 1L
             )
 
             assertThat(comment.content.length).isEqualTo(FeedComment.CONTENT_MAX_LENGTH)
@@ -170,7 +170,7 @@ class FeedCommentTest {
         fun `소유 여부 - 일치`() {
             val comment = createComment()
 
-            assertThat(comment.isOwnedBy("member1")).isTrue()
+            assertThat(comment.isOwnedBy(1L)).isTrue()
         }
 
         @Test
@@ -178,7 +178,7 @@ class FeedCommentTest {
         fun `소유 여부 - 불일치`() {
             val comment = createComment()
 
-            assertThat(comment.isOwnedBy("member2")).isFalse()
+            assertThat(comment.isOwnedBy(2L)).isFalse()
         }
     }
 
@@ -196,7 +196,7 @@ class FeedCommentTest {
                 likeCount = 5,
                 feedId = 1L,
                 parentCommentId = null,
-                memberId = "member1",
+                memberId = 1L,
                 createdAt = now,
                 updatedAt = now
             )
@@ -218,7 +218,7 @@ class FeedCommentTest {
                 likeCount = 0,
                 feedId = 1L,
                 parentCommentId = 1L,
-                memberId = "member1",
+                memberId = 1L,
                 createdAt = now,
                 updatedAt = now
             )
@@ -231,7 +231,7 @@ class FeedCommentTest {
         return FeedComment.create(
             content = "테스트 댓글",
             feedId = FeedId.of(1L),
-            memberId = "member1"
+            memberId = 1L
         )
     }
 }

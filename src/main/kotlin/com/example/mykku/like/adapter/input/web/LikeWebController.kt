@@ -77,7 +77,7 @@ class LikeWebController(
         return ResponseEntity.ok(
             ApiResponse(
                 message = "게시판 즐겨찾기가 성공적으로 처리되었습니다.",
-                data = LikeBoardWebResponse.from(result)
+                data = LikeBoardWebResponse.from(result, member.memberId)
             )
         )
     }
@@ -113,7 +113,7 @@ class LikeWebController(
         return ResponseEntity.ok(
             ApiResponse(
                 message = "피드 좋아요가 성공적으로 처리되었습니다.",
-                data = LikeFeedWebResponse.from(result)
+                data = LikeFeedWebResponse.from(result, member.memberId)
             )
         )
     }
@@ -149,7 +149,7 @@ class LikeWebController(
         return ResponseEntity.ok(
             ApiResponse(
                 message = "댓글 좋아요가 성공적으로 처리되었습니다.",
-                data = LikeDailyMessageCommentWebResponse.from(result)
+                data = LikeDailyMessageCommentWebResponse.from(result, member.memberId)
             )
         )
     }
@@ -185,7 +185,7 @@ class LikeWebController(
         return ResponseEntity.ok(
             ApiResponse(
                 message = "댓글 좋아요가 성공적으로 처리되었습니다.",
-                data = LikeFeedCommentWebResponse.from(result)
+                data = LikeFeedCommentWebResponse.from(result, member.memberId)
             )
         )
     }

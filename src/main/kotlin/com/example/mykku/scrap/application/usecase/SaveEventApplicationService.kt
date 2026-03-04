@@ -52,12 +52,12 @@ class SaveEventApplicationService(
     }
 
     @Transactional(readOnly = true)
-    override fun isSaved(memberId: String, eventId: Long): Boolean {
+    override fun isSaved(memberId: Long, eventId: Long): Boolean {
         return saveEventPort.existsByMemberIdAndEventId(memberId, eventId)
     }
 
     @Transactional(readOnly = true)
-    override fun getSavedEventIds(memberId: String, eventIds: List<Long>): Set<Long> {
+    override fun getSavedEventIds(memberId: Long, eventIds: List<Long>): Set<Long> {
         return saveEventPort.findByMemberIdAndEventIdIn(memberId, eventIds)
             .map { it.eventId }
             .toSet()

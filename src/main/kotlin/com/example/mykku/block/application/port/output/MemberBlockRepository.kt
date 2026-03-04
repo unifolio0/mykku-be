@@ -8,12 +8,12 @@ import org.springframework.data.domain.Pageable
 interface MemberBlockRepository {
     fun save(memberBlock: MemberBlock): MemberBlock
     fun findById(id: MemberBlockId): MemberBlock?
-    fun findByBlockerIdAndBlockedId(blockerId: String, blockedId: String): MemberBlock?
-    fun existsByBlockerIdAndBlockedId(blockerId: String, blockedId: String): Boolean
-    fun findAllByBlockerId(blockerId: String, pageable: Pageable): Page<MemberBlock>
-    fun findBlockedIdsByBlockerId(blockerId: String): List<String>
-    fun findBlockerIdsByBlockedId(blockedId: String): List<String>
-    fun countByBlockerId(blockerId: String): Long
+    fun findByBlockerIdAndBlockedId(blockerId: Long, blockedId: Long): MemberBlock?
+    fun existsByBlockerIdAndBlockedId(blockerId: Long, blockedId: Long): Boolean
+    fun findAllByBlockerId(blockerId: Long, pageable: Pageable): Page<MemberBlock>
+    fun findBlockedIdsByBlockerId(blockerId: Long): List<Long>
+    fun findBlockerIdsByBlockedId(blockedId: Long): List<Long>
+    fun countByBlockerId(blockerId: Long): Long
     fun delete(memberBlock: MemberBlock)
-    fun deleteByBlockerIdAndBlockedId(blockerId: String, blockedId: String)
+    fun deleteByBlockerIdAndBlockedId(blockerId: Long, blockedId: Long)
 }

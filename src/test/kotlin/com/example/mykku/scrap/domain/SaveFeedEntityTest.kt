@@ -18,13 +18,13 @@ class SaveFeedEntityTest {
         @DisplayName("피드 스크랩을 생성한다")
         fun `피드 스크랩 생성 - 정상 케이스`() {
             val saveFeed = SaveFeedEntity.create(
-                memberId = "member1",
+                memberId = 1L,
                 feedId = 1L,
                 folderId = 10L
             )
 
             assertThat(saveFeed.id).isNull()
-            assertThat(saveFeed.memberId).isEqualTo("member1")
+            assertThat(saveFeed.memberId).isEqualTo(1L)
             assertThat(saveFeed.feedId).isEqualTo(1L)
             assertThat(saveFeed.folderId).isEqualTo(10L)
         }
@@ -33,7 +33,7 @@ class SaveFeedEntityTest {
         @DisplayName("피드 스크랩 생성시 createdAt과 updatedAt이 설정된다")
         fun `피드 스크랩 생성 - 시간 설정 검증`() {
             val saveFeed = SaveFeedEntity.create(
-                memberId = "member1",
+                memberId = 1L,
                 feedId = 1L,
                 folderId = 10L
             )
@@ -56,7 +56,7 @@ class SaveFeedEntityTest {
 
             val saveFeed = SaveFeedEntity.reconstitute(
                 id = 1L,
-                memberId = "member1",
+                memberId = 1L,
                 feedId = 100L,
                 folderId = 10L,
                 createdAt = createdAt,
@@ -64,7 +64,7 @@ class SaveFeedEntityTest {
             )
 
             assertThat(saveFeed.id?.value).isEqualTo(1L)
-            assertThat(saveFeed.memberId).isEqualTo("member1")
+            assertThat(saveFeed.memberId).isEqualTo(1L)
             assertThat(saveFeed.feedId).isEqualTo(100L)
             assertThat(saveFeed.folderId).isEqualTo(10L)
             assertThat(saveFeed.createdAt).isEqualTo(createdAt)
@@ -79,7 +79,7 @@ class SaveFeedEntityTest {
 
             val saveFeed = SaveFeedEntity.reconstitute(
                 id = 1L,
-                memberId = "member1",
+                memberId = 1L,
                 feedId = 100L,
                 folderId = 10L,
                 createdAt = createdAt,
@@ -132,7 +132,7 @@ class SaveFeedEntityTest {
 
     private fun createSaveFeed(): SaveFeedEntity {
         return SaveFeedEntity.create(
-            memberId = "member1",
+            memberId = 1L,
             feedId = 1L,
             folderId = 10L
         )
