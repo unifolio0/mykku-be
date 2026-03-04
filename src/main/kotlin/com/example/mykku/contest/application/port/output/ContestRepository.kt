@@ -14,6 +14,7 @@ interface ContestRepository {
     fun findByStatus(status: ContestStatusType): List<Contest>
     fun findByExpiredAtAfter(dateTime: LocalDateTime): List<Contest>
     fun findByStatusAndExpiredAtAfter(status: ContestStatusType, dateTime: LocalDateTime): List<Contest>
+    fun findAllByIds(ids: List<ContestId>): List<Contest>
     fun findWithPagination(
         status: ContestStatusType,
         sortType: ContestSortType,

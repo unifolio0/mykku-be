@@ -16,6 +16,9 @@ import com.example.mykku.contest.application.port.input.CreateContestUseCase
 import com.example.mykku.contest.application.port.input.GetContestUseCase
 import com.example.mykku.contest.application.port.input.GetContestWinnerDetailUseCase
 import com.example.mykku.contest.application.port.input.GetContestWinnersListUseCase
+import com.example.mykku.contest.application.port.input.GetMyAwardContestsUseCase
+import com.example.mykku.contest.application.port.input.GetMyAwardFeedsUseCase
+import com.example.mykku.contest.application.port.input.GetMyAwardsPreviewUseCase
 import com.example.mykku.contest.application.port.input.GetMyWinnerStatusUseCase
 import com.example.mykku.contest.application.port.input.ListContestsUseCase
 import com.example.mykku.contest.application.port.input.SetContestWinnersUseCase
@@ -145,6 +148,15 @@ abstract class BaseDocumentTest {
 
     @MockitoBean
     protected lateinit var getMyWinnerStatusUseCase: GetMyWinnerStatusUseCase
+
+    @MockitoBean
+    protected lateinit var getMyAwardContestsUseCase: GetMyAwardContestsUseCase
+
+    @MockitoBean
+    protected lateinit var getMyAwardFeedsUseCase: GetMyAwardFeedsUseCase
+
+    @MockitoBean
+    protected lateinit var getMyAwardsPreviewUseCase: GetMyAwardsPreviewUseCase
 
     @MockitoBean
     protected lateinit var setContestWinnersUseCase: SetContestWinnersUseCase

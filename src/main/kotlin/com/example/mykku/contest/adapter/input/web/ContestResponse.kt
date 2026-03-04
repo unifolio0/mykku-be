@@ -8,7 +8,10 @@ import com.example.mykku.contest.application.dto.ContestWinnerDetailResult
 import com.example.mykku.contest.application.dto.ContestWinnerPreviewResult
 import com.example.mykku.contest.application.dto.ContestWinnersListResult
 import com.example.mykku.contest.application.dto.CreateContestResult
+import com.example.mykku.contest.application.dto.MyAwardContestResult
+import com.example.mykku.contest.application.dto.MyAwardPreviewResult
 import com.example.mykku.contest.application.dto.PagedContestsResult
+import com.example.mykku.contest.application.dto.PagedMyAwardsResult
 import com.example.mykku.contest.application.dto.SetContestWinnersResult
 import com.example.mykku.contest.application.dto.MyWinnerStatusResult
 import com.example.mykku.contest.application.dto.UpdateAcceptanceSpeechResult
@@ -305,6 +308,62 @@ data class MyWinnerStatusResponse(
                 isWinner = result.isWinner,
                 winnerId = result.winnerId,
                 winnerRank = result.winnerRank
+            )
+        }
+    }
+}
+
+data class MyAwardContestResponse(
+    val contestId: Long,
+    val contestTitle: String,
+    val thumbnailUrl: String,
+    val winnerRank: Int,
+    val acceptanceSpeech: String
+) {
+    companion object {
+        fun from(result: MyAwardContestResult): MyAwardContestResponse {
+            return MyAwardContestResponse(
+                contestId = result.contestId,
+                contestTitle = result.contestTitle,
+                thumbnailUrl = result.thumbnailUrl,
+                winnerRank = result.winnerRank,
+                acceptanceSpeech = result.acceptanceSpeech
+            )
+        }
+    }
+}
+
+data class PagedMyAwardsResponse(
+    val content: List<MyAwardContestResponse>,
+    val page: Int,
+    val size: Int,
+    val totalElements: Long,
+    val totalPages: Int,
+    val isLast: Boolean
+) {
+    companion object {
+        fun from(result: PagedMyAwardsResult): PagedMyAwardsResponse {
+            return PagedMyAwardsResponse(
+                content = result.content.map { MyAwardContestResponse.from(it) },
+                page = result.page,
+                size = result.size,
+                totalElements = result.totalElements,
+                totalPages = result.totalPages,
+                isLast = result.isLast
+            )
+        }
+    }
+}
+
+data class MyAwardPreviewResponse(
+    val contestId: Long,
+    val thumbnailUrl: String
+) {
+    companion object {
+        fun from(result: MyAwardPreviewResult): MyAwardPreviewResponse {
+            return MyAwardPreviewResponse(
+                contestId = result.contestId,
+                thumbnailUrl = result.thumbnailUrl
             )
         }
     }

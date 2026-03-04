@@ -28,6 +28,12 @@ class ContestRepositoryAdapter(
             .orElse(null)
     }
 
+    override fun findAllByIds(ids: List<ContestId>): List<Contest> {
+        if (ids.isEmpty()) return emptyList()
+        return contestJpaRepository.findAllById(ids.map { it.value })
+            .map { it.toDomain() }
+    }
+
     override fun findByStatus(status: ContestStatusType): List<Contest> {
         return contestJpaRepository.findByStatus(status)
             .map { it.toDomain() }

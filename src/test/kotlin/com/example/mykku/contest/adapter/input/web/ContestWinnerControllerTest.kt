@@ -182,6 +182,96 @@ class ContestWinnerControllerTest : BaseControllerTest() {
             .statusCode(401)
     }
 
+    @Test
+    @DisplayName("내 수상 콘테스트 목록 조회 - 정상 케이스")
+    fun `getMyAwardContests - 정상적으로 내 수상 콘테스트 목록을 조회한다`() {
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
+        val board = createAndSaveBoard()
+        val contest = createAndSaveContest(status = ContestStatusType.WINNER_SELECTED)
+        val feed = createAndSaveFeed(member, board)
+        val participation = createAndSaveParticipation(member, contest, feed)
+        createAndSaveWinner(contest, participation, winnerRank = 1)
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .`when`()
+            .get("/api/v1/contests/my-awards")
+            .then()
+            .statusCode(200)
+            .body("message", equalTo("내 수상 콘테스트 목록을 성공적으로 조회했습니다."))
+            .body("data.content[0].contestId", equalTo(contest.id!!.toInt()))
+            .body("data.content[0].winnerRank", equalTo(1))
+    }
+
+    @Test
+    @DisplayName("내 수상 콘테스트 목록 조회 - 인증되지 않은 사용자")
+    fun `getMyAwardContests - 인증되지 않은 사용자는 조회할 수 없다`() {
+        RestAssured.given()
+            .`when`()
+            .get("/api/v1/contests/my-awards")
+            .then()
+            .statusCode(401)
+    }
+
+    @Test
+    @DisplayName("내 수상 피드 목록 조회 - 정상 케이스")
+    fun `getMyAwardFeeds - 정상적으로 내 수상 피드 목록을 조회한다`() {
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
+        val board = createAndSaveBoard()
+        val contest = createAndSaveContest(status = ContestStatusType.WINNER_SELECTED)
+        val feed = createAndSaveFeed(member, board)
+        val participation = createAndSaveParticipation(member, contest, feed)
+        createAndSaveWinner(contest, participation, winnerRank = 1)
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .`when`()
+            .get("/api/v1/contests/my-awards/feeds")
+            .then()
+            .statusCode(200)
+            .body("message", equalTo("내 수상 피드 목록을 성공적으로 조회했습니다."))
+            .body("data.feeds[0].title", equalTo("테스트 피드"))
+    }
+
+    @Test
+    @DisplayName("내 수상 미리보기 조회 - 정상 케이스")
+    fun `getMyAwardsPreview - 정상적으로 미리보기를 조회한다`() {
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
+        val board = createAndSaveBoard()
+        val contest = createAndSaveContest(status = ContestStatusType.WINNER_SELECTED)
+        val feed = createAndSaveFeed(member, board)
+        val participation = createAndSaveParticipation(member, contest, feed)
+        createAndSaveWinner(contest, participation, winnerRank = 1)
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .`when`()
+            .get("/api/v1/contests/my-awards/preview")
+            .then()
+            .statusCode(200)
+            .body("message", equalTo("내 수상 미리보기를 성공적으로 조회했습니다."))
+            .body("data[0].contestId", equalTo(contest.id!!.toInt()))
+            .body("data[0].thumbnailUrl", equalTo("https://example.com/thumbnail.jpg"))
+    }
+
+    @Test
+    @DisplayName("내 수상 미리보기 조회 - 수상 내역이 없는 경우")
+    fun `getMyAwardsPreview - 수상 내역이 없으면 빈 목록을 반환한다`() {
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .`when`()
+            .get("/api/v1/contests/my-awards/preview")
+            .then()
+            .statusCode(200)
+            .body("data.size()", equalTo(0))
+    }
+
     private fun createAndSaveContest(
         title: String = "테스트 공모전",
         status: ContestStatusType = ContestStatusType.ACTIVE

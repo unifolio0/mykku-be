@@ -61,6 +61,12 @@ class FeedRepositoryAdapter(
             .map { it.toDomain() }
     }
 
+    override fun findAllByIds(ids: List<FeedId>): List<Feed> {
+        if (ids.isEmpty()) return emptyList()
+        return feedJpaRepository.findAllByIdIn(ids.map { it.value })
+            .map { it.toDomain() }
+    }
+
     override fun findPopularFeedsByBoardId(boardId: Long, limit: Int, daysAgo: Int): List<Feed> {
         val board = boardJpaRepository.findById(boardId)
             .orElseThrow { IllegalArgumentException("Board not found") }
