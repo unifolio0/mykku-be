@@ -9,6 +9,11 @@ import org.springframework.transaction.support.TransactionTemplate
 
 class DatabaseCleaner : BeforeEachCallback {
 
+    companion object {
+        @Volatile
+        private var cachedTableNames: List<String>? = null
+    }
+
     override fun beforeEach(extensionContext: ExtensionContext) {
         val context = SpringExtension.getApplicationContext(extensionContext)
         cleanup(context)
@@ -26,7 +31,6 @@ class DatabaseCleaner : BeforeEachCallback {
     }
 
     private fun truncateTables(em: EntityManager) {
-        // MySQL의 경우 외래 키 검사 비활성화
         em.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0").executeUpdate()
 
         val tableNames = findTableNames(em)
@@ -34,12 +38,12 @@ class DatabaseCleaner : BeforeEachCallback {
             em.createNativeQuery("TRUNCATE TABLE $tableName").executeUpdate()
         }
 
-        // MySQL의 경우 외래 키 검사 다시 활성화
         em.createNativeQuery("SET FOREIGN_KEY_CHECKS = 1").executeUpdate()
     }
 
-    @Suppress("UNCHECKED_CAST")
     private fun findTableNames(em: EntityManager): List<String> {
+        cachedTableNames?.let { return it }
+
         val tableNameSelectQuery = """
             SELECT TABLE_NAME
             FROM INFORMATION_SCHEMA.TABLES
@@ -49,6 +53,8 @@ class DatabaseCleaner : BeforeEachCallback {
         """.trimIndent()
 
         val results = em.createNativeQuery(tableNameSelectQuery).resultList
-        return results.map { it.toString() }
+        val names = results.map { it.toString() }
+        cachedTableNames = names
+        return names
     }
 }

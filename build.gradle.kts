@@ -73,6 +73,12 @@ allOpen {
 tasks.withType<Test> {
     useJUnitPlatform()
     outputs.dir("build/generated-snippets")
+
+    jvmArgs(
+        "-XX:+UseParallelGC",
+        "-Xmx1g",
+        "-Xms512m"
+    )
 }
 
 tasks.bootJar {
