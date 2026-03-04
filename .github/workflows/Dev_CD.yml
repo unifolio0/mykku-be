@@ -117,6 +117,13 @@ jobs:
           path: ./nginx/
           if-no-files-found: error
 
+      - name: Upload monitoring config
+        uses: actions/upload-artifact@v4
+        with:
+          name: monitoring-config
+          path: ./monitoring/
+          if-no-files-found: error
+
   deploy:
     needs: build-and-push
     runs-on: dev
@@ -139,6 +146,12 @@ jobs:
         with:
           name: nginx-config
           path: ~/app/nginx
+
+      - name: Download monitoring config
+        uses: actions/download-artifact@v4
+        with:
+          name: monitoring-config
+          path: ~/app/monitoring
 
       - name: Deploy with Docker Compose
         env:
