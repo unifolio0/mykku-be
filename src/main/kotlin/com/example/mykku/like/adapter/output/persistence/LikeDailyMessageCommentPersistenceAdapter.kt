@@ -27,11 +27,11 @@ class LikeDailyMessageCommentPersistenceAdapter(
         return likeDailyMessageCommentJpaRepository.save(jpaEntity).toDomain()
     }
 
-    override fun existsByMemberIdAndDailyMessageCommentId(memberId: String, dailyMessageCommentId: Long): Boolean {
+    override fun existsByMemberIdAndDailyMessageCommentId(memberId: Long, dailyMessageCommentId: Long): Boolean {
         return likeDailyMessageCommentJpaRepository.existsByMemberIdAndDailyMessageCommentId(memberId, dailyMessageCommentId)
     }
 
-    override fun deleteByMemberIdAndDailyMessageCommentId(memberId: String, dailyMessageCommentId: Long) {
+    override fun deleteByMemberIdAndDailyMessageCommentId(memberId: Long, dailyMessageCommentId: Long) {
         likeDailyMessageCommentJpaRepository.deleteByMemberIdAndDailyMessageCommentId(memberId, dailyMessageCommentId)
     }
 }

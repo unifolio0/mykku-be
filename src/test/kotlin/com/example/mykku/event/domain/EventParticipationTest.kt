@@ -20,7 +20,7 @@ class EventParticipationTest {
         @DisplayName("정상적으로 이벤트 참여를 생성한다")
         fun `이벤트 참여 생성 - 정상 케이스`() {
             val eventId = EventId(1L)
-            val memberId = "member100"
+            val memberId = 100L
 
             val participation = EventParticipation.create(
                 eventId = eventId,
@@ -61,7 +61,7 @@ class EventParticipationTest {
         fun `이벤트 참여 생성 - 다른 이벤트`() {
             val eventId1 = EventId(1L)
             val eventId2 = EventId(2L)
-            val memberId = "member100"
+            val memberId = 100L
 
             val participation1 = EventParticipation.create(
                 eventId = eventId1,
@@ -88,7 +88,7 @@ class EventParticipationTest {
             val now = LocalDateTime.now()
             val id = EventParticipationId(1L)
             val eventId = EventId(10L)
-            val memberId = "member100"
+            val memberId = 100L
 
             val participation = EventParticipation.reconstitute(
                 id = id,
@@ -114,7 +114,7 @@ class EventParticipationTest {
             val participation = EventParticipation.reconstitute(
                 id = EventParticipationId(1L),
                 eventId = EventId(1L),
-                memberId = "member100",
+                memberId = 100L,
                 createdAt = createdAt,
                 updatedAt = updatedAt
             )
@@ -133,7 +133,7 @@ class EventParticipationTest {
             val participation1 = EventParticipation.reconstitute(
                 id = EventParticipationId(1L),
                 eventId = eventId,
-                memberId = "member100",
+                memberId = 100L,
                 createdAt = now,
                 updatedAt = now
             )
@@ -141,13 +141,13 @@ class EventParticipationTest {
             val participation2 = EventParticipation.reconstitute(
                 id = EventParticipationId(2L),
                 eventId = eventId,
-                memberId = "member200",
+                memberId = 200L,
                 createdAt = now,
                 updatedAt = now
             )
 
-            assertThat(participation1.memberId).isEqualTo("member100")
-            assertThat(participation2.memberId).isEqualTo("member200")
+            assertThat(participation1.memberId).isEqualTo(100L)
+            assertThat(participation2.memberId).isEqualTo(200L)
             assertThat(participation1.eventId).isEqualTo(participation2.eventId)
         }
 
@@ -160,7 +160,7 @@ class EventParticipationTest {
             val participation = EventParticipation.reconstitute(
                 id = specificId,
                 eventId = EventId(1L),
-                memberId = "member100",
+                memberId = 100L,
                 createdAt = now,
                 updatedAt = now
             )
@@ -172,7 +172,7 @@ class EventParticipationTest {
     private fun createEventParticipation(): EventParticipation {
         return EventParticipation.create(
             eventId = EventId(1L),
-            memberId = "member100"
+            memberId = 100L
         )
     }
 }

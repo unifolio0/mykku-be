@@ -40,7 +40,7 @@ class LikeFeedCommentPersistenceAdapterTest : BaseRepositoryTest() {
 
     @BeforeEach
     fun setUp() {
-        savedMember = createAndSaveMember(id = "testMember1", memberId = "testMember1")
+        savedMember = createAndSaveMember(memberId = "testMember1")
         savedBoard = createAndSaveBoard()
         savedFeed = feedJpaRepository.save(createFeedJpaEntity(savedBoard, savedMember))
         savedComment = feedCommentJpaRepository.save(createFeedCommentJpaEntity(savedFeed, savedMember))
@@ -69,7 +69,7 @@ class LikeFeedCommentPersistenceAdapterTest : BaseRepositoryTest() {
         @DisplayName("존재하지 않는 회원이 좋아요하면 예외가 발생한다")
         fun `피드 댓글 좋아요 저장 - 존재하지 않는 회원`() {
             val likeComment = LikeFeedCommentEntity.create(
-                memberId = "nonExistentMember",
+                memberId = 999999L,
                 feedCommentId = savedComment.id!!
             )
 

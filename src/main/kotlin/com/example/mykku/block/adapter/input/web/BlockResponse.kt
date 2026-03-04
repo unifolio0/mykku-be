@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 
 data class MemberBlockResponse(
     val id: Long,
-    val blockedMemberId: String,
+    val blockedMemberId: Long,
     val blockedMemberNickname: String?,
     val blockedMemberProfileImage: String,
     val blockedAt: LocalDateTime

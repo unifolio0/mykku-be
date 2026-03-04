@@ -19,7 +19,7 @@ class GetMyParticipatedContestsUseCaseImpl(
 ) : GetMyParticipatedContestsUseCase {
 
     @Transactional(readOnly = true)
-    override fun execute(memberId: String, page: Int, size: Int): PagedContestsResult {
+    override fun execute(memberId: Long, page: Int, size: Int): PagedContestsResult {
         val pageable = PageableValidator.validateAndCreate(page, size)
 
         val contestPage = contestParticipationRepository.findContestsByMemberId(memberId, pageable)

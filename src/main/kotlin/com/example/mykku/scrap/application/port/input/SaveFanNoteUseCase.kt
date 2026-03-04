@@ -10,5 +10,5 @@ interface SaveFanNoteUseCase {
     fun saveFanNote(command: SaveFanNoteCommand)
     fun unsaveFanNote(command: UnsaveFanNoteCommand)
     fun getSavedFanNotes(query: GetSavedFanNotesQuery): Page<SaveFanNoteResult>
-    fun isSaved(memberId: String, fanNoteId: Long): Boolean
+    fun isSaved(memberId: Long, fanNoteId: Long): Boolean
 }

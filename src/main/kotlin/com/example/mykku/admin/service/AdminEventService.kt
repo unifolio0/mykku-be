@@ -51,7 +51,7 @@ class AdminEventService(
             sortType = EventSortType.LATEST,
             page = page,
             size = size,
-            memberId = ""
+            memberId = 0L
         )
         return listEventsUseCase.execute(query)
     }

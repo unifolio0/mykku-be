@@ -18,8 +18,8 @@ class PreferenceControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("장르 취향 저장 - 정상 케이스")
     fun `updateGenrePreferences - 정상적으로 장르 취향을 저장한다`() {
-        val member = createAndSaveMember(id = "member1")
-        val authHeader = getBearerToken("member1")
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
         val request = UpdateGenrePreferenceRequest(
             genreTypes = listOf(GenreType.KPOP, GenreType.BAND_ROCK)
         )
@@ -38,8 +38,8 @@ class PreferenceControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("장르 취향 조회 - 정상 케이스")
     fun `getGenrePreferences - 장르 취향을 조회한다`() {
-        val member = createAndSaveMember(id = "member1")
-        val authHeader = getBearerToken("member1")
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
 
         val request = UpdateGenrePreferenceRequest(
             genreTypes = listOf(GenreType.KPOP, GenreType.GAME_ESPORTS)
@@ -64,8 +64,8 @@ class PreferenceControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("굿즈 취향 저장 - 정상 케이스")
     fun `updateGoodsPreferences - 정상적으로 굿즈 취향을 저장한다`() {
-        val member = createAndSaveMember(id = "member1")
-        val authHeader = getBearerToken("member1")
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
         val request = UpdateGoodsPreferenceRequest(
             goodsTypes = listOf(GoodsType.ITABAG, GoodsType.DESK_TERIOR)
         )
@@ -84,8 +84,8 @@ class PreferenceControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("굿즈 취향 조회 - 정상 케이스")
     fun `getGoodsPreferences - 굿즈 취향을 조회한다`() {
-        val member = createAndSaveMember(id = "member1")
-        val authHeader = getBearerToken("member1")
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
 
         val request = UpdateGoodsPreferenceRequest(
             goodsTypes = listOf(GoodsType.PHOTOCARD_HOLDER, GoodsType.NAME_BOARD)
@@ -110,8 +110,8 @@ class PreferenceControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("분위기 취향 저장 - 정상 케이스")
     fun `updateMoodPreferences - 정상적으로 분위기 취향을 저장한다`() {
-        val member = createAndSaveMember(id = "member1")
-        val authHeader = getBearerToken("member1")
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
         val request = UpdateMoodPreferenceRequest(
             moodTypes = listOf(MoodType.COZY, MoodType.KITSCH)
         )
@@ -130,8 +130,8 @@ class PreferenceControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("분위기 취향 조회 - 정상 케이스")
     fun `getMoodPreferences - 분위기 취향을 조회한다`() {
-        val member = createAndSaveMember(id = "member1")
-        val authHeader = getBearerToken("member1")
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
 
         val request = UpdateMoodPreferenceRequest(
             moodTypes = listOf(MoodType.FRESH, MoodType.Y2K)

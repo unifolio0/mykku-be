@@ -30,20 +30,20 @@ class LikeBoardPersistenceAdapter(
         return likeBoardJpaRepository.save(jpaEntity).toDomain()
     }
 
-    override fun existsByMemberIdAndBoardId(memberId: String, boardId: Long): Boolean {
+    override fun existsByMemberIdAndBoardId(memberId: Long, boardId: Long): Boolean {
         return likeBoardJpaRepository.existsByMemberIdAndBoardId(memberId, boardId)
     }
 
-    override fun deleteByMemberIdAndBoardId(memberId: String, boardId: Long) {
+    override fun deleteByMemberIdAndBoardId(memberId: Long, boardId: Long) {
         likeBoardJpaRepository.deleteByMemberIdAndBoardId(memberId, boardId)
     }
 
-    override fun findAllByMemberId(memberId: String): List<LikeBoardEntity> {
+    override fun findAllByMemberId(memberId: Long): List<LikeBoardEntity> {
         return likeBoardJpaRepository.findAllByMemberId(memberId)
             .map { it.toDomain() }
     }
 
-    override fun findAllByMemberIdWithBoardInfo(memberId: String, pageable: Pageable): Page<LikeBoardInfoResult> {
+    override fun findAllByMemberIdWithBoardInfo(memberId: Long, pageable: Pageable): Page<LikeBoardInfoResult> {
         return likeBoardJpaRepository.findAllByMemberId(memberId, pageable)
             .map { jpaEntity ->
                 LikeBoardInfoResult(

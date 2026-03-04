@@ -17,7 +17,7 @@ data class UpdateDailyMessageCommand(
 
 data class CreateCommentCommand(
     val dailyMessageId: Long,
-    val memberId: String,
+    val memberId: Long,
     val memberNickname: String?,
     val memberProfileImage: String,
     val content: String,
@@ -26,6 +26,6 @@ data class CreateCommentCommand(
 
 data class UpdateCommentCommand(
     val commentId: Long,
-    val memberId: String,
+    val memberId: Long,
     val content: String
 )

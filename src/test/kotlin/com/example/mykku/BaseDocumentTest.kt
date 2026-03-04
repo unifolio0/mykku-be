@@ -1,5 +1,6 @@
 package com.example.mykku
 
+import com.example.mykku.util.DatabaseCleaner
 import com.example.mykku.admin.service.AdminRoleService
 import com.example.mykku.auth.adapter.output.persistence.JwtTokenProviderAdapter
 import com.example.mykku.auth.application.port.input.MobileLoginUseCase
@@ -108,7 +109,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 
 @ActiveProfiles("test")
-@ExtendWith(RestDocumentationExtension::class, MockitoExtension::class)
+@ExtendWith(DatabaseCleaner::class, RestDocumentationExtension::class, MockitoExtension::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 abstract class BaseDocumentTest {
 
@@ -323,7 +324,6 @@ abstract class BaseDocumentTest {
     protected lateinit var deleteFeedCommentUseCase: DeleteFeedCommentUseCase
 
     companion object {
-        const val TEST_MEMBER_ID = "test-member-id"
         const val TEST_MEMBER_EMAIL = "test@example.com"
         const val TEST_ACCESS_TOKEN = "test-access-token"
 
@@ -383,7 +383,6 @@ abstract class BaseDocumentTest {
     private fun setLoginMember() {
         testMember = memberJpaRepository.save(
             MemberJpaEntity(
-                id = TEST_MEMBER_ID,
                 memberId = "testmemberid",
                 nickname = "testuser",
                 role = null,
@@ -395,7 +394,7 @@ abstract class BaseDocumentTest {
         )
 
         doReturn(true).`when`(jwtTokenProvider).validateToken(TEST_ACCESS_TOKEN)
-        doReturn(TEST_MEMBER_ID).`when`(jwtTokenProvider).getMemberIdFromToken(TEST_ACCESS_TOKEN)
+        doReturn(testMember.id).`when`(jwtTokenProvider).getMemberIdFromToken(TEST_ACCESS_TOKEN)
     }
 
     protected fun request(): RestDocumentationRequest = RestDocumentationRequest()

@@ -33,28 +33,28 @@ class MemberBlockRepositoryAdapter(
             .orElse(null)
     }
 
-    override fun findByBlockerIdAndBlockedId(blockerId: String, blockedId: String): MemberBlock? {
+    override fun findByBlockerIdAndBlockedId(blockerId: Long, blockedId: Long): MemberBlock? {
         return memberBlockJpaRepository.findByBlockerIdAndBlockedId(blockerId, blockedId)?.toDomain()
     }
 
-    override fun existsByBlockerIdAndBlockedId(blockerId: String, blockedId: String): Boolean {
+    override fun existsByBlockerIdAndBlockedId(blockerId: Long, blockedId: Long): Boolean {
         return memberBlockJpaRepository.existsByBlockerIdAndBlockedId(blockerId, blockedId)
     }
 
-    override fun findAllByBlockerId(blockerId: String, pageable: Pageable): Page<MemberBlock> {
+    override fun findAllByBlockerId(blockerId: Long, pageable: Pageable): Page<MemberBlock> {
         return memberBlockJpaRepository.findAllByBlockerId(blockerId, pageable)
             .map { it.toDomain() }
     }
 
-    override fun findBlockedIdsByBlockerId(blockerId: String): List<String> {
+    override fun findBlockedIdsByBlockerId(blockerId: Long): List<Long> {
         return memberBlockJpaRepository.findBlockedIdsByBlockerId(blockerId)
     }
 
-    override fun findBlockerIdsByBlockedId(blockedId: String): List<String> {
+    override fun findBlockerIdsByBlockedId(blockedId: Long): List<Long> {
         return memberBlockJpaRepository.findBlockerIdsByBlockedId(blockedId)
     }
 
-    override fun countByBlockerId(blockerId: String): Long {
+    override fun countByBlockerId(blockerId: Long): Long {
         return memberBlockJpaRepository.countByBlockerId(blockerId)
     }
 
@@ -64,7 +64,7 @@ class MemberBlockRepositoryAdapter(
         }
     }
 
-    override fun deleteByBlockerIdAndBlockedId(blockerId: String, blockedId: String) {
+    override fun deleteByBlockerIdAndBlockedId(blockerId: Long, blockedId: Long) {
         memberBlockJpaRepository.deleteByBlockerIdAndBlockedId(blockerId, blockedId)
     }
 }

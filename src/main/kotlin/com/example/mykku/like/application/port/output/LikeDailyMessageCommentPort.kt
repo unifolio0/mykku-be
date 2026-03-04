@@ -4,6 +4,6 @@ import com.example.mykku.like.domain.entity.LikeDailyMessageCommentEntity
 
 interface LikeDailyMessageCommentPort {
     fun save(likeDailyMessageComment: LikeDailyMessageCommentEntity): LikeDailyMessageCommentEntity
-    fun existsByMemberIdAndDailyMessageCommentId(memberId: String, dailyMessageCommentId: Long): Boolean
-    fun deleteByMemberIdAndDailyMessageCommentId(memberId: String, dailyMessageCommentId: Long)
+    fun existsByMemberIdAndDailyMessageCommentId(memberId: Long, dailyMessageCommentId: Long): Boolean
+    fun deleteByMemberIdAndDailyMessageCommentId(memberId: Long, dailyMessageCommentId: Long)
 }

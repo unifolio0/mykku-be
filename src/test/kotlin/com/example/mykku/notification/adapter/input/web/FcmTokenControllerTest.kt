@@ -39,11 +39,10 @@ class FcmTokenControllerTest : BaseControllerTest() {
     @DisplayName("FCM 토큰 등록 - 정상 케이스")
     fun `registerToken - 정상적으로 FCM 토큰을 등록한다`() {
         val member = createAndSaveMember(
-            id = "member1",
             nickname = "TestUser",
             email = "test@example.com"
         )
-        val authHeader = TestTokenGenerator.getBearerToken("member1")
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
 
         val request = mapOf(
             "token" to "test_fcm_token_123",
@@ -68,7 +67,6 @@ class FcmTokenControllerTest : BaseControllerTest() {
     @DisplayName("FCM 토큰 등록 - 이미 존재하는 deviceId는 토큰을 갱신한다")
     fun `registerToken - 이미 존재하는 deviceId는 토큰을 갱신한다`() {
         val member = createAndSaveMember(
-            id = "member1",
             nickname = "TestUser",
             email = "test@example.com"
         )
@@ -78,7 +76,7 @@ class FcmTokenControllerTest : BaseControllerTest() {
             deviceId = "device_001",
             deviceType = "ANDROID"
         )
-        val authHeader = TestTokenGenerator.getBearerToken("member1")
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
 
         val request = mapOf(
             "token" to "new_token_updated",
@@ -120,8 +118,8 @@ class FcmTokenControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("FCM 토큰 등록 - 필수 필드 누락")
     fun `registerToken - 필수 필드가 누락되면 실패한다`() {
-        val member = createAndSaveMember(id = "member1")
-        val authHeader = TestTokenGenerator.getBearerToken("member1")
+        val member = createAndSaveMember()
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
 
         val request = mapOf(
             "deviceId" to "device_001"
@@ -140,7 +138,7 @@ class FcmTokenControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("FCM 토큰 목록 조회 - 정상 케이스")
     fun `getTokens - 정상적으로 FCM 토큰 목록을 조회한다`() {
-        val member = createAndSaveMember(id = "member1")
+        val member = createAndSaveMember()
         createFcmToken(
             member = member,
             token = "token1",
@@ -153,7 +151,7 @@ class FcmTokenControllerTest : BaseControllerTest() {
             deviceId = "device_002",
             deviceType = "IOS"
         )
-        val authHeader = TestTokenGenerator.getBearerToken("member1")
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -178,13 +176,13 @@ class FcmTokenControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("FCM 토큰 삭제 - 정상 케이스")
     fun `deleteToken - 정상적으로 FCM 토큰을 삭제한다`() {
-        val member = createAndSaveMember(id = "member1")
+        val member = createAndSaveMember()
         createFcmToken(
             member = member,
             token = "token1",
             deviceId = "device_001"
         )
-        val authHeader = TestTokenGenerator.getBearerToken("member1")
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)

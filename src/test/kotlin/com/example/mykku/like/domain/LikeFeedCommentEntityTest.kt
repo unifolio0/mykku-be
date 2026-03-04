@@ -19,12 +19,12 @@ class LikeFeedCommentEntityTest {
         @DisplayName("정상적으로 피드 댓글 좋아요를 생성한다")
         fun `좋아요 생성 - 정상 케이스`() {
             val likeFeedComment = LikeFeedCommentEntity.create(
-                memberId = "member1",
+                memberId = 1L,
                 feedCommentId = 1L
             )
 
             assertThat(likeFeedComment.id).isNull()
-            assertThat(likeFeedComment.memberId).isEqualTo("member1")
+            assertThat(likeFeedComment.memberId).isEqualTo(1L)
             assertThat(likeFeedComment.feedCommentId).isEqualTo(1L)
         }
 
@@ -34,7 +34,7 @@ class LikeFeedCommentEntityTest {
             val beforeCreate = LocalDateTime.now()
 
             val likeFeedComment = LikeFeedCommentEntity.create(
-                memberId = "member1",
+                memberId = 1L,
                 feedCommentId = 1L
             )
 
@@ -59,14 +59,14 @@ class LikeFeedCommentEntityTest {
 
             val likeFeedComment = LikeFeedCommentEntity.reconstitute(
                 id = 1L,
-                memberId = "member1",
+                memberId = 1L,
                 feedCommentId = 100L,
                 createdAt = createdAt,
                 updatedAt = updatedAt
             )
 
             assertThat(likeFeedComment.id).isEqualTo(LikeFeedCommentId.of(1L))
-            assertThat(likeFeedComment.memberId).isEqualTo("member1")
+            assertThat(likeFeedComment.memberId).isEqualTo(1L)
             assertThat(likeFeedComment.feedCommentId).isEqualTo(100L)
             assertThat(likeFeedComment.createdAt).isEqualTo(createdAt)
             assertThat(likeFeedComment.updatedAt).isEqualTo(updatedAt)
@@ -77,7 +77,7 @@ class LikeFeedCommentEntityTest {
         fun `복원 - id Value Object 검증`() {
             val likeFeedComment = LikeFeedCommentEntity.reconstitute(
                 id = 42L,
-                memberId = "member1",
+                memberId = 1L,
                 feedCommentId = 1L,
                 createdAt = LocalDateTime.now(),
                 updatedAt = LocalDateTime.now()

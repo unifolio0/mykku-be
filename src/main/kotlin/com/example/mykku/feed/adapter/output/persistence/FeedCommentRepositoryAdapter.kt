@@ -18,7 +18,7 @@ class FeedCommentRepositoryAdapter(
     private val memberJpaRepository: MemberJpaRepository
 ) : FeedCommentRepository {
 
-    override fun save(feedComment: FeedComment, feedId: FeedId, memberId: String): FeedComment {
+    override fun save(feedComment: FeedComment, feedId: FeedId, memberId: Long): FeedComment {
         val feed = feedJpaRepository.findById(feedId.value)
             .orElseThrow { IllegalArgumentException("Feed not found: ${feedId.value}") }
         val member = memberJpaRepository.findById(memberId)

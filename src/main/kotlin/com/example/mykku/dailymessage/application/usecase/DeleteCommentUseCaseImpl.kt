@@ -13,7 +13,7 @@ class DeleteCommentUseCaseImpl(
     private val dailyMessageCommentRepository: DailyMessageCommentRepository
 ) : DeleteCommentUseCase {
 
-    override fun execute(commentId: Long, memberId: String) {
+    override fun execute(commentId: Long, memberId: Long) {
         val comment = dailyMessageCommentRepository.findById(DailyMessageCommentId.of(commentId))
             ?: throw DailyMessageException.dailyMessageCommentNotFound()
 

@@ -7,7 +7,7 @@ import com.example.mykku.like.application.dto.UnlikeFeedCommand
 interface LikeFeedUseCase {
     fun likeFeed(command: LikeFeedCommand): LikeFeedResult
     fun unlikeFeed(command: UnlikeFeedCommand)
-    fun isLiked(memberId: String, feedId: Long): Boolean
-    fun getLikedFeedIds(memberId: String, feedIds: List<Long>): Set<Long>
+    fun isLiked(memberId: Long, feedId: Long): Boolean
+    fun getLikedFeedIds(memberId: Long, feedIds: List<Long>): Set<Long>
     fun deleteAllByFeedId(feedId: Long)
 }

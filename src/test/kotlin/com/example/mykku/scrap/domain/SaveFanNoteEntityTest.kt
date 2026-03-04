@@ -18,12 +18,12 @@ class SaveFanNoteEntityTest {
         @DisplayName("팬노트 스크랩을 생성한다")
         fun `팬노트 스크랩 생성 - 정상 케이스`() {
             val saveFanNote = SaveFanNoteEntity.create(
-                memberId = "member1",
+                memberId = 1L,
                 fanNoteId = 100L
             )
 
             assertThat(saveFanNote.id).isNull()
-            assertThat(saveFanNote.memberId).isEqualTo("member1")
+            assertThat(saveFanNote.memberId).isEqualTo(1L)
             assertThat(saveFanNote.fanNoteId).isEqualTo(100L)
         }
 
@@ -31,7 +31,7 @@ class SaveFanNoteEntityTest {
         @DisplayName("팬노트 스크랩 생성시 createdAt과 updatedAt이 설정된다")
         fun `팬노트 스크랩 생성 - 시간 설정 검증`() {
             val saveFanNote = SaveFanNoteEntity.create(
-                memberId = "member1",
+                memberId = 1L,
                 fanNoteId = 100L
             )
 
@@ -53,14 +53,14 @@ class SaveFanNoteEntityTest {
 
             val saveFanNote = SaveFanNoteEntity.reconstitute(
                 id = 1L,
-                memberId = "member1",
+                memberId = 1L,
                 fanNoteId = 100L,
                 createdAt = createdAt,
                 updatedAt = updatedAt
             )
 
             assertThat(saveFanNote.id?.value).isEqualTo(1L)
-            assertThat(saveFanNote.memberId).isEqualTo("member1")
+            assertThat(saveFanNote.memberId).isEqualTo(1L)
             assertThat(saveFanNote.fanNoteId).isEqualTo(100L)
             assertThat(saveFanNote.createdAt).isEqualTo(createdAt)
             assertThat(saveFanNote.updatedAt).isEqualTo(updatedAt)
@@ -73,14 +73,14 @@ class SaveFanNoteEntityTest {
 
             val saveFanNote = SaveFanNoteEntity.reconstitute(
                 id = 999L,
-                memberId = "test-member",
+                memberId = 2L,
                 fanNoteId = 12345L,
                 createdAt = now,
                 updatedAt = now
             )
 
             assertThat(saveFanNote.id?.value).isEqualTo(999L)
-            assertThat(saveFanNote.memberId).isEqualTo("test-member")
+            assertThat(saveFanNote.memberId).isEqualTo(2L)
             assertThat(saveFanNote.fanNoteId).isEqualTo(12345L)
         }
     }

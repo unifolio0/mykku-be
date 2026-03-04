@@ -1,6 +1,7 @@
 package com.example.mykku.notification.application.usecase
 
 import com.example.mykku.member.application.port.output.MemberRepository
+import com.example.mykku.member.domain.vo.MemberPk
 import com.example.mykku.notification.application.dto.GetNotificationsQuery
 import com.example.mykku.notification.application.dto.GetUnreadCountQuery
 import com.example.mykku.notification.application.dto.GetUnreadNotificationsQuery
@@ -25,7 +26,7 @@ class GetNotificationsService(
             notificationRepository.findAllByReceiverId(query.memberId, query.pageable)
         }
         return notifications.map { notification ->
-            val sender = notification.senderId?.let { memberRepository.findByIdString(it) }
+            val sender = notification.senderId?.let { memberRepository.findById(MemberPk.of(it)) }
             NotificationResult.from(notification, sender?.nickname, sender?.profileImage)
         }
     }
@@ -37,7 +38,7 @@ class GetNotificationsService(
             notificationRepository.findAllByReceiverIdAndIsRead(query.memberId, false, query.pageable)
         }
         return notifications.map { notification ->
-            val sender = notification.senderId?.let { memberRepository.findByIdString(it) }
+            val sender = notification.senderId?.let { memberRepository.findById(MemberPk.of(it)) }
             NotificationResult.from(notification, sender?.nickname, sender?.profileImage)
         }
     }

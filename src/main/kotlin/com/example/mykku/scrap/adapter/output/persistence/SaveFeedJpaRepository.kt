@@ -8,11 +8,11 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface SaveFeedJpaRepository : JpaRepository<SaveFeedJpaEntity, Long> {
-    fun existsByMemberIdAndFeedId(memberId: String, feedId: Long): Boolean
-    fun findByMemberIdAndFeedIdIn(memberId: String, feedIds: List<Long>): List<SaveFeedJpaEntity>
-    fun findByMemberId(memberId: String, pageable: Pageable): Page<SaveFeedJpaEntity>
-    fun findByMemberIdAndFolderId(memberId: String, folderId: Long?, pageable: Pageable): Page<SaveFeedJpaEntity>
-    fun findByMemberIdAndFeedId(memberId: String, feedId: Long): SaveFeedJpaEntity?
-    fun deleteByMemberIdAndFeedId(memberId: String, feedId: Long)
+    fun existsByMemberIdAndFeedId(memberId: Long, feedId: Long): Boolean
+    fun findByMemberIdAndFeedIdIn(memberId: Long, feedIds: List<Long>): List<SaveFeedJpaEntity>
+    fun findByMemberId(memberId: Long, pageable: Pageable): Page<SaveFeedJpaEntity>
+    fun findByMemberIdAndFolderId(memberId: Long, folderId: Long?, pageable: Pageable): Page<SaveFeedJpaEntity>
+    fun findByMemberIdAndFeedId(memberId: Long, feedId: Long): SaveFeedJpaEntity?
+    fun deleteByMemberIdAndFeedId(memberId: Long, feedId: Long)
     fun deleteAllByFeedId(feedId: Long)
 }

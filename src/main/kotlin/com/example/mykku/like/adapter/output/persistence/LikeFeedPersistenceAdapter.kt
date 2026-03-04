@@ -27,15 +27,15 @@ class LikeFeedPersistenceAdapter(
         return likeFeedJpaRepository.save(jpaEntity).toDomain()
     }
 
-    override fun existsByMemberIdAndFeedId(memberId: String, feedId: Long): Boolean {
+    override fun existsByMemberIdAndFeedId(memberId: Long, feedId: Long): Boolean {
         return likeFeedJpaRepository.existsByMemberIdAndFeedId(memberId, feedId)
     }
 
-    override fun deleteByMemberIdAndFeedId(memberId: String, feedId: Long) {
+    override fun deleteByMemberIdAndFeedId(memberId: Long, feedId: Long) {
         likeFeedJpaRepository.deleteByMemberIdAndFeedId(memberId, feedId)
     }
 
-    override fun findByMemberIdAndFeedIdIn(memberId: String, feedIds: List<Long>): List<LikeFeedEntity> {
+    override fun findByMemberIdAndFeedIdIn(memberId: Long, feedIds: List<Long>): List<LikeFeedEntity> {
         return likeFeedJpaRepository.findByMemberIdAndFeedIdIn(memberId, feedIds)
             .map { it.toDomain() }
     }

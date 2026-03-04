@@ -32,9 +32,8 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
     @DisplayName("댓글 생성 - 정상 케이스")
     fun `createComment - 정상적으로 댓글을 생성한다`() {
         // given
-        memberJpaRepository.save(
+        val member = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member1",
                 memberId = "testmemberid1",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
@@ -51,7 +50,7 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
                 date = LocalDate.now()
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken("member1")
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
         val request = CreateCommentRequest(content = "좋은 글이네요!")
 
         // when & then
@@ -96,7 +95,6 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
         // given
         val member = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member1",
                 memberId = "testmemberid2",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
@@ -120,7 +118,7 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
                 member = member
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken("member1")
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
         val request = UpdateCommentRequest(content = "수정된 댓글")
 
         // when & then
@@ -158,7 +156,6 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
         // given
         val member = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member1",
                 memberId = "testmemberid3",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
@@ -182,7 +179,7 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
                 member = member
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken("member1")
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
 
         // when & then
         RestAssured.given()
@@ -200,7 +197,6 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
         // given
         val member1 = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member1",
                 memberId = "testmemberid4",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
@@ -210,9 +206,8 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
                 profileImage = ""
             )
         )
-        memberJpaRepository.save(
+        val member2 = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member2",
                 memberId = "testmemberid5",
                 socialId = "member2",
                 provider = SocialProvider.GOOGLE,
@@ -236,7 +231,7 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
                 member = member1
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken("member2")
+        val authHeader = TestTokenGenerator.getBearerToken(member2.id)
 
         // when & then
         RestAssured.given()

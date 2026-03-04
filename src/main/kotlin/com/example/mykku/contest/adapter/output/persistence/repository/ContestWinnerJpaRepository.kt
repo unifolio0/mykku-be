@@ -23,6 +23,6 @@ interface ContestWinnerJpaRepository : JpaRepository<ContestWinnerJpaEntity, Lon
     )
     fun findByContestAndMemberId(
         @Param("contest") contest: ContestJpaEntity,
-        @Param("memberId") memberId: String
+        @Param("memberId") memberId: Long
     ): ContestWinnerJpaEntity?
 }

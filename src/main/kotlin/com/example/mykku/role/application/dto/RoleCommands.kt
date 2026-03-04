@@ -3,7 +3,7 @@ package com.example.mykku.role.application.dto
 import java.time.LocalDateTime
 
 data class ChangeRepresentativeRoleCommand(
-    val memberId: String,
+    val memberId: Long,
     val memberRoleId: Long
 )
 

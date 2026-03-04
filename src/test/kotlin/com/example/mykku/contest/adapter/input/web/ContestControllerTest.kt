@@ -21,8 +21,8 @@ class ContestControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("공모전 목록 조회 - 정상 케이스")
     fun `getContests - 정상적으로 공모전 목록을 조회한다`() {
-        createAndSaveMember(id = "member1")
-        val authHeader = getBearerToken("member1")
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
 
         createAndSaveContest(
             title = "진행중인 공모전",
@@ -47,8 +47,8 @@ class ContestControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("공모전 상세 조회 - 정상 케이스")
     fun `getContestDetail - 정상적으로 공모전 상세를 조회한다`() {
-        createAndSaveMember(id = "member1")
-        val authHeader = getBearerToken("member1")
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
 
         val contest = createAndSaveContest(
             title = "상세 조회 테스트 공모전",

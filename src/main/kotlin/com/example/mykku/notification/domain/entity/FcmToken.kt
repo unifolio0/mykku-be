@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 
 class FcmToken private constructor(
     val id: FcmTokenId?,
-    val memberId: String,
+    val memberId: Long,
     private var _token: String,
     val deviceId: String,
     val deviceType: String?,
@@ -21,7 +21,7 @@ class FcmToken private constructor(
 
     companion object {
         fun create(
-            memberId: String,
+            memberId: Long,
             token: String,
             deviceId: String,
             deviceType: String? = null
@@ -40,7 +40,7 @@ class FcmToken private constructor(
 
         fun reconstitute(
             id: FcmTokenId,
-            memberId: String,
+            memberId: Long,
             token: String,
             deviceId: String,
             deviceType: String?,

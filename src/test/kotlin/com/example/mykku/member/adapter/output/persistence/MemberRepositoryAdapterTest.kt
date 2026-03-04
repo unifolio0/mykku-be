@@ -3,9 +3,8 @@ package com.example.mykku.member.adapter.output.persistence
 import com.example.mykku.BaseRepositoryTest
 import com.example.mykku.member.application.port.output.MemberRepository
 import com.example.mykku.member.domain.entity.Member
-import com.example.mykku.member.domain.vo.MemberId
+import com.example.mykku.member.domain.vo.MemberPk
 import com.example.mykku.member.domain.vo.SocialProvider
-import java.time.LocalDateTime
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -18,32 +17,6 @@ class MemberRepositoryAdapterTest : BaseRepositoryTest() {
     @Autowired
     private lateinit var memberRepository: MemberRepository
 
-    private fun createTestMember(
-        id: String = "testId123",
-        memberId: String = "testMemberId",
-        nickname: String = "testNick",
-        email: String = "test@example.com",
-        provider: SocialProvider = SocialProvider.GOOGLE,
-        socialId: String = "socialId123",
-        profileImage: String = "profile.png"
-    ): Member {
-        val now = LocalDateTime.now()
-        return Member.reconstitute(
-            id = id,
-            memberId = memberId,
-            nickname = nickname,
-            roleId = null,
-            profileImage = profileImage,
-            provider = provider,
-            socialId = socialId,
-            email = email,
-            password = null,
-            emailVerified = true,
-            createdAt = now,
-            updatedAt = now
-        )
-    }
-
     @Nested
     @DisplayName("save 메서드는")
     inner class SaveMethod {
@@ -51,13 +24,16 @@ class MemberRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("새로운 회원을 저장하고 반환한다")
         fun saveNewMember() {
-            val member = createTestMember()
+            val member = Member.createSocialMember(
+                profileImage = "profile.png",
+                provider = SocialProvider.GOOGLE,
+                socialId = "socialId123",
+                email = "test@example.com"
+            )
 
             val savedMember = memberRepository.save(member)
 
-            assertThat(savedMember.id.value).isEqualTo(member.id.value)
-            assertThat(savedMember.memberId).isEqualTo(member.memberId)
-            assertThat(savedMember.nickname).isEqualTo(member.nickname)
+            assertThat(savedMember.id.value).isNotEqualTo(0L)
             assertThat(savedMember.email).isEqualTo(member.email)
             assertThat(savedMember.provider).isEqualTo(member.provider)
             assertThat(savedMember.socialId).isEqualTo(member.socialId)
@@ -68,7 +44,6 @@ class MemberRepositoryAdapterTest : BaseRepositoryTest() {
         @DisplayName("이메일 회원을 저장하고 반환한다")
         fun saveEmailMember() {
             val member = Member.createEmailMember(
-                id = "emailUser123",
                 email = "email@example.com",
                 password = "encodedPassword123",
                 profileImage = "profile.png"
@@ -76,7 +51,7 @@ class MemberRepositoryAdapterTest : BaseRepositoryTest() {
 
             val savedMember = memberRepository.save(member)
 
-            assertThat(savedMember.id.value).isEqualTo(member.id.value)
+            assertThat(savedMember.id.value).isNotEqualTo(0L)
             assertThat(savedMember.memberId).isEqualTo(member.memberId)
             assertThat(savedMember.email).isEqualTo(member.email)
             assertThat(savedMember.password).isEqualTo(member.password)
@@ -87,7 +62,12 @@ class MemberRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("기존 회원 정보를 업데이트하고 반환한다")
         fun updateExistingMember() {
-            val member = createTestMember()
+            val member = Member.createSocialMember(
+                profileImage = "profile.png",
+                provider = SocialProvider.GOOGLE,
+                socialId = "socialId123",
+                email = "test@example.com"
+            )
             val savedMember = memberRepository.save(member)
 
             savedMember.updateProfile("newNick", "newProfile.png")
@@ -106,47 +86,56 @@ class MemberRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("존재하는 회원 ID로 조회하면 회원을 반환한다")
         fun findExistingMemberById() {
-            val member = createTestMember()
-            memberRepository.save(member)
+            val member = Member.createSocialMember(
+                profileImage = "profile.png",
+                provider = SocialProvider.GOOGLE,
+                socialId = "socialId123",
+                email = "test@example.com"
+            )
+            val savedMember = memberRepository.save(member)
 
-            val foundMember = memberRepository.findById(MemberId.of(member.id.value))
+            val foundMember = memberRepository.findById(MemberPk.of(savedMember.id.value))
 
             assertThat(foundMember).isNotNull
-            assertThat(foundMember!!.id.value).isEqualTo(member.id.value)
-            assertThat(foundMember.nickname).isEqualTo(member.nickname)
-            assertThat(foundMember.email).isEqualTo(member.email)
+            assertThat(foundMember!!.id.value).isEqualTo(savedMember.id.value)
+            assertThat(foundMember.email).isEqualTo(savedMember.email)
         }
 
         @Test
         @DisplayName("존재하지 않는 회원 ID로 조회하면 null을 반환한다")
         fun findNonExistingMemberById() {
-            val foundMember = memberRepository.findById(MemberId.of("nonExistingId"))
+            val foundMember = memberRepository.findById(MemberPk.of(999999L))
 
             assertThat(foundMember).isNull()
         }
     }
 
     @Nested
-    @DisplayName("findByIdString 메서드는")
-    inner class FindByIdStringMethod {
+    @DisplayName("findByProviderAndSocialId 메서드는")
+    inner class FindByProviderAndSocialIdMethod {
 
         @Test
-        @DisplayName("존재하는 회원 ID 문자열로 조회하면 회원을 반환한다")
-        fun findExistingMemberByIdString() {
-            val member = createTestMember()
+        @DisplayName("존재하는 provider와 socialId로 조회하면 회원을 반환한다")
+        fun findExistingMember() {
+            val member = Member.createSocialMember(
+                profileImage = "profile.png",
+                provider = SocialProvider.GOOGLE,
+                socialId = "google123",
+                email = "test@example.com"
+            )
             memberRepository.save(member)
 
-            val foundMember = memberRepository.findByIdString(member.id.value)
+            val foundMember = memberRepository.findByProviderAndSocialId(SocialProvider.GOOGLE, "google123")
 
             assertThat(foundMember).isNotNull
-            assertThat(foundMember!!.id.value).isEqualTo(member.id.value)
-            assertThat(foundMember.nickname).isEqualTo(member.nickname)
+            assertThat(foundMember!!.provider).isEqualTo(SocialProvider.GOOGLE)
+            assertThat(foundMember.socialId).isEqualTo("google123")
         }
 
         @Test
-        @DisplayName("존재하지 않는 회원 ID 문자열로 조회하면 null을 반환한다")
-        fun findNonExistingMemberByIdString() {
-            val foundMember = memberRepository.findByIdString("nonExistingId")
+        @DisplayName("존재하지 않는 조합으로 조회하면 null을 반환한다")
+        fun findNonExistingMember() {
+            val foundMember = memberRepository.findByProviderAndSocialId(SocialProvider.GOOGLE, "nonExisting")
 
             assertThat(foundMember).isNull()
         }
@@ -159,8 +148,7 @@ class MemberRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("존재하는 닉네임이면 true를 반환한다")
         fun existingNicknameReturnsTrue() {
-            val member = createTestMember(nickname = "uniqueNick")
-            memberRepository.save(member)
+            val jpaEntity = createAndSaveMember(nickname = "uniqueNick")
 
             val exists = memberRepository.existsByNickname("uniqueNick")
 
@@ -183,8 +171,7 @@ class MemberRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("존재하는 이메일이면 true를 반환한다")
         fun existingEmailReturnsTrue() {
-            val member = createTestMember(email = "unique@example.com")
-            memberRepository.save(member)
+            createAndSaveMember(email = "unique@example.com")
 
             val exists = memberRepository.existsByEmail("unique@example.com")
 
@@ -207,14 +194,13 @@ class MemberRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("존재하는 이메일로 조회하면 회원을 반환한다")
         fun findExistingMemberByEmail() {
-            val member = createTestMember(email = "search@example.com")
-            memberRepository.save(member)
+            createAndSaveMember(email = "search@example.com", nickname = "testNick")
 
             val foundMember = memberRepository.findByEmail("search@example.com")
 
             assertThat(foundMember).isNotNull
             assertThat(foundMember!!.email).isEqualTo("search@example.com")
-            assertThat(foundMember.nickname).isEqualTo(member.nickname)
+            assertThat(foundMember.nickname).isEqualTo("testNick")
         }
 
         @Test
@@ -233,8 +219,7 @@ class MemberRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("존재하는 memberId이면 true를 반환한다")
         fun existingMemberIdReturnsTrue() {
-            val member = createTestMember(memberId = "uniqueMemId")
-            memberRepository.save(member)
+            createAndSaveMember(memberId = "uniqueMemId")
 
             val exists = memberRepository.existsByMemberId("uniqueMemId")
 
@@ -257,14 +242,13 @@ class MemberRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("존재하는 memberId로 조회하면 회원을 반환한다")
         fun findExistingMemberByMemberId() {
-            val member = createTestMember(memberId = "searchMemId")
-            memberRepository.save(member)
+            createAndSaveMember(memberId = "searchMemId", nickname = "testNick")
 
             val foundMember = memberRepository.findByMemberId("searchMemId")
 
             assertThat(foundMember).isNotNull
             assertThat(foundMember!!.memberId).isEqualTo("searchMemId")
-            assertThat(foundMember.nickname).isEqualTo(member.nickname)
+            assertThat(foundMember.nickname).isEqualTo("testNick")
         }
 
         @Test

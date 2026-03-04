@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable
 
 interface SaveFanNotePort {
     fun save(saveFanNote: SaveFanNoteEntity): SaveFanNoteEntity
-    fun existsByMemberIdAndFanNoteId(memberId: String, fanNoteId: Long): Boolean
-    fun findByMemberId(memberId: String, pageable: Pageable): Page<SaveFanNoteResult>
-    fun deleteByMemberIdAndFanNoteId(memberId: String, fanNoteId: Long)
+    fun existsByMemberIdAndFanNoteId(memberId: Long, fanNoteId: Long): Boolean
+    fun findByMemberId(memberId: Long, pageable: Pageable): Page<SaveFanNoteResult>
+    fun deleteByMemberIdAndFanNoteId(memberId: Long, fanNoteId: Long)
 }

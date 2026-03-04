@@ -5,16 +5,16 @@ import java.time.LocalDateTime
 
 class MemberBlock private constructor(
     val id: MemberBlockId?,
-    val blockerId: String,
-    val blockedId: String,
+    val blockerId: Long,
+    val blockedId: Long,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 ) {
 
     companion object {
         fun create(
-            blockerId: String,
-            blockedId: String
+            blockerId: Long,
+            blockedId: Long
         ): MemberBlock {
             val now = LocalDateTime.now()
             return MemberBlock(
@@ -28,8 +28,8 @@ class MemberBlock private constructor(
 
         fun reconstitute(
             id: MemberBlockId,
-            blockerId: String,
-            blockedId: String,
+            blockerId: Long,
+            blockedId: Long,
             createdAt: LocalDateTime,
             updatedAt: LocalDateTime
         ): MemberBlock {

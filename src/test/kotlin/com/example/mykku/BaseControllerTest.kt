@@ -45,8 +45,7 @@ abstract class BaseControllerTest {
     }
 
     protected fun createAndSaveMember(
-        id: String = "testMember",
-        memberId: String? = null,
+        memberId: String? = "testmember",
         nickname: String = "테스트유저",
         email: String = "test@example.com",
         socialId: String = "12345",
@@ -55,8 +54,7 @@ abstract class BaseControllerTest {
         profileImage: String = ""
     ): MemberJpaEntity {
         val member = MemberJpaEntity(
-            id = id,
-            memberId = memberId ?: id,
+            memberId = memberId,
             nickname = nickname,
             email = email,
             socialId = socialId,
@@ -78,18 +76,12 @@ abstract class BaseControllerTest {
         return boardJpaRepository.save(board)
     }
 
-    /**
-     * 테스트용 인증 토큰 생성 (Bearer 형식)
-     */
-    protected fun getBearerToken(memberId: String): String {
-        return TestTokenGenerator.getBearerToken(memberId)
+    protected fun getBearerToken(memberPk: Long): String {
+        return TestTokenGenerator.getBearerToken(memberPk)
     }
 
-    /**
-     * 테스트용 인증 헤더 생성
-     */
-    protected fun createAuthHeaders(memberId: String): Map<String, String> {
-        return TestTokenGenerator.createAuthHeaders(memberId)
+    protected fun createAuthHeaders(memberPk: Long): Map<String, String> {
+        return TestTokenGenerator.createAuthHeaders(memberPk)
     }
 
     /**

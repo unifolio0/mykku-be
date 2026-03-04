@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 class DailyMessageComment private constructor(
     val id: DailyMessageCommentId,
     val dailyMessageId: Long,
-    val memberId: String?,
+    val memberId: Long?,
     val memberNickname: String?,
     val memberProfileImage: String?,
     val content: String,
@@ -21,7 +21,7 @@ class DailyMessageComment private constructor(
 
         fun create(
             dailyMessageId: Long,
-            memberId: String,
+            memberId: Long,
             memberNickname: String?,
             memberProfileImage: String,
             content: String,
@@ -46,7 +46,7 @@ class DailyMessageComment private constructor(
         fun reconstitute(
             id: DailyMessageCommentId,
             dailyMessageId: Long,
-            memberId: String?,
+            memberId: Long?,
             memberNickname: String?,
             memberProfileImage: String?,
             content: String,
@@ -92,7 +92,7 @@ class DailyMessageComment private constructor(
         )
     }
 
-    fun isOwnedBy(memberId: String): Boolean {
+    fun isOwnedBy(memberId: Long): Boolean {
         return this.memberId == memberId
     }
 }

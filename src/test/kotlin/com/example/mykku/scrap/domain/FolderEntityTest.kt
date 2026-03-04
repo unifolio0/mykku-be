@@ -18,13 +18,13 @@ class FolderEntityTest {
         @DisplayName("description과 함께 폴더를 생성한다")
         fun `폴더 생성 - description 포함`() {
             val folder = FolderEntity.create(
-                memberId = "member1",
+                memberId = 1L,
                 name = "테스트 폴더",
                 description = "테스트 설명"
             )
 
             assertThat(folder.id).isNull()
-            assertThat(folder.memberId).isEqualTo("member1")
+            assertThat(folder.memberId).isEqualTo(1L)
             assertThat(folder.name).isEqualTo("테스트 폴더")
             assertThat(folder.description).isEqualTo("테스트 설명")
         }
@@ -33,13 +33,13 @@ class FolderEntityTest {
         @DisplayName("description 없이 폴더를 생성한다")
         fun `폴더 생성 - description 없음`() {
             val folder = FolderEntity.create(
-                memberId = "member1",
+                memberId = 1L,
                 name = "테스트 폴더",
                 description = null
             )
 
             assertThat(folder.id).isNull()
-            assertThat(folder.memberId).isEqualTo("member1")
+            assertThat(folder.memberId).isEqualTo(1L)
             assertThat(folder.name).isEqualTo("테스트 폴더")
             assertThat(folder.description).isNull()
         }
@@ -48,7 +48,7 @@ class FolderEntityTest {
         @DisplayName("폴더 생성시 createdAt과 updatedAt이 설정된다")
         fun `폴더 생성 - 시간 설정 검증`() {
             val folder = FolderEntity.create(
-                memberId = "member1",
+                memberId = 1L,
                 name = "테스트 폴더",
                 description = null
             )
@@ -122,7 +122,7 @@ class FolderEntityTest {
 
             val folder = FolderEntity.reconstitute(
                 id = 1L,
-                memberId = "member1",
+                memberId = 1L,
                 name = "복원 폴더",
                 description = "복원 설명",
                 createdAt = createdAt,
@@ -130,7 +130,7 @@ class FolderEntityTest {
             )
 
             assertThat(folder.id?.value).isEqualTo(1L)
-            assertThat(folder.memberId).isEqualTo("member1")
+            assertThat(folder.memberId).isEqualTo(1L)
             assertThat(folder.name).isEqualTo("복원 폴더")
             assertThat(folder.description).isEqualTo("복원 설명")
             assertThat(folder.createdAt).isEqualTo(createdAt)
@@ -144,7 +144,7 @@ class FolderEntityTest {
 
             val folder = FolderEntity.reconstitute(
                 id = 1L,
-                memberId = "member1",
+                memberId = 1L,
                 name = "복원 폴더",
                 description = null,
                 createdAt = now,
@@ -158,7 +158,7 @@ class FolderEntityTest {
 
     private fun createFolder(): FolderEntity {
         return FolderEntity.create(
-            memberId = "member1",
+            memberId = 1L,
             name = "테스트 폴더",
             description = "테스트 설명"
         )

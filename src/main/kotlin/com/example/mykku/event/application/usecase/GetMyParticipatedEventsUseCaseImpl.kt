@@ -17,7 +17,7 @@ class GetMyParticipatedEventsUseCaseImpl(
 ) : GetMyParticipatedEventsUseCase {
 
     @Transactional(readOnly = true)
-    override fun execute(memberId: String, page: Int, size: Int): PagedEventsResult {
+    override fun execute(memberId: Long, page: Int, size: Int): PagedEventsResult {
         val pageable = PageableValidator.validateAndCreate(page, size)
 
         val eventPage = eventParticipationRepository.findEventsByMemberId(memberId, pageable)

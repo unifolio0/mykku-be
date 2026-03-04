@@ -31,15 +31,15 @@ class FolderPersistenceAdapter(
         return folderJpaRepository.save(jpaEntity).toDomain()
     }
 
-    override fun findByMemberIdAndId(memberId: String, id: Long): FolderEntity? {
+    override fun findByMemberIdAndId(memberId: Long, id: Long): FolderEntity? {
         return folderJpaRepository.findByMemberIdAndId(memberId, id)?.toDomain()
     }
 
-    override fun findByMemberId(memberId: String): List<FolderEntity> {
+    override fun findByMemberId(memberId: Long): List<FolderEntity> {
         return folderJpaRepository.findByMemberId(memberId).map { it.toDomain() }
     }
 
-    override fun existsByMemberIdAndName(memberId: String, name: String): Boolean {
+    override fun existsByMemberIdAndName(memberId: Long, name: String): Boolean {
         return folderJpaRepository.existsByMemberIdAndName(memberId, name)
     }
 

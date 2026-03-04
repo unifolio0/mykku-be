@@ -9,7 +9,6 @@ import com.example.mykku.email.tool.RedisVerificationCodeManager
 import com.example.mykku.email.util.TemporaryPasswordGenerator
 import com.example.mykku.member.domain.entity.Member
 import com.example.mykku.member.application.port.output.MemberRepository
-import java.util.UUID
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -61,17 +60,15 @@ class EmailAuthService(
         }
 
         val encodedPassword = passwordEncoder.encode(password)
-        val id = UUID.randomUUID().toString()
 
         val member = Member.createEmailMember(
-            id = id,
             email = email,
             password = encodedPassword
         )
 
-        memberRepository.save(member)
+        val savedMember = memberRepository.save(member)
 
-        val result = jwtTokenProvider.createLoginResult(member, email, false)
+        val result = jwtTokenProvider.createLoginResult(savedMember, email, false)
         return LoginResponse.from(result)
     }
 

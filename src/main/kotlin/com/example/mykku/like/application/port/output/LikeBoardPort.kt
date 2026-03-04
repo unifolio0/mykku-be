@@ -7,8 +7,8 @@ import org.springframework.data.domain.Pageable
 
 interface LikeBoardPort {
     fun save(likeBoard: LikeBoardEntity): LikeBoardEntity
-    fun existsByMemberIdAndBoardId(memberId: String, boardId: Long): Boolean
-    fun deleteByMemberIdAndBoardId(memberId: String, boardId: Long)
-    fun findAllByMemberId(memberId: String): List<LikeBoardEntity>
-    fun findAllByMemberIdWithBoardInfo(memberId: String, pageable: Pageable): Page<LikeBoardInfoResult>
+    fun existsByMemberIdAndBoardId(memberId: Long, boardId: Long): Boolean
+    fun deleteByMemberIdAndBoardId(memberId: Long, boardId: Long)
+    fun findAllByMemberId(memberId: Long): List<LikeBoardEntity>
+    fun findAllByMemberIdWithBoardInfo(memberId: Long, pageable: Pageable): Page<LikeBoardInfoResult>
 }

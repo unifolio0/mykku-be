@@ -77,7 +77,7 @@ class AdminRoleApiController(
     @PostMapping("/{roleId}/members/{memberId}")
     fun assignRoleToMember(
         @PathVariable roleId: Long,
-        @PathVariable memberId: String
+        @PathVariable memberId: Long
     ): ResponseEntity<ApiResponse<MemberRoleResponse>> {
         val memberRole = adminRoleService.assignRoleToMember(roleId, memberId)
         return ResponseEntity.status(HttpStatus.CREATED).body(

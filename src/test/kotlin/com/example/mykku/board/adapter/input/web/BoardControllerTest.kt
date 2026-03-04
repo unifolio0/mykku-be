@@ -55,7 +55,6 @@ class BoardControllerTest : BaseControllerTest() {
     fun `getFeedsByBoard - 정상적으로 보드별 피드 목록을 조회한다`() {
         val member = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member1",
                 memberId = "testmemberid1",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
@@ -107,7 +106,6 @@ class BoardControllerTest : BaseControllerTest() {
     fun `getPopularFeedsByBoard - 정상적으로 인기 피드 목록을 조회한다`() {
         val member = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member1",
                 memberId = "testmemberid2",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,

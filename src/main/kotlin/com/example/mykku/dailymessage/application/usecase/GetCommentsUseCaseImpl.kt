@@ -19,7 +19,7 @@ class GetCommentsUseCaseImpl(
     private val dailyMessageCommentRepository: DailyMessageCommentRepository
 ) : GetCommentsUseCase {
 
-    override fun execute(dailyMessageId: Long, memberId: String?, pageable: Pageable): DailyMessageCommentsResult {
+    override fun execute(dailyMessageId: Long, memberId: Long?, pageable: Pageable): DailyMessageCommentsResult {
         val id = DailyMessageId.of(dailyMessageId)
 
         dailyMessageRepository.findById(id)

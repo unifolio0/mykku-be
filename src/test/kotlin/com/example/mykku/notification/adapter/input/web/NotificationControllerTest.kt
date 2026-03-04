@@ -39,8 +39,8 @@ class NotificationControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("알림 목록 조회 - 정상 케이스")
     fun `getNotifications - 정상적으로 알림 목록을 조회한다`() {
-        val sender = createAndSaveMember(id = "sender1", nickname = "Sender")
-        val receiver = createAndSaveMember(id = "receiver1", nickname = "Receiver")
+        val sender = createAndSaveMember(memberId = "sender", nickname = "Sender", email = "sender@example.com", socialId = "sender1")
+        val receiver = createAndSaveMember(memberId = "receiver", nickname = "Receiver", email = "receiver@example.com", socialId = "receiver1")
 
         createNotification(
             type = NotificationType.FEED_LIKE,
@@ -55,7 +55,7 @@ class NotificationControllerTest : BaseControllerTest() {
             content = "sender1님이 회원님의 피드에 댓글을 남겼습니다"
         )
 
-        val authHeader = TestTokenGenerator.getBearerToken("receiver1")
+        val authHeader = TestTokenGenerator.getBearerToken(receiver.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -72,8 +72,8 @@ class NotificationControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("알림 목록 조회 - 카테고리 필터링")
     fun `getNotifications - 카테고리로 필터링하여 조회한다`() {
-        val sender = createAndSaveMember(id = "sender1", nickname = "Sender")
-        val receiver = createAndSaveMember(id = "receiver1", nickname = "Receiver")
+        val sender = createAndSaveMember(memberId = "sender", nickname = "Sender", email = "sender@example.com", socialId = "sender1")
+        val receiver = createAndSaveMember(memberId = "receiver", nickname = "Receiver", email = "receiver@example.com", socialId = "receiver1")
 
         createNotification(
             type = NotificationType.FEED_LIKE,
@@ -88,7 +88,7 @@ class NotificationControllerTest : BaseControllerTest() {
             content = "시스템 공지사항"
         )
 
-        val authHeader = TestTokenGenerator.getBearerToken("receiver1")
+        val authHeader = TestTokenGenerator.getBearerToken(receiver.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -122,8 +122,8 @@ class NotificationControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("읽지 않은 알림 목록 조회 - 정상 케이스")
     fun `getUnreadNotifications - 읽지 않은 알림만 조회한다`() {
-        val sender = createAndSaveMember(id = "sender1")
-        val receiver = createAndSaveMember(id = "receiver1")
+        val sender = createAndSaveMember(memberId = "sender", email = "sender@example.com", socialId = "sender1")
+        val receiver = createAndSaveMember(memberId = "receiver", email = "receiver@example.com", socialId = "receiver1")
 
         val readNotification = NotificationJpaEntity(
             type = NotificationType.FEED_LIKE,
@@ -141,7 +141,7 @@ class NotificationControllerTest : BaseControllerTest() {
             content = "읽지 않은 알림"
         )
 
-        val authHeader = TestTokenGenerator.getBearerToken("receiver1")
+        val authHeader = TestTokenGenerator.getBearerToken(receiver.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -156,8 +156,8 @@ class NotificationControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("읽지 않은 알림 개수 조회 - 정상 케이스")
     fun `getUnreadCount - 읽지 않은 알림 개수를 조회한다`() {
-        val sender = createAndSaveMember(id = "sender1")
-        val receiver = createAndSaveMember(id = "receiver1")
+        val sender = createAndSaveMember(memberId = "sender", email = "sender@example.com", socialId = "sender1")
+        val receiver = createAndSaveMember(memberId = "receiver", email = "receiver@example.com", socialId = "receiver1")
 
         createNotification(
             type = NotificationType.FEED_LIKE,
@@ -172,7 +172,7 @@ class NotificationControllerTest : BaseControllerTest() {
             content = "알림2"
         )
 
-        val authHeader = TestTokenGenerator.getBearerToken("receiver1")
+        val authHeader = TestTokenGenerator.getBearerToken(receiver.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -187,8 +187,8 @@ class NotificationControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("알림 읽음 처리 - 정상 케이스")
     fun `markAsRead - 알림을 읽음 처리한다`() {
-        val sender = createAndSaveMember(id = "sender1")
-        val receiver = createAndSaveMember(id = "receiver1")
+        val sender = createAndSaveMember(memberId = "sender", email = "sender@example.com", socialId = "sender1")
+        val receiver = createAndSaveMember(memberId = "receiver", email = "receiver@example.com", socialId = "receiver1")
 
         val notification = createNotification(
             type = NotificationType.FEED_LIKE,
@@ -197,7 +197,7 @@ class NotificationControllerTest : BaseControllerTest() {
             content = "알림"
         )
 
-        val authHeader = TestTokenGenerator.getBearerToken("receiver1")
+        val authHeader = TestTokenGenerator.getBearerToken(receiver.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -214,9 +214,9 @@ class NotificationControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("알림 읽음 처리 - 권한 없음")
     fun `markAsRead - 다른 사용자의 알림은 읽음 처리할 수 없다`() {
-        val sender = createAndSaveMember(id = "sender1")
-        val receiver = createAndSaveMember(id = "receiver1")
-        createAndSaveMember(id = "other")
+        val sender = createAndSaveMember(memberId = "sender", email = "sender@example.com", socialId = "sender1")
+        val receiver = createAndSaveMember(memberId = "receiver", email = "receiver@example.com", socialId = "receiver1")
+        val other = createAndSaveMember(memberId = "other", email = "other@example.com", socialId = "other")
 
         val notification = createNotification(
             type = NotificationType.FEED_LIKE,
@@ -225,7 +225,7 @@ class NotificationControllerTest : BaseControllerTest() {
             content = "알림"
         )
 
-        val authHeader = TestTokenGenerator.getBearerToken("other")
+        val authHeader = TestTokenGenerator.getBearerToken(other.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -238,8 +238,8 @@ class NotificationControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("모든 알림 읽음 처리 - 정상 케이스")
     fun `markAllAsRead - 모든 읽지 않은 알림을 읽음 처리한다`() {
-        val sender = createAndSaveMember(id = "sender1")
-        val receiver = createAndSaveMember(id = "receiver1")
+        val sender = createAndSaveMember(memberId = "sender", email = "sender@example.com", socialId = "sender1")
+        val receiver = createAndSaveMember(memberId = "receiver", email = "receiver@example.com", socialId = "receiver1")
 
         createNotification(
             type = NotificationType.FEED_LIKE,
@@ -254,7 +254,7 @@ class NotificationControllerTest : BaseControllerTest() {
             content = "알림2"
         )
 
-        val authHeader = TestTokenGenerator.getBearerToken("receiver1")
+        val authHeader = TestTokenGenerator.getBearerToken(receiver.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -271,8 +271,8 @@ class NotificationControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("카테고리별 전체 읽음 처리 - 정상 케이스")
     fun `markAllAsRead - 카테고리별로 읽음 처리한다`() {
-        val sender = createAndSaveMember(id = "sender1")
-        val receiver = createAndSaveMember(id = "receiver1")
+        val sender = createAndSaveMember(memberId = "sender", email = "sender@example.com", socialId = "sender1")
+        val receiver = createAndSaveMember(memberId = "receiver", email = "receiver@example.com", socialId = "receiver1")
 
         createNotification(
             type = NotificationType.FEED_LIKE,
@@ -287,7 +287,7 @@ class NotificationControllerTest : BaseControllerTest() {
             content = "시스템 공지"
         )
 
-        val authHeader = TestTokenGenerator.getBearerToken("receiver1")
+        val authHeader = TestTokenGenerator.getBearerToken(receiver.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -315,8 +315,8 @@ class NotificationControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("알림 삭제 - 정상 케이스")
     fun `deleteNotification - 알림을 삭제한다`() {
-        val sender = createAndSaveMember(id = "sender1")
-        val receiver = createAndSaveMember(id = "receiver1")
+        val sender = createAndSaveMember(memberId = "sender", email = "sender@example.com", socialId = "sender1")
+        val receiver = createAndSaveMember(memberId = "receiver", email = "receiver@example.com", socialId = "receiver1")
 
         val notification = createNotification(
             type = NotificationType.FEED_LIKE,
@@ -325,7 +325,7 @@ class NotificationControllerTest : BaseControllerTest() {
             content = "알림"
         )
 
-        val authHeader = TestTokenGenerator.getBearerToken("receiver1")
+        val authHeader = TestTokenGenerator.getBearerToken(receiver.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -341,9 +341,9 @@ class NotificationControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("알림 삭제 - 권한 없음")
     fun `deleteNotification - 다른 사용자의 알림은 삭제할 수 없다`() {
-        val sender = createAndSaveMember(id = "sender1")
-        val receiver = createAndSaveMember(id = "receiver1")
-        createAndSaveMember(id = "other")
+        val sender = createAndSaveMember(memberId = "sender", email = "sender@example.com", socialId = "sender1")
+        val receiver = createAndSaveMember(memberId = "receiver", email = "receiver@example.com", socialId = "receiver1")
+        val other = createAndSaveMember(memberId = "other", email = "other@example.com", socialId = "other")
 
         val notification = createNotification(
             type = NotificationType.FEED_LIKE,
@@ -352,7 +352,7 @@ class NotificationControllerTest : BaseControllerTest() {
             content = "알림"
         )
 
-        val authHeader = TestTokenGenerator.getBearerToken("other")
+        val authHeader = TestTokenGenerator.getBearerToken(other.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)

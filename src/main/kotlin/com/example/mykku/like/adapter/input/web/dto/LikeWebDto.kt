@@ -8,7 +8,7 @@ import com.example.mykku.like.application.dto.LikeFeedResult
 
 data class LikeFeedWebResponse(
     val id: Long,
-    val memberId: String,
+    val memberId: Long,
     val feedId: Long
 ) {
     companion object {
@@ -24,7 +24,7 @@ data class LikeFeedWebResponse(
 
 data class LikeFeedCommentWebResponse(
     val id: Long,
-    val memberId: String,
+    val memberId: Long,
     val feedCommentId: Long
 ) {
     companion object {
@@ -40,7 +40,7 @@ data class LikeFeedCommentWebResponse(
 
 data class LikeBoardWebResponse(
     val id: Long,
-    val memberId: String,
+    val memberId: Long,
     val boardId: Long
 ) {
     companion object {
@@ -72,7 +72,7 @@ data class LikeBoardInfoWebResponse(
 
 data class LikeDailyMessageCommentWebResponse(
     val id: Long,
-    val memberId: String,
+    val memberId: Long,
     val dailyMessageCommentId: Long
 ) {
     companion object {

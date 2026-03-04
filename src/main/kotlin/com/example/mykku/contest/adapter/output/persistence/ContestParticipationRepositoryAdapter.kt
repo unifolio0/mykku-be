@@ -28,8 +28,8 @@ class ContestParticipationRepositoryAdapter(
     override fun save(participation: ContestParticipation): ContestParticipation {
         val contestJpaEntity = contestJpaRepository.findById(participation.contestId.value)
             .orElseThrow { ContestException.contestNotFound() }
-        val memberJpaEntity = memberJpaRepository.findByMemberId(participation.memberId!!)
-            ?: throw MemberException.memberNotFound()
+        val memberJpaEntity = memberJpaRepository.findById(participation.memberId!!)
+            .orElseThrow { MemberException.memberNotFound() }
         val feedJpaEntity = feedJpaRepository.findById(participation.feedId)
             .orElseThrow { FeedException.feedNotFound() }
 
@@ -71,18 +71,18 @@ class ContestParticipationRepositoryAdapter(
             .map { it.toDomain() }
     }
 
-    override fun findContestsByMemberId(memberId: String, pageable: Pageable): Page<Contest> {
-        val memberJpaEntity = memberJpaRepository.findByMemberId(memberId)
+    override fun findContestsByMemberId(memberId: Long, pageable: Pageable): Page<Contest> {
+        val memberJpaEntity = memberJpaRepository.findById(memberId).orElse(null)
             ?: return Page.empty(pageable)
 
         return contestParticipationJpaRepository.findContestsByMember(memberJpaEntity, pageable)
             .map { it.toDomain() }
     }
 
-    override fun findByMemberIdAndContestIds(memberId: String, contestIds: List<ContestId>): List<ContestParticipation> {
+    override fun findByMemberIdAndContestIds(memberId: Long, contestIds: List<ContestId>): List<ContestParticipation> {
         if (contestIds.isEmpty()) return emptyList()
 
-        val memberJpaEntity = memberJpaRepository.findByMemberId(memberId)
+        val memberJpaEntity = memberJpaRepository.findById(memberId).orElse(null)
             ?: return emptyList()
 
         val contestJpaEntities = contestJpaRepository.findAllById(contestIds.map { it.value })
@@ -92,8 +92,8 @@ class ContestParticipationRepositoryAdapter(
             .map { it.toDomain() }
     }
 
-    override fun existsByMemberIdAndContestId(memberId: String, contestId: ContestId): Boolean {
-        val memberJpaEntity = memberJpaRepository.findByMemberId(memberId)
+    override fun existsByMemberIdAndContestId(memberId: Long, contestId: ContestId): Boolean {
+        val memberJpaEntity = memberJpaRepository.findById(memberId).orElse(null)
             ?: return false
 
         val contestJpaEntity = contestJpaRepository.findById(contestId.value).orElse(null)
@@ -102,8 +102,8 @@ class ContestParticipationRepositoryAdapter(
         return contestParticipationJpaRepository.existsByMemberAndContest(memberJpaEntity, contestJpaEntity)
     }
 
-    override fun existsByMemberIdAndContestIdAndFeedId(memberId: String, contestId: ContestId, feedId: Long): Boolean {
-        val memberJpaEntity = memberJpaRepository.findByMemberId(memberId)
+    override fun existsByMemberIdAndContestIdAndFeedId(memberId: Long, contestId: ContestId, feedId: Long): Boolean {
+        val memberJpaEntity = memberJpaRepository.findById(memberId).orElse(null)
             ?: return false
 
         val contestJpaEntity = contestJpaRepository.findById(contestId.value).orElse(null)

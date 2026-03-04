@@ -4,6 +4,6 @@ import org.springframework.data.domain.Pageable
 
 data class GetFeedCommentsQuery(
     val feedId: Long,
-    val memberId: String?,
+    val memberId: Long?,
     val pageable: Pageable
 )

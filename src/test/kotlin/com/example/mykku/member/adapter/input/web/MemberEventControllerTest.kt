@@ -26,8 +26,8 @@ class MemberEventControllerTest : BaseControllerTest() {
     @DisplayName("내가 참여한 이벤트 목록 조회 - 정상 케이스")
     fun `getMyParticipatedEvents - 참여한 이벤트 목록을 조회한다`() {
         // given
-        val member = createAndSaveMember(id = "member1")
-        val authHeader = getBearerToken("member1")
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
 
         val event1 = eventJpaRepository.save(
             EventJpaEntity(
@@ -67,8 +67,8 @@ class MemberEventControllerTest : BaseControllerTest() {
     @DisplayName("내가 참여한 이벤트 목록 조회 - 참여한 이벤트가 없는 경우")
     fun `getMyParticipatedEvents - 참여한 이벤트가 없으면 빈 목록을 반환한다`() {
         // given
-        val member = createAndSaveMember(id = "member1")
-        val authHeader = getBearerToken("member1")
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
 
         // when & then
         RestAssured.given()
@@ -88,8 +88,8 @@ class MemberEventControllerTest : BaseControllerTest() {
     @DisplayName("내가 참여한 이벤트 목록 조회 - 페이지네이션 동작 확인")
     fun `getMyParticipatedEvents - 페이지네이션이 정상 동작한다`() {
         // given
-        val member = createAndSaveMember(id = "member1")
-        val authHeader = getBearerToken("member1")
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
 
         repeat(5) { index ->
             val event = eventJpaRepository.save(

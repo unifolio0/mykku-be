@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 
 class KeywordBlock private constructor(
     val id: KeywordBlockId?,
-    val memberId: String,
+    val memberId: Long,
     val keyword: String,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
@@ -16,7 +16,7 @@ class KeywordBlock private constructor(
         const val MAX_KEYWORD_COUNT = 100
 
         fun create(
-            memberId: String,
+            memberId: Long,
             keyword: String
         ): KeywordBlock {
             require(keyword.length <= KEYWORD_MAX_LENGTH) {
@@ -35,7 +35,7 @@ class KeywordBlock private constructor(
 
         fun reconstitute(
             id: KeywordBlockId,
-            memberId: String,
+            memberId: Long,
             keyword: String,
             createdAt: LocalDateTime,
             updatedAt: LocalDateTime

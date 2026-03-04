@@ -29,15 +29,15 @@ class GenrePreferenceRepositoryAdapter(
         return jpaRepository.saveAll(entities).map { it.toDomain() }
     }
 
-    override fun findByMemberId(memberId: String): List<MemberGenrePreference> {
+    override fun findByMemberId(memberId: Long): List<MemberGenrePreference> {
         return jpaRepository.findByMemberId(memberId).map { it.toDomain() }
     }
 
-    override fun deleteByMemberId(memberId: String) {
+    override fun deleteByMemberId(memberId: Long) {
         jpaRepository.deleteByMemberId(memberId)
     }
 
-    override fun existsByMemberIdAndGenreType(memberId: String, genreType: GenreType): Boolean {
+    override fun existsByMemberIdAndGenreType(memberId: Long, genreType: GenreType): Boolean {
         return jpaRepository.existsByMemberIdAndGenreType(memberId, genreType)
     }
 }

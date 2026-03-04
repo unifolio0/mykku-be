@@ -1,12 +1,12 @@
 package com.example.mykku.member.domain.entity
 
-import com.example.mykku.member.domain.vo.MemberId
+import com.example.mykku.member.domain.vo.MemberPk
 import com.example.mykku.member.domain.vo.SocialProvider
 import com.example.mykku.member.exception.MemberException
 import java.time.LocalDateTime
 
 class Member private constructor(
-    val id: MemberId,
+    val id: MemberPk,
     var memberId: String?,
     var nickname: String?,
     var roleId: Long?,
@@ -42,14 +42,13 @@ class Member private constructor(
         }
 
         fun createEmailMember(
-            id: String,
             email: String,
             password: String,
             profileImage: String = ""
         ): Member {
             val now = LocalDateTime.now()
             return Member(
-                id = MemberId.of(id),
+                id = MemberPk(0),
                 memberId = null,
                 nickname = null,
                 roleId = null,
@@ -65,7 +64,6 @@ class Member private constructor(
         }
 
         fun createSocialMember(
-            id: String,
             profileImage: String,
             provider: SocialProvider,
             socialId: String,
@@ -73,7 +71,7 @@ class Member private constructor(
         ): Member {
             val now = LocalDateTime.now()
             return Member(
-                id = MemberId.of(id),
+                id = MemberPk(0),
                 memberId = null,
                 nickname = null,
                 roleId = null,
@@ -89,7 +87,7 @@ class Member private constructor(
         }
 
         fun reconstitute(
-            id: String,
+            id: Long,
             memberId: String?,
             nickname: String?,
             roleId: Long?,
@@ -103,7 +101,7 @@ class Member private constructor(
             updatedAt: LocalDateTime
         ): Member {
             return Member(
-                id = MemberId.of(id),
+                id = MemberPk.of(id),
                 memberId = memberId,
                 nickname = nickname,
                 roleId = roleId,

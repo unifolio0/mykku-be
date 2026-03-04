@@ -19,12 +19,12 @@ class NotificationSettingRepositoryAdapterTest : BaseRepositoryTest() {
     @Autowired
     private lateinit var notificationSettingRepository: NotificationSettingRepository
 
-    private lateinit var memberId: String
+    private var memberId: Long = 0
 
     @BeforeEach
     fun setUp() {
         val member = createAndSaveMember(
-            id = "member1",
+            memberId = "ns_member",
             nickname = "테스트유저",
             email = "test@example.com",
             socialId = "test123"
@@ -151,7 +151,7 @@ class NotificationSettingRepositoryAdapterTest : BaseRepositoryTest() {
         fun `회원별 조회 - 다른 회원`() {
             notificationSettingRepository.save(createNotificationSetting())
             val otherMember = createAndSaveMember(
-                id = "other",
+                memberId = "ns_other",
                 nickname = "다른유저",
                 email = "other@example.com",
                 socialId = "other123"
@@ -208,7 +208,7 @@ class NotificationSettingRepositoryAdapterTest : BaseRepositoryTest() {
         fun `회원ID_타입으로 조회 - 다른 회원`() {
             notificationSettingRepository.save(createNotificationSetting())
             val otherMember = createAndSaveMember(
-                id = "other",
+                memberId = "ns_other",
                 nickname = "다른유저",
                 email = "other@example.com",
                 socialId = "other123"
@@ -274,7 +274,7 @@ class NotificationSettingRepositoryAdapterTest : BaseRepositoryTest() {
         fun `존재 여부 확인 - 다른 회원`() {
             notificationSettingRepository.save(createNotificationSetting())
             val otherMember = createAndSaveMember(
-                id = "other",
+                memberId = "ns_other",
                 nickname = "다른유저",
                 email = "other@example.com",
                 socialId = "other123"
@@ -329,7 +329,7 @@ class NotificationSettingRepositoryAdapterTest : BaseRepositoryTest() {
         @DisplayName("다른 회원의 설정은 삭제되지 않는다")
         fun `회원별 전체 삭제 - 다른 회원`() {
             val otherMember = createAndSaveMember(
-                id = "other",
+                memberId = "ns_other",
                 nickname = "다른유저",
                 email = "other@example.com",
                 socialId = "other123"

@@ -30,11 +30,11 @@ class SaveEventPersistenceAdapter(
         return saveEventJpaRepository.save(jpaEntity).toDomain()
     }
 
-    override fun existsByMemberIdAndEventId(memberId: String, eventId: Long): Boolean {
+    override fun existsByMemberIdAndEventId(memberId: Long, eventId: Long): Boolean {
         return saveEventJpaRepository.existsByMemberIdAndEventId(memberId, eventId)
     }
 
-    override fun findByMemberId(memberId: String, pageable: Pageable): Page<SaveEventResult> {
+    override fun findByMemberId(memberId: Long, pageable: Pageable): Page<SaveEventResult> {
         return saveEventJpaRepository.findByMemberId(memberId, pageable)
             .map { jpaEntity ->
                 SaveEventResult(
@@ -44,11 +44,11 @@ class SaveEventPersistenceAdapter(
             }
     }
 
-    override fun deleteByMemberIdAndEventId(memberId: String, eventId: Long) {
+    override fun deleteByMemberIdAndEventId(memberId: Long, eventId: Long) {
         saveEventJpaRepository.deleteByMemberIdAndEventId(memberId, eventId)
     }
 
-    override fun findByMemberIdAndEventIdIn(memberId: String, eventIds: List<Long>): List<SaveEventEntity> {
+    override fun findByMemberIdAndEventIdIn(memberId: Long, eventIds: List<Long>): List<SaveEventEntity> {
         return saveEventJpaRepository.findByMemberIdAndEventIdIn(memberId, eventIds)
             .map { it.toDomain() }
     }

@@ -18,12 +18,12 @@ class SaveDailyMessageEntityTest {
         @DisplayName("데일리 메시지 스크랩을 생성한다")
         fun `데일리 메시지 스크랩 생성 - 정상 케이스`() {
             val saveDailyMessage = SaveDailyMessageEntity.create(
-                memberId = "member1",
+                memberId = 1L,
                 dailyMessageId = 1L
             )
 
             assertThat(saveDailyMessage.id).isNull()
-            assertThat(saveDailyMessage.memberId).isEqualTo("member1")
+            assertThat(saveDailyMessage.memberId).isEqualTo(1L)
             assertThat(saveDailyMessage.dailyMessageId).isEqualTo(1L)
         }
 
@@ -31,7 +31,7 @@ class SaveDailyMessageEntityTest {
         @DisplayName("데일리 메시지 스크랩 생성시 createdAt과 updatedAt이 설정된다")
         fun `데일리 메시지 스크랩 생성 - 시간 설정 검증`() {
             val saveDailyMessage = SaveDailyMessageEntity.create(
-                memberId = "member1",
+                memberId = 1L,
                 dailyMessageId = 1L
             )
 
@@ -44,11 +44,11 @@ class SaveDailyMessageEntityTest {
         @DisplayName("다른 memberId와 dailyMessageId로 생성할 수 있다")
         fun `데일리 메시지 스크랩 생성 - 다양한 값`() {
             val saveDailyMessage = SaveDailyMessageEntity.create(
-                memberId = "another-member",
+                memberId = 2L,
                 dailyMessageId = 999L
             )
 
-            assertThat(saveDailyMessage.memberId).isEqualTo("another-member")
+            assertThat(saveDailyMessage.memberId).isEqualTo(2L)
             assertThat(saveDailyMessage.dailyMessageId).isEqualTo(999L)
         }
     }
@@ -65,14 +65,14 @@ class SaveDailyMessageEntityTest {
 
             val saveDailyMessage = SaveDailyMessageEntity.reconstitute(
                 id = 1L,
-                memberId = "member1",
+                memberId = 1L,
                 dailyMessageId = 100L,
                 createdAt = createdAt,
                 updatedAt = updatedAt
             )
 
             assertThat(saveDailyMessage.id?.value).isEqualTo(1L)
-            assertThat(saveDailyMessage.memberId).isEqualTo("member1")
+            assertThat(saveDailyMessage.memberId).isEqualTo(1L)
             assertThat(saveDailyMessage.dailyMessageId).isEqualTo(100L)
             assertThat(saveDailyMessage.createdAt).isEqualTo(createdAt)
             assertThat(saveDailyMessage.updatedAt).isEqualTo(updatedAt)
@@ -86,7 +86,7 @@ class SaveDailyMessageEntityTest {
 
             val saveDailyMessage = SaveDailyMessageEntity.reconstitute(
                 id = 1L,
-                memberId = "member1",
+                memberId = 1L,
                 dailyMessageId = 100L,
                 createdAt = createdAt,
                 updatedAt = updatedAt
@@ -103,7 +103,7 @@ class SaveDailyMessageEntityTest {
 
             val saveDailyMessage = SaveDailyMessageEntity.reconstitute(
                 id = 1L,
-                memberId = "member1",
+                memberId = 1L,
                 dailyMessageId = 100L,
                 createdAt = now,
                 updatedAt = now

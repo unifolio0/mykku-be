@@ -19,7 +19,7 @@ class KeywordBlockTest {
         @Test
         @DisplayName("정상적으로 키워드 차단을 생성한다")
         fun `키워드 차단 생성 - 정상 케이스`() {
-            val memberId = "member-uuid"
+            val memberId = 1L
             val keyword = "차단키워드"
 
             val keywordBlock = KeywordBlock.create(
@@ -35,7 +35,7 @@ class KeywordBlockTest {
         @DisplayName("생성시 id는 null이다")
         fun `키워드 차단 생성 - id null`() {
             val keywordBlock = KeywordBlock.create(
-                memberId = "member-uuid",
+                memberId = 1L,
                 keyword = "차단키워드"
             )
 
@@ -48,7 +48,7 @@ class KeywordBlockTest {
             val beforeCreate = LocalDateTime.now()
 
             val keywordBlock = KeywordBlock.create(
-                memberId = "member-uuid",
+                memberId = 1L,
                 keyword = "차단키워드"
             )
 
@@ -62,7 +62,7 @@ class KeywordBlockTest {
             val beforeCreate = LocalDateTime.now()
 
             val keywordBlock = KeywordBlock.create(
-                memberId = "member-uuid",
+                memberId = 1L,
                 keyword = "차단키워드"
             )
 
@@ -74,7 +74,7 @@ class KeywordBlockTest {
         @DisplayName("생성시 createdAt과 updatedAt이 동일하다")
         fun `키워드 차단 생성 - createdAt과 updatedAt 동일`() {
             val keywordBlock = KeywordBlock.create(
-                memberId = "member-uuid",
+                memberId = 1L,
                 keyword = "차단키워드"
             )
 
@@ -87,7 +87,7 @@ class KeywordBlockTest {
             val keyword = "a".repeat(KeywordBlock.KEYWORD_MAX_LENGTH)
 
             val keywordBlock = KeywordBlock.create(
-                memberId = "member-uuid",
+                memberId = 1L,
                 keyword = keyword
             )
 
@@ -101,7 +101,7 @@ class KeywordBlockTest {
 
             val exception = assertThrows<IllegalArgumentException> {
                 KeywordBlock.create(
-                    memberId = "member-uuid",
+                    memberId = 1L,
                     keyword = keyword
                 )
             }
@@ -113,7 +113,7 @@ class KeywordBlockTest {
         @DisplayName("빈 키워드도 생성할 수 있다")
         fun `키워드 차단 생성 - 빈 키워드`() {
             val keywordBlock = KeywordBlock.create(
-                memberId = "member-uuid",
+                memberId = 1L,
                 keyword = ""
             )
 
@@ -129,7 +129,7 @@ class KeywordBlockTest {
         @DisplayName("저장된 데이터로 KeywordBlock을 복원한다")
         fun `복원 - 정상 케이스`() {
             val id = KeywordBlockId(1L)
-            val memberId = "member-uuid"
+            val memberId = 1L
             val keyword = "차단키워드"
             val createdAt = LocalDateTime.of(2025, 1, 1, 10, 0, 0)
             val updatedAt = LocalDateTime.of(2025, 1, 2, 10, 0, 0)
@@ -157,7 +157,7 @@ class KeywordBlockTest {
 
             val keywordBlock = KeywordBlock.reconstitute(
                 id = id,
-                memberId = "member-uuid",
+                memberId = 1L,
                 keyword = "차단키워드",
                 createdAt = now,
                 updatedAt = now
@@ -175,7 +175,7 @@ class KeywordBlockTest {
 
             val keywordBlock = KeywordBlock.reconstitute(
                 id = KeywordBlockId(1L),
-                memberId = "member-uuid",
+                memberId = 1L,
                 keyword = longKeyword,
                 createdAt = now,
                 updatedAt = now

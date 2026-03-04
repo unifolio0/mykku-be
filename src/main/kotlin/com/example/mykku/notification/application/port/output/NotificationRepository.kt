@@ -9,15 +9,15 @@ import org.springframework.data.domain.Pageable
 interface NotificationRepository {
     fun save(notification: Notification): Notification
     fun findById(id: NotificationId): Notification?
-    fun findAllByReceiverId(receiverId: String, pageable: Pageable): Page<Notification>
-    fun findAllByReceiverIdAndIsRead(receiverId: String, isRead: Boolean, pageable: Pageable): Page<Notification>
-    fun findAllByReceiverIdAndType(receiverId: String, type: NotificationType, pageable: Pageable): Page<Notification>
-    fun findAllByReceiverIdAndTypeIn(receiverId: String, types: List<NotificationType>, pageable: Pageable): Page<Notification>
-    fun findAllByReceiverIdAndIsReadAndTypeIn(receiverId: String, isRead: Boolean, types: List<NotificationType>, pageable: Pageable): Page<Notification>
-    fun countByReceiverIdAndIsRead(receiverId: String, isRead: Boolean): Long
-    fun countByReceiverIdAndIsReadAndTypeIn(receiverId: String, isRead: Boolean, types: List<NotificationType>): Long
-    fun markAllAsReadByReceiverId(receiverId: String): Int
-    fun markAllAsReadByReceiverIdAndTypeIn(receiverId: String, types: List<NotificationType>): Int
+    fun findAllByReceiverId(receiverId: Long, pageable: Pageable): Page<Notification>
+    fun findAllByReceiverIdAndIsRead(receiverId: Long, isRead: Boolean, pageable: Pageable): Page<Notification>
+    fun findAllByReceiverIdAndType(receiverId: Long, type: NotificationType, pageable: Pageable): Page<Notification>
+    fun findAllByReceiverIdAndTypeIn(receiverId: Long, types: List<NotificationType>, pageable: Pageable): Page<Notification>
+    fun findAllByReceiverIdAndIsReadAndTypeIn(receiverId: Long, isRead: Boolean, types: List<NotificationType>, pageable: Pageable): Page<Notification>
+    fun countByReceiverIdAndIsRead(receiverId: Long, isRead: Boolean): Long
+    fun countByReceiverIdAndIsReadAndTypeIn(receiverId: Long, isRead: Boolean, types: List<NotificationType>): Long
+    fun markAllAsReadByReceiverId(receiverId: Long): Int
+    fun markAllAsReadByReceiverIdAndTypeIn(receiverId: Long, types: List<NotificationType>): Int
     fun delete(notification: Notification)
-    fun deleteAllByReceiverId(receiverId: String)
+    fun deleteAllByReceiverId(receiverId: Long)
 }

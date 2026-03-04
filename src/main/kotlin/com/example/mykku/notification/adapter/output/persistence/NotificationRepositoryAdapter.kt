@@ -45,44 +45,44 @@ class NotificationRepositoryAdapter(
             .orElse(null)
     }
 
-    override fun findAllByReceiverId(receiverId: String, pageable: Pageable): Page<Notification> {
+    override fun findAllByReceiverId(receiverId: Long, pageable: Pageable): Page<Notification> {
         return notificationJpaRepository.findAllByReceiverId(receiverId, pageable)
             .map { it.toDomain() }
     }
 
-    override fun findAllByReceiverIdAndIsRead(receiverId: String, isRead: Boolean, pageable: Pageable): Page<Notification> {
+    override fun findAllByReceiverIdAndIsRead(receiverId: Long, isRead: Boolean, pageable: Pageable): Page<Notification> {
         return notificationJpaRepository.findAllByReceiverIdAndIsRead(receiverId, isRead, pageable)
             .map { it.toDomain() }
     }
 
-    override fun findAllByReceiverIdAndType(receiverId: String, type: NotificationType, pageable: Pageable): Page<Notification> {
+    override fun findAllByReceiverIdAndType(receiverId: Long, type: NotificationType, pageable: Pageable): Page<Notification> {
         return notificationJpaRepository.findAllByReceiverIdAndType(receiverId, type, pageable)
             .map { it.toDomain() }
     }
 
-    override fun findAllByReceiverIdAndTypeIn(receiverId: String, types: List<NotificationType>, pageable: Pageable): Page<Notification> {
+    override fun findAllByReceiverIdAndTypeIn(receiverId: Long, types: List<NotificationType>, pageable: Pageable): Page<Notification> {
         return notificationJpaRepository.findAllByReceiverIdAndTypeIn(receiverId, types, pageable)
             .map { it.toDomain() }
     }
 
-    override fun findAllByReceiverIdAndIsReadAndTypeIn(receiverId: String, isRead: Boolean, types: List<NotificationType>, pageable: Pageable): Page<Notification> {
+    override fun findAllByReceiverIdAndIsReadAndTypeIn(receiverId: Long, isRead: Boolean, types: List<NotificationType>, pageable: Pageable): Page<Notification> {
         return notificationJpaRepository.findAllByReceiverIdAndIsReadAndTypeIn(receiverId, isRead, types, pageable)
             .map { it.toDomain() }
     }
 
-    override fun countByReceiverIdAndIsRead(receiverId: String, isRead: Boolean): Long {
+    override fun countByReceiverIdAndIsRead(receiverId: Long, isRead: Boolean): Long {
         return notificationJpaRepository.countByReceiverIdAndIsRead(receiverId, isRead)
     }
 
-    override fun countByReceiverIdAndIsReadAndTypeIn(receiverId: String, isRead: Boolean, types: List<NotificationType>): Long {
+    override fun countByReceiverIdAndIsReadAndTypeIn(receiverId: Long, isRead: Boolean, types: List<NotificationType>): Long {
         return notificationJpaRepository.countByReceiverIdAndIsReadAndTypeIn(receiverId, isRead, types)
     }
 
-    override fun markAllAsReadByReceiverId(receiverId: String): Int {
+    override fun markAllAsReadByReceiverId(receiverId: Long): Int {
         return notificationJpaRepository.markAllAsReadByReceiverId(receiverId)
     }
 
-    override fun markAllAsReadByReceiverIdAndTypeIn(receiverId: String, types: List<NotificationType>): Int {
+    override fun markAllAsReadByReceiverIdAndTypeIn(receiverId: Long, types: List<NotificationType>): Int {
         return notificationJpaRepository.markAllAsReadByReceiverIdAndTypeIn(receiverId, types)
     }
 
@@ -92,7 +92,7 @@ class NotificationRepositoryAdapter(
         }
     }
 
-    override fun deleteAllByReceiverId(receiverId: String) {
+    override fun deleteAllByReceiverId(receiverId: Long) {
         notificationJpaRepository.deleteAllByReceiverId(receiverId)
     }
 }

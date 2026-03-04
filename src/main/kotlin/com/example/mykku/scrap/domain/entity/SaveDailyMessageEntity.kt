@@ -5,14 +5,14 @@ import java.time.LocalDateTime
 
 class SaveDailyMessageEntity private constructor(
     val id: SaveDailyMessageId?,
-    val memberId: String,
+    val memberId: Long,
     val dailyMessageId: Long,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 ) {
     companion object {
         fun create(
-            memberId: String,
+            memberId: Long,
             dailyMessageId: Long
         ): SaveDailyMessageEntity {
             val now = LocalDateTime.now()
@@ -27,7 +27,7 @@ class SaveDailyMessageEntity private constructor(
 
         fun reconstitute(
             id: Long,
-            memberId: String,
+            memberId: Long,
             dailyMessageId: Long,
             createdAt: LocalDateTime,
             updatedAt: LocalDateTime

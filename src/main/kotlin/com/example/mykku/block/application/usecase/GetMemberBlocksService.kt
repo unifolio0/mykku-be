@@ -6,6 +6,7 @@ import com.example.mykku.block.application.dto.MemberBlockResult
 import com.example.mykku.block.application.port.input.GetMemberBlocksUseCase
 import com.example.mykku.block.application.port.output.MemberBlockRepository
 import com.example.mykku.member.application.port.output.MemberRepository
+import com.example.mykku.member.domain.vo.MemberPk
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -20,7 +21,7 @@ class GetMemberBlocksService(
         val page = memberBlockRepository.findAllByBlockerId(query.memberId, query.pageable)
 
         val blocks = page.content.map { memberBlock ->
-            val blockedMember = memberRepository.findByIdString(memberBlock.blockedId)
+            val blockedMember = memberRepository.findById(MemberPk.of(memberBlock.blockedId))
             MemberBlockResult.from(
                 memberBlock,
                 blockedMember?.nickname ?: "",

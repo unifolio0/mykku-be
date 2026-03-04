@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface LikeFeedCommentJpaRepository : JpaRepository<LikeFeedCommentJpaEntity, Long> {
-    fun existsByMemberIdAndFeedCommentId(memberId: String, feedCommentId: Long): Boolean
-    fun deleteByMemberIdAndFeedCommentId(memberId: String, feedCommentId: Long)
+    fun existsByMemberIdAndFeedCommentId(memberId: Long, feedCommentId: Long): Boolean
+    fun deleteByMemberIdAndFeedCommentId(memberId: Long, feedCommentId: Long)
     fun deleteAllByFeedCommentIdIn(feedCommentIds: List<Long>)
 }

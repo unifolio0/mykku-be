@@ -25,7 +25,7 @@ class FeedRepositoryAdapter(
         const val DEFAULT_POPULAR_FEEDS_DAYS_AGO = 7
     }
 
-    override fun save(feed: Feed, boardId: Long, memberId: String): Feed {
+    override fun save(feed: Feed, boardId: Long, memberId: Long): Feed {
         val board = boardJpaRepository.findById(boardId)
             .orElseThrow { IllegalArgumentException("Board not found: $boardId") }
         val member = memberJpaRepository.findById(memberId)

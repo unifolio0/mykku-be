@@ -35,8 +35,7 @@ abstract class BaseRepositoryTest {
     protected lateinit var roleJpaRepository: RoleJpaRepository
 
     protected fun createAndSaveMember(
-        id: String = "testMember",
-        memberId: String? = null,
+        memberId: String? = "testmember",
         nickname: String = "테스트유저",
         email: String = "test@example.com",
         socialId: String = "12345",
@@ -45,8 +44,7 @@ abstract class BaseRepositoryTest {
         profileImage: String = ""
     ): MemberJpaEntity {
         val member = MemberJpaEntity(
-            id = id,
-            memberId = memberId ?: id,
+            memberId = memberId,
             nickname = nickname,
             email = email,
             socialId = socialId,

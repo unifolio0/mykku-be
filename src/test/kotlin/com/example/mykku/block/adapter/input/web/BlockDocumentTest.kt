@@ -42,7 +42,7 @@ class BlockDocumentTest : BaseDocumentTest() {
             val request = BlockMemberRequest(memberId = "blocked-user-id")
             val result = MemberBlockResult(
                 id = 1L,
-                blockedMemberId = "blocked-user-id",
+                blockedMemberId = 999L,
                 blockedMemberNickname = "차단유저",
                 blockedMemberProfileImage = "https://example.com/profile.jpg",
                 blockedAt = LocalDateTime.now()
@@ -58,7 +58,7 @@ class BlockDocumentTest : BaseDocumentTest() {
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
                             fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("차단 ID"),
-                            fieldWithPath("data.blockedMemberId").type(JsonFieldType.STRING).description("차단된 사용자 ID"),
+                            fieldWithPath("data.blockedMemberId").type(JsonFieldType.NUMBER).description("차단된 사용자 ID"),
                             fieldWithPath("data.blockedMemberNickname").type(JsonFieldType.STRING).description("차단된 사용자 닉네임"),
                             fieldWithPath("data.blockedMemberProfileImage").type(JsonFieldType.STRING).description("차단된 사용자 프로필 이미지").optional(),
                             fieldWithPath("data.blockedAt").type(JsonFieldType.STRING).description("차단 시간")
@@ -78,7 +78,7 @@ class BlockDocumentTest : BaseDocumentTest() {
 
         @Test
         fun `자기 자신 차단 에러`() {
-            val request = BlockMemberRequest(memberId = TEST_MEMBER_ID)
+            val request = BlockMemberRequest(memberId = testMember.memberId!!)
 
             `when`(blockMemberUseCase.blockMember(any()))
                 .thenThrow(BlockException(BlockErrorCode.CANNOT_BLOCK_SELF))
@@ -200,14 +200,14 @@ class BlockDocumentTest : BaseDocumentTest() {
                 blocks = listOf(
                     MemberBlockResult(
                         id = 1L,
-                        blockedMemberId = "user1",
+                        blockedMemberId = 100L,
                         blockedMemberNickname = "유저1",
                         blockedMemberProfileImage = "https://example.com/profile1.jpg",
                         blockedAt = LocalDateTime.now()
                     ),
                     MemberBlockResult(
                         id = 2L,
-                        blockedMemberId = "user2",
+                        blockedMemberId = 200L,
                         blockedMemberNickname = "유저2",
                         blockedMemberProfileImage = "",
                         blockedAt = LocalDateTime.now()
@@ -228,7 +228,7 @@ class BlockDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
                             fieldWithPath("data.blocks[]").type(JsonFieldType.ARRAY).description("차단 목록"),
                             fieldWithPath("data.blocks[].id").type(JsonFieldType.NUMBER).description("차단 ID"),
-                            fieldWithPath("data.blocks[].blockedMemberId").type(JsonFieldType.STRING).description("차단된 사용자 ID"),
+                            fieldWithPath("data.blocks[].blockedMemberId").type(JsonFieldType.NUMBER).description("차단된 사용자 ID"),
                             fieldWithPath("data.blocks[].blockedMemberNickname").type(JsonFieldType.STRING).description("차단된 사용자 닉네임"),
                             fieldWithPath("data.blocks[].blockedMemberProfileImage").type(JsonFieldType.STRING).description("차단된 사용자 프로필 이미지").optional(),
                             fieldWithPath("data.blocks[].blockedAt").type(JsonFieldType.STRING).description("차단 시간"),

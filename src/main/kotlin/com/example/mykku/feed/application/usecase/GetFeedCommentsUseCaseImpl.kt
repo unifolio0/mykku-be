@@ -11,6 +11,7 @@ import com.example.mykku.feed.application.port.output.FeedRepository
 import com.example.mykku.feed.domain.vo.FeedId
 import com.example.mykku.like.application.port.output.LikeFeedCommentPort
 import com.example.mykku.member.application.port.output.MemberRepository
+import com.example.mykku.member.domain.vo.MemberPk
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -37,7 +38,7 @@ class GetFeedCommentsUseCaseImpl(
 
         val allComments = commentsPage.content + repliesMap.values.flatten()
         val memberIds = allComments.mapNotNull { it.memberId }.distinct()
-        val membersMap = memberIds.mapNotNull { memberRepository.findByIdString(it) }
+        val membersMap = memberIds.mapNotNull { memberRepository.findById(MemberPk.of(it)) }
             .associateBy { it.id.value }
 
         val commentResponses = commentsPage.content.map { comment ->

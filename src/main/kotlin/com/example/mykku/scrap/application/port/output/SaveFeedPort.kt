@@ -7,10 +7,10 @@ import org.springframework.data.domain.Pageable
 
 interface SaveFeedPort {
     fun save(saveFeed: SaveFeedEntity): SaveFeedEntity
-    fun existsByMemberIdAndFeedId(memberId: String, feedId: Long): Boolean
-    fun findByMemberIdAndFeedIdIn(memberId: String, feedIds: List<Long>): List<SaveFeedEntity>
-    fun findByMemberIdAndFolderId(memberId: String, folderId: Long?, pageable: Pageable): Page<SaveFeedResult>
-    fun findByMemberIdAndFeedId(memberId: String, feedId: Long): SaveFeedEntity?
-    fun deleteByMemberIdAndFeedId(memberId: String, feedId: Long)
+    fun existsByMemberIdAndFeedId(memberId: Long, feedId: Long): Boolean
+    fun findByMemberIdAndFeedIdIn(memberId: Long, feedIds: List<Long>): List<SaveFeedEntity>
+    fun findByMemberIdAndFolderId(memberId: Long, folderId: Long?, pageable: Pageable): Page<SaveFeedResult>
+    fun findByMemberIdAndFeedId(memberId: Long, feedId: Long): SaveFeedEntity?
+    fun deleteByMemberIdAndFeedId(memberId: Long, feedId: Long)
     fun deleteAllByFeedId(feedId: Long)
 }

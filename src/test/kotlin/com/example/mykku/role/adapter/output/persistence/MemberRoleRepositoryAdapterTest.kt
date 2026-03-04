@@ -18,7 +18,7 @@ class MemberRoleRepositoryAdapterTest : BaseRepositoryTest() {
     private lateinit var memberRoleRepository: MemberRoleRepository
 
     private fun createMemberRole(
-        memberId: String,
+        memberId: Long,
         roleId: RoleId
     ): MemberRole {
         return MemberRole.create(memberId = memberId, roleId = roleId)
@@ -32,7 +32,7 @@ class MemberRoleRepositoryAdapterTest : BaseRepositoryTest() {
         @DisplayName("새로운 멤버 역할을 저장하면 ID가 생성된다")
         fun saveNewMemberRole() {
             val role = createAndSaveRole(name = "save_role", description = "저장 테스트 역할")
-            val member = createAndSaveMember(id = "save_member1", email = "save_member1@test.com", socialId = "save_social1")
+            val member = createAndSaveMember(email = "save_member1@test.com", socialId = "save_social1")
 
             val memberRole = createMemberRole(memberId = member.id, roleId = RoleId(role.id!!))
 
@@ -52,7 +52,7 @@ class MemberRoleRepositoryAdapterTest : BaseRepositoryTest() {
         @DisplayName("존재하는 ID로 조회하면 멤버 역할을 반환한다")
         fun findByExistingId() {
             val role = createAndSaveRole(name = "findById_role", description = "조회 테스트 역할")
-            val member = createAndSaveMember(id = "findById_member1", email = "findById_member1@test.com", socialId = "findById_social1")
+            val member = createAndSaveMember(email = "findById_member1@test.com", socialId = "findById_social1")
 
             val savedMemberRole = memberRoleRepository.save(createMemberRole(memberId = member.id, roleId = RoleId(role.id!!)))
 
@@ -82,8 +82,8 @@ class MemberRoleRepositoryAdapterTest : BaseRepositoryTest() {
         fun findByMemberId() {
             val role1 = createAndSaveRole(name = "fmid_role1", description = "역할1")
             val role2 = createAndSaveRole(name = "fmid_role2", description = "역할2")
-            val member1 = createAndSaveMember(id = "fmid_m1", email = "fmid_m1@test.com", socialId = "fmid_s1")
-            val member2 = createAndSaveMember(id = "fmid_m2", email = "fmid_m2@test.com", socialId = "fmid_s2")
+            val member1 = createAndSaveMember(memberId = "fmid_m1", email = "fmid_m1@test.com", socialId = "fmid_s1")
+            val member2 = createAndSaveMember(memberId = "fmid_m2", email = "fmid_m2@test.com", socialId = "fmid_s2")
 
             memberRoleRepository.save(createMemberRole(memberId = member1.id, roleId = RoleId(role1.id!!)))
             memberRoleRepository.save(createMemberRole(memberId = member1.id, roleId = RoleId(role2.id!!)))
@@ -98,7 +98,7 @@ class MemberRoleRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("존재하지 않는 멤버 ID로 조회하면 빈 리스트를 반환한다")
         fun findByNonExistingMemberId() {
-            val memberRoles = memberRoleRepository.findByMemberId("non_existing")
+            val memberRoles = memberRoleRepository.findByMemberId(999999L)
 
             assertThat(memberRoles).isEmpty()
         }
@@ -113,7 +113,7 @@ class MemberRoleRepositoryAdapterTest : BaseRepositoryTest() {
         fun findByMemberIdWithRole() {
             val role1 = createAndSaveRole(name = "fwr_ADMIN", description = "관리자")
             val role2 = createAndSaveRole(name = "fwr_USER", description = "일반 사용자")
-            val member = createAndSaveMember(id = "fwr_m1", email = "fwr_m1@test.com", socialId = "fwr_s1")
+            val member = createAndSaveMember(email = "fwr_m1@test.com", socialId = "fwr_s1")
 
             memberRoleRepository.save(createMemberRole(memberId = member.id, roleId = RoleId(role1.id!!)))
             memberRoleRepository.save(createMemberRole(memberId = member.id, roleId = RoleId(role2.id!!)))
@@ -127,7 +127,7 @@ class MemberRoleRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("존재하지 않는 멤버 ID로 조회하면 빈 리스트를 반환한다")
         fun findByNonExistingMemberIdWithRole() {
-            val memberRolesWithRole = memberRoleRepository.findByMemberIdWithRole("non_existing")
+            val memberRolesWithRole = memberRoleRepository.findByMemberIdWithRole(999999L)
 
             assertThat(memberRolesWithRole).isEmpty()
         }
@@ -141,7 +141,7 @@ class MemberRoleRepositoryAdapterTest : BaseRepositoryTest() {
         @DisplayName("해당 멤버와 역할 조합이 존재하면 true를 반환한다")
         fun existsByMemberIdAndRoleId() {
             val role = createAndSaveRole(name = "emr_role", description = "존재 확인 역할")
-            val member = createAndSaveMember(id = "emr_m1", email = "emr_m1@test.com", socialId = "emr_s1")
+            val member = createAndSaveMember(email = "emr_m1@test.com", socialId = "emr_s1")
 
             memberRoleRepository.save(createMemberRole(memberId = member.id, roleId = RoleId(role.id!!)))
 
@@ -155,7 +155,7 @@ class MemberRoleRepositoryAdapterTest : BaseRepositoryTest() {
         fun notExistsByMemberIdAndRoleId() {
             val role = createAndSaveRole(name = "nemr_role", description = "존재하지 않는 역할")
 
-            val exists = memberRoleRepository.existsByMemberIdAndRoleId("nemr_m1", RoleId(role.id!!))
+            val exists = memberRoleRepository.existsByMemberIdAndRoleId(999999L, RoleId(role.id!!))
 
             assertThat(exists).isFalse()
         }
@@ -169,7 +169,7 @@ class MemberRoleRepositoryAdapterTest : BaseRepositoryTest() {
         @DisplayName("해당 역할 ID를 가진 멤버 역할이 존재하면 true를 반환한다")
         fun existsByRoleId() {
             val role = createAndSaveRole(name = "eri_role", description = "역할 존재 확인")
-            val member = createAndSaveMember(id = "eri_m1", email = "eri_m1@test.com", socialId = "eri_s1")
+            val member = createAndSaveMember(email = "eri_m1@test.com", socialId = "eri_s1")
 
             memberRoleRepository.save(createMemberRole(memberId = member.id, roleId = RoleId(role.id!!)))
 
@@ -195,7 +195,7 @@ class MemberRoleRepositoryAdapterTest : BaseRepositoryTest() {
         @DisplayName("멤버 역할을 삭제하면 조회되지 않는다")
         fun deleteMemberRole() {
             val role = createAndSaveRole(name = "delete_role", description = "삭제 테스트 역할")
-            val member = createAndSaveMember(id = "delete_member1", email = "delete_member1@test.com", socialId = "delete_social1")
+            val member = createAndSaveMember(email = "delete_member1@test.com", socialId = "delete_social1")
 
             val savedMemberRole = memberRoleRepository.save(createMemberRole(memberId = member.id, roleId = RoleId(role.id!!)))
 

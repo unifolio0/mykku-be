@@ -39,7 +39,7 @@ class ContestWinnerControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("수상작 목록 조회 - 정상 케이스")
     fun `getContestsWithWinners - 정상적으로 수상작 목록을 조회한다`() {
-        val member = createAndSaveMember(id = "member1")
+        val member = createAndSaveMember()
         val board = createAndSaveBoard()
         val contest = createAndSaveContest(status = ContestStatusType.WINNER_SELECTED)
         val feed = createAndSaveFeed(member, board)
@@ -58,7 +58,7 @@ class ContestWinnerControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("수상작 상세 조회 - 정상 케이스")
     fun `getContestWinnerDetail - 정상적으로 수상작 상세를 조회한다`() {
-        val member = createAndSaveMember(id = "member1")
+        val member = createAndSaveMember()
         val board = createAndSaveBoard()
         val contest = createAndSaveContest(status = ContestStatusType.WINNER_SELECTED)
         val feed = createAndSaveFeed(member, board)
@@ -77,8 +77,8 @@ class ContestWinnerControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("수상 소감 수정 - 정상 케이스")
     fun `updateAcceptanceSpeech - 정상적으로 수상 소감을 수정한다`() {
-        val member = createAndSaveMember(id = "member1")
-        val authHeader = getBearerToken("member1")
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
         val board = createAndSaveBoard()
         val contest = createAndSaveContest(status = ContestStatusType.WINNER_SELECTED)
         val feed = createAndSaveFeed(member, board)
@@ -104,7 +104,7 @@ class ContestWinnerControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("수상 소감 수정 - 인증되지 않은 사용자")
     fun `updateAcceptanceSpeech - 인증되지 않은 사용자는 수상 소감을 수정할 수 없다`() {
-        val member = createAndSaveMember(id = "member1")
+        val member = createAndSaveMember()
         val board = createAndSaveBoard()
         val contest = createAndSaveContest(status = ContestStatusType.WINNER_SELECTED)
         val feed = createAndSaveFeed(member, board)
@@ -127,8 +127,8 @@ class ContestWinnerControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("수상 여부 조회 - 수상자인 경우")
     fun `getMyWinnerStatus - 수상자인 경우 정상적으로 조회한다`() {
-        val member = createAndSaveMember(id = "winner1")
-        val authHeader = getBearerToken("winner1")
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
         val board = createAndSaveBoard()
         val contest = createAndSaveContest(status = ContestStatusType.WINNER_SELECTED)
         val feed = createAndSaveFeed(member, board)
@@ -150,9 +150,9 @@ class ContestWinnerControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("수상 여부 조회 - 수상자가 아닌 경우")
     fun `getMyWinnerStatus - 수상자가 아닌 경우 false를 반환한다`() {
-        val winnerMember = createAndSaveMember(id = "winner2")
-        val nonWinner = createAndSaveMember(id = "nonwinner1", nickname = "비수상자", email = "nonwinner@example.com", socialId = "99999")
-        val authHeader = getBearerToken("nonwinner1")
+        val winnerMember = createAndSaveMember(memberId = "winner")
+        val nonWinner = createAndSaveMember(memberId = "nonwinner", nickname = "비수상자", email = "nonwinner@example.com", socialId = "99999")
+        val authHeader = getBearerToken(nonWinner.id)
         val board = createAndSaveBoard()
         val contest = createAndSaveContest(status = ContestStatusType.WINNER_SELECTED)
         val feed = createAndSaveFeed(winnerMember, board)

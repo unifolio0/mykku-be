@@ -5,14 +5,14 @@ import java.time.LocalDateTime
 
 class SaveFanNoteEntity private constructor(
     val id: SaveFanNoteId?,
-    val memberId: String,
+    val memberId: Long,
     val fanNoteId: Long,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 ) {
     companion object {
         fun create(
-            memberId: String,
+            memberId: Long,
             fanNoteId: Long
         ): SaveFanNoteEntity {
             val now = LocalDateTime.now()
@@ -27,7 +27,7 @@ class SaveFanNoteEntity private constructor(
 
         fun reconstitute(
             id: Long,
-            memberId: String,
+            memberId: Long,
             fanNoteId: Long,
             createdAt: LocalDateTime,
             updatedAt: LocalDateTime

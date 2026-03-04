@@ -22,8 +22,8 @@ class FolderControllerTest : BaseControllerTest() {
     @DisplayName("폴더 생성 - 정상 케이스")
     fun `createFolder - 정상적으로 폴더를 생성한다`() {
         // given
-        val member = createAndSaveMember(id = "member1")
-        val authHeader = getBearerToken("member1")
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
         val request = CreateFolderWebRequest(
             name = "테스트 폴더",
             description = "폴더 설명"
@@ -67,8 +67,8 @@ class FolderControllerTest : BaseControllerTest() {
     @DisplayName("폴더 목록 조회 - 정상 케이스")
     fun `getFolders - 회원의 폴더 목록을 조회한다`() {
         // given
-        val member = createAndSaveMember(id = "member1")
-        val authHeader = getBearerToken("member1")
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
 
         // when & then
         RestAssured.given()
@@ -85,8 +85,8 @@ class FolderControllerTest : BaseControllerTest() {
     @DisplayName("폴더 수정 - 정상 케이스")
     fun `updateFolder - 정상적으로 폴더를 수정한다`() {
         // given
-        val member = createAndSaveMember(id = "member1")
-        val authHeader = getBearerToken("member1")
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
 
         // 먼저 폴더 생성
         val createRequest = CreateFolderWebRequest(name = "원래 폴더", description = "원래 설명")
@@ -125,8 +125,8 @@ class FolderControllerTest : BaseControllerTest() {
     @DisplayName("폴더 삭제 - 정상 케이스")
     fun `deleteFolder - 정상적으로 폴더를 삭제한다`() {
         // given
-        val member = createAndSaveMember(id = "member1")
-        val authHeader = getBearerToken("member1")
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
 
         // 먼저 폴더 생성
         val createRequest = CreateFolderWebRequest(name = "삭제할 폴더", description = null)

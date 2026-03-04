@@ -23,15 +23,15 @@ class NotificationTest {
         fun `알림 생성 - 정상 케이스`() {
             val notification = Notification.create(
                 type = NotificationType.FEED_LIKE,
-                senderId = "sender1",
-                receiverId = "receiver1",
+                senderId = 1L,
+                receiverId = 2L,
                 content = "테스트 알림 내용"
             )
 
             assertThat(notification.id).isNull()
             assertThat(notification.type).isEqualTo(NotificationType.FEED_LIKE)
-            assertThat(notification.senderId).isEqualTo("sender1")
-            assertThat(notification.receiverId).isEqualTo("receiver1")
+            assertThat(notification.senderId).isEqualTo(1L)
+            assertThat(notification.receiverId).isEqualTo(2L)
             assertThat(notification.content).isEqualTo("테스트 알림 내용")
         }
 
@@ -58,7 +58,7 @@ class NotificationTest {
             val notification = Notification.create(
                 type = NotificationType.SYSTEM_NOTICE,
                 senderId = null,
-                receiverId = "receiver1",
+                receiverId = 2L,
                 content = "시스템 공지사항입니다"
             )
 
@@ -71,8 +71,8 @@ class NotificationTest {
         fun `알림 생성 - 연관 리소스 포함`() {
             val notification = Notification.create(
                 type = NotificationType.FEED_COMMENT,
-                senderId = "sender1",
-                receiverId = "receiver1",
+                senderId = 1L,
+                receiverId = 2L,
                 content = "새로운 댓글이 달렸습니다",
                 relatedResourceId = 123L,
                 relatedResourceType = "FEED"
@@ -90,8 +90,8 @@ class NotificationTest {
             val exception = assertThrows<IllegalArgumentException> {
                 Notification.create(
                     type = NotificationType.FEED_LIKE,
-                    senderId = "sender1",
-                    receiverId = "receiver1",
+                    senderId = 1L,
+                    receiverId = 2L,
                     content = longContent
                 )
             }
@@ -106,8 +106,8 @@ class NotificationTest {
 
             val notification = Notification.create(
                 type = NotificationType.FEED_LIKE,
-                senderId = "sender1",
-                receiverId = "receiver1",
+                senderId = 1L,
+                receiverId = 2L,
                 content = exactContent
             )
 
@@ -155,8 +155,8 @@ class NotificationTest {
                 id = NotificationId(1L),
                 type = NotificationType.FEED_LIKE,
                 displayColor = NotificationDisplayColor.BLACK,
-                senderId = "sender1",
-                receiverId = "receiver1",
+                senderId = 1L,
+                receiverId = 2L,
                 content = "알림 내용",
                 isRead = true,
                 relatedResourceId = 100L,
@@ -181,8 +181,8 @@ class NotificationTest {
                 id = NotificationId(1L),
                 type = NotificationType.FEED_COMMENT,
                 displayColor = NotificationDisplayColor.BLACK,
-                senderId = "sender1",
-                receiverId = "receiver1",
+                senderId = 1L,
+                receiverId = 2L,
                 content = "댓글 알림",
                 isRead = false,
                 relatedResourceId = null,
@@ -206,8 +206,8 @@ class NotificationTest {
         fun `타입 검증 - FEED_LIKE`() {
             val notification = Notification.create(
                 type = NotificationType.FEED_LIKE,
-                senderId = "sender1",
-                receiverId = "receiver1",
+                senderId = 1L,
+                receiverId = 2L,
                 content = "좋아요 알림"
             )
 
@@ -220,8 +220,8 @@ class NotificationTest {
         fun `타입 검증 - FEED_COMMENT`() {
             val notification = Notification.create(
                 type = NotificationType.FEED_COMMENT,
-                senderId = "sender1",
-                receiverId = "receiver1",
+                senderId = 1L,
+                receiverId = 2L,
                 content = "댓글 알림"
             )
 
@@ -235,7 +235,7 @@ class NotificationTest {
             val notification = Notification.create(
                 type = NotificationType.SYSTEM_NOTICE,
                 senderId = null,
-                receiverId = "receiver1",
+                receiverId = 2L,
                 content = "시스템 공지"
             )
 
@@ -247,8 +247,8 @@ class NotificationTest {
     private fun createNotification(): Notification {
         return Notification.create(
             type = NotificationType.FEED_LIKE,
-            senderId = "sender1",
-            receiverId = "receiver1",
+            senderId = 1L,
+            receiverId = 2L,
             content = "테스트 알림 내용"
         )
     }

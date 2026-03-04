@@ -1,11 +1,11 @@
 package com.example.mykku.like.application.dto
 
 data class LikeDailyMessageCommentCommand(
-    val memberId: String,
+    val memberId: Long,
     val dailyMessageCommentId: Long
 )
 
 data class UnlikeDailyMessageCommentCommand(
-    val memberId: String,
+    val memberId: Long,
     val dailyMessageCommentId: Long
 )

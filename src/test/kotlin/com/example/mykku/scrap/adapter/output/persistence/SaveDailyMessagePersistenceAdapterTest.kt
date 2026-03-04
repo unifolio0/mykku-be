@@ -34,7 +34,7 @@ class SaveDailyMessagePersistenceAdapterTest : BaseRepositoryTest() {
 
     @BeforeEach
     fun setUp() {
-        savedMember = createAndSaveMember(id = "testMember1", memberId = "testMember1")
+        savedMember = createAndSaveMember(memberId = "testMember1")
         savedDailyMessage = dailyMessageJpaRepository.save(createDailyMessageJpaEntity())
     }
 
@@ -61,7 +61,7 @@ class SaveDailyMessagePersistenceAdapterTest : BaseRepositoryTest() {
         @DisplayName("존재하지 않는 회원이 저장하면 예외가 발생한다")
         fun `하루덕담 저장 - 존재하지 않는 회원`() {
             val saveDailyMessage = SaveDailyMessageEntity.create(
-                memberId = "nonExistentMember",
+                memberId = 999999L,
                 dailyMessageId = savedDailyMessage.id!!
             )
 

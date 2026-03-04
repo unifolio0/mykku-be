@@ -9,7 +9,7 @@ data class NotificationResult(
     val id: Long,
     val type: NotificationType,
     val displayColor: NotificationDisplayColor,
-    val senderId: String?,
+    val senderId: Long?,
     val senderNickname: String?,
     val senderProfileImage: String?,
     val content: String,

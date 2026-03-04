@@ -7,8 +7,8 @@ import org.springframework.data.domain.Pageable
 
 interface SaveEventPort {
     fun save(saveEvent: SaveEventEntity): SaveEventEntity
-    fun existsByMemberIdAndEventId(memberId: String, eventId: Long): Boolean
-    fun findByMemberId(memberId: String, pageable: Pageable): Page<SaveEventResult>
-    fun deleteByMemberIdAndEventId(memberId: String, eventId: Long)
-    fun findByMemberIdAndEventIdIn(memberId: String, eventIds: List<Long>): List<SaveEventEntity>
+    fun existsByMemberIdAndEventId(memberId: Long, eventId: Long): Boolean
+    fun findByMemberId(memberId: Long, pageable: Pageable): Page<SaveEventResult>
+    fun deleteByMemberIdAndEventId(memberId: Long, eventId: Long)
+    fun findByMemberIdAndEventIdIn(memberId: Long, eventIds: List<Long>): List<SaveEventEntity>
 }

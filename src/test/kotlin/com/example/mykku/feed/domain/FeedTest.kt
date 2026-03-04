@@ -24,14 +24,14 @@ class FeedTest {
                 title = "테스트 제목",
                 content = "테스트 내용",
                 boardId = 1L,
-                memberId = "member1"
+                memberId = 1L
             )
 
             assertThat(feed.id).isNull()
             assertThat(feed.title).isEqualTo("테스트 제목")
             assertThat(feed.content).isEqualTo("테스트 내용")
             assertThat(feed.boardId).isEqualTo(1L)
-            assertThat(feed.memberId).isEqualTo("member1")
+            assertThat(feed.memberId).isEqualTo(1L)
         }
 
         @Test
@@ -41,7 +41,7 @@ class FeedTest {
                 title = "테스트 제목",
                 content = "테스트 내용",
                 boardId = 1L,
-                memberId = "member1"
+                memberId = 1L
             )
 
             assertThat(feed.likeCount).isEqualTo(0)
@@ -55,7 +55,7 @@ class FeedTest {
                 title = "테스트 제목",
                 content = "테스트 내용",
                 boardId = 1L,
-                memberId = "member1"
+                memberId = 1L
             )
 
             assertThat(feed.createdAt).isNotNull()
@@ -73,7 +73,7 @@ class FeedTest {
                     title = "테스트 제목",
                     content = longContent,
                     boardId = 1L,
-                    memberId = "member1"
+                    memberId = 1L
                 )
             }
 
@@ -89,7 +89,7 @@ class FeedTest {
                 title = "테스트 제목",
                 content = exactContent,
                 boardId = 1L,
-                memberId = "member1"
+                memberId = 1L
             )
 
             assertThat(feed.content.length).isEqualTo(Feed.CONTENT_MAX_LENGTH)
@@ -155,7 +155,7 @@ class FeedTest {
                 likeCount = 10,
                 commentCount = 5,
                 boardId = 1L,
-                memberId = "member1",
+                memberId = 1L,
                 createdAt = LocalDateTime.now(),
                 updatedAt = LocalDateTime.now()
             )
@@ -189,7 +189,7 @@ class FeedTest {
         fun `소유 여부 - 일치`() {
             val feed = createFeed()
 
-            assertThat(feed.isOwnedBy("member1")).isTrue()
+            assertThat(feed.isOwnedBy(1L)).isTrue()
         }
 
         @Test
@@ -197,7 +197,7 @@ class FeedTest {
         fun `소유 여부 - 불일치`() {
             val feed = createFeed()
 
-            assertThat(feed.isOwnedBy("member2")).isFalse()
+            assertThat(feed.isOwnedBy(2L)).isFalse()
         }
     }
 
@@ -216,7 +216,7 @@ class FeedTest {
                 likeCount = 10,
                 commentCount = 5,
                 boardId = 1L,
-                memberId = "member1",
+                memberId = 1L,
                 createdAt = now,
                 updatedAt = now
             )
@@ -234,7 +234,7 @@ class FeedTest {
             title = "테스트 제목",
             content = "테스트 내용",
             boardId = 1L,
-            memberId = "member1"
+            memberId = 1L
         )
     }
 }

@@ -8,7 +8,7 @@ import com.example.mykku.scrap.application.dto.UpdateFolderCommand
 
 interface FolderUseCase {
     fun createFolder(command: CreateFolderCommand): FolderResult
-    fun getFolders(memberId: String): FoldersResult
+    fun getFolders(memberId: Long): FoldersResult
     fun updateFolder(command: UpdateFolderCommand): FolderResult
     fun deleteFolder(command: DeleteFolderCommand)
 }

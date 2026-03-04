@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
 interface FeedCommentRepository {
-    fun save(feedComment: FeedComment, feedId: FeedId, memberId: String): FeedComment
+    fun save(feedComment: FeedComment, feedId: FeedId, memberId: Long): FeedComment
     fun findById(id: FeedCommentId): FeedComment?
     fun findByIdOrThrow(id: FeedCommentId): FeedComment
     fun findByFeedIdAndParentCommentIsNull(feedId: FeedId, pageable: Pageable): Page<FeedComment>

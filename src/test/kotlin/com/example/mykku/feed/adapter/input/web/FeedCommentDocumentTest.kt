@@ -53,7 +53,7 @@ class FeedCommentDocumentTest : BaseDocumentTest() {
                 id = 1L,
                 content = "좋은 피드네요!",
                 author = CommentAuthorResult(
-                    memberId = TEST_MEMBER_ID,
+                    memberId = testMember.memberId,
                     nickname = "testuser",
                     profileImage = "https://example.com/profile.jpg"
                 ),
@@ -148,7 +148,7 @@ class FeedCommentDocumentTest : BaseDocumentTest() {
                 id = 2L,
                 content = "저도 동감합니다!",
                 author = CommentAuthorResult(
-                    memberId = TEST_MEMBER_ID,
+                    memberId = testMember.memberId,
                     nickname = "testuser",
                     profileImage = "https://example.com/profile.jpg"
                 ),
@@ -213,7 +213,7 @@ class FeedCommentDocumentTest : BaseDocumentTest() {
                 id = commentId,
                 content = "수정된 댓글 내용입니다!",
                 author = CommentAuthorResult(
-                    memberId = TEST_MEMBER_ID,
+                    memberId = testMember.memberId,
                     nickname = "testuser",
                     profileImage = "https://example.com/profile.jpg"
                 ),

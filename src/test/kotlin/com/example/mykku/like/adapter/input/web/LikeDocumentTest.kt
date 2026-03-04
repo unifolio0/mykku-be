@@ -121,7 +121,7 @@ class LikeDocumentTest : BaseDocumentTest() {
         @Test
         fun `성공`() {
             val boardId = 1L
-            val response = LikeBoardResult(id = 1L, memberId = "member123", boardId = boardId)
+            val response = LikeBoardResult(id = 1L, memberId = testMember.id, boardId = boardId)
 
             `when`(likeBoardUseCase.likeBoard(any())).thenReturn(response)
 
@@ -133,7 +133,7 @@ class LikeDocumentTest : BaseDocumentTest() {
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("좋아요 정보"),
                             fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("좋아요 ID"),
-                            fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("회원 ID"),
+                            fieldWithPath("data.memberId").type(JsonFieldType.NUMBER).description("회원 ID"),
                             fieldWithPath("data.boardId").type(JsonFieldType.NUMBER).description("게시판 ID")
                         )
                 )
@@ -249,7 +249,7 @@ class LikeDocumentTest : BaseDocumentTest() {
         @Test
         fun `성공`() {
             val feedId = 10L
-            val response = LikeFeedResult(id = 1L, memberId = "member123", feedId = feedId)
+            val response = LikeFeedResult(id = 1L, memberId = testMember.id, feedId = feedId)
 
             `when`(likeFeedUseCase.likeFeed(any())).thenReturn(response)
 
@@ -261,7 +261,7 @@ class LikeDocumentTest : BaseDocumentTest() {
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("좋아요 정보"),
                             fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("좋아요 ID"),
-                            fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("회원 ID"),
+                            fieldWithPath("data.memberId").type(JsonFieldType.NUMBER).description("회원 ID"),
                             fieldWithPath("data.feedId").type(JsonFieldType.NUMBER).description("피드 ID")
                         )
                 )
@@ -377,7 +377,7 @@ class LikeDocumentTest : BaseDocumentTest() {
         @Test
         fun `성공`() {
             val feedCommentId = 20L
-            val response = LikeFeedCommentResult(id = 1L, memberId = "member123", feedCommentId = feedCommentId)
+            val response = LikeFeedCommentResult(id = 1L, memberId = testMember.id, feedCommentId = feedCommentId)
 
             `when`(likeFeedCommentUseCase.likeFeedComment(any())).thenReturn(response)
 
@@ -389,7 +389,7 @@ class LikeDocumentTest : BaseDocumentTest() {
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("좋아요 정보"),
                             fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("좋아요 ID"),
-                            fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("회원 ID"),
+                            fieldWithPath("data.memberId").type(JsonFieldType.NUMBER).description("회원 ID"),
                             fieldWithPath("data.feedCommentId").type(JsonFieldType.NUMBER).description("댓글 ID")
                         )
                 )
@@ -505,7 +505,7 @@ class LikeDocumentTest : BaseDocumentTest() {
         @Test
         fun `성공`() {
             val dailyMessageCommentId = 30L
-            val response = LikeDailyMessageCommentResult(id = 1L, memberId = "member123", dailyMessageCommentId = dailyMessageCommentId)
+            val response = LikeDailyMessageCommentResult(id = 1L, memberId = testMember.id, dailyMessageCommentId = dailyMessageCommentId)
 
             `when`(likeDailyMessageCommentUseCase.likeDailyMessageComment(any())).thenReturn(response)
 
@@ -517,7 +517,7 @@ class LikeDocumentTest : BaseDocumentTest() {
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("좋아요 정보"),
                             fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("좋아요 ID"),
-                            fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("회원 ID"),
+                            fieldWithPath("data.memberId").type(JsonFieldType.NUMBER).description("회원 ID"),
                             fieldWithPath("data.dailyMessageCommentId").type(JsonFieldType.NUMBER)
                                 .description("하루 덕담 댓글 ID")
                         )

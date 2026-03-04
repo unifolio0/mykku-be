@@ -27,7 +27,7 @@ class FolderPersistenceAdapterTest : BaseRepositoryTest() {
 
     @BeforeEach
     fun setUp() {
-        savedMember = createAndSaveMember(id = "testMember1", memberId = "testMember1")
+        savedMember = createAndSaveMember(memberId = "testMember1")
     }
 
     @Nested
@@ -69,7 +69,7 @@ class FolderPersistenceAdapterTest : BaseRepositoryTest() {
         @DisplayName("존재하지 않는 회원의 폴더를 저장하면 예외가 발생한다")
         fun `폴더 저장 - 존재하지 않는 회원`() {
             val folder = FolderEntity.create(
-                memberId = "nonExistentMember",
+                memberId = 999999L,
                 name = "테스트 폴더",
                 description = null
             )
@@ -163,6 +163,7 @@ class FolderPersistenceAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("다른 회원의 폴더를 조회하면 null을 반환한다")
         fun `폴더 조회 - 다른 회원`() {
+            val otherMember = createAndSaveMember(memberId = "otherMember", email = "other@example.com", socialId = "99999")
             val folder = FolderEntity.create(
                 memberId = savedMember.id,
                 name = "테스트 폴더",
@@ -170,7 +171,7 @@ class FolderPersistenceAdapterTest : BaseRepositoryTest() {
             )
             val saved = folderPort.save(folder)
 
-            val found = folderPort.findByMemberIdAndId("otherMember", saved.id!!.value)
+            val found = folderPort.findByMemberIdAndId(otherMember.id, saved.id!!.value)
 
             assertThat(found).isNull()
         }
@@ -226,7 +227,7 @@ class FolderPersistenceAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("다른 회원의 같은 이름 폴더는 중복으로 간주하지 않는다")
         fun `폴더 이름 중복 확인 - 다른 회원`() {
-            val otherMember = createAndSaveMember(id = "otherMember", memberId = "otherMember", email = "other@example.com", socialId = "99999")
+            val otherMember = createAndSaveMember(memberId = "otherMember", email = "other@example.com", socialId = "99999")
             folderPort.save(FolderEntity.create(otherMember.id, "테스트 폴더", null))
 
             val exists = folderPort.existsByMemberIdAndName(savedMember.id, "테스트 폴더")

@@ -18,12 +18,12 @@ class SaveContestEntityTest {
         @DisplayName("콘테스트 스크랩을 생성한다")
         fun `콘테스트 스크랩 생성 - 정상 케이스`() {
             val saveContest = SaveContestEntity.create(
-                memberId = "member1",
+                memberId = 1L,
                 contestId = 100L
             )
 
             assertThat(saveContest.id).isNull()
-            assertThat(saveContest.memberId).isEqualTo("member1")
+            assertThat(saveContest.memberId).isEqualTo(1L)
             assertThat(saveContest.contestId).isEqualTo(100L)
         }
 
@@ -31,7 +31,7 @@ class SaveContestEntityTest {
         @DisplayName("콘테스트 스크랩 생성시 createdAt과 updatedAt이 설정된다")
         fun `콘테스트 스크랩 생성 - 시간 설정 검증`() {
             val saveContest = SaveContestEntity.create(
-                memberId = "member1",
+                memberId = 1L,
                 contestId = 100L
             )
 
@@ -53,14 +53,14 @@ class SaveContestEntityTest {
 
             val saveContest = SaveContestEntity.reconstitute(
                 id = 1L,
-                memberId = "member1",
+                memberId = 1L,
                 contestId = 100L,
                 createdAt = createdAt,
                 updatedAt = updatedAt
             )
 
             assertThat(saveContest.id?.value).isEqualTo(1L)
-            assertThat(saveContest.memberId).isEqualTo("member1")
+            assertThat(saveContest.memberId).isEqualTo(1L)
             assertThat(saveContest.contestId).isEqualTo(100L)
             assertThat(saveContest.createdAt).isEqualTo(createdAt)
             assertThat(saveContest.updatedAt).isEqualTo(updatedAt)
@@ -73,14 +73,14 @@ class SaveContestEntityTest {
 
             val saveContest = SaveContestEntity.reconstitute(
                 id = 999L,
-                memberId = "test-member",
+                memberId = 2L,
                 contestId = 12345L,
                 createdAt = now,
                 updatedAt = now
             )
 
             assertThat(saveContest.id?.value).isEqualTo(999L)
-            assertThat(saveContest.memberId).isEqualTo("test-member")
+            assertThat(saveContest.memberId).isEqualTo(2L)
             assertThat(saveContest.contestId).isEqualTo(12345L)
         }
     }

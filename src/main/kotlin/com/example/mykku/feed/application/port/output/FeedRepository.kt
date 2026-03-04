@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
 interface FeedRepository {
-    fun save(feed: Feed, boardId: Long, memberId: String): Feed
+    fun save(feed: Feed, boardId: Long, memberId: Long): Feed
     fun update(feed: Feed): Feed
     fun findById(id: FeedId): Feed?
     fun findByIdOrThrow(id: FeedId): Feed

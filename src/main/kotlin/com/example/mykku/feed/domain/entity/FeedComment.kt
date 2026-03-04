@@ -11,7 +11,7 @@ class FeedComment private constructor(
     val likeCount: Int,
     val feedId: FeedId,
     val parentCommentId: FeedCommentId?,
-    val memberId: String?,
+    val memberId: Long?,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 ) {
@@ -21,7 +21,7 @@ class FeedComment private constructor(
         fun create(
             content: String,
             feedId: FeedId,
-            memberId: String,
+            memberId: Long,
             parentCommentId: FeedCommentId? = null
         ): FeedComment {
             validateContent(content)
@@ -44,7 +44,7 @@ class FeedComment private constructor(
             likeCount: Int,
             feedId: Long,
             parentCommentId: Long?,
-            memberId: String?,
+            memberId: Long?,
             createdAt: LocalDateTime,
             updatedAt: LocalDateTime
         ): FeedComment {
@@ -81,5 +81,5 @@ class FeedComment private constructor(
         )
     }
 
-    fun isOwnedBy(memberId: String): Boolean = this.memberId == memberId
+    fun isOwnedBy(memberId: Long): Boolean = this.memberId == memberId
 }

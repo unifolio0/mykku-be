@@ -13,21 +13,21 @@ import org.springframework.stereotype.Repository
 interface KeywordBlockJpaRepository : JpaRepository<KeywordBlockJpaEntity, Long> {
 
     @Query("SELECT CASE WHEN COUNT(kb) > 0 THEN true ELSE false END FROM KeywordBlockJpaEntity kb WHERE kb.member.id = :memberId AND kb.keyword = :keyword")
-    fun existsByMemberIdAndKeyword(@Param("memberId") memberId: String, @Param("keyword") keyword: String): Boolean
+    fun existsByMemberIdAndKeyword(@Param("memberId") memberId: Long, @Param("keyword") keyword: String): Boolean
 
     @Query("SELECT kb FROM KeywordBlockJpaEntity kb WHERE kb.member.id = :memberId AND kb.keyword = :keyword")
-    fun findByMemberIdAndKeyword(@Param("memberId") memberId: String, @Param("keyword") keyword: String): KeywordBlockJpaEntity?
+    fun findByMemberIdAndKeyword(@Param("memberId") memberId: Long, @Param("keyword") keyword: String): KeywordBlockJpaEntity?
 
     @Query("SELECT kb.keyword FROM KeywordBlockJpaEntity kb WHERE kb.member.id = :memberId")
-    fun findKeywordsByMemberId(@Param("memberId") memberId: String): List<String>
+    fun findKeywordsByMemberId(@Param("memberId") memberId: Long): List<String>
 
     @Query("SELECT kb FROM KeywordBlockJpaEntity kb WHERE kb.member.id = :memberId")
-    fun findAllByMemberId(@Param("memberId") memberId: String, pageable: Pageable): Page<KeywordBlockJpaEntity>
+    fun findAllByMemberId(@Param("memberId") memberId: Long, pageable: Pageable): Page<KeywordBlockJpaEntity>
 
     @Modifying
     @Query("DELETE FROM KeywordBlockJpaEntity kb WHERE kb.member.id = :memberId AND kb.keyword = :keyword")
-    fun deleteByMemberIdAndKeyword(@Param("memberId") memberId: String, @Param("keyword") keyword: String)
+    fun deleteByMemberIdAndKeyword(@Param("memberId") memberId: Long, @Param("keyword") keyword: String)
 
     @Query("SELECT COUNT(kb) FROM KeywordBlockJpaEntity kb WHERE kb.member.id = :memberId")
-    fun countByMemberId(@Param("memberId") memberId: String): Long
+    fun countByMemberId(@Param("memberId") memberId: Long): Long
 }

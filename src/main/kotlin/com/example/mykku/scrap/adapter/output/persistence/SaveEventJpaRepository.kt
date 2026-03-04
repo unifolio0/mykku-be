@@ -8,8 +8,8 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface SaveEventJpaRepository : JpaRepository<SaveEventJpaEntity, Long> {
-    fun existsByMemberIdAndEventId(memberId: String, eventId: Long): Boolean
-    fun findByMemberId(memberId: String, pageable: Pageable): Page<SaveEventJpaEntity>
-    fun deleteByMemberIdAndEventId(memberId: String, eventId: Long)
-    fun findByMemberIdAndEventIdIn(memberId: String, eventIds: List<Long>): List<SaveEventJpaEntity>
+    fun existsByMemberIdAndEventId(memberId: Long, eventId: Long): Boolean
+    fun findByMemberId(memberId: Long, pageable: Pageable): Page<SaveEventJpaEntity>
+    fun deleteByMemberIdAndEventId(memberId: Long, eventId: Long)
+    fun findByMemberIdAndEventIdIn(memberId: Long, eventIds: List<Long>): List<SaveEventJpaEntity>
 }

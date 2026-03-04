@@ -20,12 +20,12 @@ class NotificationSettingTest {
         @DisplayName("정상적으로 알림 설정을 생성한다")
         fun `알림 설정 생성 - 정상 케이스`() {
             val setting = NotificationSetting.create(
-                memberId = "member1",
+                memberId = 1L,
                 notificationType = NotificationType.FEED_LIKE
             )
 
             assertThat(setting.id).isNull()
-            assertThat(setting.memberId).isEqualTo("member1")
+            assertThat(setting.memberId).isEqualTo(1L)
             assertThat(setting.notificationType).isEqualTo(NotificationType.FEED_LIKE)
         }
 
@@ -33,7 +33,7 @@ class NotificationSettingTest {
         @DisplayName("알림 설정 생성시 기본적으로 활성화 상태이다")
         fun `알림 설정 생성 - 기본 활성화`() {
             val setting = NotificationSetting.create(
-                memberId = "member1",
+                memberId = 1L,
                 notificationType = NotificationType.FEED_LIKE
             )
 
@@ -44,7 +44,7 @@ class NotificationSettingTest {
         @DisplayName("알림 설정을 비활성화 상태로 생성할 수 있다")
         fun `알림 설정 생성 - 비활성화 상태`() {
             val setting = NotificationSetting.create(
-                memberId = "member1",
+                memberId = 1L,
                 notificationType = NotificationType.FEED_COMMENT,
                 isEnabled = false
             )
@@ -77,7 +77,7 @@ class NotificationSettingTest {
         @DisplayName("FEED_COMMENT 타입으로 알림 설정을 생성할 수 있다")
         fun `알림 설정 생성 - FEED_COMMENT 타입`() {
             val setting = NotificationSetting.create(
-                memberId = "member1",
+                memberId = 1L,
                 notificationType = NotificationType.FEED_COMMENT
             )
 
@@ -89,7 +89,7 @@ class NotificationSettingTest {
         @DisplayName("SYSTEM_NOTICE 타입으로 알림 설정을 생성할 수 있다")
         fun `알림 설정 생성 - SYSTEM_NOTICE 타입`() {
             val setting = NotificationSetting.create(
-                memberId = "member1",
+                memberId = 1L,
                 notificationType = NotificationType.SYSTEM_NOTICE
             )
 
@@ -106,7 +106,7 @@ class NotificationSettingTest {
         @DisplayName("비활성화된 알림 설정을 활성화할 수 있다")
         fun `활성화 - 정상 케이스`() {
             val setting = NotificationSetting.create(
-                memberId = "member1",
+                memberId = 1L,
                 notificationType = NotificationType.FEED_LIKE,
                 isEnabled = false
             )
@@ -149,7 +149,7 @@ class NotificationSettingTest {
         @DisplayName("이미 비활성화된 알림 설정을 다시 비활성화해도 false 상태를 유지한다")
         fun `비활성화 - 중복 호출`() {
             val setting = NotificationSetting.create(
-                memberId = "member1",
+                memberId = 1L,
                 notificationType = NotificationType.FEED_LIKE,
                 isEnabled = false
             )
@@ -169,7 +169,7 @@ class NotificationSettingTest {
         @DisplayName("알림 설정을 활성화 상태로 업데이트할 수 있다")
         fun `상태 업데이트 - 활성화`() {
             val setting = NotificationSetting.create(
-                memberId = "member1",
+                memberId = 1L,
                 notificationType = NotificationType.FEED_LIKE,
                 isEnabled = false
             )
@@ -223,7 +223,7 @@ class NotificationSettingTest {
         @Test
         @DisplayName("모든 NotificationType에 대한 기본 설정을 생성한다")
         fun `기본 설정 생성 - 정상 케이스`() {
-            val settings = NotificationSetting.createDefaultSettings("member1")
+            val settings = NotificationSetting.createDefaultSettings(1L)
 
             assertThat(settings).hasSize(NotificationType.entries.size)
         }
@@ -231,7 +231,7 @@ class NotificationSettingTest {
         @Test
         @DisplayName("기본 설정은 모든 NotificationType 타입을 포함한다")
         fun `기본 설정 생성 - 타입 검증`() {
-            val settings = NotificationSetting.createDefaultSettings("member1")
+            val settings = NotificationSetting.createDefaultSettings(1L)
             val types = settings.map { it.notificationType }
 
             assertThat(types).containsExactlyInAnyOrder(
@@ -247,7 +247,7 @@ class NotificationSettingTest {
         @Test
         @DisplayName("모든 기본 설정은 활성화 상태로 생성된다")
         fun `기본 설정 생성 - 모두 활성화`() {
-            val settings = NotificationSetting.createDefaultSettings("member1")
+            val settings = NotificationSetting.createDefaultSettings(1L)
 
             assertThat(settings).allMatch { it.isEnabled }
         }
@@ -255,7 +255,7 @@ class NotificationSettingTest {
         @Test
         @DisplayName("모든 기본 설정은 동일한 memberId를 가진다")
         fun `기본 설정 생성 - memberId 일관성`() {
-            val memberId = "test-member-123"
+            val memberId = 3L
             val settings = NotificationSetting.createDefaultSettings(memberId)
 
             assertThat(settings).allMatch { it.memberId == memberId }
@@ -264,7 +264,7 @@ class NotificationSettingTest {
         @Test
         @DisplayName("모든 기본 설정의 id는 null이다")
         fun `기본 설정 생성 - id null`() {
-            val settings = NotificationSetting.createDefaultSettings("member1")
+            val settings = NotificationSetting.createDefaultSettings(1L)
 
             assertThat(settings).allMatch { it.id == null }
         }
@@ -272,11 +272,11 @@ class NotificationSettingTest {
         @Test
         @DisplayName("서로 다른 회원에 대해 독립적인 설정을 생성한다")
         fun `기본 설정 생성 - 회원별 독립성`() {
-            val settings1 = NotificationSetting.createDefaultSettings("member1")
-            val settings2 = NotificationSetting.createDefaultSettings("member2")
+            val settings1 = NotificationSetting.createDefaultSettings(1L)
+            val settings2 = NotificationSetting.createDefaultSettings(2L)
 
-            assertThat(settings1).allMatch { it.memberId == "member1" }
-            assertThat(settings2).allMatch { it.memberId == "member2" }
+            assertThat(settings1).allMatch { it.memberId == 1L }
+            assertThat(settings2).allMatch { it.memberId == 2L }
             assertThat(settings1.size).isEqualTo(settings2.size)
         }
     }
@@ -292,7 +292,7 @@ class NotificationSettingTest {
 
             val setting = NotificationSetting.reconstitute(
                 id = NotificationSettingId(1L),
-                memberId = "member1",
+                memberId = 1L,
                 notificationType = NotificationType.FEED_LIKE,
                 isEnabled = true,
                 createdAt = now.minusDays(1),
@@ -300,7 +300,7 @@ class NotificationSettingTest {
             )
 
             assertThat(setting.id?.value).isEqualTo(1L)
-            assertThat(setting.memberId).isEqualTo("member1")
+            assertThat(setting.memberId).isEqualTo(1L)
             assertThat(setting.notificationType).isEqualTo(NotificationType.FEED_LIKE)
             assertThat(setting.isEnabled).isTrue()
             assertThat(setting.createdAt).isEqualTo(now.minusDays(1))
@@ -314,7 +314,7 @@ class NotificationSettingTest {
 
             val setting = NotificationSetting.reconstitute(
                 id = NotificationSettingId(1L),
-                memberId = "member1",
+                memberId = 1L,
                 notificationType = NotificationType.FEED_COMMENT,
                 isEnabled = false,
                 createdAt = now,
@@ -330,7 +330,7 @@ class NotificationSettingTest {
             val now = LocalDateTime.now()
             val setting = NotificationSetting.reconstitute(
                 id = NotificationSettingId(1L),
-                memberId = "member1",
+                memberId = 1L,
                 notificationType = NotificationType.SYSTEM_NOTICE,
                 isEnabled = false,
                 createdAt = now,
@@ -349,7 +349,7 @@ class NotificationSettingTest {
             val now = LocalDateTime.now()
             val setting = NotificationSetting.reconstitute(
                 id = NotificationSettingId(1L),
-                memberId = "member1",
+                memberId = 1L,
                 notificationType = NotificationType.FEED_LIKE,
                 isEnabled = true,
                 createdAt = now,
@@ -369,7 +369,7 @@ class NotificationSettingTest {
 
             val setting = NotificationSetting.reconstitute(
                 id = NotificationSettingId(100L),
-                memberId = "member1",
+                memberId = 1L,
                 notificationType = NotificationType.FEED_LIKE,
                 isEnabled = true,
                 createdAt = createdAt,
@@ -436,7 +436,7 @@ class NotificationSettingTest {
 
     private fun createNotificationSetting(): NotificationSetting {
         return NotificationSetting.create(
-            memberId = "member1",
+            memberId = 1L,
             notificationType = NotificationType.FEED_LIKE
         )
     }

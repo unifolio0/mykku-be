@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface SaveFanNoteJpaRepository : JpaRepository<SaveFanNoteJpaEntity, Long> {
-    fun existsByMemberIdAndFanNoteId(memberId: String, fanNoteId: Long): Boolean
-    fun findByMemberId(memberId: String, pageable: Pageable): Page<SaveFanNoteJpaEntity>
-    fun deleteByMemberIdAndFanNoteId(memberId: String, fanNoteId: Long)
+    fun existsByMemberIdAndFanNoteId(memberId: Long, fanNoteId: Long): Boolean
+    fun findByMemberId(memberId: Long, pageable: Pageable): Page<SaveFanNoteJpaEntity>
+    fun deleteByMemberIdAndFanNoteId(memberId: Long, fanNoteId: Long)
 }

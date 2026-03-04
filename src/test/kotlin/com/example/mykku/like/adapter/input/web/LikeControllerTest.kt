@@ -21,7 +21,6 @@ class LikeControllerTest : BaseControllerTest() {
         // given
         val member = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member1",
                 memberId = "testmemberid1",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
@@ -31,7 +30,7 @@ class LikeControllerTest : BaseControllerTest() {
                 profileImage = ""
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken("member1")
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
 
         // when & then
         RestAssured.given()
@@ -61,7 +60,6 @@ class LikeControllerTest : BaseControllerTest() {
         // given
         val member = memberJpaRepository.save(
             MemberJpaEntity(
-                id = "member1",
                 memberId = "member1",
                 socialId = "member1",
                 provider = SocialProvider.GOOGLE,
@@ -77,7 +75,7 @@ class LikeControllerTest : BaseControllerTest() {
                 logo = "test_logo.png"
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken("member1")
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
 
         // when & then
         RestAssured.given()
@@ -88,7 +86,7 @@ class LikeControllerTest : BaseControllerTest() {
             .then()
             .statusCode(200)
             .body("message", equalTo("게시판 즐겨찾기가 성공적으로 처리되었습니다."))
-            .body("data.memberId", equalTo("member1"))
+            .body("data.memberId", equalTo(member.id.toInt()))
             .body("data.boardId", equalTo(board.id!!.toInt()))
     }
 

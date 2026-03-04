@@ -52,7 +52,7 @@ class SaveFanNoteApplicationService(
     }
 
     @Transactional(readOnly = true)
-    override fun isSaved(memberId: String, fanNoteId: Long): Boolean {
+    override fun isSaved(memberId: Long, fanNoteId: Long): Boolean {
         return saveFanNotePort.existsByMemberIdAndFanNoteId(memberId, fanNoteId)
     }
 }

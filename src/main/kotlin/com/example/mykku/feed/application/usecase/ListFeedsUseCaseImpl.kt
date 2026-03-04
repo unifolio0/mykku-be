@@ -20,6 +20,7 @@ import com.example.mykku.feed.domain.entity.Feed
 import com.example.mykku.feed.domain.entity.FeedTag
 import com.example.mykku.like.application.port.output.LikeFeedPort
 import com.example.mykku.member.application.port.output.MemberRepository
+import com.example.mykku.member.domain.vo.MemberPk
 import com.example.mykku.role.application.dto.RoleResult
 import com.example.mykku.role.application.port.output.RoleRepository
 import com.example.mykku.role.domain.vo.RoleId
@@ -54,7 +55,7 @@ class ListFeedsUseCaseImpl(
             contentExtractors = listOf({ it.title }, { it.content })
         )
 
-        val feedResponses = convertToFeedResults(query.memberId ?: "", filteredFeeds)
+        val feedResponses = convertToFeedResults(query.memberId, filteredFeeds)
 
         return PagedFeedsResult(
             feeds = feedResponses,
@@ -67,7 +68,7 @@ class ListFeedsUseCaseImpl(
         )
     }
 
-    private fun convertToFeedResults(memberId: String, feeds: List<Feed>): List<FeedResult> {
+    private fun convertToFeedResults(memberId: Long?, feeds: List<Feed>): List<FeedResult> {
         if (feeds.isEmpty()) return emptyList()
 
         val feedIds = feeds.map { it.id!! }
@@ -77,8 +78,8 @@ class ListFeedsUseCaseImpl(
         val allTags = feedTagsMap.values.flatten()
         val contestTagsMap = getContestTagsMap(allTags)
 
-        val memberIds = feeds.mapNotNull { it.memberId }.distinct()
-        val membersMap = memberIds.mapNotNull { memberRepository.findByIdString(it) }
+        val memberPks = feeds.mapNotNull { it.memberId }.distinct()
+        val membersMap = memberPks.mapNotNull { memberRepository.findById(MemberPk.of(it)) }
             .associateBy { it.id.value }
 
         val boardIds = feeds.map { it.boardId }.distinct()
@@ -86,11 +87,11 @@ class ListFeedsUseCaseImpl(
             .associateBy { it.id.value }
 
         val feedIdValues = feedIds.map { it.value }
-        val likedFeedIds = if (memberId.isNotEmpty()) {
+        val likedFeedIds = if (memberId != null) {
             likeFeedPort.findByMemberIdAndFeedIdIn(memberId, feedIdValues).map { it.feedId }.toSet()
         } else emptySet()
 
-        val savedFeedIds = if (memberId.isNotEmpty()) {
+        val savedFeedIds = if (memberId != null) {
             saveFeedPort.findByMemberIdAndFeedIdIn(memberId, feedIdValues).map { it.feedId }.toSet()
         } else emptySet()
 
@@ -116,7 +117,7 @@ class ListFeedsUseCaseImpl(
                 feed.id!!, PageRequest.of(0, 1)
             ).content.firstOrNull()
 
-            val commentMember = firstComment?.memberId?.let { memberRepository.findByIdString(it) }
+            val commentMember = firstComment?.memberId?.let { memberRepository.findById(MemberPk.of(it)) }
 
             FeedResult(
                 id = feedId,

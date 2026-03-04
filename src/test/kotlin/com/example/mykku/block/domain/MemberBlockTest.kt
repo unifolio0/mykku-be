@@ -18,8 +18,8 @@ class MemberBlockTest {
         @Test
         @DisplayName("정상적으로 회원 차단을 생성한다")
         fun `회원 차단 생성 - 정상 케이스`() {
-            val blockerId = "blocker-uuid"
-            val blockedId = "blocked-uuid"
+            val blockerId = 1L
+            val blockedId = 2L
 
             val memberBlock = MemberBlock.create(
                 blockerId = blockerId,
@@ -34,8 +34,8 @@ class MemberBlockTest {
         @DisplayName("생성시 id는 null이다")
         fun `회원 차단 생성 - id null`() {
             val memberBlock = MemberBlock.create(
-                blockerId = "blocker-uuid",
-                blockedId = "blocked-uuid"
+                blockerId = 1L,
+                blockedId = 2L
             )
 
             assertThat(memberBlock.id).isNull()
@@ -47,8 +47,8 @@ class MemberBlockTest {
             val beforeCreate = LocalDateTime.now()
 
             val memberBlock = MemberBlock.create(
-                blockerId = "blocker-uuid",
-                blockedId = "blocked-uuid"
+                blockerId = 1L,
+                blockedId = 2L
             )
 
             assertThat(memberBlock.createdAt).isNotNull()
@@ -61,8 +61,8 @@ class MemberBlockTest {
             val beforeCreate = LocalDateTime.now()
 
             val memberBlock = MemberBlock.create(
-                blockerId = "blocker-uuid",
-                blockedId = "blocked-uuid"
+                blockerId = 1L,
+                blockedId = 2L
             )
 
             assertThat(memberBlock.updatedAt).isNotNull()
@@ -73,8 +73,8 @@ class MemberBlockTest {
         @DisplayName("생성시 createdAt과 updatedAt이 동일하다")
         fun `회원 차단 생성 - createdAt과 updatedAt 동일`() {
             val memberBlock = MemberBlock.create(
-                blockerId = "blocker-uuid",
-                blockedId = "blocked-uuid"
+                blockerId = 1L,
+                blockedId = 2L
             )
 
             assertThat(memberBlock.createdAt).isEqualTo(memberBlock.updatedAt)
@@ -89,8 +89,8 @@ class MemberBlockTest {
         @DisplayName("저장된 데이터로 MemberBlock을 복원한다")
         fun `복원 - 정상 케이스`() {
             val id = MemberBlockId(1L)
-            val blockerId = "blocker-uuid"
-            val blockedId = "blocked-uuid"
+            val blockerId = 1L
+            val blockedId = 2L
             val createdAt = LocalDateTime.of(2025, 1, 1, 10, 0, 0)
             val updatedAt = LocalDateTime.of(2025, 1, 2, 10, 0, 0)
 
@@ -117,8 +117,8 @@ class MemberBlockTest {
 
             val memberBlock = MemberBlock.reconstitute(
                 id = id,
-                blockerId = "blocker-uuid",
-                blockedId = "blocked-uuid",
+                blockerId = 1L,
+                blockedId = 2L,
                 createdAt = now,
                 updatedAt = now
             )

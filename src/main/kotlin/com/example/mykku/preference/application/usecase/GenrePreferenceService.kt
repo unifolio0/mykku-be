@@ -15,7 +15,7 @@ class GenrePreferenceService(
 ) : GetGenrePreferenceUseCase, UpdateGenrePreferenceUseCase {
 
     @Transactional(readOnly = true)
-    override fun getGenrePreferences(memberId: String): GenrePreferenceResult {
+    override fun getGenrePreferences(memberId: Long): GenrePreferenceResult {
         val preferences = genrePreferenceRepository.findByMemberId(memberId)
         return GenrePreferenceResult(
             genreTypes = preferences.map { it.genreType }

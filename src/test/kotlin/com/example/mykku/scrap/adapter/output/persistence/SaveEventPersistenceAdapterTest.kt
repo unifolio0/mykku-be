@@ -35,7 +35,7 @@ class SaveEventPersistenceAdapterTest : BaseRepositoryTest() {
 
     @BeforeEach
     fun setUp() {
-        savedMember = createAndSaveMember(id = "testMember1", memberId = "testMember1")
+        savedMember = createAndSaveMember(memberId = "testMember1")
         savedEvent = eventJpaRepository.save(createEventJpaEntity())
     }
 
@@ -62,7 +62,7 @@ class SaveEventPersistenceAdapterTest : BaseRepositoryTest() {
         @DisplayName("존재하지 않는 회원이 저장하면 예외가 발생한다")
         fun `이벤트 저장 - 존재하지 않는 회원`() {
             val saveEvent = SaveEventEntity.create(
-                memberId = "nonExistentMember",
+                memberId = 999999L,
                 eventId = savedEvent.id!!
             )
 

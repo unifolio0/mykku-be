@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface LikeDailyMessageCommentJpaRepository : JpaRepository<LikeDailyMessageCommentJpaEntity, Long> {
-    fun existsByMemberIdAndDailyMessageCommentId(memberId: String, dailyMessageCommentId: Long): Boolean
-    fun deleteByMemberIdAndDailyMessageCommentId(memberId: String, dailyMessageCommentId: Long)
+    fun existsByMemberIdAndDailyMessageCommentId(memberId: Long, dailyMessageCommentId: Long): Boolean
+    fun deleteByMemberIdAndDailyMessageCommentId(memberId: Long, dailyMessageCommentId: Long)
 }

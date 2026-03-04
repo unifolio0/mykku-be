@@ -18,12 +18,12 @@ class SaveEventEntityTest {
         @DisplayName("이벤트 스크랩을 생성한다")
         fun `이벤트 스크랩 생성 - 정상 케이스`() {
             val saveEvent = SaveEventEntity.create(
-                memberId = "member1",
+                memberId = 1L,
                 eventId = 100L
             )
 
             assertThat(saveEvent.id).isNull()
-            assertThat(saveEvent.memberId).isEqualTo("member1")
+            assertThat(saveEvent.memberId).isEqualTo(1L)
             assertThat(saveEvent.eventId).isEqualTo(100L)
         }
 
@@ -31,7 +31,7 @@ class SaveEventEntityTest {
         @DisplayName("이벤트 스크랩 생성시 createdAt과 updatedAt이 설정된다")
         fun `이벤트 스크랩 생성 - 시간 설정 검증`() {
             val saveEvent = SaveEventEntity.create(
-                memberId = "member1",
+                memberId = 1L,
                 eventId = 100L
             )
 
@@ -53,14 +53,14 @@ class SaveEventEntityTest {
 
             val saveEvent = SaveEventEntity.reconstitute(
                 id = 1L,
-                memberId = "member1",
+                memberId = 1L,
                 eventId = 100L,
                 createdAt = createdAt,
                 updatedAt = updatedAt
             )
 
             assertThat(saveEvent.id?.value).isEqualTo(1L)
-            assertThat(saveEvent.memberId).isEqualTo("member1")
+            assertThat(saveEvent.memberId).isEqualTo(1L)
             assertThat(saveEvent.eventId).isEqualTo(100L)
             assertThat(saveEvent.createdAt).isEqualTo(createdAt)
             assertThat(saveEvent.updatedAt).isEqualTo(updatedAt)
@@ -73,14 +73,14 @@ class SaveEventEntityTest {
 
             val saveEvent = SaveEventEntity.reconstitute(
                 id = 999L,
-                memberId = "test-member",
+                memberId = 2L,
                 eventId = 12345L,
                 createdAt = now,
                 updatedAt = now
             )
 
             assertThat(saveEvent.id?.value).isEqualTo(999L)
-            assertThat(saveEvent.memberId).isEqualTo("test-member")
+            assertThat(saveEvent.memberId).isEqualTo(2L)
             assertThat(saveEvent.eventId).isEqualTo(12345L)
         }
     }

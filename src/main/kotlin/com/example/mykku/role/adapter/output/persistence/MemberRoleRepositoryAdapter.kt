@@ -30,11 +30,11 @@ class MemberRoleRepositoryAdapter(
         return jpaRepository.findByIdOrNull(id.value)?.toDomain()
     }
 
-    override fun findByMemberId(memberId: String): List<MemberRole> {
+    override fun findByMemberId(memberId: Long): List<MemberRole> {
         return jpaRepository.findByMemberId(memberId).map { it.toDomain() }
     }
 
-    override fun findByMemberIdWithRole(memberId: String): List<MemberRoleWithRole> {
+    override fun findByMemberIdWithRole(memberId: Long): List<MemberRoleWithRole> {
         return jpaRepository.findByMemberIdWithRole(memberId).map { entity ->
             MemberRoleWithRole(
                 memberRole = entity.toDomain(),
@@ -43,7 +43,7 @@ class MemberRoleRepositoryAdapter(
         }
     }
 
-    override fun existsByMemberIdAndRoleId(memberId: String, roleId: RoleId): Boolean {
+    override fun existsByMemberIdAndRoleId(memberId: Long, roleId: RoleId): Boolean {
         return jpaRepository.existsByMemberIdAndRoleId(memberId, roleId.value)
     }
 

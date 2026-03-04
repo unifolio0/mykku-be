@@ -23,7 +23,7 @@ class DailyMessageCommentTest {
         fun `댓글 생성 - 정상 케이스`() {
             val comment = DailyMessageComment.create(
                 dailyMessageId = 1L,
-                memberId = "member1",
+                memberId = 1L,
                 memberNickname = "닉네임",
                 memberProfileImage = "https://example.com/profile.jpg",
                 content = "테스트 댓글"
@@ -31,7 +31,7 @@ class DailyMessageCommentTest {
 
             assertThat(comment.id.value).isEqualTo(0L)
             assertThat(comment.dailyMessageId).isEqualTo(1L)
-            assertThat(comment.memberId).isEqualTo("member1")
+            assertThat(comment.memberId).isEqualTo(1L)
             assertThat(comment.memberNickname).isEqualTo("닉네임")
             assertThat(comment.memberProfileImage).isEqualTo("https://example.com/profile.jpg")
             assertThat(comment.content).isEqualTo("테스트 댓글")
@@ -43,7 +43,7 @@ class DailyMessageCommentTest {
         fun `댓글 생성 - 기본값 설정 검증`() {
             val comment = DailyMessageComment.create(
                 dailyMessageId = 1L,
-                memberId = "member1",
+                memberId = 1L,
                 memberNickname = "닉네임",
                 memberProfileImage = "https://example.com/profile.jpg",
                 content = "테스트 댓글"
@@ -57,7 +57,7 @@ class DailyMessageCommentTest {
         fun `댓글 생성 - 시간 설정 검증`() {
             val comment = DailyMessageComment.create(
                 dailyMessageId = 1L,
-                memberId = "member1",
+                memberId = 1L,
                 memberNickname = "닉네임",
                 memberProfileImage = "https://example.com/profile.jpg",
                 content = "테스트 댓글"
@@ -73,7 +73,7 @@ class DailyMessageCommentTest {
         fun `댓글 생성 - 대댓글`() {
             val comment = DailyMessageComment.create(
                 dailyMessageId = 1L,
-                memberId = "member1",
+                memberId = 1L,
                 memberNickname = "닉네임",
                 memberProfileImage = "https://example.com/profile.jpg",
                 content = "대댓글 내용",
@@ -92,7 +92,7 @@ class DailyMessageCommentTest {
             val exception = assertThrows<DailyMessageException> {
                 DailyMessageComment.create(
                     dailyMessageId = 1L,
-                    memberId = "member1",
+                    memberId = 1L,
                     memberNickname = "닉네임",
                     memberProfileImage = "https://example.com/profile.jpg",
                     content = longContent
@@ -109,7 +109,7 @@ class DailyMessageCommentTest {
 
             val comment = DailyMessageComment.create(
                 dailyMessageId = 1L,
-                memberId = "member1",
+                memberId = 1L,
                 memberNickname = "닉네임",
                 memberProfileImage = "https://example.com/profile.jpg",
                 content = exactContent
@@ -123,7 +123,7 @@ class DailyMessageCommentTest {
         fun `댓글 생성 - 빈 컨텐츠`() {
             val comment = DailyMessageComment.create(
                 dailyMessageId = 1L,
-                memberId = "member1",
+                memberId = 1L,
                 memberNickname = "닉네임",
                 memberProfileImage = "https://example.com/profile.jpg",
                 content = ""
@@ -210,7 +210,7 @@ class DailyMessageCommentTest {
         fun `소유 여부 - 일치`() {
             val comment = createComment()
 
-            assertThat(comment.isOwnedBy("member1")).isTrue()
+            assertThat(comment.isOwnedBy(1L)).isTrue()
         }
 
         @Test
@@ -218,15 +218,15 @@ class DailyMessageCommentTest {
         fun `소유 여부 - 불일치`() {
             val comment = createComment()
 
-            assertThat(comment.isOwnedBy("member2")).isFalse()
+            assertThat(comment.isOwnedBy(2L)).isFalse()
         }
 
         @Test
-        @DisplayName("빈 문자열과 비교시 false를 반환한다")
-        fun `소유 여부 - 빈 문자열`() {
+        @DisplayName("다른 memberId와 비교시 false를 반환한다")
+        fun `소유 여부 - 다른 memberId`() {
             val comment = createComment()
 
-            assertThat(comment.isOwnedBy("")).isFalse()
+            assertThat(comment.isOwnedBy(0L)).isFalse()
         }
     }
 
@@ -241,7 +241,7 @@ class DailyMessageCommentTest {
             val comment = DailyMessageComment.reconstitute(
                 id = DailyMessageCommentId(1L),
                 dailyMessageId = 10L,
-                memberId = "member1",
+                memberId = 1L,
                 memberNickname = "닉네임",
                 memberProfileImage = "https://example.com/profile.jpg",
                 content = "댓글 내용",
@@ -253,7 +253,7 @@ class DailyMessageCommentTest {
 
             assertThat(comment.id.value).isEqualTo(1L)
             assertThat(comment.dailyMessageId).isEqualTo(10L)
-            assertThat(comment.memberId).isEqualTo("member1")
+            assertThat(comment.memberId).isEqualTo(1L)
             assertThat(comment.memberNickname).isEqualTo("닉네임")
             assertThat(comment.memberProfileImage).isEqualTo("https://example.com/profile.jpg")
             assertThat(comment.content).isEqualTo("댓글 내용")
@@ -270,7 +270,7 @@ class DailyMessageCommentTest {
             val comment = DailyMessageComment.reconstitute(
                 id = DailyMessageCommentId(2L),
                 dailyMessageId = 10L,
-                memberId = "member1",
+                memberId = 1L,
                 memberNickname = "닉네임",
                 memberProfileImage = "https://example.com/profile.jpg",
                 content = "대댓글 내용",
@@ -292,7 +292,7 @@ class DailyMessageCommentTest {
             val comment = DailyMessageComment.reconstitute(
                 id = DailyMessageCommentId(1L),
                 dailyMessageId = 10L,
-                memberId = "member1",
+                memberId = 1L,
                 memberNickname = "닉네임",
                 memberProfileImage = "https://example.com/profile.jpg",
                 content = longContent,
@@ -320,7 +320,7 @@ class DailyMessageCommentTest {
     private fun createComment(): DailyMessageComment {
         return DailyMessageComment.create(
             dailyMessageId = 1L,
-            memberId = "member1",
+            memberId = 1L,
             memberNickname = "닉네임",
             memberProfileImage = "https://example.com/profile.jpg",
             content = "테스트 댓글"

@@ -19,12 +19,12 @@ class MemberGoodsPreferenceTest {
         @Test
         fun `정상적으로 굿즈 선호도를 생성한다`() {
             val preference = MemberGoodsPreference.create(
-                memberId = "member-123",
+                memberId = 1L,
                 goodsType = GoodsType.PHOTOCARD_HOLDER
             )
 
             assertThat(preference.id).isEqualTo(PreferenceId(0))
-            assertThat(preference.memberId).isEqualTo("member-123")
+            assertThat(preference.memberId).isEqualTo(1L)
             assertThat(preference.goodsType).isEqualTo(GoodsType.PHOTOCARD_HOLDER)
         }
 
@@ -33,7 +33,7 @@ class MemberGoodsPreferenceTest {
             val beforeCreate = LocalDateTime.now()
 
             val preference = MemberGoodsPreference.create(
-                memberId = "member-123",
+                memberId = 1L,
                 goodsType = GoodsType.DESK_TERIOR
             )
 
@@ -48,7 +48,7 @@ class MemberGoodsPreferenceTest {
         @Test
         fun `굿즈 선호도 생성시 createdAt과 updatedAt이 동일하다`() {
             val preference = MemberGoodsPreference.create(
-                memberId = "member-456",
+                memberId = 2L,
                 goodsType = GoodsType.LIGHT_STICK_DECO
             )
 
@@ -59,7 +59,7 @@ class MemberGoodsPreferenceTest {
         fun `모든 굿즈 타입으로 생성할 수 있다`() {
             GoodsType.entries.forEach { goodsType ->
                 val preference = MemberGoodsPreference.create(
-                    memberId = "member-test",
+                    memberId = 3L,
                     goodsType = goodsType
                 )
 
@@ -79,14 +79,14 @@ class MemberGoodsPreferenceTest {
 
             val preference = MemberGoodsPreference.reconstitute(
                 id = PreferenceId(1L),
-                memberId = "member-123",
+                memberId = 1L,
                 goodsType = GoodsType.ITABAG,
                 createdAt = createdAt,
                 updatedAt = updatedAt
             )
 
             assertThat(preference.id).isEqualTo(PreferenceId(1L))
-            assertThat(preference.memberId).isEqualTo("member-123")
+            assertThat(preference.memberId).isEqualTo(1L)
             assertThat(preference.goodsType).isEqualTo(GoodsType.ITABAG)
             assertThat(preference.createdAt).isEqualTo(createdAt)
             assertThat(preference.updatedAt).isEqualTo(updatedAt)
@@ -96,7 +96,7 @@ class MemberGoodsPreferenceTest {
         fun `복원된 엔티티의 id는 PreferenceId Value Object로 래핑된다`() {
             val preference = MemberGoodsPreference.reconstitute(
                 id = PreferenceId(42L),
-                memberId = "member-123",
+                memberId = 1L,
                 goodsType = GoodsType.UCHIWA,
                 createdAt = LocalDateTime.now(),
                 updatedAt = LocalDateTime.now()
@@ -112,7 +112,7 @@ class MemberGoodsPreferenceTest {
 
             val preference = MemberGoodsPreference.reconstitute(
                 id = PreferenceId(999L),
-                memberId = "member-999",
+                memberId = 999L,
                 goodsType = GoodsType.DIARY_DECO,
                 createdAt = now,
                 updatedAt = now
@@ -128,7 +128,7 @@ class MemberGoodsPreferenceTest {
             GoodsType.entries.forEachIndexed { index, goodsType ->
                 val preference = MemberGoodsPreference.reconstitute(
                     id = PreferenceId(index.toLong()),
-                    memberId = "member-$index",
+                    memberId = index.toLong(),
                     goodsType = goodsType,
                     createdAt = now,
                     updatedAt = now
@@ -145,7 +145,7 @@ class MemberGoodsPreferenceTest {
 
             val preference = MemberGoodsPreference.reconstitute(
                 id = PreferenceId(1L),
-                memberId = "member-123",
+                memberId = 1L,
                 goodsType = GoodsType.PHONE_ACCESSORY,
                 createdAt = createdAt,
                 updatedAt = updatedAt

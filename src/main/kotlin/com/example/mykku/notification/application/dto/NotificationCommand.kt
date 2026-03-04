@@ -6,8 +6,8 @@ import com.example.mykku.notification.domain.vo.NotificationType
 
 data class CreateNotificationCommand(
     val type: NotificationType,
-    val senderId: String?,
-    val receiverId: String,
+    val senderId: Long?,
+    val receiverId: Long,
     val content: String,
     val relatedResourceId: Long? = null,
     val relatedResourceType: String? = null,
@@ -16,15 +16,15 @@ data class CreateNotificationCommand(
 
 data class MarkAsReadCommand(
     val notificationId: Long,
-    val memberId: String
+    val memberId: Long
 )
 
 data class MarkAllAsReadCommand(
-    val memberId: String,
+    val memberId: Long,
     val category: NotificationCategory? = null
 )
 
 data class DeleteNotificationCommand(
     val notificationId: Long,
-    val memberId: String
+    val memberId: Long
 )

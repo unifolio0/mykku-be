@@ -19,12 +19,12 @@ class MemberMoodPreferenceTest {
         @Test
         fun `정상적으로 분위기 선호도를 생성한다`() {
             val preference = MemberMoodPreference.create(
-                memberId = "member-123",
+                memberId = 1L,
                 moodType = MoodType.COZY
             )
 
             assertThat(preference.id).isEqualTo(PreferenceId(0))
-            assertThat(preference.memberId).isEqualTo("member-123")
+            assertThat(preference.memberId).isEqualTo(1L)
             assertThat(preference.moodType).isEqualTo(MoodType.COZY)
         }
 
@@ -33,7 +33,7 @@ class MemberMoodPreferenceTest {
             val beforeCreate = LocalDateTime.now()
 
             val preference = MemberMoodPreference.create(
-                memberId = "member-123",
+                memberId = 1L,
                 moodType = MoodType.KITSCH
             )
 
@@ -48,7 +48,7 @@ class MemberMoodPreferenceTest {
         @Test
         fun `분위기 선호도 생성시 createdAt과 updatedAt이 동일하다`() {
             val preference = MemberMoodPreference.create(
-                memberId = "member-456",
+                memberId = 2L,
                 moodType = MoodType.FRESH
             )
 
@@ -59,7 +59,7 @@ class MemberMoodPreferenceTest {
         fun `모든 분위기 타입으로 생성할 수 있다`() {
             MoodType.entries.forEach { moodType ->
                 val preference = MemberMoodPreference.create(
-                    memberId = "member-test",
+                    memberId = 3L,
                     moodType = moodType
                 )
 
@@ -79,14 +79,14 @@ class MemberMoodPreferenceTest {
 
             val preference = MemberMoodPreference.reconstitute(
                 id = PreferenceId(1L),
-                memberId = "member-123",
+                memberId = 1L,
                 moodType = MoodType.DECADENT,
                 createdAt = createdAt,
                 updatedAt = updatedAt
             )
 
             assertThat(preference.id).isEqualTo(PreferenceId(1L))
-            assertThat(preference.memberId).isEqualTo("member-123")
+            assertThat(preference.memberId).isEqualTo(1L)
             assertThat(preference.moodType).isEqualTo(MoodType.DECADENT)
             assertThat(preference.createdAt).isEqualTo(createdAt)
             assertThat(preference.updatedAt).isEqualTo(updatedAt)
@@ -96,7 +96,7 @@ class MemberMoodPreferenceTest {
         fun `복원된 엔티티의 id는 PreferenceId Value Object로 래핑된다`() {
             val preference = MemberMoodPreference.reconstitute(
                 id = PreferenceId(42L),
-                memberId = "member-123",
+                memberId = 1L,
                 moodType = MoodType.SILLY,
                 createdAt = LocalDateTime.now(),
                 updatedAt = LocalDateTime.now()
@@ -112,7 +112,7 @@ class MemberMoodPreferenceTest {
 
             val preference = MemberMoodPreference.reconstitute(
                 id = PreferenceId(999L),
-                memberId = "member-999",
+                memberId = 999L,
                 moodType = MoodType.Y2K,
                 createdAt = now,
                 updatedAt = now
@@ -128,7 +128,7 @@ class MemberMoodPreferenceTest {
             MoodType.entries.forEachIndexed { index, moodType ->
                 val preference = MemberMoodPreference.reconstitute(
                     id = PreferenceId(index.toLong()),
-                    memberId = "member-$index",
+                    memberId = index.toLong(),
                     moodType = moodType,
                     createdAt = now,
                     updatedAt = now
@@ -145,7 +145,7 @@ class MemberMoodPreferenceTest {
 
             val preference = MemberMoodPreference.reconstitute(
                 id = PreferenceId(1L),
-                memberId = "member-123",
+                memberId = 1L,
                 moodType = MoodType.FUNNY,
                 createdAt = createdAt,
                 updatedAt = updatedAt

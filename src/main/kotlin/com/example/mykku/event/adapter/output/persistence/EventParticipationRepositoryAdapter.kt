@@ -38,14 +38,14 @@ class EventParticipationRepositoryAdapter(
             .map { it.toDomain() }
     }
 
-    override fun findEventsByMemberId(memberId: String, pageable: Pageable): Page<Event> {
+    override fun findEventsByMemberId(memberId: Long, pageable: Pageable): Page<Event> {
         val memberJpaEntity = memberJpaRepository.findById(memberId)
             .orElseThrow { MemberException.memberNotFound() }
         return eventParticipationJpaRepository.findEventsByMember(memberJpaEntity, pageable)
             .map { it.toDomain() }
     }
 
-    override fun findByMemberIdAndEventIds(memberId: String, eventIds: List<EventId>): List<EventParticipation> {
+    override fun findByMemberIdAndEventIds(memberId: Long, eventIds: List<EventId>): List<EventParticipation> {
         if (eventIds.isEmpty()) {
             return emptyList()
         }
@@ -62,7 +62,7 @@ class EventParticipationRepositoryAdapter(
             .map { it.toDomain() }
     }
 
-    override fun existsByMemberIdAndEventId(memberId: String, eventId: EventId): Boolean {
+    override fun existsByMemberIdAndEventId(memberId: Long, eventId: EventId): Boolean {
         val memberJpaEntity = memberJpaRepository.findById(memberId).orElse(null)
             ?: return false
         val eventJpaEntity = eventJpaRepository.findById(eventId.value).orElse(null)

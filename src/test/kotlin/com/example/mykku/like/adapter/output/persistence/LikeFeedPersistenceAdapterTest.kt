@@ -34,7 +34,7 @@ class LikeFeedPersistenceAdapterTest : BaseRepositoryTest() {
 
     @BeforeEach
     fun setUp() {
-        savedMember = createAndSaveMember(id = "testMember1", memberId = "testMember1")
+        savedMember = createAndSaveMember(memberId = "testMember1")
         savedBoard = createAndSaveBoard()
         savedFeed = feedJpaRepository.save(createFeedJpaEntity(savedBoard, savedMember))
     }
@@ -62,7 +62,7 @@ class LikeFeedPersistenceAdapterTest : BaseRepositoryTest() {
         @DisplayName("존재하지 않는 회원이 좋아요하면 예외가 발생한다")
         fun `피드 좋아요 저장 - 존재하지 않는 회원`() {
             val likeFeed = LikeFeedEntity.create(
-                memberId = "nonExistentMember",
+                memberId = 999999L,
                 feedId = savedFeed.id!!
             )
 
@@ -177,7 +177,7 @@ class LikeFeedPersistenceAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("피드의 모든 좋아요를 삭제한다")
         fun `피드 좋아요 전체 삭제 - 정상 케이스`() {
-            val member2 = createAndSaveMember(id = "testMember2", memberId = "testMember2", email = "test2@example.com", socialId = "22222")
+            val member2 = createAndSaveMember(memberId = "testMember2", email = "test2@example.com", socialId = "22222")
             likeFeedPort.save(LikeFeedEntity.create(savedMember.id, savedFeed.id!!))
             likeFeedPort.save(LikeFeedEntity.create(member2.id, savedFeed.id!!))
 

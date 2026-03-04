@@ -52,7 +52,7 @@ class SaveDailyMessageApplicationService(
     }
 
     @Transactional(readOnly = true)
-    override fun isSaved(memberId: String, dailyMessageId: Long): Boolean {
+    override fun isSaved(memberId: Long, dailyMessageId: Long): Boolean {
         return saveDailyMessagePort.existsByMemberIdAndDailyMessageId(memberId, dailyMessageId)
     }
 }

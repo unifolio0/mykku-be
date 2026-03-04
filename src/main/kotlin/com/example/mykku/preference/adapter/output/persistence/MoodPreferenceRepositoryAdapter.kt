@@ -29,15 +29,15 @@ class MoodPreferenceRepositoryAdapter(
         return jpaRepository.saveAll(entities).map { it.toDomain() }
     }
 
-    override fun findByMemberId(memberId: String): List<MemberMoodPreference> {
+    override fun findByMemberId(memberId: Long): List<MemberMoodPreference> {
         return jpaRepository.findByMemberId(memberId).map { it.toDomain() }
     }
 
-    override fun deleteByMemberId(memberId: String) {
+    override fun deleteByMemberId(memberId: Long) {
         jpaRepository.deleteByMemberId(memberId)
     }
 
-    override fun existsByMemberIdAndMoodType(memberId: String, moodType: MoodType): Boolean {
+    override fun existsByMemberIdAndMoodType(memberId: Long, moodType: MoodType): Boolean {
         return jpaRepository.existsByMemberIdAndMoodType(memberId, moodType)
     }
 }

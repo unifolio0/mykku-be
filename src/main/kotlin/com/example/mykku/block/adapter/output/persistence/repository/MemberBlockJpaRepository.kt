@@ -13,24 +13,24 @@ import org.springframework.stereotype.Repository
 interface MemberBlockJpaRepository : JpaRepository<MemberBlockJpaEntity, Long> {
 
     @Query("SELECT CASE WHEN COUNT(mb) > 0 THEN true ELSE false END FROM MemberBlockJpaEntity mb WHERE mb.blocker.id = :blockerId AND mb.blocked.id = :blockedId")
-    fun existsByBlockerIdAndBlockedId(@Param("blockerId") blockerId: String, @Param("blockedId") blockedId: String): Boolean
+    fun existsByBlockerIdAndBlockedId(@Param("blockerId") blockerId: Long, @Param("blockedId") blockedId: Long): Boolean
 
     @Query("SELECT mb FROM MemberBlockJpaEntity mb WHERE mb.blocker.id = :blockerId AND mb.blocked.id = :blockedId")
-    fun findByBlockerIdAndBlockedId(@Param("blockerId") blockerId: String, @Param("blockedId") blockedId: String): MemberBlockJpaEntity?
+    fun findByBlockerIdAndBlockedId(@Param("blockerId") blockerId: Long, @Param("blockedId") blockedId: Long): MemberBlockJpaEntity?
 
     @Query("SELECT mb.blocked.id FROM MemberBlockJpaEntity mb WHERE mb.blocker.id = :blockerId")
-    fun findBlockedIdsByBlockerId(@Param("blockerId") blockerId: String): List<String>
+    fun findBlockedIdsByBlockerId(@Param("blockerId") blockerId: Long): List<Long>
 
     @Query("SELECT mb.blocker.id FROM MemberBlockJpaEntity mb WHERE mb.blocked.id = :blockedId")
-    fun findBlockerIdsByBlockedId(@Param("blockedId") blockedId: String): List<String>
+    fun findBlockerIdsByBlockedId(@Param("blockedId") blockedId: Long): List<Long>
 
     @Query("SELECT mb FROM MemberBlockJpaEntity mb WHERE mb.blocker.id = :blockerId")
-    fun findAllByBlockerId(@Param("blockerId") blockerId: String, pageable: Pageable): Page<MemberBlockJpaEntity>
+    fun findAllByBlockerId(@Param("blockerId") blockerId: Long, pageable: Pageable): Page<MemberBlockJpaEntity>
 
     @Modifying
     @Query("DELETE FROM MemberBlockJpaEntity mb WHERE mb.blocker.id = :blockerId AND mb.blocked.id = :blockedId")
-    fun deleteByBlockerIdAndBlockedId(@Param("blockerId") blockerId: String, @Param("blockedId") blockedId: String)
+    fun deleteByBlockerIdAndBlockedId(@Param("blockerId") blockerId: Long, @Param("blockedId") blockedId: Long)
 
     @Query("SELECT COUNT(mb) FROM MemberBlockJpaEntity mb WHERE mb.blocker.id = :blockerId")
-    fun countByBlockerId(@Param("blockerId") blockerId: String): Long
+    fun countByBlockerId(@Param("blockerId") blockerId: Long): Long
 }

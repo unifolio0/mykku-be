@@ -113,7 +113,6 @@ class AdminRoleApiControllerTest : BaseControllerTest() {
     fun `assignRoleToMember - 회원에게 칭호를 부여한다`() {
         // given
         val member = createAndSaveMember(
-            id = "test-member",
             nickname = "테스터",
             role = role1
         )

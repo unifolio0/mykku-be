@@ -63,7 +63,7 @@ class AdminRoleService(
     }
 
     @Transactional
-    fun assignRoleToMember(roleId: Long, memberId: String): MemberRoleResponse {
+    fun assignRoleToMember(roleId: Long, memberId: Long): MemberRoleResponse {
         val role = roleJpaRepository.findByIdOrNull(roleId)
             ?: throw RoleException.roleNotFound()
         val member = memberJpaRepository.findById(memberId)

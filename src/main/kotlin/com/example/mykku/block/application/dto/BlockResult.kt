@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 
 data class MemberBlockResult(
     val id: Long,
-    val blockedMemberId: String,
+    val blockedMemberId: Long,
     val blockedMemberNickname: String?,
     val blockedMemberProfileImage: String,
     val blockedAt: LocalDateTime

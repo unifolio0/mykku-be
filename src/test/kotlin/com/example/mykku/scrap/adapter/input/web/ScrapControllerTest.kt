@@ -49,9 +49,9 @@ class ScrapControllerTest : BaseControllerTest() {
     @DisplayName("피드 저장 - 정상 케이스")
     fun `saveFeed - 정상적으로 피드를 저장한다`() {
         // given
-        val member = createAndSaveMember(id = "member1")
+        val member = createAndSaveMember()
         val board = createAndSaveBoard()
-        val authHeader = getBearerToken("member1")
+        val authHeader = getBearerToken(member.id)
 
         // 피드 생성
         val feed = feedJpaRepository.save(
@@ -90,9 +90,9 @@ class ScrapControllerTest : BaseControllerTest() {
     @DisplayName("피드 저장 취소 - 정상 케이스")
     fun `unsaveFeed - 정상적으로 피드 저장을 취소한다`() {
         // given
-        val member = createAndSaveMember(id = "member1")
+        val member = createAndSaveMember()
         val board = createAndSaveBoard()
-        val authHeader = getBearerToken("member1")
+        val authHeader = getBearerToken(member.id)
 
         // 피드 생성
         val feed = feedJpaRepository.save(
@@ -138,8 +138,8 @@ class ScrapControllerTest : BaseControllerTest() {
     @DisplayName("저장된 피드 목록 조회 - 정상 케이스")
     fun `getSavedFeeds - 저장된 피드 목록을 조회한다`() {
         // given
-        val member = createAndSaveMember(id = "member1")
-        val authHeader = getBearerToken("member1")
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
 
         // when & then
         RestAssured.given()
@@ -158,9 +158,9 @@ class ScrapControllerTest : BaseControllerTest() {
     @DisplayName("저장된 피드 폴더 변경 - 정상 케이스")
     fun `updateSaveFeedFolder - 저장된 피드의 폴더를 변경한다`() {
         // given
-        val member = createAndSaveMember(id = "member1")
+        val member = createAndSaveMember()
         val board = createAndSaveBoard()
-        val authHeader = getBearerToken("member1")
+        val authHeader = getBearerToken(member.id)
 
         // 피드 생성
         val feed = feedJpaRepository.save(
@@ -210,8 +210,8 @@ class ScrapControllerTest : BaseControllerTest() {
     @DisplayName("하루덕담 저장 - 정상 케이스")
     fun `saveDailyMessage - 정상적으로 하루덕담을 저장한다`() {
         // given
-        val member = createAndSaveMember(id = "member1")
-        val authHeader = getBearerToken("member1")
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
 
         // 하루덕담 생성
         val dailyMessage = dailyMessageJpaRepository.save(
@@ -236,8 +236,8 @@ class ScrapControllerTest : BaseControllerTest() {
     @DisplayName("저장된 하루덕담 목록 조회 - 정상 케이스")
     fun `getSavedDailyMessages - 저장된 하루덕담 목록을 조회한다`() {
         // given
-        val member = createAndSaveMember(id = "member1")
-        val authHeader = getBearerToken("member1")
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
 
         // when & then
         RestAssured.given()
@@ -256,8 +256,8 @@ class ScrapControllerTest : BaseControllerTest() {
     @DisplayName("이벤트 저장 - 정상 케이스")
     fun `saveEvent - 정상적으로 이벤트를 저장한다`() {
         // given
-        val member = createAndSaveMember(id = "member1")
-        val authHeader = getBearerToken("member1")
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
 
         // 이벤트 생성
         val event = eventJpaRepository.save(
@@ -283,8 +283,8 @@ class ScrapControllerTest : BaseControllerTest() {
     @DisplayName("덕질노트 저장 - 정상 케이스")
     fun `saveFanNote - 정상적으로 덕질노트를 저장한다`() {
         // given
-        val member = createAndSaveMember(id = "member1")
-        val authHeader = getBearerToken("member1")
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
 
         // 덕질노트 생성
         val fanNote = fanNoteJpaRepository.save(

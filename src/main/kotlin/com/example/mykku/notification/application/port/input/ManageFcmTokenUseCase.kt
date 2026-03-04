@@ -6,6 +6,6 @@ import com.example.mykku.notification.application.dto.RegisterFcmTokenCommand
 
 interface ManageFcmTokenUseCase {
     fun registerOrUpdateToken(command: RegisterFcmTokenCommand): FcmTokenResult
-    fun getTokens(memberId: String): List<FcmTokenResult>
+    fun getTokens(memberId: Long): List<FcmTokenResult>
     fun deleteToken(command: DeleteFcmTokenCommand)
 }

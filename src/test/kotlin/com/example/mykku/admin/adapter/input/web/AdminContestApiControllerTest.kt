@@ -34,7 +34,7 @@ class AdminContestApiControllerTest : BaseControllerTest() {
     @DisplayName("수상자 선정 - 정상 케이스")
     fun `setWinners - 관리자가 정상적으로 수상자를 선정한다`() {
         val adminSessionId = getAdminSessionId()
-        val member = createAndSaveMember(id = "member1")
+        val member = createAndSaveMember()
         val board = createAndSaveBoard()
         val contest = createAndSaveContest(status = ContestStatusType.EXPIRED)
         val feed = createAndSaveFeed(member, board)
@@ -66,7 +66,7 @@ class AdminContestApiControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("수상자 선정 - 관리자 인증 없이 접근 불가")
     fun `setWinners - 관리자 인증이 없으면 수상자를 선정할 수 없다`() {
-        val member = createAndSaveMember(id = "member1")
+        val member = createAndSaveMember()
         val board = createAndSaveBoard()
         val contest = createAndSaveContest(status = ContestStatusType.EXPIRED)
         val feed = createAndSaveFeed(member, board)
@@ -95,8 +95,8 @@ class AdminContestApiControllerTest : BaseControllerTest() {
     @DisplayName("수상자 선정 - 복수 수상자 선정")
     fun `setWinners - 관리자가 복수의 수상자를 선정한다`() {
         val adminSessionId = getAdminSessionId()
-        val member1 = createAndSaveMember(id = "member1", nickname = "회원1")
-        val member2 = createAndSaveMember(id = "member2", nickname = "회원2", email = "test2@example.com", socialId = "12346")
+        val member1 = createAndSaveMember(nickname = "회원1", memberId = "member1")
+        val member2 = createAndSaveMember(nickname = "회원2", email = "test2@example.com", socialId = "12346", memberId = "member2")
         val board = createAndSaveBoard()
         val contest = createAndSaveContest(status = ContestStatusType.EXPIRED)
         val feed1 = createAndSaveFeed(member1, board, title = "피드1")
