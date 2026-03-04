@@ -118,3 +118,25 @@ data class MyWinnerStatusResult(
     val winnerId: Long?,
     val winnerRank: Int?
 )
+
+data class MyAwardContestResult(
+    val contestId: Long,
+    val contestTitle: String,
+    val thumbnailUrl: String,
+    val winnerRank: Int,
+    val acceptanceSpeech: String
+)
+
+data class PagedMyAwardsResult(
+    val content: List<MyAwardContestResult>,
+    val page: Int,
+    val size: Int,
+    val totalElements: Long,
+    val totalPages: Int,
+    val isLast: Boolean
+)
+
+data class MyAwardPreviewResult(
+    val contestId: Long,
+    val thumbnailUrl: String
+)

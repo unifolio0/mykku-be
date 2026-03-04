@@ -3,6 +3,8 @@ package com.example.mykku.contest.adapter.output.persistence.repository
 import com.example.mykku.contest.adapter.output.persistence.entity.ContestJpaEntity
 import com.example.mykku.contest.adapter.output.persistence.entity.ContestParticipationJpaEntity
 import com.example.mykku.contest.adapter.output.persistence.entity.ContestWinnerJpaEntity
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
@@ -25,4 +27,25 @@ interface ContestWinnerJpaRepository : JpaRepository<ContestWinnerJpaEntity, Lon
         @Param("contest") contest: ContestJpaEntity,
         @Param("memberId") memberId: Long
     ): ContestWinnerJpaEntity?
+
+    @Query(
+        "SELECT w FROM ContestWinnerJpaEntity w " +
+        "JOIN w.participation p " +
+        "WHERE p.member.id = :memberId " +
+        "ORDER BY w.createdAt DESC"
+    )
+    fun findByMemberId(
+        @Param("memberId") memberId: Long,
+        pageable: Pageable
+    ): Page<ContestWinnerJpaEntity>
+
+    @Query(
+        "SELECT w FROM ContestWinnerJpaEntity w " +
+        "JOIN w.participation p " +
+        "WHERE p.member.id = :memberId " +
+        "ORDER BY w.createdAt DESC"
+    )
+    fun findAllByMemberId(
+        @Param("memberId") memberId: Long
+    ): List<ContestWinnerJpaEntity>
 }

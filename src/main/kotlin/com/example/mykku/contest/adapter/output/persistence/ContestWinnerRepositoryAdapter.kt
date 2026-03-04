@@ -10,6 +10,8 @@ import com.example.mykku.contest.domain.vo.ContestId
 import com.example.mykku.contest.domain.vo.ContestParticipationId
 import com.example.mykku.contest.domain.vo.ContestWinnerId
 import com.example.mykku.contest.exception.ContestException
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -80,6 +82,16 @@ class ContestWinnerRepositoryAdapter(
         if (contestJpaEntities.isEmpty()) return emptyList()
 
         return contestWinnerJpaRepository.findByContestIn(contestJpaEntities)
+            .map { it.toDomain() }
+    }
+
+    override fun findByMemberId(memberId: Long, pageable: Pageable): Page<ContestWinner> {
+        return contestWinnerJpaRepository.findByMemberId(memberId, pageable)
+            .map { it.toDomain() }
+    }
+
+    override fun findByMemberId(memberId: Long): List<ContestWinner> {
+        return contestWinnerJpaRepository.findAllByMemberId(memberId)
             .map { it.toDomain() }
     }
 

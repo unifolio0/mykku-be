@@ -4,10 +4,21 @@ import com.example.mykku.BaseDocumentTest
 import com.example.mykku.contest.application.dto.ContestWinnerDetailResult
 import com.example.mykku.contest.application.dto.ContestWinnerPreviewResult
 import com.example.mykku.contest.application.dto.ContestWinnersListResult
+import com.example.mykku.contest.application.dto.MyAwardContestResult
+import com.example.mykku.contest.application.dto.MyAwardPreviewResult
 import com.example.mykku.contest.application.dto.MyWinnerStatusResult
+import com.example.mykku.contest.application.dto.PagedMyAwardsResult
 import com.example.mykku.contest.application.dto.UpdateAcceptanceSpeechResult
 import com.example.mykku.contest.application.dto.WinnerDetailResult
 import com.example.mykku.contest.application.dto.WinnerThumbnailResult
+import com.example.mykku.feed.application.dto.AuthorResult
+import com.example.mykku.feed.application.dto.CommentPreviewResult
+import com.example.mykku.feed.application.dto.FeedImageResult
+import com.example.mykku.feed.application.dto.FeedResult
+import com.example.mykku.feed.application.dto.PagedFeedsResult
+import com.example.mykku.feed.application.dto.TagResult
+import com.example.mykku.role.application.dto.RoleResult
+import java.time.LocalDateTime
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
 import com.example.mykku.docs.Tag
@@ -299,6 +310,238 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                 .get("/api/v1/contests/{contestId}/my-winner-status", contestId)
                 .then()
                 .statusCode(400)
+        }
+    }
+
+    @Nested
+    @DisplayName("내 수상 콘테스트 목록 조회")
+    inner class GetMyAwardContests {
+
+        private val apiConfig = ApiRequestConfig(
+            tag = Tag.CONTEST_WINNER_API,
+            summary = "내 수상 콘테스트 목록 조회",
+            description = "인증된 사용자가 수상한 콘테스트 목록을 페이지네이션으로 조회합니다.",
+            queryParameters = listOf(
+                parameterWithName("page").description("페이지 번호 (0부터 시작)").optional(),
+                parameterWithName("size").description("페이지 크기 (기본 20)").optional()
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
+        )
+
+        @Test
+        fun `성공`() {
+            val result = PagedMyAwardsResult(
+                content = listOf(
+                    MyAwardContestResult(
+                        contestId = 1L,
+                        contestTitle = "첫 번째 콘테스트",
+                        thumbnailUrl = "https://example.com/thumbnail1.jpg",
+                        winnerRank = 1,
+                        acceptanceSpeech = "감사합니다!"
+                    ),
+                    MyAwardContestResult(
+                        contestId = 2L,
+                        contestTitle = "두 번째 콘테스트",
+                        thumbnailUrl = "https://example.com/thumbnail2.jpg",
+                        winnerRank = 2,
+                        acceptanceSpeech = ""
+                    )
+                ),
+                page = 0,
+                size = 20,
+                totalElements = 2,
+                totalPages = 1,
+                isLast = true
+            )
+
+            `when`(getMyAwardContestsUseCase.execute(any())).thenReturn(result)
+
+            val documentFilter = document("contest-winner/my-awards", 200)
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
+                            fieldWithPath("data.content[]").type(JsonFieldType.ARRAY).description("수상 콘테스트 목록"),
+                            fieldWithPath("data.content[].contestId").type(JsonFieldType.NUMBER).description("콘테스트 ID"),
+                            fieldWithPath("data.content[].contestTitle").type(JsonFieldType.STRING).description("콘테스트 제목"),
+                            fieldWithPath("data.content[].thumbnailUrl").type(JsonFieldType.STRING).description("콘테스트 썸네일 URL"),
+                            fieldWithPath("data.content[].winnerRank").type(JsonFieldType.NUMBER).description("수상 순위"),
+                            fieldWithPath("data.content[].acceptanceSpeech").type(JsonFieldType.STRING).description("수상 소감"),
+                            fieldWithPath("data.page").type(JsonFieldType.NUMBER).description("현재 페이지"),
+                            fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
+                            fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 항목 수"),
+                            fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
+                            fieldWithPath("data.isLast").type(JsonFieldType.BOOLEAN).description("마지막 페이지 여부")
+                        )
+                )
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .get("/api/v1/contests/my-awards")
+                .then()
+                .statusCode(200)
+        }
+    }
+
+    @Nested
+    @DisplayName("내 수상 피드 목록 조회")
+    inner class GetMyAwardFeeds {
+
+        private val apiConfig = ApiRequestConfig(
+            tag = Tag.CONTEST_WINNER_API,
+            summary = "내 수상 피드 목록 조회",
+            description = "인증된 사용자가 수상한 피드 목록을 페이지네이션으로 조회합니다.",
+            queryParameters = listOf(
+                parameterWithName("page").description("페이지 번호 (0부터 시작)").optional(),
+                parameterWithName("size").description("페이지 크기 (기본 20)").optional()
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
+        )
+
+        @Test
+        fun `성공`() {
+            val result = PagedFeedsResult(
+                feeds = listOf(
+                    FeedResult(
+                        id = 1L,
+                        author = AuthorResult(
+                            memberId = "testmemberid",
+                            nickname = "testuser",
+                            profileImage = "https://example.com/profile.jpg",
+                            role = RoleResult(1L, "아미", "BTS 팬클럽")
+                        ),
+                        board = "자유게시판",
+                        createdAt = LocalDateTime.now(),
+                        title = "수상작 피드",
+                        content = "수상작 내용입니다.",
+                        images = listOf(
+                            FeedImageResult(1L, "https://example.com/feed-image.jpg", 1080, 1080)
+                        ),
+                        tags = listOf(
+                            TagResult("콘테스트태그", true)
+                        ),
+                        likeCount = 10,
+                        isLiked = false,
+                        isSaved = false,
+                        commentCount = 3,
+                        comment = CommentPreviewResult(
+                            profileImage = "https://example.com/commenter.jpg",
+                            content = "축하합니다!"
+                        )
+                    )
+                ),
+                currentPage = 0,
+                totalPages = 1,
+                totalElements = 1,
+                size = 20,
+                hasNext = false,
+                hasPrevious = false
+            )
+
+            `when`(getMyAwardFeedsUseCase.execute(any())).thenReturn(result)
+
+            val documentFilter = document("contest-winner/my-award-feeds", 200)
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
+                            fieldWithPath("data.feeds[]").type(JsonFieldType.ARRAY).description("피드 목록"),
+                            fieldWithPath("data.feeds[].id").type(JsonFieldType.NUMBER).description("피드 ID"),
+                            fieldWithPath("data.feeds[].author").type(JsonFieldType.OBJECT).description("작성자 정보").optional(),
+                            fieldWithPath("data.feeds[].author.memberId").type(JsonFieldType.STRING).description("작성자 회원 ID").optional(),
+                            fieldWithPath("data.feeds[].author.nickname").type(JsonFieldType.STRING).description("작성자 닉네임").optional(),
+                            fieldWithPath("data.feeds[].author.profileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지"),
+                            fieldWithPath("data.feeds[].author.role").type(JsonFieldType.OBJECT).description("작성자 역할").optional(),
+                            fieldWithPath("data.feeds[].author.role.id").type(JsonFieldType.NUMBER).description("역할 ID"),
+                            fieldWithPath("data.feeds[].author.role.name").type(JsonFieldType.STRING).description("역할 이름"),
+                            fieldWithPath("data.feeds[].author.role.description").type(JsonFieldType.STRING).description("역할 설명"),
+                            fieldWithPath("data.feeds[].board").type(JsonFieldType.STRING).description("게시판 이름"),
+                            fieldWithPath("data.feeds[].createdAt").type(JsonFieldType.STRING).description("생성일시"),
+                            fieldWithPath("data.feeds[].title").type(JsonFieldType.STRING).description("피드 제목"),
+                            fieldWithPath("data.feeds[].content").type(JsonFieldType.STRING).description("피드 내용"),
+                            fieldWithPath("data.feeds[].images[]").type(JsonFieldType.ARRAY).description("이미지 목록"),
+                            fieldWithPath("data.feeds[].images[].id").type(JsonFieldType.NUMBER).description("이미지 ID"),
+                            fieldWithPath("data.feeds[].images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
+                            fieldWithPath("data.feeds[].images[].width").type(JsonFieldType.NUMBER).description("이미지 너비"),
+                            fieldWithPath("data.feeds[].images[].height").type(JsonFieldType.NUMBER).description("이미지 높이"),
+                            fieldWithPath("data.feeds[].tags[]").type(JsonFieldType.ARRAY).description("태그 목록"),
+                            fieldWithPath("data.feeds[].tags[].title").type(JsonFieldType.STRING).description("태그 제목"),
+                            fieldWithPath("data.feeds[].tags[].isContest").type(JsonFieldType.BOOLEAN).description("콘테스트 태그 여부"),
+                            fieldWithPath("data.feeds[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
+                            fieldWithPath("data.feeds[].isLiked").type(JsonFieldType.BOOLEAN).description("좋아요 여부"),
+                            fieldWithPath("data.feeds[].isSaved").type(JsonFieldType.BOOLEAN).description("스크랩 여부"),
+                            fieldWithPath("data.feeds[].commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
+                            fieldWithPath("data.feeds[].comment").type(JsonFieldType.OBJECT).description("첫 번째 댓글 미리보기"),
+                            fieldWithPath("data.feeds[].comment.profileImage").type(JsonFieldType.STRING).description("댓글 작성자 프로필").optional(),
+                            fieldWithPath("data.feeds[].comment.content").type(JsonFieldType.STRING).description("댓글 내용"),
+                            fieldWithPath("data.currentPage").type(JsonFieldType.NUMBER).description("현재 페이지"),
+                            fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
+                            fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 항목 수"),
+                            fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
+                            fieldWithPath("data.hasNext").type(JsonFieldType.BOOLEAN).description("다음 페이지 존재 여부"),
+                            fieldWithPath("data.hasPrevious").type(JsonFieldType.BOOLEAN).description("이전 페이지 존재 여부")
+                        )
+                )
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .get("/api/v1/contests/my-awards/feeds")
+                .then()
+                .statusCode(200)
+        }
+    }
+
+    @Nested
+    @DisplayName("내 수상 미리보기 조회")
+    inner class GetMyAwardsPreview {
+
+        private val apiConfig = ApiRequestConfig(
+            tag = Tag.CONTEST_WINNER_API,
+            summary = "내 수상 미리보기 조회",
+            description = "인증된 사용자의 최근 수상 콘테스트 3개의 썸네일과 ID를 조회합니다.",
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
+        )
+
+        @Test
+        fun `성공`() {
+            val result = listOf(
+                MyAwardPreviewResult(contestId = 1L, thumbnailUrl = "https://example.com/thumb1.jpg"),
+                MyAwardPreviewResult(contestId = 2L, thumbnailUrl = "https://example.com/thumb2.jpg"),
+                MyAwardPreviewResult(contestId = 3L, thumbnailUrl = "https://example.com/thumb3.jpg")
+            )
+
+            `when`(getMyAwardsPreviewUseCase.execute(any())).thenReturn(result)
+
+            val documentFilter = document("contest-winner/my-awards-preview", 200)
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                            fieldWithPath("data[]").type(JsonFieldType.ARRAY).description("미리보기 목록"),
+                            fieldWithPath("data[].contestId").type(JsonFieldType.NUMBER).description("콘테스트 ID"),
+                            fieldWithPath("data[].thumbnailUrl").type(JsonFieldType.STRING).description("콘테스트 썸네일 URL")
+                        )
+                )
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .get("/api/v1/contests/my-awards/preview")
+                .then()
+                .statusCode(200)
         }
     }
 

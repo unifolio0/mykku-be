@@ -2,6 +2,7 @@ package com.example.mykku.contest.application.dto
 
 import com.example.mykku.contest.domain.vo.ContestSortType
 import com.example.mykku.contest.domain.vo.ContestStatusType
+import org.springframework.data.domain.Pageable
 import java.time.LocalDateTime
 
 data class CreateContestCommand(
@@ -46,5 +47,19 @@ data class UpdateAcceptanceSpeechCommand(
 
 data class GetMyWinnerStatusQuery(
     val contestId: Long,
+    val memberId: Long
+)
+
+data class GetMyAwardsQuery(
+    val memberId: Long,
+    val pageable: Pageable
+)
+
+data class GetMyAwardFeedsQuery(
+    val memberId: Long,
+    val pageable: Pageable
+)
+
+data class GetMyAwardsPreviewQuery(
     val memberId: Long
 )

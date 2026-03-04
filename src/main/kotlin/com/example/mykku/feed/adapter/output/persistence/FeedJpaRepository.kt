@@ -35,6 +35,8 @@ interface FeedJpaRepository : JpaRepository<FeedJpaEntity, Long> {
         pageable: Pageable
     ): Page<FeedJpaEntity>
 
+    fun findAllByIdIn(ids: List<Long>): List<FeedJpaEntity>
+
     @Query("""
         SELECT f FROM FeedJpaEntity f
         WHERE f.board = :board

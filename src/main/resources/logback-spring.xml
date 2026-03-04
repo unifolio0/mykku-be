@@ -38,7 +38,7 @@
 
     <!-- dev 프로파일 - 콘솔 + 파일 -->
     <springProfile name="dev">
-        <property name="LOG_PATH" value="/home/ubuntu/app/logs"/>
+        <property name="LOG_PATH" value="/app/logs"/>
         <property name="LOG_FILE_NAME" value="mykku"/>
 
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -87,7 +87,7 @@
 
     <!-- prod 프로파일 - 콘솔 + 파일 -->
     <springProfile name="prod">
-        <property name="LOG_PATH" value="/home/ubuntu/app/logs"/>
+        <property name="LOG_PATH" value="/app/logs"/>
         <property name="LOG_FILE_NAME" value="mykku"/>
 
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
