@@ -30,7 +30,6 @@ import com.example.mykku.member.domain.vo.MemberPk
 import com.example.mykku.role.application.dto.RoleResult
 import com.example.mykku.role.application.port.output.RoleRepository
 import com.example.mykku.role.domain.vo.RoleId
-import com.example.mykku.scrap.application.port.output.SaveFeedPort
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -48,7 +47,6 @@ class GetMyAwardFeedsUseCaseImpl(
     private val roleRepository: RoleRepository,
     private val contestTagRepository: ContestTagRepository,
     private val likeFeedPort: LikeFeedPort,
-    private val saveFeedPort: SaveFeedPort,
     private val blockFilterUseCase: BlockFilterUseCase
 ) : GetMyAwardFeedsUseCase {
 
@@ -109,10 +107,8 @@ class GetMyAwardFeedsUseCaseImpl(
         val feedIdValues = feedIds.map { it.value }
         val likedFeedIds = likeFeedPort.findByMemberIdAndFeedIdIn(memberId, feedIdValues)
             .map { it.feedId }.toSet()
-        val savedFeedIds = saveFeedPort.findByMemberIdAndFeedIdIn(memberId, feedIdValues)
-            .map { it.feedId }.toSet()
 
-        return feeds.map { feed -> buildFeedResult(feed, feedImagesMap, feedTagsMap, contestTagsMap, membersMap, boardsMap, likedFeedIds, savedFeedIds) }
+        return feeds.map { feed -> buildFeedResult(feed, feedImagesMap, feedTagsMap, contestTagsMap, membersMap, boardsMap, likedFeedIds) }
     }
 
     private fun buildFeedResult(
@@ -122,8 +118,7 @@ class GetMyAwardFeedsUseCaseImpl(
         contestTagsMap: Map<String, Any>,
         membersMap: Map<Long, Member>,
         boardsMap: Map<Long, Board>,
-        likedFeedIds: Set<Long>,
-        savedFeedIds: Set<Long>
+        likedFeedIds: Set<Long>
     ): FeedResult {
         val feedId = feed.id!!.value
         val images = feedImagesMap[feedId] ?: emptyList()
@@ -148,7 +143,6 @@ class GetMyAwardFeedsUseCaseImpl(
             tags = tags.map { TagResult(it.title, contestTagsMap.containsKey(it.title)) },
             likeCount = feed.likeCount,
             isLiked = feedId in likedFeedIds,
-            isSaved = feedId in savedFeedIds,
             commentCount = feed.commentCount,
             comment = CommentPreviewResult(
                 profileImage = commentMember?.profileImage,

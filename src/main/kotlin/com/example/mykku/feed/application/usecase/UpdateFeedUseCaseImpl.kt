@@ -25,7 +25,6 @@ import com.example.mykku.like.application.port.output.LikeFeedPort
 import com.example.mykku.member.domain.entity.Member
 import com.example.mykku.role.application.port.output.RoleRepository
 import com.example.mykku.role.domain.vo.RoleId
-import com.example.mykku.scrap.application.port.output.SaveFeedPort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -39,8 +38,7 @@ class UpdateFeedUseCaseImpl(
     private val roleRepository: RoleRepository,
     private val contestTagRepository: ContestTagRepository,
     private val imageUploadService: ImageUploadService,
-    private val likeFeedPort: LikeFeedPort,
-    private val saveFeedPort: SaveFeedPort
+    private val likeFeedPort: LikeFeedPort
 ) : UpdateFeedUseCase {
 
     override fun execute(command: UpdateFeedCommand, member: Member): FeedDetailResult {
@@ -66,7 +64,6 @@ class UpdateFeedUseCaseImpl(
 
         val contestTagTitles = getContestTagTitles(updatedTags.map { it.title })
         val isLiked = likeFeedPort.existsByMemberIdAndFeedId(member.id.value, savedFeed.id!!.value)
-        val isSaved = saveFeedPort.existsByMemberIdAndFeedId(member.id.value, savedFeed.id!!.value)
 
         return FeedDetailResult(
             id = savedFeed.id!!.value,
@@ -86,7 +83,6 @@ class UpdateFeedUseCaseImpl(
             tags = updatedTags.map { TagResult(it.title, contestTagTitles.contains(it.title)) },
             likeCount = savedFeed.likeCount,
             isLiked = isLiked,
-            isSaved = isSaved,
             commentCount = savedFeed.commentCount
         )
     }

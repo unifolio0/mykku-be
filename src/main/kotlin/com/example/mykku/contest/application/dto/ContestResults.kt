@@ -27,8 +27,7 @@ data class ContestListResult(
     val expiredAt: LocalDateTime,
     val status: ContestStatusType,
     val thumbnailUrl: String,
-    val tags: List<String>,
-    val isSaved: Boolean
+    val tags: List<String>
 )
 
 data class PagedContestsResult(
@@ -50,7 +49,6 @@ data class ContestDetailResult(
     val thumbnailUrl: String,
     val images: List<ContestImageResult>,
     val tags: List<String>,
-    val isSaved: Boolean,
     val createdAt: LocalDateTime
 )
 

@@ -24,7 +24,7 @@ interface ContestJpaRepository : JpaRepository<ContestJpaEntity, Long> {
             SELECT c
             FROM ContestJpaEntity c
             WHERE c.expiredAt > :dateTime
-            ORDER BY c.scrapCount DESC, c.createdAt DESC
+            ORDER BY c.createdAt DESC
         """
     )
     fun findActiveContestsByPopular(dateTime: LocalDateTime, pageable: Pageable): Page<ContestJpaEntity>

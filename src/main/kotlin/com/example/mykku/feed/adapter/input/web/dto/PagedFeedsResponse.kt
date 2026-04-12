@@ -34,7 +34,6 @@ data class PagedFeedsResponse(
                     tags = feedResult.tags.map { TagResponse(it.title, it.isContest) },
                     likeCount = feedResult.likeCount,
                     isLiked = feedResult.isLiked,
-                    isSaved = feedResult.isSaved,
                     commentCount = feedResult.commentCount,
                     comment = CommentPreviewResponse(
                         profileImage = feedResult.comment.profileImage,
@@ -63,7 +62,6 @@ data class FeedResponse(
     val tags: List<TagResponse>,
     val likeCount: Int,
     val isLiked: Boolean,
-    val isSaved: Boolean,
     val commentCount: Int,
     val comment: CommentPreviewResponse
 )

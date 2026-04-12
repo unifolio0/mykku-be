@@ -427,7 +427,6 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                         ),
                         likeCount = 10,
                         isLiked = false,
-                        isSaved = false,
                         commentCount = 3,
                         comment = CommentPreviewResult(
                             profileImage = "https://example.com/commenter.jpg",
@@ -476,7 +475,6 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.feeds[].tags[].isContest").type(JsonFieldType.BOOLEAN).description("콘테스트 태그 여부"),
                             fieldWithPath("data.feeds[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                             fieldWithPath("data.feeds[].isLiked").type(JsonFieldType.BOOLEAN).description("좋아요 여부"),
-                            fieldWithPath("data.feeds[].isSaved").type(JsonFieldType.BOOLEAN).description("스크랩 여부"),
                             fieldWithPath("data.feeds[].commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
                             fieldWithPath("data.feeds[].comment").type(JsonFieldType.OBJECT).description("첫 번째 댓글 미리보기"),
                             fieldWithPath("data.feeds[].comment.profileImage").type(JsonFieldType.STRING).description("댓글 작성자 프로필").optional(),

@@ -25,8 +25,7 @@ data class EventListResult(
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
     val status: EventStatusType,
-    val thumbnailUrl: String,
-    val isSaved: Boolean
+    val thumbnailUrl: String
 )
 
 data class PagedEventsResult(
@@ -47,7 +46,6 @@ data class EventDetailResult(
     val status: EventStatusType,
     val thumbnailUrl: String,
     val images: List<EventImageResult>,
-    val isSaved: Boolean,
     val createdAt: LocalDateTime
 )
 

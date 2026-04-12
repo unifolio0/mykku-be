@@ -17,7 +17,6 @@ data class FeedDetailResponse(
     val tags: List<TagResponse>,
     val likeCount: Int,
     val isLiked: Boolean,
-    val isSaved: Boolean,
     val commentCount: Int
 ) {
     companion object {
@@ -41,7 +40,6 @@ data class FeedDetailResponse(
             tags = result.tags.map { TagResponse(it.title, it.isContest) },
             likeCount = result.likeCount,
             isLiked = result.isLiked,
-            isSaved = result.isSaved,
             commentCount = result.commentCount
         )
     }

@@ -44,8 +44,7 @@ class MemberContestDocumentTest : BaseDocumentTest() {
                     expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
                     status = ContestStatusType.ACTIVE,
                     thumbnailUrl = "https://example.com/thumbnail1.jpg",
-                    tags = listOf("디자인", "개발"),
-                    isSaved = true
+                    tags = listOf("디자인", "개발")
                 ),
                 ContestListResult(
                     id = 2L,
@@ -54,8 +53,7 @@ class MemberContestDocumentTest : BaseDocumentTest() {
                     expiredAt = LocalDateTime.of(2025, 11, 30, 23, 59, 59),
                     status = ContestStatusType.EXPIRED,
                     thumbnailUrl = "https://example.com/thumbnail2.jpg",
-                    tags = listOf("기획"),
-                    isSaved = false
+                    tags = listOf("기획")
                 )
             )
 
@@ -86,7 +84,6 @@ class MemberContestDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.content[].thumbnailUrl").type(JsonFieldType.STRING)
                                 .description("썸네일 이미지 URL").optional(),
                             fieldWithPath("data.content[].tags[]").type(JsonFieldType.ARRAY).description("태그 목록"),
-                            fieldWithPath("data.content[].isSaved").type(JsonFieldType.BOOLEAN).description("저장 여부"),
                             fieldWithPath("data.page").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
                             fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
                             fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 요소 수"),

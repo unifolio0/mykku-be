@@ -24,7 +24,6 @@ import com.example.mykku.member.domain.vo.MemberPk
 import com.example.mykku.role.application.dto.RoleResult
 import com.example.mykku.role.application.port.output.RoleRepository
 import com.example.mykku.role.domain.vo.RoleId
-import com.example.mykku.scrap.application.port.output.SaveFeedPort
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -41,7 +40,6 @@ class ListFeedsUseCaseImpl(
     private val roleRepository: RoleRepository,
     private val contestTagRepository: ContestTagRepository,
     private val likeFeedPort: LikeFeedPort,
-    private val saveFeedPort: SaveFeedPort,
     private val blockFilterUseCase: BlockFilterUseCase
 ) : ListFeedsUseCase {
 
@@ -91,10 +89,6 @@ class ListFeedsUseCaseImpl(
             likeFeedPort.findByMemberIdAndFeedIdIn(memberId, feedIdValues).map { it.feedId }.toSet()
         } else emptySet()
 
-        val savedFeedIds = if (memberId != null) {
-            saveFeedPort.findByMemberIdAndFeedIdIn(memberId, feedIdValues).map { it.feedId }.toSet()
-        } else emptySet()
-
         return feeds.map { feed ->
             val feedId = feed.id!!.value
             val images = feedImagesMap[feedId] ?: emptyList()
@@ -130,7 +124,6 @@ class ListFeedsUseCaseImpl(
                 tags = tags.map { TagResult(it.title, contestTagsMap.containsKey(it.title)) },
                 likeCount = feed.likeCount,
                 isLiked = feedId in likedFeedIds,
-                isSaved = feedId in savedFeedIds,
                 commentCount = feed.commentCount,
                 comment = CommentPreviewResult(
                     profileImage = commentMember?.profileImage,
