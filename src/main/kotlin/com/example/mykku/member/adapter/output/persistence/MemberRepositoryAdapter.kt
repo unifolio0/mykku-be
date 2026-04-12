@@ -37,6 +37,11 @@ class MemberRepositoryAdapter(
         return memberJpaRepository.findById(id.value).orElse(null)?.toDomain()
     }
 
+    override fun findByIds(ids: List<MemberPk>): List<Member> {
+        if (ids.isEmpty()) return emptyList()
+        return memberJpaRepository.findAllById(ids.map { it.value }).map { it.toDomain() }
+    }
+
     override fun findByProviderAndSocialId(provider: SocialProvider, socialId: String): Member? {
         return memberJpaRepository.findByProviderAndSocialId(provider, socialId)?.toDomain()
     }

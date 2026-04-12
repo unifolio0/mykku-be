@@ -17,6 +17,18 @@ interface FeedCommentJpaRepository : JpaRepository<FeedCommentJpaEntity, Long> {
     )
     fun findByFeedAndParentCommentIsNull(@Param("feed") feed: FeedJpaEntity, pageable: Pageable): Page<FeedCommentJpaEntity>
 
+    @Query("""
+        SELECT fc FROM FeedCommentJpaEntity fc
+        JOIN FETCH fc.member
+        WHERE fc.feed.id IN :feedIds
+        AND fc.parentComment IS NULL
+        AND fc.id = (
+            SELECT MIN(fc2.id) FROM FeedCommentJpaEntity fc2
+            WHERE fc2.feed.id = fc.feed.id AND fc2.parentComment IS NULL
+        )
+    """)
+    fun findFirstCommentsByFeedIds(@Param("feedIds") feedIds: List<Long>): List<FeedCommentJpaEntity>
+
     @Query("SELECT fc FROM FeedCommentJpaEntity fc JOIN FETCH fc.member WHERE fc.parentComment = :parentComment ORDER BY fc.createdAt ASC")
     fun findByParentComment(@Param("parentComment") parentComment: FeedCommentJpaEntity): List<FeedCommentJpaEntity>
 

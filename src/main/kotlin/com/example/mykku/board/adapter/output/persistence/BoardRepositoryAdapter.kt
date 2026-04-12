@@ -20,6 +20,11 @@ class BoardRepositoryAdapter(
         return boardJpaRepository.findById(id.value).orElse(null)?.toDomain()
     }
 
+    override fun findByIds(ids: List<BoardId>): List<Board> {
+        if (ids.isEmpty()) return emptyList()
+        return boardJpaRepository.findAllById(ids.map { it.value }).map { it.toDomain() }
+    }
+
     override fun findAll(): List<Board> {
         return boardJpaRepository.findAll().map { it.toDomain() }
     }

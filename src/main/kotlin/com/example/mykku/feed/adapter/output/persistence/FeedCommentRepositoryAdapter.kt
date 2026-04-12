@@ -49,6 +49,12 @@ class FeedCommentRepositoryAdapter(
             .map { it.toDomain() }
     }
 
+    override fun findFirstCommentsByFeedIds(feedIds: List<FeedId>): Map<Long, FeedComment> {
+        if (feedIds.isEmpty()) return emptyMap()
+        val comments = feedCommentJpaRepository.findFirstCommentsByFeedIds(feedIds.map { it.value })
+        return comments.associate { it.feed.id!! to it.toDomain() }
+    }
+
     override fun findByParentCommentId(parentCommentId: FeedCommentId): List<FeedComment> {
         val parentComment = feedCommentJpaRepository.findById(parentCommentId.value).orElse(null)
             ?: return emptyList()

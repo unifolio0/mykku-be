@@ -6,6 +6,7 @@ import com.example.mykku.role.domain.vo.RoleId
 interface RoleRepository {
     fun save(role: Role): Role
     fun findById(id: RoleId): Role?
+    fun findByIds(ids: List<RoleId>): List<Role>
     fun findByName(name: String): Role?
     fun findAll(): List<Role>
     fun existsByName(name: String): Boolean

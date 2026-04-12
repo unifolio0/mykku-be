@@ -7,6 +7,7 @@ import com.example.mykku.member.domain.vo.SocialProvider
 interface MemberRepository {
     fun save(member: Member): Member
     fun findById(id: MemberPk): Member?
+    fun findByIds(ids: List<MemberPk>): List<Member>
     fun findByProviderAndSocialId(provider: SocialProvider, socialId: String): Member?
     fun existsByNickname(nickname: String): Boolean
     fun existsByEmail(email: String): Boolean
