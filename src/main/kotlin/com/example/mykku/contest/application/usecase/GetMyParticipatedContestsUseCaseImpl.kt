@@ -58,8 +58,7 @@ class GetMyParticipatedContestsUseCaseImpl(
             expiredAt = contest.expiredAt,
             status = contest.status,
             thumbnailUrl = contest.thumbnailUrl,
-            tags = tags.map { it.title },
-            isSaved = false
+            tags = tags.map { it.title }
         )
     }
 }

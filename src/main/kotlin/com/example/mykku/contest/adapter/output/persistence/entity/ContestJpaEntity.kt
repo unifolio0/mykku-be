@@ -33,9 +33,6 @@ class ContestJpaEntity(
     @Column(name = "expired_at")
     var expiredAt: LocalDateTime,
 
-    @Column(name = "scrap_count")
-    var scrapCount: Int = 0,
-
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     var status: ContestStatusType = ContestStatusType.ACTIVE,
@@ -51,7 +48,6 @@ class ContestJpaEntity(
             description = description,
             startedAt = startedAt,
             expiredAt = expiredAt,
-            scrapCount = scrapCount,
             thumbnailUrl = thumbnailUrl,
             status = status,
             createdAt = createdAt,
@@ -70,7 +66,6 @@ class ContestJpaEntity(
                 description = contest.description,
                 startedAt = contest.startedAt,
                 expiredAt = contest.expiredAt,
-                scrapCount = contest.scrapCount,
                 status = contest.status,
                 thumbnailUrl = contest.thumbnailUrl
             )

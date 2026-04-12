@@ -21,7 +21,7 @@ interface EventJpaRepository : JpaRepository<EventJpaEntity, Long> {
             SELECT e
             FROM EventJpaEntity e
             WHERE e.expiredAt > :dateTime
-            ORDER BY e.scrapCount DESC, e.createdAt DESC
+            ORDER BY e.createdAt DESC
         """
     )
     fun findActiveEventsByPopular(dateTime: LocalDateTime, pageable: Pageable): Page<EventJpaEntity>

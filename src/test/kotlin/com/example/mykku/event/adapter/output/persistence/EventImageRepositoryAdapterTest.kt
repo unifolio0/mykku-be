@@ -209,7 +209,6 @@ class EventImageRepositoryAdapterTest : BaseRepositoryTest() {
             startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7),
             thumbnailUrl = "https://example.com/thumbnail.jpg",
-            scrapCount = 0,
             status = EventStatusType.ACTIVE
         )
     }

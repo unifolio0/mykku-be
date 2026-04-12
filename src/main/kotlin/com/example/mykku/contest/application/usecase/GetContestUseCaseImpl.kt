@@ -38,7 +38,6 @@ class GetContestUseCaseImpl(
                 ContestImageResult(url = it.url, orderIndex = it.orderIndex)
             },
             tags = tags.map { it.title },
-            isSaved = false,
             createdAt = contest.createdAt
         )
     }

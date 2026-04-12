@@ -30,7 +30,6 @@ class ContestTagRepositoryAdapterTest : BaseRepositoryTest() {
         description: String? = "테스트 설명",
         startedAt: LocalDateTime = LocalDateTime.now().minusDays(1),
         expiredAt: LocalDateTime = LocalDateTime.now().plusDays(7),
-        scrapCount: Int = 0,
         status: ContestStatusType = ContestStatusType.ACTIVE
     ): ContestJpaEntity {
         val contest = ContestJpaEntity(
@@ -38,7 +37,6 @@ class ContestTagRepositoryAdapterTest : BaseRepositoryTest() {
             description = description,
             startedAt = startedAt,
             expiredAt = expiredAt,
-            scrapCount = scrapCount,
             status = status,
             thumbnailUrl = "https://example.com/thumbnail.jpg"
         )

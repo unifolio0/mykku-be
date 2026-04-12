@@ -34,7 +34,6 @@ class GetEventUseCaseImpl(
             images = images.sortedBy { it.orderIndex }.map {
                 EventImageResult(url = it.url, orderIndex = it.orderIndex)
             },
-            isSaved = false,
             createdAt = event.createdAt
         )
     }

@@ -16,7 +16,6 @@ data class FeedDetailResult(
     val tags: List<TagResult>,
     val likeCount: Int,
     val isLiked: Boolean,
-    val isSaved: Boolean,
     val commentCount: Int
 )
 

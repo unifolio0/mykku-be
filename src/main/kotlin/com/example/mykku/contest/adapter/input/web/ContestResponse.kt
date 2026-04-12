@@ -70,8 +70,7 @@ data class ContestListResponse(
     val expiredAt: LocalDateTime,
     val status: ContestStatusType,
     val thumbnailUrl: String,
-    val tags: List<String>,
-    val isSaved: Boolean
+    val tags: List<String>
 ) {
     companion object {
         fun from(result: ContestListResult): ContestListResponse {
@@ -82,8 +81,7 @@ data class ContestListResponse(
                 expiredAt = result.expiredAt,
                 status = result.status,
                 thumbnailUrl = result.thumbnailUrl,
-                tags = result.tags,
-                isSaved = result.isSaved
+                tags = result.tags
             )
         }
     }
@@ -121,7 +119,6 @@ data class ContestDetailResponse(
     val thumbnailUrl: String,
     val images: List<ContestImageResponse>,
     val tags: List<String>,
-    val isSaved: Boolean,
     val createdAt: LocalDateTime
 ) {
     companion object {
@@ -136,7 +133,6 @@ data class ContestDetailResponse(
                 thumbnailUrl = result.thumbnailUrl,
                 images = result.images.map { ContestImageResponse.from(it) },
                 tags = result.tags,
-                isSaved = result.isSaved,
                 createdAt = result.createdAt
             )
         }
