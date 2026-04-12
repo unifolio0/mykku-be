@@ -46,6 +46,7 @@ import com.example.mykku.feed.application.port.input.DeleteFeedUseCase
 import com.example.mykku.feed.application.port.input.GetFeedCommentsUseCase
 import com.example.mykku.feed.application.port.input.GetFeedDetailUseCase
 import com.example.mykku.feed.application.port.input.GetPopularFeedsUseCase
+import com.example.mykku.feed.application.port.input.GetMyFeedsUseCase
 import com.example.mykku.feed.application.port.input.ListFeedsUseCase
 import com.example.mykku.feed.application.port.input.UpdateFeedCommentUseCase
 import com.example.mykku.feed.application.port.input.UpdateFeedUseCase
@@ -299,6 +300,9 @@ abstract class BaseDocumentTest {
 
     @MockitoBean
     protected lateinit var listFeedsUseCase: ListFeedsUseCase
+
+    @MockitoBean
+    protected lateinit var getMyFeedsUseCase: GetMyFeedsUseCase
 
     @MockitoBean
     protected lateinit var getFeedCommentsUseCase: GetFeedCommentsUseCase

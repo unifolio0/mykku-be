@@ -67,6 +67,11 @@ class FeedRepositoryAdapter(
             .map { it.toDomain() }
     }
 
+    override fun findByMemberId(memberId: Long, pageable: Pageable): Page<Feed> {
+        return feedJpaRepository.findAllByMemberIdOrderByCreatedAtDesc(memberId, pageable)
+            .map { it.toDomain() }
+    }
+
     override fun findPopularFeedsByBoardId(boardId: Long, limit: Int, daysAgo: Int): List<Feed> {
         val board = boardJpaRepository.findById(boardId)
             .orElseThrow { IllegalArgumentException("Board not found") }

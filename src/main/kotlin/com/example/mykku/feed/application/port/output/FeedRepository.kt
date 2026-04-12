@@ -12,6 +12,7 @@ interface FeedRepository {
     fun findByIdOrThrow(id: FeedId): Feed
     fun findByBoardId(boardId: Long, pageable: Pageable): Page<Feed>
     fun findAllByIds(ids: List<FeedId>): List<Feed>
+    fun findByMemberId(memberId: Long, pageable: Pageable): Page<Feed>
     fun findPopularFeedsByBoardId(boardId: Long, limit: Int, daysAgo: Int): List<Feed>
     fun delete(feed: Feed)
 }

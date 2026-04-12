@@ -53,6 +53,8 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                     ContestWinnerPreviewResult(
                         contestId = 1L,
                         contestTitle = "첫 번째 콘테스트",
+                        startedAt = LocalDateTime.now().minusDays(30),
+                        expiredAt = LocalDateTime.now().minusDays(1),
                         winners = listOf(
                             WinnerThumbnailResult(
                                 winnerId = 1L,
@@ -74,6 +76,8 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                     ContestWinnerPreviewResult(
                         contestId = 2L,
                         contestTitle = "두 번째 콘테스트",
+                        startedAt = LocalDateTime.now().minusDays(60),
+                        expiredAt = LocalDateTime.now().minusDays(31),
                         winners = listOf(
                             WinnerThumbnailResult(
                                 winnerId = 4L,
@@ -99,6 +103,10 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                                 .description("콘테스트 ID"),
                             fieldWithPath("data.contests[].contestTitle").type(JsonFieldType.STRING)
                                 .description("콘테스트 제목"),
+                            fieldWithPath("data.contests[].startedAt").type(JsonFieldType.STRING)
+                                .description("콘테스트 시작일시"),
+                            fieldWithPath("data.contests[].expiredAt").type(JsonFieldType.STRING)
+                                .description("콘테스트 종료일시"),
                             fieldWithPath("data.contests[].winners[]").type(JsonFieldType.ARRAY).description("수상자 목록"),
                             fieldWithPath("data.contests[].winners[].winnerId").type(JsonFieldType.NUMBER)
                                 .description("수상자 ID"),
@@ -337,14 +345,20 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                         contestTitle = "첫 번째 콘테스트",
                         thumbnailUrl = "https://example.com/thumbnail1.jpg",
                         winnerRank = 1,
-                        acceptanceSpeech = "감사합니다!"
+                        acceptanceSpeech = "감사합니다!",
+                        feedId = 101L,
+                        feedTitle = "수상작 피드 제목",
+                        feedImageUrl = "https://example.com/feed1.jpg"
                     ),
                     MyAwardContestResult(
                         contestId = 2L,
                         contestTitle = "두 번째 콘테스트",
                         thumbnailUrl = "https://example.com/thumbnail2.jpg",
                         winnerRank = 2,
-                        acceptanceSpeech = ""
+                        acceptanceSpeech = "",
+                        feedId = 102L,
+                        feedTitle = "두 번째 수상작",
+                        feedImageUrl = null
                     )
                 ),
                 page = 0,
@@ -369,6 +383,9 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.content[].thumbnailUrl").type(JsonFieldType.STRING).description("콘테스트 썸네일 URL"),
                             fieldWithPath("data.content[].winnerRank").type(JsonFieldType.NUMBER).description("수상 순위"),
                             fieldWithPath("data.content[].acceptanceSpeech").type(JsonFieldType.STRING).description("수상 소감"),
+                            fieldWithPath("data.content[].feedId").type(JsonFieldType.NUMBER).description("피드 ID"),
+                            fieldWithPath("data.content[].feedTitle").type(JsonFieldType.STRING).description("피드 제목"),
+                            fieldWithPath("data.content[].feedImageUrl").type(JsonFieldType.STRING).description("피드 이미지 URL").optional(),
                             fieldWithPath("data.page").type(JsonFieldType.NUMBER).description("현재 페이지"),
                             fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
                             fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 항목 수"),
