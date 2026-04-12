@@ -1,14 +1,12 @@
 package com.example.mykku.notification.application.dto
 
 import com.example.mykku.notification.domain.entity.Notification
-import com.example.mykku.notification.domain.vo.NotificationDisplayColor
 import com.example.mykku.notification.domain.vo.NotificationType
 import java.time.LocalDateTime
 
 data class NotificationResult(
     val id: Long,
     val type: NotificationType,
-    val displayColor: NotificationDisplayColor,
     val senderId: Long?,
     val senderNickname: String?,
     val senderProfileImage: String?,
@@ -23,7 +21,6 @@ data class NotificationResult(
             return NotificationResult(
                 id = notification.id!!.value,
                 type = notification.type,
-                displayColor = notification.displayColor,
                 senderId = notification.senderId,
                 senderNickname = senderNickname,
                 senderProfileImage = senderProfileImage,

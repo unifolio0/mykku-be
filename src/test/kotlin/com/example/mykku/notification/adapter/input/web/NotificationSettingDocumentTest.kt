@@ -4,7 +4,6 @@ import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.Tag
 import com.example.mykku.notification.application.dto.NotificationSettingResult
-import com.example.mykku.notification.domain.vo.NotificationCategory
 import com.example.mykku.notification.domain.vo.NotificationType
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.DisplayName
@@ -34,38 +33,12 @@ class NotificationSettingDocumentTest : BaseDocumentTest() {
                 NotificationSettingResult(
                     id = 1L,
                     notificationType = NotificationType.FEED_LIKE,
-                    category = NotificationCategory.COMMUNITY,
                     isEnabled = true
                 ),
                 NotificationSettingResult(
                     id = 2L,
                     notificationType = NotificationType.FEED_COMMENT,
-                    category = NotificationCategory.COMMUNITY,
                     isEnabled = false
-                ),
-                NotificationSettingResult(
-                    id = 3L,
-                    notificationType = NotificationType.SYSTEM_NOTICE,
-                    category = NotificationCategory.NOTICE,
-                    isEnabled = true
-                ),
-                NotificationSettingResult(
-                    id = 4L,
-                    notificationType = NotificationType.ROLE_EARNED,
-                    category = NotificationCategory.COMMUNITY,
-                    isEnabled = true
-                ),
-                NotificationSettingResult(
-                    id = 5L,
-                    notificationType = NotificationType.CONTEST,
-                    category = NotificationCategory.CONTENTS,
-                    isEnabled = true
-                ),
-                NotificationSettingResult(
-                    id = 6L,
-                    notificationType = NotificationType.EVENT,
-                    category = NotificationCategory.CONTENTS,
-                    isEnabled = true
                 )
             )
 
@@ -80,9 +53,7 @@ class NotificationSettingDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data[]").type(JsonFieldType.ARRAY).description("알림 설정 목록"),
                             fieldWithPath("data[].id").type(JsonFieldType.NUMBER).description("설정 ID"),
                             fieldWithPath("data[].notificationType").type(JsonFieldType.STRING)
-                                .description("알림 타입 (FEED_LIKE, FEED_COMMENT, SYSTEM_NOTICE, ROLE_EARNED, CONTEST, EVENT)"),
-                            fieldWithPath("data[].category").type(JsonFieldType.STRING)
-                                .description("알림 카테고리 (NOTICE, COMMUNITY, CONTENTS)"),
+                                .description("알림 타입 (FEED_LIKE, FEED_COMMENT)"),
                             fieldWithPath("data[].isEnabled").type(JsonFieldType.BOOLEAN).description("알림 활성화 여부")
                         )
                 )
@@ -108,7 +79,7 @@ class NotificationSettingDocumentTest : BaseDocumentTest() {
             description = "알림 설정을 변경합니다.",
             requestBodyFields = listOf(
                 fieldWithPath("notificationType").type(JsonFieldType.STRING)
-                    .description("변경할 알림 타입 (FEED_LIKE, FEED_COMMENT, SYSTEM_NOTICE, ROLE_EARNED, CONTEST, EVENT)"),
+                    .description("변경할 알림 타입 (FEED_LIKE, FEED_COMMENT)"),
                 fieldWithPath("isEnabled").type(JsonFieldType.BOOLEAN).description("활성화 여부")
             ),
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
@@ -124,7 +95,6 @@ class NotificationSettingDocumentTest : BaseDocumentTest() {
             val response = NotificationSettingResult(
                 id = 1L,
                 notificationType = NotificationType.FEED_LIKE,
-                category = NotificationCategory.COMMUNITY,
                 isEnabled = false
             )
 
@@ -139,7 +109,6 @@ class NotificationSettingDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("변경된 알림 설정"),
                             fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("설정 ID"),
                             fieldWithPath("data.notificationType").type(JsonFieldType.STRING).description("알림 타입"),
-                            fieldWithPath("data.category").type(JsonFieldType.STRING).description("알림 카테고리"),
                             fieldWithPath("data.isEnabled").type(JsonFieldType.BOOLEAN).description("알림 활성화 여부")
                         )
                 )

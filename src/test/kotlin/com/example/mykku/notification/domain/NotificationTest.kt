@@ -1,7 +1,6 @@
 package com.example.mykku.notification.domain
 
 import com.example.mykku.notification.domain.entity.Notification
-import com.example.mykku.notification.domain.vo.NotificationDisplayColor
 import com.example.mykku.notification.domain.vo.NotificationId
 import com.example.mykku.notification.domain.vo.NotificationType
 import org.assertj.core.api.Assertions.assertThat
@@ -53,17 +52,17 @@ class NotificationTest {
         }
 
         @Test
-        @DisplayName("senderId 없이 알림을 생성할 수 있다 (시스템 알림)")
-        fun `알림 생성 - 시스템 알림`() {
+        @DisplayName("senderId 없이 알림을 생성할 수 있다")
+        fun `알림 생성 - senderId 없음`() {
             val notification = Notification.create(
-                type = NotificationType.SYSTEM_NOTICE,
+                type = NotificationType.FEED_LIKE,
                 senderId = null,
                 receiverId = 2L,
-                content = "시스템 공지사항입니다"
+                content = "알림 내용입니다"
             )
 
             assertThat(notification.senderId).isNull()
-            assertThat(notification.type).isEqualTo(NotificationType.SYSTEM_NOTICE)
+            assertThat(notification.type).isEqualTo(NotificationType.FEED_LIKE)
         }
 
         @Test
@@ -154,7 +153,6 @@ class NotificationTest {
             val notification = Notification.reconstitute(
                 id = NotificationId(1L),
                 type = NotificationType.FEED_LIKE,
-                displayColor = NotificationDisplayColor.BLACK,
                 senderId = 1L,
                 receiverId = 2L,
                 content = "알림 내용",
@@ -167,7 +165,6 @@ class NotificationTest {
 
             assertThat(notification.id?.value).isEqualTo(1L)
             assertThat(notification.type).isEqualTo(NotificationType.FEED_LIKE)
-            assertThat(notification.displayColor).isEqualTo(NotificationDisplayColor.BLACK)
             assertThat(notification.isRead).isTrue()
             assertThat(notification.relatedResourceId).isEqualTo(100L)
         }
@@ -180,7 +177,6 @@ class NotificationTest {
             val notification = Notification.reconstitute(
                 id = NotificationId(1L),
                 type = NotificationType.FEED_COMMENT,
-                displayColor = NotificationDisplayColor.BLACK,
                 senderId = 1L,
                 receiverId = 2L,
                 content = "댓글 알림",
@@ -227,20 +223,6 @@ class NotificationTest {
 
             assertThat(notification.type).isEqualTo(NotificationType.FEED_COMMENT)
             assertThat(notification.type.description).isEqualTo("피드 댓글")
-        }
-
-        @Test
-        @DisplayName("SYSTEM_NOTICE 타입 알림을 생성할 수 있다")
-        fun `타입 검증 - SYSTEM_NOTICE`() {
-            val notification = Notification.create(
-                type = NotificationType.SYSTEM_NOTICE,
-                senderId = null,
-                receiverId = 2L,
-                content = "시스템 공지"
-            )
-
-            assertThat(notification.type).isEqualTo(NotificationType.SYSTEM_NOTICE)
-            assertThat(notification.type.description).isEqualTo("시스템 공지")
         }
     }
 

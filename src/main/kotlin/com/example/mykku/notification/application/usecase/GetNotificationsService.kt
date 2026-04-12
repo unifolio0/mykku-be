@@ -20,11 +20,7 @@ class GetNotificationsService(
 ) : GetNotificationsUseCase {
 
     override fun getNotifications(query: GetNotificationsQuery): Page<NotificationResult> {
-        val notifications = if (query.category != null) {
-            notificationRepository.findAllByReceiverIdAndTypeIn(query.memberId, query.category.types, query.pageable)
-        } else {
-            notificationRepository.findAllByReceiverId(query.memberId, query.pageable)
-        }
+        val notifications = notificationRepository.findAllByReceiverId(query.memberId, query.pageable)
         return notifications.map { notification ->
             val sender = notification.senderId?.let { memberRepository.findById(MemberPk.of(it)) }
             NotificationResult.from(notification, sender?.nickname, sender?.profileImage)
@@ -32,11 +28,7 @@ class GetNotificationsService(
     }
 
     override fun getUnreadNotifications(query: GetUnreadNotificationsQuery): Page<NotificationResult> {
-        val notifications = if (query.category != null) {
-            notificationRepository.findAllByReceiverIdAndIsReadAndTypeIn(query.memberId, false, query.category.types, query.pageable)
-        } else {
-            notificationRepository.findAllByReceiverIdAndIsRead(query.memberId, false, query.pageable)
-        }
+        val notifications = notificationRepository.findAllByReceiverIdAndIsRead(query.memberId, false, query.pageable)
         return notifications.map { notification ->
             val sender = notification.senderId?.let { memberRepository.findById(MemberPk.of(it)) }
             NotificationResult.from(notification, sender?.nickname, sender?.profileImage)
@@ -44,10 +36,6 @@ class GetNotificationsService(
     }
 
     override fun getUnreadCount(query: GetUnreadCountQuery): Long {
-        return if (query.category != null) {
-            notificationRepository.countByReceiverIdAndIsReadAndTypeIn(query.memberId, false, query.category.types)
-        } else {
-            notificationRepository.countByReceiverIdAndIsRead(query.memberId, false)
-        }
+        return notificationRepository.countByReceiverIdAndIsRead(query.memberId, false)
     }
 }
