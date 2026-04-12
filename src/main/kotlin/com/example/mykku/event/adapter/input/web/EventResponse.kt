@@ -55,8 +55,7 @@ data class EventListResponse(
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
     val status: EventStatusType,
-    val thumbnailUrl: String,
-    val isSaved: Boolean
+    val thumbnailUrl: String
 ) {
     companion object {
         fun from(result: EventListResult): EventListResponse {
@@ -66,8 +65,7 @@ data class EventListResponse(
                 startedAt = result.startedAt,
                 expiredAt = result.expiredAt,
                 status = result.status,
-                thumbnailUrl = result.thumbnailUrl,
-                isSaved = result.isSaved
+                thumbnailUrl = result.thumbnailUrl
             )
         }
     }
@@ -104,7 +102,6 @@ data class EventDetailResponse(
     val status: EventStatusType,
     val thumbnailUrl: String,
     val images: List<EventImageResponse>,
-    val isSaved: Boolean,
     val createdAt: LocalDateTime
 ) {
     companion object {
@@ -118,7 +115,6 @@ data class EventDetailResponse(
                 status = result.status,
                 thumbnailUrl = result.thumbnailUrl,
                 images = result.images.map { EventImageResponse.from(it) },
-                isSaved = result.isSaved,
                 createdAt = result.createdAt
             )
         }

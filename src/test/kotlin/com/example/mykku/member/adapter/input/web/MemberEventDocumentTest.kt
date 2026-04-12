@@ -43,8 +43,7 @@ class MemberEventDocumentTest : BaseDocumentTest() {
                     startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                     expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
                     status = EventStatusType.ACTIVE,
-                    thumbnailUrl = "https://example.com/thumbnail1.jpg",
-                    isSaved = true
+                    thumbnailUrl = "https://example.com/thumbnail1.jpg"
                 ),
                 EventListResult(
                     id = 2L,
@@ -52,8 +51,7 @@ class MemberEventDocumentTest : BaseDocumentTest() {
                     startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                     expiredAt = LocalDateTime.of(2025, 11, 30, 23, 59, 59),
                     status = EventStatusType.EXPIRED,
-                    thumbnailUrl = "https://example.com/thumbnail2.jpg",
-                    isSaved = false
+                    thumbnailUrl = "https://example.com/thumbnail2.jpg"
                 )
             )
 
@@ -83,7 +81,6 @@ class MemberEventDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.content[].status").type(JsonFieldType.STRING).description("이벤트 상태 (ACTIVE, EXPIRED)"),
                             fieldWithPath("data.content[].thumbnailUrl").type(JsonFieldType.STRING)
                                 .description("썸네일 이미지 URL").optional(),
-                            fieldWithPath("data.content[].isSaved").type(JsonFieldType.BOOLEAN).description("저장 여부"),
                             fieldWithPath("data.page").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
                             fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
                             fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 요소 수"),

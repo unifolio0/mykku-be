@@ -23,6 +23,6 @@ class ImageExceptionHandler {
         return ResponseEntity
             .status(exception.errorCode.status)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(ErrorResponse(exception.errorCode.message))
+            .body(ErrorResponse(exception.errorCode.code, exception.errorCode.message))
     }
 }

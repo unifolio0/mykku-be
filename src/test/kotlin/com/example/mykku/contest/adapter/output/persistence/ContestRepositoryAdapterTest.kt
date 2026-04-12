@@ -30,7 +30,6 @@ class ContestRepositoryAdapterTest : BaseRepositoryTest() {
         description: String? = "테스트 설명",
         startedAt: LocalDateTime = LocalDateTime.now().minusDays(1),
         expiredAt: LocalDateTime = LocalDateTime.now().plusDays(7),
-        scrapCount: Int = 0,
         status: ContestStatusType = ContestStatusType.ACTIVE
     ): ContestJpaEntity {
         val contest = ContestJpaEntity(
@@ -38,7 +37,6 @@ class ContestRepositoryAdapterTest : BaseRepositoryTest() {
             description = description,
             startedAt = startedAt,
             expiredAt = expiredAt,
-            scrapCount = scrapCount,
             status = status,
             thumbnailUrl = "https://example.com/thumbnail.jpg"
         )
@@ -232,8 +230,9 @@ class ContestRepositoryAdapterTest : BaseRepositoryTest() {
         @DisplayName("ACTIVE 상태를 POPULAR 정렬로 조회할 수 있다")
         fun findWithPaginationActivePopular() {
             val now = LocalDateTime.now()
-            createAndSaveContest(title = "인기 콘테스트", scrapCount = 100, expiredAt = now.plusDays(7))
-            createAndSaveContest(title = "일반 콘테스트", scrapCount = 10, expiredAt = now.plusDays(7))
+            createAndSaveContest(title = "이전 콘테스트", expiredAt = now.plusDays(7))
+            Thread.sleep(10)
+            createAndSaveContest(title = "최근 콘테스트", expiredAt = now.plusDays(7))
 
             val page = contestRepository.findWithPagination(
                 status = ContestStatusType.ACTIVE,
@@ -243,7 +242,7 @@ class ContestRepositoryAdapterTest : BaseRepositoryTest() {
             )
 
             assertThat(page.content).hasSize(2)
-            assertThat(page.content[0].scrapCount).isGreaterThanOrEqualTo(page.content[1].scrapCount)
+            assertThat(page.content[0].title).isEqualTo("최근 콘테스트")
         }
 
         @Test

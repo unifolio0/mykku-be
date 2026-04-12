@@ -24,8 +24,6 @@ import com.example.mykku.member.domain.vo.MemberPk
 import com.example.mykku.role.application.dto.RoleResult
 import com.example.mykku.role.application.port.output.RoleRepository
 import com.example.mykku.role.domain.vo.RoleId
-import com.example.mykku.scrap.application.port.output.SaveFeedPort
-import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -41,7 +39,6 @@ class ListFeedsUseCaseImpl(
     private val roleRepository: RoleRepository,
     private val contestTagRepository: ContestTagRepository,
     private val likeFeedPort: LikeFeedPort,
-    private val saveFeedPort: SaveFeedPort,
     private val blockFilterUseCase: BlockFilterUseCase
 ) : ListFeedsUseCase {
 
@@ -78,21 +75,23 @@ class ListFeedsUseCaseImpl(
         val allTags = feedTagsMap.values.flatten()
         val contestTagsMap = getContestTagsMap(allTags)
 
-        val memberPks = feeds.mapNotNull { it.memberId }.distinct()
-        val membersMap = memberPks.mapNotNull { memberRepository.findById(MemberPk.of(it)) }
-            .associateBy { it.id.value }
+        val memberPks = feeds.mapNotNull { it.memberId }.distinct().map { MemberPk.of(it) }
+        val membersMap = memberRepository.findByIds(memberPks).associateBy { it.id.value }
 
-        val boardIds = feeds.map { it.boardId }.distinct()
-        val boardsMap = boardIds.mapNotNull { boardRepository.findById(BoardId(it)) }
-            .associateBy { it.id.value }
+        val boardIds = feeds.map { it.boardId }.distinct().map { BoardId(it) }
+        val boardsMap = boardRepository.findByIds(boardIds).associateBy { it.id.value }
+
+        val roleIds = membersMap.values.mapNotNull { it.roleId }.distinct().map { RoleId.of(it) }
+        val rolesMap = roleRepository.findByIds(roleIds).associateBy { it.id.value }
+
+        val firstCommentsMap = feedCommentRepository.findFirstCommentsByFeedIds(feedIds)
+
+        val commentMemberIds = firstCommentsMap.values.mapNotNull { it.memberId }.distinct().map { MemberPk.of(it) }
+        val commentMembersMap = memberRepository.findByIds(commentMemberIds).associateBy { it.id.value }
 
         val feedIdValues = feedIds.map { it.value }
         val likedFeedIds = if (memberId != null) {
             likeFeedPort.findByMemberIdAndFeedIdIn(memberId, feedIdValues).map { it.feedId }.toSet()
-        } else emptySet()
-
-        val savedFeedIds = if (memberId != null) {
-            saveFeedPort.findByMemberIdAndFeedIdIn(memberId, feedIdValues).map { it.feedId }.toSet()
         } else emptySet()
 
         return feeds.map { feed ->
@@ -103,7 +102,7 @@ class ListFeedsUseCaseImpl(
             val member = feed.memberId?.let { membersMap[it] }
             val board = boardsMap[feed.boardId]
             val authorResult = member?.let {
-                val role = it.roleId?.let { roleId -> roleRepository.findById(RoleId.of(roleId)) }
+                val role = it.roleId?.let { roleId -> rolesMap[roleId] }
                 val roleResult = role?.let { r -> RoleResult(r.id.value, r.name, r.description) }
                 AuthorResult(
                     memberId = it.memberId,
@@ -113,11 +112,8 @@ class ListFeedsUseCaseImpl(
                 )
             }
 
-            val firstComment = feedCommentRepository.findByFeedIdAndParentCommentIsNull(
-                feed.id!!, PageRequest.of(0, 1)
-            ).content.firstOrNull()
-
-            val commentMember = firstComment?.memberId?.let { memberRepository.findById(MemberPk.of(it)) }
+            val firstComment = firstCommentsMap[feedId]
+            val commentMember = firstComment?.memberId?.let { commentMembersMap[it] }
 
             FeedResult(
                 id = feedId,
@@ -130,7 +126,6 @@ class ListFeedsUseCaseImpl(
                 tags = tags.map { TagResult(it.title, contestTagsMap.containsKey(it.title)) },
                 likeCount = feed.likeCount,
                 isLiked = feedId in likedFeedIds,
-                isSaved = feedId in savedFeedIds,
                 commentCount = feed.commentCount,
                 comment = CommentPreviewResult(
                     profileImage = commentMember?.profileImage,

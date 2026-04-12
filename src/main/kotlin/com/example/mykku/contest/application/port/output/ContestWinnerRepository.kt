@@ -16,6 +16,7 @@ interface ContestWinnerRepository {
     fun findByContestIds(contestIds: List<ContestId>): List<ContestWinner>
     fun findByMemberId(memberId: Long, pageable: Pageable): Page<ContestWinner>
     fun findByMemberId(memberId: Long): List<ContestWinner>
+    fun findByMemberIdAndContestIds(memberId: Long, contestIds: List<ContestId>): List<ContestWinner>
     fun existsByContestId(contestId: ContestId): Boolean
     fun deleteAllByContestId(contestId: ContestId)
     fun deleteAllByParticipationIds(participationIds: List<ContestParticipationId>)

@@ -57,8 +57,7 @@ class ListEventsUseCaseImpl(
             startedAt = event.startedAt,
             expiredAt = event.expiredAt,
             status = event.status,
-            thumbnailUrl = event.thumbnailUrl,
-            isSaved = false
+            thumbnailUrl = event.thumbnailUrl
         )
     }
 }

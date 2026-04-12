@@ -269,7 +269,6 @@ class FeedControllerTest : BaseControllerTest() {
             .body("data.id", equalTo(feed.id?.toInt()))
             .body("data.title", equalTo("공개 피드"))
             .body("data.isLiked", equalTo(false))
-            .body("data.isSaved", equalTo(false))
     }
 
     @Test

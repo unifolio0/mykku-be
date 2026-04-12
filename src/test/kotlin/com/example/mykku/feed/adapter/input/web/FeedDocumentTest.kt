@@ -328,7 +328,6 @@ class FeedDocumentTest : BaseDocumentTest() {
                 ),
                 likeCount = 25,
                 isLiked = true,
-                isSaved = false,
                 commentCount = 10
             )
 
@@ -368,7 +367,6 @@ class FeedDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                             fieldWithPath("data.commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
                             fieldWithPath("data.isLiked").type(JsonFieldType.BOOLEAN).description("현재 사용자의 좋아요 여부"),
-                            fieldWithPath("data.isSaved").type(JsonFieldType.BOOLEAN).description("현재 사용자의 저장 여부"),
                             fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성 일시"),
                             fieldWithPath("data.updatedAt").type(JsonFieldType.STRING).description("수정 일시")
                         )
@@ -631,7 +629,6 @@ class FeedDocumentTest : BaseDocumentTest() {
                 ),
                 likeCount = 25,
                 isLiked = true,
-                isSaved = false,
                 commentCount = 10
             )
 
@@ -679,7 +676,6 @@ class FeedDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                             fieldWithPath("data.commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
                             fieldWithPath("data.isLiked").type(JsonFieldType.BOOLEAN).description("현재 사용자의 좋아요 여부"),
-                            fieldWithPath("data.isSaved").type(JsonFieldType.BOOLEAN).description("현재 사용자의 저장 여부"),
                             fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성 일시"),
                             fieldWithPath("data.updatedAt").type(JsonFieldType.STRING).description("수정 일시")
                         )

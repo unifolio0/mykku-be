@@ -46,14 +46,6 @@ class EventTest {
         }
 
         @Test
-        @DisplayName("이벤트 생성시 scrapCount가 0이다")
-        fun `이벤트 생성 - scrapCount 초기값`() {
-            val event = createEvent()
-
-            assertThat(event.scrapCount).isEqualTo(0)
-        }
-
-        @Test
         @DisplayName("이벤트 생성시 createdAt과 updatedAt이 설정된다")
         fun `이벤트 생성 - 시간 설정 검증`() {
             val event = createEvent()
@@ -140,7 +132,6 @@ class EventTest {
                 description = "설명",
                 startedAt = startedAt,
                 expiredAt = expiredAt,
-                scrapCount = 10,
                 thumbnailUrl = "https://example.com/thumbnail.jpg",
                 status = EventStatusType.EXPIRED,
                 createdAt = now,
@@ -149,7 +140,6 @@ class EventTest {
 
             assertThat(event.id.value).isEqualTo(1L)
             assertThat(event.title).isEqualTo("복원된 이벤트")
-            assertThat(event.scrapCount).isEqualTo(10)
             assertThat(event.status).isEqualTo(EventStatusType.EXPIRED)
         }
 
@@ -164,7 +154,6 @@ class EventTest {
                 description = null,
                 startedAt = now,
                 expiredAt = now.plusDays(7),
-                scrapCount = 0,
                 thumbnailUrl = "https://example.com/thumbnail.jpg",
                 status = EventStatusType.ACTIVE,
                 createdAt = now,
@@ -177,7 +166,6 @@ class EventTest {
                 description = null,
                 startedAt = now,
                 expiredAt = now.plusDays(7),
-                scrapCount = 0,
                 thumbnailUrl = "https://example.com/thumbnail.jpg",
                 status = EventStatusType.WINNER_SELECTED,
                 createdAt = now,
@@ -199,7 +187,6 @@ class EventTest {
                 description = null,
                 startedAt = now,
                 expiredAt = now.plusDays(7),
-                scrapCount = 5,
                 thumbnailUrl = "https://example.com/thumbnail.jpg",
                 status = EventStatusType.ACTIVE,
                 createdAt = now,

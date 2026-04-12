@@ -14,7 +14,6 @@ import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.like.application.port.output.LikeFeedCommentPort
 import com.example.mykku.like.application.port.output.LikeFeedPort
 import com.example.mykku.member.domain.entity.Member
-import com.example.mykku.scrap.application.port.output.SaveFeedPort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -27,7 +26,6 @@ class DeleteFeedUseCaseImpl(
     private val feedCommentRepository: FeedCommentRepository,
     private val likeFeedPort: LikeFeedPort,
     private val likeFeedCommentPort: LikeFeedCommentPort,
-    private val saveFeedPort: SaveFeedPort,
     private val contestParticipationRepository: ContestParticipationRepository,
     private val contestWinnerRepository: ContestWinnerRepository
 ) : DeleteFeedUseCase {
@@ -52,8 +50,6 @@ class DeleteFeedUseCaseImpl(
         likeFeedCommentPort.deleteAllByFeedCommentIdIn(commentIds)
         feedCommentRepository.deleteAllByFeedId(feedId)
         likeFeedPort.deleteAllByFeedId(feedId.value)
-
-        saveFeedPort.deleteAllByFeedId(feedId.value)
 
         val participations = contestParticipationRepository.findByFeedId(feedId.value)
         val participationIds = participations.map { it.id }

@@ -28,7 +28,8 @@ data class ContestListResult(
     val status: ContestStatusType,
     val thumbnailUrl: String,
     val tags: List<String>,
-    val isSaved: Boolean
+    val isWinner: Boolean = false,
+    val winnerRank: Int? = null
 )
 
 data class PagedContestsResult(
@@ -50,7 +51,6 @@ data class ContestDetailResult(
     val thumbnailUrl: String,
     val images: List<ContestImageResult>,
     val tags: List<String>,
-    val isSaved: Boolean,
     val createdAt: LocalDateTime
 )
 
@@ -81,6 +81,8 @@ data class ContestWinnersListResult(
 data class ContestWinnerPreviewResult(
     val contestId: Long,
     val contestTitle: String,
+    val startedAt: LocalDateTime,
+    val expiredAt: LocalDateTime,
     val winners: List<WinnerThumbnailResult>
 )
 
@@ -124,7 +126,10 @@ data class MyAwardContestResult(
     val contestTitle: String,
     val thumbnailUrl: String,
     val winnerRank: Int,
-    val acceptanceSpeech: String
+    val acceptanceSpeech: String,
+    val feedId: Long,
+    val feedTitle: String,
+    val feedImageUrl: String?
 )
 
 data class PagedMyAwardsResult(

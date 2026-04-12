@@ -52,8 +52,7 @@ class EventDocumentTest : BaseDocumentTest() {
                     startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                     expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
                     status = EventStatusType.ACTIVE,
-                    thumbnailUrl = "https://example.com/thumbnail1.jpg",
-                    isSaved = true
+                    thumbnailUrl = "https://example.com/thumbnail1.jpg"
                 ),
                 EventListResult(
                     id = 2L,
@@ -61,8 +60,7 @@ class EventDocumentTest : BaseDocumentTest() {
                     startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                     expiredAt = LocalDateTime.of(2025, 11, 30, 23, 59, 59),
                     status = EventStatusType.ACTIVE,
-                    thumbnailUrl = "https://example.com/thumbnail2.jpg",
-                    isSaved = false
+                    thumbnailUrl = "https://example.com/thumbnail2.jpg"
                 )
             )
 
@@ -90,7 +88,6 @@ class EventDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.content[].expiredAt").type(JsonFieldType.STRING).description("만료일"),
                             fieldWithPath("data.content[].thumbnailUrl").type(JsonFieldType.STRING)
                                 .description("썸네일 이미지 URL"),
-                            fieldWithPath("data.content[].isSaved").type(JsonFieldType.BOOLEAN).description("저장 여부"),
                             fieldWithPath("data.content[].status").type(JsonFieldType.STRING).description("이벤트 상태"),
                             fieldWithPath("data.content[].startedAt").type(JsonFieldType.STRING).description("시작일"),
                             fieldWithPath("data.page").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
@@ -143,7 +140,6 @@ class EventDocumentTest : BaseDocumentTest() {
                     EventImageResult(url = "https://example.com/image1.jpg", orderIndex = 0),
                     EventImageResult(url = "https://example.com/image2.jpg", orderIndex = 1)
                 ),
-                isSaved = true,
                 createdAt = LocalDateTime.now()
             )
 
@@ -164,7 +160,6 @@ class EventDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.images[]").type(JsonFieldType.ARRAY).description("이벤트 이미지 목록"),
                             fieldWithPath("data.images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
                             fieldWithPath("data.images[].orderIndex").type(JsonFieldType.NUMBER).description("이미지 순서"),
-                            fieldWithPath("data.isSaved").type(JsonFieldType.BOOLEAN).description("저장 여부"),
                             fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성일시"),
                             fieldWithPath("data.startedAt").type(JsonFieldType.STRING).description("시작일"),
                             fieldWithPath("data.status").type(JsonFieldType.STRING).description("이벤트 상태"),

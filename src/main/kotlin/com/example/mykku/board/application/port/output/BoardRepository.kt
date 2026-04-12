@@ -6,6 +6,7 @@ import com.example.mykku.board.domain.vo.BoardId
 interface BoardRepository {
     fun save(board: Board): Board
     fun findById(id: BoardId): Board?
+    fun findByIds(ids: List<BoardId>): List<Board>
     fun findAll(): List<Board>
     fun delete(board: Board)
     fun existsById(id: BoardId): Boolean

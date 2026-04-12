@@ -29,6 +29,11 @@ class RoleRepositoryAdapter(
         return jpaRepository.findByIdOrNull(id.value)?.toDomain()
     }
 
+    override fun findByIds(ids: List<RoleId>): List<Role> {
+        if (ids.isEmpty()) return emptyList()
+        return jpaRepository.findAllById(ids.map { it.value }).map { it.toDomain() }
+    }
+
     override fun findByName(name: String): Role? {
         return jpaRepository.findByName(name)?.toDomain()
     }

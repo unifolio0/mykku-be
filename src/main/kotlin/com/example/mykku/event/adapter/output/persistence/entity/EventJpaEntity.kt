@@ -33,9 +33,6 @@ class EventJpaEntity(
     @Column(name = "expired_at")
     var expiredAt: LocalDateTime,
 
-    @Column(name = "scrap_count")
-    var scrapCount: Int = 0,
-
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     var status: EventStatusType = EventStatusType.ACTIVE,
@@ -51,7 +48,6 @@ class EventJpaEntity(
             description = description,
             startedAt = startedAt,
             expiredAt = expiredAt,
-            scrapCount = scrapCount,
             thumbnailUrl = thumbnailUrl,
             status = status,
             createdAt = createdAt,
@@ -69,7 +65,6 @@ class EventJpaEntity(
                 description = event.description,
                 startedAt = event.startedAt,
                 expiredAt = event.expiredAt,
-                scrapCount = event.scrapCount,
                 status = event.status,
                 thumbnailUrl = event.thumbnailUrl
             )

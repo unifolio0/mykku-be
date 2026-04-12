@@ -41,6 +41,8 @@ class GetContestWinnersListUseCaseImpl(
             ContestWinnerPreviewResult(
                 contestId = contest.id.value,
                 contestTitle = contest.title,
+                startedAt = contest.startedAt,
+                expiredAt = contest.expiredAt,
                 winners = winners.sortedBy { it.winnerRank }.map { winner ->
                     WinnerThumbnailResult(
                         winnerId = winner.id.value,

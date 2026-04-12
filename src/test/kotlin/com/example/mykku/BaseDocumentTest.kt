@@ -46,6 +46,7 @@ import com.example.mykku.feed.application.port.input.DeleteFeedUseCase
 import com.example.mykku.feed.application.port.input.GetFeedCommentsUseCase
 import com.example.mykku.feed.application.port.input.GetFeedDetailUseCase
 import com.example.mykku.feed.application.port.input.GetPopularFeedsUseCase
+import com.example.mykku.feed.application.port.input.GetMyFeedsUseCase
 import com.example.mykku.feed.application.port.input.ListFeedsUseCase
 import com.example.mykku.feed.application.port.input.UpdateFeedCommentUseCase
 import com.example.mykku.feed.application.port.input.UpdateFeedUseCase
@@ -76,11 +77,6 @@ import com.example.mykku.preference.application.port.input.UpdateGoodsPreference
 import com.example.mykku.preference.application.port.input.UpdateMoodPreferenceUseCase
 import com.example.mykku.role.application.port.input.ChangeRepresentativeRoleUseCase
 import com.example.mykku.role.application.port.input.GetMyRolesUseCase
-import com.example.mykku.scrap.application.port.input.FolderUseCase
-import com.example.mykku.scrap.application.port.input.SaveDailyMessageUseCase
-import com.example.mykku.scrap.application.port.input.SaveEventUseCase
-import com.example.mykku.scrap.application.port.input.SaveFanNoteUseCase
-import com.example.mykku.scrap.application.port.input.SaveFeedUseCase
 import com.example.mykku.contest.application.port.input.GetMyParticipatedContestsUseCase
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
@@ -160,21 +156,6 @@ abstract class BaseDocumentTest {
 
     @MockitoBean
     protected lateinit var setContestWinnersUseCase: SetContestWinnersUseCase
-
-    @MockitoBean
-    protected lateinit var saveFeedUseCase: SaveFeedUseCase
-
-    @MockitoBean
-    protected lateinit var saveDailyMessageUseCase: SaveDailyMessageUseCase
-
-    @MockitoBean
-    protected lateinit var saveEventUseCase: SaveEventUseCase
-
-    @MockitoBean
-    protected lateinit var saveFanNoteUseCase: SaveFanNoteUseCase
-
-    @MockitoBean
-    protected lateinit var folderUseCase: FolderUseCase
 
     @MockitoBean
     protected lateinit var getMyRolesUseCase: GetMyRolesUseCase
@@ -319,6 +300,9 @@ abstract class BaseDocumentTest {
 
     @MockitoBean
     protected lateinit var listFeedsUseCase: ListFeedsUseCase
+
+    @MockitoBean
+    protected lateinit var getMyFeedsUseCase: GetMyFeedsUseCase
 
     @MockitoBean
     protected lateinit var getFeedCommentsUseCase: GetFeedCommentsUseCase

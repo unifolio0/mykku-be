@@ -52,8 +52,7 @@ class ContestDocumentTest : BaseDocumentTest() {
                     expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
                     status = ContestStatusType.ACTIVE,
                     thumbnailUrl = "https://example.com/thumbnail1.jpg",
-                    tags = listOf("디자인", "개발"),
-                    isSaved = true
+                    tags = listOf("디자인", "개발")
                 ),
                 ContestListResult(
                     id = 2L,
@@ -62,8 +61,7 @@ class ContestDocumentTest : BaseDocumentTest() {
                     expiredAt = LocalDateTime.of(2025, 11, 30, 23, 59, 59),
                     status = ContestStatusType.ACTIVE,
                     thumbnailUrl = "https://example.com/thumbnail2.jpg",
-                    tags = listOf("기획"),
-                    isSaved = false
+                    tags = listOf("기획")
                 )
             )
 
@@ -94,7 +92,8 @@ class ContestDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.content[].thumbnailUrl").type(JsonFieldType.STRING)
                                 .description("썸네일 이미지 URL"),
                             fieldWithPath("data.content[].tags[]").type(JsonFieldType.ARRAY).description("태그 목록"),
-                            fieldWithPath("data.content[].isSaved").type(JsonFieldType.BOOLEAN).description("저장 여부"),
+                            fieldWithPath("data.content[].isWinner").type(JsonFieldType.BOOLEAN).description("수상 여부"),
+                            fieldWithPath("data.content[].winnerRank").type(JsonFieldType.NUMBER).description("수상 순위").optional(),
                             fieldWithPath("data.page").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
                             fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
                             fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 요소 수"),
@@ -146,7 +145,6 @@ class ContestDocumentTest : BaseDocumentTest() {
                     ContestImageResult(url = "https://example.com/image2.jpg", orderIndex = 1)
                 ),
                 tags = listOf("디자인", "개발", "기획"),
-                isSaved = true,
                 createdAt = LocalDateTime.now()
             )
 
@@ -168,7 +166,6 @@ class ContestDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
                             fieldWithPath("data.images[].orderIndex").type(JsonFieldType.NUMBER).description("이미지 순서"),
                             fieldWithPath("data.tags[]").type(JsonFieldType.ARRAY).description("태그 목록"),
-                            fieldWithPath("data.isSaved").type(JsonFieldType.BOOLEAN).description("저장 여부"),
                             fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성일시"),
                             fieldWithPath("data.startedAt").type(JsonFieldType.STRING).description("시작일시"),
                             fieldWithPath("data.status").type(JsonFieldType.STRING).description("공모전 상태"),

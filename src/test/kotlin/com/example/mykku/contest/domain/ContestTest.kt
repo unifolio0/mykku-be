@@ -46,14 +46,6 @@ class ContestTest {
         }
 
         @Test
-        @DisplayName("콘테스트 생성시 scrapCount가 0이다")
-        fun `콘테스트 생성 - scrapCount 초기값`() {
-            val contest = createContest()
-
-            assertThat(contest.scrapCount).isEqualTo(0)
-        }
-
-        @Test
         @DisplayName("콘테스트 생성시 createdAt과 updatedAt이 설정된다")
         fun `콘테스트 생성 - 시간 설정 검증`() {
             val contest = createContest()
@@ -140,7 +132,6 @@ class ContestTest {
                 description = "설명",
                 startedAt = startedAt,
                 expiredAt = expiredAt,
-                scrapCount = 10,
                 thumbnailUrl = "https://example.com/thumbnail.jpg",
                 status = ContestStatusType.EXPIRED,
                 createdAt = now,
@@ -149,7 +140,6 @@ class ContestTest {
 
             assertThat(contest.id.value).isEqualTo(1L)
             assertThat(contest.title).isEqualTo("복원된 콘테스트")
-            assertThat(contest.scrapCount).isEqualTo(10)
             assertThat(contest.status).isEqualTo(ContestStatusType.EXPIRED)
         }
 
@@ -164,7 +154,6 @@ class ContestTest {
                 description = null,
                 startedAt = now,
                 expiredAt = now.plusDays(7),
-                scrapCount = 0,
                 thumbnailUrl = "https://example.com/thumbnail.jpg",
                 status = ContestStatusType.ACTIVE,
                 createdAt = now,
@@ -177,7 +166,6 @@ class ContestTest {
                 description = null,
                 startedAt = now,
                 expiredAt = now.plusDays(7),
-                scrapCount = 0,
                 thumbnailUrl = "https://example.com/thumbnail.jpg",
                 status = ContestStatusType.WINNER_SELECTED,
                 createdAt = now,

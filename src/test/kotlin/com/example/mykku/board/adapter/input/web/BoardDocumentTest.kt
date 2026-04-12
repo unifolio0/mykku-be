@@ -124,7 +124,6 @@ class BoardDocumentTest : BaseDocumentTest() {
                         ),
                         likeCount = 15,
                         isLiked = true,
-                        isSaved = false,
                         commentCount = 3,
                         comment = CommentPreviewResult(
                             profileImage = "https://example.com/commenter1.jpg",
@@ -188,8 +187,6 @@ class BoardDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.feeds[].commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
                             fieldWithPath("data.feeds[].isLiked").type(JsonFieldType.BOOLEAN)
                                 .description("현재 사용자의 좋아요 여부"),
-                            fieldWithPath("data.feeds[].isSaved").type(JsonFieldType.BOOLEAN)
-                                .description("현재 사용자의 저장 여부"),
                             fieldWithPath("data.feeds[].createdAt").type(JsonFieldType.STRING).description("작성 일시"),
                             fieldWithPath("data.feeds[].comment").type(JsonFieldType.OBJECT).description("첫 댓글 미리보기"),
                             fieldWithPath("data.feeds[].comment.profileImage").type(JsonFieldType.STRING)

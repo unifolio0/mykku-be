@@ -7,7 +7,9 @@ import com.example.mykku.contest.application.port.input.GetMyParticipatedContest
 import com.example.mykku.contest.application.port.output.ContestImageRepository
 import com.example.mykku.contest.application.port.output.ContestParticipationRepository
 import com.example.mykku.contest.application.port.output.ContestTagRepository
+import com.example.mykku.contest.application.port.output.ContestWinnerRepository
 import com.example.mykku.contest.domain.entity.Contest
+import com.example.mykku.contest.domain.entity.ContestWinner
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -15,7 +17,8 @@ import org.springframework.transaction.annotation.Transactional
 class GetMyParticipatedContestsUseCaseImpl(
     private val contestParticipationRepository: ContestParticipationRepository,
     private val contestImageRepository: ContestImageRepository,
-    private val contestTagRepository: ContestTagRepository
+    private val contestTagRepository: ContestTagRepository,
+    private val contestWinnerRepository: ContestWinnerRepository
 ) : GetMyParticipatedContestsUseCase {
 
     @Transactional(readOnly = true)
@@ -30,8 +33,11 @@ class GetMyParticipatedContestsUseCaseImpl(
         val tagsByContestId = contestTagRepository.findByContestIds(contestIds)
             .groupBy { it.contestId.value }
 
+        val winnersByContestId = contestWinnerRepository.findByMemberIdAndContestIds(memberId, contestIds)
+            .associateBy { it.contestId.value }
+
         val contestListResults = contestPage.content.map { contest ->
-            toContestListResult(contest, imagesByContestId, tagsByContestId)
+            toContestListResult(contest, imagesByContestId, tagsByContestId, winnersByContestId)
         }
 
         return PagedContestsResult(
@@ -47,9 +53,11 @@ class GetMyParticipatedContestsUseCaseImpl(
     private fun toContestListResult(
         contest: Contest,
         imagesByContestId: Map<Long, List<com.example.mykku.contest.domain.entity.ContestImage>>,
-        tagsByContestId: Map<Long, List<com.example.mykku.contest.domain.entity.ContestTag>>
+        tagsByContestId: Map<Long, List<com.example.mykku.contest.domain.entity.ContestTag>>,
+        winnersByContestId: Map<Long, ContestWinner>
     ): ContestListResult {
         val tags = tagsByContestId[contest.id.value] ?: emptyList()
+        val winner = winnersByContestId[contest.id.value]
 
         return ContestListResult(
             id = contest.id.value,
@@ -59,7 +67,8 @@ class GetMyParticipatedContestsUseCaseImpl(
             status = contest.status,
             thumbnailUrl = contest.thumbnailUrl,
             tags = tags.map { it.title },
-            isSaved = false
+            isWinner = winner != null,
+            winnerRank = winner?.winnerRank
         )
     }
 }

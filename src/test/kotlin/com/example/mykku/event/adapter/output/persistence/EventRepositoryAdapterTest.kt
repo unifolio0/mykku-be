@@ -43,16 +43,6 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
         }
 
         @Test
-        @DisplayName("이벤트 저장 시 scrapCount 기본값이 0이다")
-        fun `이벤트 저장 - scrapCount 기본값`() {
-            val event = createEvent()
-
-            val savedEvent = eventRepository.save(event)
-
-            assertThat(savedEvent.scrapCount).isEqualTo(0)
-        }
-
-        @Test
         @DisplayName("description이 null인 이벤트를 저장할 수 있다")
         fun `이벤트 저장 - description null`() {
             val event = Event.create(
@@ -193,10 +183,9 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
             @DisplayName("POPULAR 정렬로 활성 이벤트를 조회한다")
             fun `활성 이벤트 조회 - POPULAR 정렬`() {
                 val now = LocalDateTime.now()
-                val event1 = createEventJpaEntityWithScrapCount(now.plusDays(7), 10)
-                val event2 = createEventJpaEntityWithScrapCount(now.plusDays(7), 50)
-                eventJpaRepository.save(event1)
-                eventJpaRepository.save(event2)
+                val event1 = eventRepository.save(createEventWithExpiredAt(now.plusDays(7)))
+                Thread.sleep(10)
+                val event2 = eventRepository.save(createEventWithExpiredAt(now.plusDays(7)))
                 val pageable = PageRequest.of(0, 10)
 
                 val page = eventRepository.findWithPagination(
@@ -207,7 +196,7 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
                 )
 
                 assertThat(page.content).hasSize(2)
-                assertThat(page.content[0].scrapCount).isEqualTo(50)
+                assertThat(page.content[0].id).isEqualTo(event2.id)
             }
         }
 
@@ -325,15 +314,4 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
         )
     }
 
-    private fun createEventJpaEntityWithScrapCount(expiredAt: LocalDateTime, scrapCount: Int): EventJpaEntity {
-        return EventJpaEntity(
-            title = "테스트 이벤트",
-            description = "테스트 이벤트 설명",
-            startedAt = LocalDateTime.now().minusDays(1),
-            expiredAt = expiredAt,
-            thumbnailUrl = "https://example.com/thumbnail.jpg",
-            scrapCount = scrapCount,
-            status = EventStatusType.ACTIVE
-        )
-    }
 }

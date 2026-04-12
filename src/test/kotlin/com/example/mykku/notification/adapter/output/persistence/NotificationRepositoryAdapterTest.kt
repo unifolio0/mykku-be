@@ -62,20 +62,20 @@ class NotificationRepositoryAdapterTest : BaseRepositoryTest() {
         }
 
         @Test
-        @DisplayName("senderId가 null인 시스템 알림을 저장할 수 있다")
-        fun `알림 저장 - 시스템 알림`() {
+        @DisplayName("senderId가 null인 알림을 저장할 수 있다")
+        fun `알림 저장 - senderId 없음`() {
             val notification = Notification.create(
-                type = NotificationType.SYSTEM_NOTICE,
+                type = NotificationType.FEED_LIKE,
                 senderId = null,
                 receiverId = receiverId,
-                content = "시스템 공지사항"
+                content = "알림 내용"
             )
 
             val saved = notificationRepository.save(notification)
 
             assertThat(saved.id).isNotNull()
             assertThat(saved.senderId).isNull()
-            assertThat(saved.type).isEqualTo(NotificationType.SYSTEM_NOTICE)
+            assertThat(saved.type).isEqualTo(NotificationType.FEED_LIKE)
         }
 
         @Test
@@ -260,7 +260,7 @@ class NotificationRepositoryAdapterTest : BaseRepositoryTest() {
 
             val page = notificationRepository.findAllByReceiverIdAndType(
                 receiverId,
-                NotificationType.SYSTEM_NOTICE,
+                NotificationType.FEED_COMMENT,
                 pageable
             )
 
@@ -289,14 +289,6 @@ class NotificationRepositoryAdapterTest : BaseRepositoryTest() {
                     senderId = senderId,
                     receiverId = receiverId,
                     content = "댓글 알림"
-                )
-            )
-            notificationRepository.save(
-                Notification.create(
-                    type = NotificationType.SYSTEM_NOTICE,
-                    senderId = null,
-                    receiverId = receiverId,
-                    content = "시스템 공지"
                 )
             )
             val pageable = PageRequest.of(0, 10)
@@ -332,17 +324,17 @@ class NotificationRepositoryAdapterTest : BaseRepositoryTest() {
             )
             notificationRepository.save(
                 Notification.create(
-                    type = NotificationType.SYSTEM_NOTICE,
-                    senderId = null,
+                    type = NotificationType.FEED_COMMENT,
+                    senderId = senderId,
                     receiverId = receiverId,
-                    content = "시스템 공지"
+                    content = "댓글 알림"
                 )
             )
 
             val count = notificationRepository.countByReceiverIdAndIsReadAndTypeIn(
                 receiverId,
                 false,
-                listOf(NotificationType.FEED_LIKE, NotificationType.FEED_COMMENT)
+                listOf(NotificationType.FEED_LIKE)
             )
 
             assertThat(count).isEqualTo(1)
@@ -455,7 +447,7 @@ class NotificationRepositoryAdapterTest : BaseRepositoryTest() {
 
         @Test
         @DisplayName("특정 타입의 알림만 읽음 처리할 수 있다")
-        fun `카테고리별 전체 읽음 처리 - 정상 케이스`() {
+        fun `타입별 전체 읽음 처리 - 정상 케이스`() {
             notificationRepository.save(
                 Notification.create(
                     type = NotificationType.FEED_LIKE,
@@ -472,42 +464,34 @@ class NotificationRepositoryAdapterTest : BaseRepositoryTest() {
                     content = "댓글 알림"
                 )
             )
-            notificationRepository.save(
-                Notification.create(
-                    type = NotificationType.SYSTEM_NOTICE,
-                    senderId = null,
-                    receiverId = receiverId,
-                    content = "시스템 공지"
-                )
-            )
 
             val updatedCount = notificationRepository.markAllAsReadByReceiverIdAndTypeIn(
                 receiverId,
-                listOf(NotificationType.FEED_LIKE, NotificationType.FEED_COMMENT)
+                listOf(NotificationType.FEED_LIKE)
             )
 
-            assertThat(updatedCount).isEqualTo(2)
+            assertThat(updatedCount).isEqualTo(1)
             val pageable = PageRequest.of(0, 10)
-            val unreadNotice = notificationRepository.findAllByReceiverIdAndIsRead(receiverId, false, pageable)
-            assertThat(unreadNotice.content).hasSize(1)
-            assertThat(unreadNotice.content[0].type).isEqualTo(NotificationType.SYSTEM_NOTICE)
+            val unreadNotifications = notificationRepository.findAllByReceiverIdAndIsRead(receiverId, false, pageable)
+            assertThat(unreadNotifications.content).hasSize(1)
+            assertThat(unreadNotifications.content[0].type).isEqualTo(NotificationType.FEED_COMMENT)
         }
 
         @Test
         @DisplayName("해당 타입의 알림이 없으면 0을 반환한다")
-        fun `카테고리별 전체 읽음 처리 - 해당 타입 없음`() {
+        fun `타입별 전체 읽음 처리 - 해당 타입 없음`() {
             notificationRepository.save(
                 Notification.create(
-                    type = NotificationType.SYSTEM_NOTICE,
-                    senderId = null,
+                    type = NotificationType.FEED_COMMENT,
+                    senderId = senderId,
                     receiverId = receiverId,
-                    content = "시스템 공지"
+                    content = "댓글 알림"
                 )
             )
 
             val updatedCount = notificationRepository.markAllAsReadByReceiverIdAndTypeIn(
                 receiverId,
-                listOf(NotificationType.FEED_LIKE, NotificationType.FEED_COMMENT)
+                listOf(NotificationType.FEED_LIKE)
             )
 
             assertThat(updatedCount).isEqualTo(0)
