@@ -34,6 +34,7 @@ class RestDocumentationResponse {
     companion object {
         val ERROR_RESPONSE = RestDocumentationResponse().apply {
             responseBodyField(
+                fieldWithPath("code").type(JsonFieldType.STRING).description("에러 코드"),
                 fieldWithPath("message").type(JsonFieldType.STRING).description("에러 메시지")
             )
         }
