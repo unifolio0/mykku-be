@@ -30,7 +30,7 @@ class BaseExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(ErrorResponse(errorMessage))
+            .body(ErrorResponse(CommonErrorCode.INVALID_INPUT.code, errorMessage))
     }
 
     @ExceptionHandler(HttpMessageNotReadableException::class)
@@ -42,7 +42,7 @@ class BaseExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(ErrorResponse(CommonErrorCode.INVALID_INPUT.message))
+            .body(ErrorResponse(CommonErrorCode.INVALID_INPUT.code, CommonErrorCode.INVALID_INPUT.message))
     }
 
     @ExceptionHandler(BaseException::class)
@@ -52,7 +52,7 @@ class BaseExceptionHandler {
         return ResponseEntity
             .status(exception.errorCode.status)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(ErrorResponse(exception.errorCode.message))
+            .body(ErrorResponse(exception.errorCode.code, exception.errorCode.message))
     }
 
     @ExceptionHandler(RedisException::class)
@@ -62,7 +62,7 @@ class BaseExceptionHandler {
         return ResponseEntity
             .status(CommonErrorCode.REDIS_CONNECTION_FAILURE.status)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(ErrorResponse(CommonErrorCode.REDIS_CONNECTION_FAILURE.message))
+            .body(ErrorResponse(CommonErrorCode.REDIS_CONNECTION_FAILURE.code, CommonErrorCode.REDIS_CONNECTION_FAILURE.message))
     }
 
     @ExceptionHandler(Exception::class)
@@ -72,6 +72,6 @@ class BaseExceptionHandler {
         return ResponseEntity
             .status(CommonErrorCode.INTERNAL_SERVER_ERROR.status)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(ErrorResponse(CommonErrorCode.INTERNAL_SERVER_ERROR.message))
+            .body(ErrorResponse(CommonErrorCode.INTERNAL_SERVER_ERROR.code, CommonErrorCode.INTERNAL_SERVER_ERROR.message))
     }
 }
