@@ -35,23 +35,13 @@ class NotificationSettingControllerTest : BaseControllerTest() {
     }
 
     @Test
-    @DisplayName("알림 설정 목록 조회 - 기존 유저 설정 보충 (3개 → 6개)")
+    @DisplayName("알림 설정 목록 조회 - 기존 유저 설정 보충 (1개 → 2개)")
     fun `getSettings - 기존 유저의 누락된 설정을 보충한다`() {
         val member = createAndSaveMember()
 
         createNotificationSetting(
             member = member,
             notificationType = NotificationType.FEED_LIKE,
-            isEnabled = true
-        )
-        createNotificationSetting(
-            member = member,
-            notificationType = NotificationType.FEED_COMMENT,
-            isEnabled = false
-        )
-        createNotificationSetting(
-            member = member,
-            notificationType = NotificationType.SYSTEM_NOTICE,
             isEnabled = true
         )
 
@@ -64,7 +54,7 @@ class NotificationSettingControllerTest : BaseControllerTest() {
             .then()
             .statusCode(200)
             .body("message", equalTo("알림 설정을 성공적으로 조회했습니다."))
-            .body("data", hasSize<Any>(6))
+            .body("data", hasSize<Any>(2))
     }
 
     @Test
@@ -81,7 +71,7 @@ class NotificationSettingControllerTest : BaseControllerTest() {
             .then()
             .statusCode(200)
             .body("message", equalTo("알림 설정을 성공적으로 조회했습니다."))
-            .body("data", hasSize<Any>(6))
+            .body("data", hasSize<Any>(2))
     }
 
     @Test
@@ -131,7 +121,7 @@ class NotificationSettingControllerTest : BaseControllerTest() {
         val member = createAndSaveMember()
 
         val request = UpdateNotificationSettingRequest(
-            notificationType = NotificationType.SYSTEM_NOTICE,
+            notificationType = NotificationType.FEED_COMMENT,
             isEnabled = false
         )
 
@@ -146,7 +136,7 @@ class NotificationSettingControllerTest : BaseControllerTest() {
             .then()
             .statusCode(200)
             .body("message", equalTo("알림 설정이 성공적으로 변경되었습니다."))
-            .body("data.notificationType", equalTo("SYSTEM_NOTICE"))
+            .body("data.notificationType", equalTo("FEED_COMMENT"))
             .body("data.isEnabled", equalTo(false))
     }
 

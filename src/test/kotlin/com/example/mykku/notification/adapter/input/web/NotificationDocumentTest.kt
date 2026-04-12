@@ -5,7 +5,6 @@ import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
 import com.example.mykku.docs.Tag
 import com.example.mykku.notification.application.dto.NotificationResult
-import com.example.mykku.notification.domain.vo.NotificationDisplayColor
 import com.example.mykku.notification.domain.vo.NotificationType
 import com.example.mykku.notification.exception.NotificationErrorCode
 import com.example.mykku.notification.exception.NotificationException
@@ -32,11 +31,10 @@ class NotificationDocumentTest : BaseDocumentTest() {
         private val apiConfig = ApiRequestConfig(
             tag = Tag.NOTIFICATION_API,
             summary = "알림 목록 조회",
-            description = "사용자의 알림 목록을 페이지네이션으로 조회합니다. category 파라미터로 탭별 필터링이 가능합니다.",
+            description = "사용자의 알림 목록을 페이지네이션으로 조회합니다.",
             queryParameters = listOf(
                 parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
-                parameterWithName("size").description("페이지 크기 (기본값: 20)").optional(),
-                parameterWithName("category").description("알림 카테고리 필터 (NOTICE, COMMUNITY, CONTENTS)").optional()
+                parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
             ),
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
@@ -47,7 +45,6 @@ class NotificationDocumentTest : BaseDocumentTest() {
                 NotificationResult(
                     id = 1L,
                     type = NotificationType.FEED_LIKE,
-                    displayColor = NotificationDisplayColor.BLACK,
                     senderId = 100L,
                     senderNickname = "홍길동",
                     senderProfileImage = "https://example.com/profile.jpg",
@@ -60,7 +57,6 @@ class NotificationDocumentTest : BaseDocumentTest() {
                 NotificationResult(
                     id = 2L,
                     type = NotificationType.FEED_COMMENT,
-                    displayColor = NotificationDisplayColor.BLACK,
                     senderId = 200L,
                     senderNickname = "김철수",
                     senderProfileImage = null,
@@ -85,8 +81,6 @@ class NotificationDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.content[]").type(JsonFieldType.ARRAY).description("알림 목록"),
                             fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("알림 ID"),
                             fieldWithPath("data.content[].type").type(JsonFieldType.STRING).description("알림 타입"),
-                            fieldWithPath("data.content[].displayColor").type(JsonFieldType.STRING)
-                                .description("표시 색상 (RED, GREEN, BLACK)"),
                             fieldWithPath("data.content[].senderId").type(JsonFieldType.STRING).description("발신자 ID")
                                 .optional(),
                             fieldWithPath("data.content[].senderNickname").type(JsonFieldType.STRING).description("발신자 닉네임")
@@ -146,11 +140,10 @@ class NotificationDocumentTest : BaseDocumentTest() {
         private val apiConfig = ApiRequestConfig(
             tag = Tag.NOTIFICATION_API,
             summary = "읽지 않은 알림 목록 조회",
-            description = "읽지 않은 알림 목록을 페이지네이션으로 조회합니다. category 파라미터로 탭별 필터링이 가능합니다.",
+            description = "읽지 않은 알림 목록을 페이지네이션으로 조회합니다.",
             queryParameters = listOf(
                 parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
-                parameterWithName("size").description("페이지 크기 (기본값: 20)").optional(),
-                parameterWithName("category").description("알림 카테고리 필터 (NOTICE, COMMUNITY, CONTENTS)").optional()
+                parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
             ),
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
@@ -161,7 +154,6 @@ class NotificationDocumentTest : BaseDocumentTest() {
                 NotificationResult(
                     id = 1L,
                     type = NotificationType.FEED_LIKE,
-                    displayColor = NotificationDisplayColor.BLACK,
                     senderId = 100L,
                     senderNickname = "홍길동",
                     senderProfileImage = "https://example.com/profile.jpg",
@@ -174,7 +166,6 @@ class NotificationDocumentTest : BaseDocumentTest() {
                 NotificationResult(
                     id = 2L,
                     type = NotificationType.FEED_COMMENT,
-                    displayColor = NotificationDisplayColor.BLACK,
                     senderId = 200L,
                     senderNickname = "김철수",
                     senderProfileImage = null,
@@ -199,8 +190,6 @@ class NotificationDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.content[]").type(JsonFieldType.ARRAY).description("읽지 않은 알림 목록"),
                             fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("알림 ID"),
                             fieldWithPath("data.content[].type").type(JsonFieldType.STRING).description("알림 타입"),
-                            fieldWithPath("data.content[].displayColor").type(JsonFieldType.STRING)
-                                .description("표시 색상 (RED, GREEN, BLACK)"),
                             fieldWithPath("data.content[].senderId").type(JsonFieldType.STRING).description("발신자 ID")
                                 .optional(),
                             fieldWithPath("data.content[].senderNickname").type(JsonFieldType.STRING).description("발신자 닉네임")
@@ -260,10 +249,7 @@ class NotificationDocumentTest : BaseDocumentTest() {
         private val apiConfig = ApiRequestConfig(
             tag = Tag.NOTIFICATION_API,
             summary = "읽지 않은 알림 개수 조회",
-            description = "읽지 않은 알림의 개수를 조회합니다. category 파라미터로 탭별 필터링이 가능합니다.",
-            queryParameters = listOf(
-                parameterWithName("category").description("알림 카테고리 필터 (NOTICE, COMMUNITY, CONTENTS)").optional()
-            ),
+            description = "읽지 않은 알림의 개수를 조회합니다.",
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
@@ -338,10 +324,7 @@ class NotificationDocumentTest : BaseDocumentTest() {
         private val apiConfig = ApiRequestConfig(
             tag = Tag.NOTIFICATION_API,
             summary = "모든 알림 읽음 처리",
-            description = "모든 알림을 읽음 처리합니다. category 파라미터로 특정 카테고리의 알림만 읽음 처리할 수 있습니다.",
-            queryParameters = listOf(
-                parameterWithName("category").description("알림 카테고리 필터 (NOTICE, COMMUNITY, CONTENTS)").optional()
-            ),
+            description = "모든 알림을 읽음 처리합니다.",
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 

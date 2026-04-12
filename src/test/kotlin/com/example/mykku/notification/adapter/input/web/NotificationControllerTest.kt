@@ -70,46 +70,6 @@ class NotificationControllerTest : BaseControllerTest() {
     }
 
     @Test
-    @DisplayName("알림 목록 조회 - 카테고리 필터링")
-    fun `getNotifications - 카테고리로 필터링하여 조회한다`() {
-        val sender = createAndSaveMember(memberId = "sender", nickname = "Sender", email = "sender@example.com", socialId = "sender1")
-        val receiver = createAndSaveMember(memberId = "receiver", nickname = "Receiver", email = "receiver@example.com", socialId = "receiver1")
-
-        createNotification(
-            type = NotificationType.FEED_LIKE,
-            sender = sender,
-            receiver = receiver,
-            content = "sender1님이 회원님의 피드를 좋아합니다"
-        )
-        createNotification(
-            type = NotificationType.SYSTEM_NOTICE,
-            sender = sender,
-            receiver = receiver,
-            content = "시스템 공지사항"
-        )
-
-        val authHeader = TestTokenGenerator.getBearerToken(receiver.id)
-
-        RestAssured.given()
-            .header("Authorization", authHeader)
-            .queryParam("category", "COMMUNITY")
-            .`when`()
-            .get("/api/v1/notifications")
-            .then()
-            .statusCode(200)
-            .body("data.content", hasSize<Any>(1))
-
-        RestAssured.given()
-            .header("Authorization", authHeader)
-            .queryParam("category", "NOTICE")
-            .`when`()
-            .get("/api/v1/notifications")
-            .then()
-            .statusCode(200)
-            .body("data.content", hasSize<Any>(1))
-    }
-
-    @Test
     @DisplayName("알림 목록 조회 - 인증되지 않은 사용자")
     fun `getNotifications - 인증되지 않은 사용자는 조회할 수 없다`() {
         RestAssured.given()
@@ -266,50 +226,6 @@ class NotificationControllerTest : BaseControllerTest() {
 
         val unreadCount = notificationJpaRepository.countByReceiverIdAndIsRead(receiver.id, false)
         assertThat(unreadCount).isEqualTo(0L)
-    }
-
-    @Test
-    @DisplayName("카테고리별 전체 읽음 처리 - 정상 케이스")
-    fun `markAllAsRead - 카테고리별로 읽음 처리한다`() {
-        val sender = createAndSaveMember(memberId = "sender", email = "sender@example.com", socialId = "sender1")
-        val receiver = createAndSaveMember(memberId = "receiver", email = "receiver@example.com", socialId = "receiver1")
-
-        createNotification(
-            type = NotificationType.FEED_LIKE,
-            sender = sender,
-            receiver = receiver,
-            content = "좋아요 알림"
-        )
-        createNotification(
-            type = NotificationType.SYSTEM_NOTICE,
-            sender = sender,
-            receiver = receiver,
-            content = "시스템 공지"
-        )
-
-        val authHeader = TestTokenGenerator.getBearerToken(receiver.id)
-
-        RestAssured.given()
-            .header("Authorization", authHeader)
-            .queryParam("category", "COMMUNITY")
-            .`when`()
-            .patch("/api/v1/notifications/read-all")
-            .then()
-            .statusCode(200)
-
-        val communityUnread = notificationJpaRepository.countByReceiverIdAndIsReadAndTypeIn(
-            receiver.id,
-            false,
-            listOf(NotificationType.FEED_LIKE, NotificationType.FEED_COMMENT, NotificationType.ROLE_EARNED)
-        )
-        assertThat(communityUnread).isEqualTo(0L)
-
-        val noticeUnread = notificationJpaRepository.countByReceiverIdAndIsReadAndTypeIn(
-            receiver.id,
-            false,
-            listOf(NotificationType.SYSTEM_NOTICE)
-        )
-        assertThat(noticeUnread).isEqualTo(1L)
     }
 
     @Test

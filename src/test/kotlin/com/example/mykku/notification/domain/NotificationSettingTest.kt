@@ -85,17 +85,6 @@ class NotificationSettingTest {
             assertThat(setting.notificationType.description).isEqualTo("피드 댓글")
         }
 
-        @Test
-        @DisplayName("SYSTEM_NOTICE 타입으로 알림 설정을 생성할 수 있다")
-        fun `알림 설정 생성 - SYSTEM_NOTICE 타입`() {
-            val setting = NotificationSetting.create(
-                memberId = 1L,
-                notificationType = NotificationType.SYSTEM_NOTICE
-            )
-
-            assertThat(setting.notificationType).isEqualTo(NotificationType.SYSTEM_NOTICE)
-            assertThat(setting.notificationType.description).isEqualTo("시스템 공지")
-        }
     }
 
     @Nested
@@ -236,11 +225,7 @@ class NotificationSettingTest {
 
             assertThat(types).containsExactlyInAnyOrder(
                 NotificationType.FEED_LIKE,
-                NotificationType.FEED_COMMENT,
-                NotificationType.SYSTEM_NOTICE,
-                NotificationType.ROLE_EARNED,
-                NotificationType.CONTEST,
-                NotificationType.EVENT
+                NotificationType.FEED_COMMENT
             )
         }
 
@@ -331,7 +316,7 @@ class NotificationSettingTest {
             val setting = NotificationSetting.reconstitute(
                 id = NotificationSettingId(1L),
                 memberId = 1L,
-                notificationType = NotificationType.SYSTEM_NOTICE,
+                notificationType = NotificationType.FEED_COMMENT,
                 isEnabled = false,
                 createdAt = now,
                 updatedAt = now
@@ -399,15 +384,9 @@ class NotificationSettingTest {
         }
 
         @Test
-        @DisplayName("SYSTEM_NOTICE 타입의 description을 검증한다")
-        fun `타입 검증 - SYSTEM_NOTICE`() {
-            assertThat(NotificationType.SYSTEM_NOTICE.description).isEqualTo("시스템 공지")
-        }
-
-        @Test
-        @DisplayName("NotificationType은 6개의 항목을 가진다")
+        @DisplayName("NotificationType은 2개의 항목을 가진다")
         fun `타입 검증 - 항목 수`() {
-            assertThat(NotificationType.entries).hasSize(6)
+            assertThat(NotificationType.entries).hasSize(2)
         }
     }
 
