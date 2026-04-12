@@ -48,4 +48,14 @@ interface ContestWinnerJpaRepository : JpaRepository<ContestWinnerJpaEntity, Lon
     fun findAllByMemberId(
         @Param("memberId") memberId: Long
     ): List<ContestWinnerJpaEntity>
+
+    @Query(
+        "SELECT w FROM ContestWinnerJpaEntity w " +
+        "JOIN w.participation p " +
+        "WHERE p.member.id = :memberId AND w.contest IN :contests"
+    )
+    fun findByMemberIdAndContestIn(
+        @Param("memberId") memberId: Long,
+        @Param("contests") contests: List<ContestJpaEntity>
+    ): List<ContestWinnerJpaEntity>
 }

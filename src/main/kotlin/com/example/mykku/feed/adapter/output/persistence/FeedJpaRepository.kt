@@ -39,6 +39,16 @@ interface FeedJpaRepository : JpaRepository<FeedJpaEntity, Long> {
 
     @Query("""
         SELECT f FROM FeedJpaEntity f
+        WHERE f.member.id = :memberId
+        ORDER BY f.createdAt DESC
+    """)
+    fun findAllByMemberIdOrderByCreatedAtDesc(
+        @Param("memberId") memberId: Long,
+        pageable: Pageable
+    ): Page<FeedJpaEntity>
+
+    @Query("""
+        SELECT f FROM FeedJpaEntity f
         WHERE f.board = :board
         AND f.createdAt >= :since
         ORDER BY f.likeCount DESC

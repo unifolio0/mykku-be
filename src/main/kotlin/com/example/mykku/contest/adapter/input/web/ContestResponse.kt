@@ -70,7 +70,9 @@ data class ContestListResponse(
     val expiredAt: LocalDateTime,
     val status: ContestStatusType,
     val thumbnailUrl: String,
-    val tags: List<String>
+    val tags: List<String>,
+    val isWinner: Boolean,
+    val winnerRank: Int?
 ) {
     companion object {
         fun from(result: ContestListResult): ContestListResponse {
@@ -81,7 +83,9 @@ data class ContestListResponse(
                 expiredAt = result.expiredAt,
                 status = result.status,
                 thumbnailUrl = result.thumbnailUrl,
-                tags = result.tags
+                tags = result.tags,
+                isWinner = result.isWinner,
+                winnerRank = result.winnerRank
             )
         }
     }
@@ -206,6 +210,8 @@ data class ContestWinnersListResponse(
 data class ContestWinnerPreviewResponse(
     val contestId: Long,
     val contestTitle: String,
+    val startedAt: LocalDateTime,
+    val expiredAt: LocalDateTime,
     val winners: List<WinnerThumbnailResponse>
 ) {
     companion object {
@@ -213,6 +219,8 @@ data class ContestWinnerPreviewResponse(
             return ContestWinnerPreviewResponse(
                 contestId = result.contestId,
                 contestTitle = result.contestTitle,
+                startedAt = result.startedAt,
+                expiredAt = result.expiredAt,
                 winners = result.winners.map { WinnerThumbnailResponse.from(it) }
             )
         }
@@ -314,7 +322,10 @@ data class MyAwardContestResponse(
     val contestTitle: String,
     val thumbnailUrl: String,
     val winnerRank: Int,
-    val acceptanceSpeech: String
+    val acceptanceSpeech: String,
+    val feedId: Long,
+    val feedTitle: String,
+    val feedImageUrl: String?
 ) {
     companion object {
         fun from(result: MyAwardContestResult): MyAwardContestResponse {
@@ -323,7 +334,10 @@ data class MyAwardContestResponse(
                 contestTitle = result.contestTitle,
                 thumbnailUrl = result.thumbnailUrl,
                 winnerRank = result.winnerRank,
-                acceptanceSpeech = result.acceptanceSpeech
+                acceptanceSpeech = result.acceptanceSpeech,
+                feedId = result.feedId,
+                feedTitle = result.feedTitle,
+                feedImageUrl = result.feedImageUrl
             )
         }
     }
