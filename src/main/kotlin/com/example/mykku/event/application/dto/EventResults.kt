@@ -46,11 +46,78 @@ data class EventDetailResult(
     val status: EventStatusType,
     val thumbnailUrl: String,
     val images: List<EventImageResult>,
-    val createdAt: LocalDateTime
+    val createdAt: LocalDateTime,
+    val isWinner: Boolean
 )
 
 data class EventPreviewResult(
     val id: Long,
     val thumbnailUrl: String,
     val images: List<String>
+)
+
+data class MyParticipatedEventResult(
+    val id: Long,
+    val title: String,
+    val startedAt: LocalDateTime,
+    val expiredAt: LocalDateTime,
+    val status: EventStatusType,
+    val thumbnailUrl: String,
+    val isWinner: Boolean
+)
+
+data class PagedMyParticipatedEventsResult(
+    val content: List<MyParticipatedEventResult>,
+    val page: Int,
+    val size: Int,
+    val totalElements: Long,
+    val totalPages: Int,
+    val isLast: Boolean
+)
+
+data class SetEventWinnersResult(
+    val eventId: Long,
+    val eventTitle: String,
+    val winners: List<EventWinnerInfoResult>
+)
+
+data class EventWinnerInfoResult(
+    val winnerId: Long,
+    val memberId: String?,
+    val nickname: String?
+)
+
+data class EventWinnersResult(
+    val eventId: Long,
+    val eventTitle: String,
+    val winners: List<EventWinnerResult>
+)
+
+data class EventWinnerResult(
+    val winnerId: Long,
+    val memberId: String?,
+    val nickname: String?,
+    val profileImage: String
+)
+
+data class MyEventWinnerStatusResult(
+    val isWinner: Boolean,
+    val winnerId: Long?
+)
+
+data class MyAwardEventResult(
+    val eventId: Long,
+    val eventTitle: String,
+    val thumbnailUrl: String,
+    val startedAt: LocalDateTime,
+    val expiredAt: LocalDateTime
+)
+
+data class PagedMyAwardEventsResult(
+    val content: List<MyAwardEventResult>,
+    val page: Int,
+    val size: Int,
+    val totalElements: Long,
+    val totalPages: Int,
+    val isLast: Boolean
 )

@@ -26,6 +26,13 @@ class EventRepositoryAdapter(
         return eventJpaRepository.findById(id.value).orElse(null)?.toDomain()
     }
 
+    override fun findAllByIds(ids: List<EventId>): List<Event> {
+        if (ids.isEmpty()) {
+            return emptyList()
+        }
+        return eventJpaRepository.findAllById(ids.map { it.value }).map { it.toDomain() }
+    }
+
     override fun findByExpiredAtAfter(dateTime: LocalDateTime): List<Event> {
         return eventJpaRepository.findByExpiredAtAfter(dateTime).map { it.toDomain() }
     }

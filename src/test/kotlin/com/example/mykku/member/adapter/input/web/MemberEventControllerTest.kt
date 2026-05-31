@@ -3,8 +3,10 @@ package com.example.mykku.member.adapter.input.web
 import com.example.mykku.BaseControllerTest
 import com.example.mykku.event.adapter.output.persistence.entity.EventJpaEntity
 import com.example.mykku.event.adapter.output.persistence.entity.EventParticipationJpaEntity
+import com.example.mykku.event.adapter.output.persistence.entity.EventWinnerJpaEntity
 import com.example.mykku.event.adapter.output.persistence.repository.EventJpaRepository
 import com.example.mykku.event.adapter.output.persistence.repository.EventParticipationJpaRepository
+import com.example.mykku.event.adapter.output.persistence.repository.EventWinnerJpaRepository
 import io.restassured.RestAssured
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
@@ -21,6 +23,40 @@ class MemberEventControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var eventParticipationJpaRepository: EventParticipationJpaRepository
+
+    @Autowired
+    private lateinit var eventWinnerJpaRepository: EventWinnerJpaRepository
+
+    @Test
+    @DisplayName("내가 참여한 이벤트 목록 조회 - 당첨 여부가 포함된다")
+    fun `getMyParticipatedEvents - 당첨된 이벤트는 isWinner가 true이다`() {
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
+
+        val event = eventJpaRepository.save(
+            EventJpaEntity(
+                title = "당첨 이벤트",
+                startedAt = LocalDateTime.now().minusDays(7),
+                expiredAt = LocalDateTime.now().minusDays(1),
+                thumbnailUrl = "https://example.com/thumbnail.jpg"
+            )
+        )
+        val participation = eventParticipationJpaRepository.save(
+            EventParticipationJpaEntity(member = member, event = event)
+        )
+        eventWinnerJpaRepository.save(EventWinnerJpaEntity(event = event, participation = participation))
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .queryParam("page", 0)
+            .queryParam("size", 20)
+        .`when`()
+            .get("/api/v1/members/me/events")
+        .then()
+            .statusCode(200)
+            .body("data.content[0].id", equalTo(event.id!!.toInt()))
+            .body("data.content[0].isWinner", equalTo(true))
+    }
 
     @Test
     @DisplayName("내가 참여한 이벤트 목록 조회 - 정상 케이스")

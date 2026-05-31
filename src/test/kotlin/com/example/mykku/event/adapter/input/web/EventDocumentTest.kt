@@ -140,7 +140,8 @@ class EventDocumentTest : BaseDocumentTest() {
                     EventImageResult(url = "https://example.com/image1.jpg", orderIndex = 0),
                     EventImageResult(url = "https://example.com/image2.jpg", orderIndex = 1)
                 ),
-                createdAt = LocalDateTime.now()
+                createdAt = LocalDateTime.now(),
+                isWinner = true
             )
 
             `when`(getEventUseCase.execute(any(), any())).thenReturn(response)
@@ -163,7 +164,8 @@ class EventDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성일시"),
                             fieldWithPath("data.startedAt").type(JsonFieldType.STRING).description("시작일"),
                             fieldWithPath("data.status").type(JsonFieldType.STRING).description("이벤트 상태"),
-                            fieldWithPath("data.thumbnailUrl").type(JsonFieldType.STRING).description("썸네일 이미지 URL")
+                            fieldWithPath("data.thumbnailUrl").type(JsonFieldType.STRING).description("썸네일 이미지 URL"),
+                            fieldWithPath("data.isWinner").type(JsonFieldType.BOOLEAN).description("현재 사용자의 당첨 여부")
                         )
                 )
                 .build()

@@ -7,6 +7,7 @@ import com.example.mykku.event.application.port.output.EventParticipationReposit
 import com.example.mykku.event.domain.entity.Event
 import com.example.mykku.event.domain.entity.EventParticipation
 import com.example.mykku.event.domain.vo.EventId
+import com.example.mykku.event.domain.vo.EventParticipationId
 import com.example.mykku.event.exception.EventException
 import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
 import com.example.mykku.member.exception.MemberException
@@ -59,6 +60,14 @@ class EventParticipationRepositoryAdapter(
         }
 
         return eventParticipationJpaRepository.findByMemberAndEventIn(memberJpaEntity, eventEntities)
+            .map { it.toDomain() }
+    }
+
+    override fun findAllByIdIn(ids: List<EventParticipationId>): List<EventParticipation> {
+        if (ids.isEmpty()) {
+            return emptyList()
+        }
+        return eventParticipationJpaRepository.findAllByIdIn(ids.map { it.value })
             .map { it.toDomain() }
     }
 

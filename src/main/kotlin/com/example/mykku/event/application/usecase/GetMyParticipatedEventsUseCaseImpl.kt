@@ -1,11 +1,11 @@
 package com.example.mykku.event.application.usecase
 
 import com.example.mykku.common.util.PageableValidator
-import com.example.mykku.event.application.dto.EventListResult
-import com.example.mykku.event.application.dto.PagedEventsResult
+import com.example.mykku.event.application.dto.MyParticipatedEventResult
+import com.example.mykku.event.application.dto.PagedMyParticipatedEventsResult
 import com.example.mykku.event.application.port.input.GetMyParticipatedEventsUseCase
-import com.example.mykku.event.application.port.output.EventImageRepository
 import com.example.mykku.event.application.port.output.EventParticipationRepository
+import com.example.mykku.event.application.port.output.EventWinnerRepository
 import com.example.mykku.event.domain.entity.Event
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -13,25 +13,24 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class GetMyParticipatedEventsUseCaseImpl(
     private val eventParticipationRepository: EventParticipationRepository,
-    private val eventImageRepository: EventImageRepository
+    private val eventWinnerRepository: EventWinnerRepository
 ) : GetMyParticipatedEventsUseCase {
 
     @Transactional(readOnly = true)
-    override fun execute(memberId: Long, page: Int, size: Int): PagedEventsResult {
+    override fun execute(memberId: Long, page: Int, size: Int): PagedMyParticipatedEventsResult {
         val pageable = PageableValidator.validateAndCreate(page, size)
 
         val eventPage = eventParticipationRepository.findEventsByMemberId(memberId, pageable)
 
         val eventIds = eventPage.content.map { it.id }
-        val imagesByEventId = eventImageRepository.findByEventIds(eventIds)
-            .groupBy { it.eventId.value }
+        val wonEventIds = eventWinnerRepository.findByMemberIdAndEventIds(memberId, eventIds)
+            .map { it.eventId.value }
+            .toSet()
 
-        val eventListResults = eventPage.content.map { event ->
-            toEventListResult(event, imagesByEventId)
-        }
+        val results = eventPage.content.map { toResult(it, wonEventIds) }
 
-        return PagedEventsResult(
-            content = eventListResults,
+        return PagedMyParticipatedEventsResult(
+            content = results,
             page = eventPage.number,
             size = eventPage.size,
             totalElements = eventPage.totalElements,
@@ -40,17 +39,15 @@ class GetMyParticipatedEventsUseCaseImpl(
         )
     }
 
-    private fun toEventListResult(
-        event: Event,
-        imagesByEventId: Map<Long, List<com.example.mykku.event.domain.entity.EventImage>>
-    ): EventListResult {
-        return EventListResult(
+    private fun toResult(event: Event, wonEventIds: Set<Long>): MyParticipatedEventResult {
+        return MyParticipatedEventResult(
             id = event.id.value,
             title = event.title,
             startedAt = event.startedAt,
             expiredAt = event.expiredAt,
             status = event.status,
-            thumbnailUrl = event.thumbnailUrl
+            thumbnailUrl = event.thumbnailUrl,
+            isWinner = wonEventIds.contains(event.id.value)
         )
     }
 }

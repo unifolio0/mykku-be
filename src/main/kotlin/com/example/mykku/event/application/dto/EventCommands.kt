@@ -2,6 +2,7 @@ package com.example.mykku.event.application.dto
 
 import com.example.mykku.event.domain.vo.EventSortType
 import com.example.mykku.event.domain.vo.EventStatusType
+import org.springframework.data.domain.Pageable
 import java.time.LocalDateTime
 
 data class CreateEventCommand(
@@ -24,4 +25,19 @@ data class EventListQuery(
     val page: Int,
     val size: Int,
     val memberId: Long
+)
+
+data class SetEventWinnersCommand(
+    val eventId: Long,
+    val participationIds: List<Long>
+)
+
+data class GetMyEventWinnerStatusQuery(
+    val eventId: Long,
+    val memberId: Long
+)
+
+data class GetMyAwardEventsQuery(
+    val memberId: Long,
+    val pageable: Pageable
 )

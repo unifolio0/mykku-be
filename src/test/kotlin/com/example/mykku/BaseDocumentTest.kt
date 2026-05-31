@@ -36,7 +36,11 @@ import com.example.mykku.docs.RestDocumentationResponse
 import com.example.mykku.email.EmailAuthService
 import com.example.mykku.event.application.port.input.CreateEventUseCase
 import com.example.mykku.event.application.port.input.GetEventUseCase
+import com.example.mykku.event.application.port.input.GetEventWinnersUseCase
+import com.example.mykku.event.application.port.input.GetMyAwardEventsUseCase
+import com.example.mykku.event.application.port.input.GetMyEventWinnerStatusUseCase
 import com.example.mykku.event.application.port.input.ListEventsUseCase
+import com.example.mykku.event.application.port.input.SetEventWinnersUseCase
 import com.example.mykku.fannote.application.port.input.GetFanNoteDetailUseCase
 import com.example.mykku.fannote.application.port.input.GetFanNoteListUseCase
 import com.example.mykku.feed.application.port.input.CreateFeedCommentUseCase
@@ -246,6 +250,18 @@ abstract class BaseDocumentTest {
 
     @MockitoBean
     protected lateinit var listEventsUseCase: ListEventsUseCase
+
+    @MockitoBean
+    protected lateinit var getEventWinnersUseCase: GetEventWinnersUseCase
+
+    @MockitoBean
+    protected lateinit var getMyEventWinnerStatusUseCase: GetMyEventWinnerStatusUseCase
+
+    @MockitoBean
+    protected lateinit var getMyAwardEventsUseCase: GetMyAwardEventsUseCase
+
+    @MockitoBean
+    protected lateinit var setEventWinnersUseCase: SetEventWinnersUseCase
 
     @MockitoBean
     protected lateinit var emailAuthService: EmailAuthService
