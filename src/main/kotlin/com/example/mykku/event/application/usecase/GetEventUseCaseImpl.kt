@@ -5,6 +5,7 @@ import com.example.mykku.event.application.dto.EventImageResult
 import com.example.mykku.event.application.port.input.GetEventUseCase
 import com.example.mykku.event.application.port.output.EventImageRepository
 import com.example.mykku.event.application.port.output.EventRepository
+import com.example.mykku.event.application.port.output.EventWinnerRepository
 import com.example.mykku.event.domain.vo.EventId
 import com.example.mykku.event.exception.EventException
 import org.springframework.stereotype.Service
@@ -13,7 +14,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class GetEventUseCaseImpl(
     private val eventRepository: EventRepository,
-    private val eventImageRepository: EventImageRepository
+    private val eventImageRepository: EventImageRepository,
+    private val eventWinnerRepository: EventWinnerRepository
 ) : GetEventUseCase {
 
     @Transactional(readOnly = true)
@@ -22,6 +24,7 @@ class GetEventUseCaseImpl(
             ?: throw EventException.eventNotFound()
 
         val images = eventImageRepository.findByEventIds(listOf(event.id))
+        val isWinner = eventWinnerRepository.findByEventIdAndMemberId(event.id, memberId) != null
 
         return EventDetailResult(
             id = event.id.value,
@@ -34,7 +37,8 @@ class GetEventUseCaseImpl(
             images = images.sortedBy { it.orderIndex }.map {
                 EventImageResult(url = it.url, orderIndex = it.orderIndex)
             },
-            createdAt = event.createdAt
+            createdAt = event.createdAt,
+            isWinner = isWinner
         )
     }
 }

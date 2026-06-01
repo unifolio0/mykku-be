@@ -5,7 +5,9 @@ import com.example.mykku.event.application.dto.EventDetailResult
 import com.example.mykku.event.application.dto.EventImageResult
 import com.example.mykku.event.application.dto.EventListResult
 import com.example.mykku.event.application.dto.EventPreviewResult
+import com.example.mykku.event.application.dto.MyParticipatedEventResult
 import com.example.mykku.event.application.dto.PagedEventsResult
+import com.example.mykku.event.application.dto.PagedMyParticipatedEventsResult
 import com.example.mykku.event.domain.vo.EventStatusType
 import java.time.LocalDateTime
 
@@ -102,7 +104,8 @@ data class EventDetailResponse(
     val status: EventStatusType,
     val thumbnailUrl: String,
     val images: List<EventImageResponse>,
-    val createdAt: LocalDateTime
+    val createdAt: LocalDateTime,
+    val isWinner: Boolean
 ) {
     companion object {
         fun from(result: EventDetailResult): EventDetailResponse {
@@ -115,7 +118,8 @@ data class EventDetailResponse(
                 status = result.status,
                 thumbnailUrl = result.thumbnailUrl,
                 images = result.images.map { EventImageResponse.from(it) },
-                createdAt = result.createdAt
+                createdAt = result.createdAt,
+                isWinner = result.isWinner
             )
         }
     }
@@ -132,6 +136,52 @@ data class EventPreviewResponse(
                 id = result.id,
                 thumbnailUrl = result.thumbnailUrl,
                 images = result.images
+            )
+        }
+    }
+}
+
+data class MyParticipatedEventResponse(
+    val id: Long,
+    val title: String,
+    val startedAt: LocalDateTime,
+    val expiredAt: LocalDateTime,
+    val status: EventStatusType,
+    val thumbnailUrl: String,
+    val isWinner: Boolean
+) {
+    companion object {
+        fun from(result: MyParticipatedEventResult): MyParticipatedEventResponse {
+            return MyParticipatedEventResponse(
+                id = result.id,
+                title = result.title,
+                startedAt = result.startedAt,
+                expiredAt = result.expiredAt,
+                status = result.status,
+                thumbnailUrl = result.thumbnailUrl,
+                isWinner = result.isWinner
+            )
+        }
+    }
+}
+
+data class PagedMyParticipatedEventsResponse(
+    val content: List<MyParticipatedEventResponse>,
+    val page: Int,
+    val size: Int,
+    val totalElements: Long,
+    val totalPages: Int,
+    val isLast: Boolean
+) {
+    companion object {
+        fun from(result: PagedMyParticipatedEventsResult): PagedMyParticipatedEventsResponse {
+            return PagedMyParticipatedEventsResponse(
+                content = result.content.map { MyParticipatedEventResponse.from(it) },
+                page = result.page,
+                size = result.size,
+                totalElements = result.totalElements,
+                totalPages = result.totalPages,
+                isLast = result.isLast
             )
         }
     }

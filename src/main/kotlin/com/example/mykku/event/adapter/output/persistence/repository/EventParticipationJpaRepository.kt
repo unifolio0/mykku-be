@@ -15,6 +15,7 @@ interface EventParticipationJpaRepository : JpaRepository<EventParticipationJpaE
     fun findByEvent(event: EventJpaEntity, pageable: Pageable): Page<EventParticipationJpaEntity>
     fun countByEvent(event: EventJpaEntity): Long
     fun findByMemberAndEventIn(member: MemberJpaEntity, events: List<EventJpaEntity>): List<EventParticipationJpaEntity>
+    fun findAllByIdIn(ids: List<Long>): List<EventParticipationJpaEntity>
 
     @Query("SELECT ep.event FROM EventParticipationJpaEntity ep WHERE ep.member = :member ORDER BY ep.createdAt DESC")
     fun findEventsByMember(member: MemberJpaEntity, pageable: Pageable): Page<EventJpaEntity>

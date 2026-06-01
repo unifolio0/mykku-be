@@ -11,6 +11,7 @@ import java.time.LocalDateTime
 interface EventRepository {
     fun save(event: Event): Event
     fun findById(id: EventId): Event?
+    fun findAllByIds(ids: List<EventId>): List<Event>
     fun findByExpiredAtAfter(dateTime: LocalDateTime): List<Event>
     fun findWithPagination(
         status: EventStatusType,
