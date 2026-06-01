@@ -17,7 +17,7 @@ class GetMyAwardEventsUseCaseImpl(
 
     @Transactional(readOnly = true)
     override fun execute(query: GetMyAwardEventsQuery): PagedMyAwardEventsResult {
-        val winnerPage = eventWinnerRepository.findByMemberId(query.memberId, query.pageable)
+        val winnerPage = eventWinnerRepository.findByMemberId(query.id, query.pageable)
 
         val eventIds = winnerPage.content.map { it.eventId }.distinct()
         val eventsMap = eventRepository.findAllByIds(eventIds).associateBy { it.id.value }

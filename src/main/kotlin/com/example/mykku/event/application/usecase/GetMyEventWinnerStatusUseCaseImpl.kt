@@ -27,7 +27,7 @@ class GetMyEventWinnerStatusUseCaseImpl(
             throw EventException.winnerNotAnnounced()
         }
 
-        val myWinner = eventWinnerRepository.findByEventIdAndMemberId(eventId, query.memberId)
+        val myWinner = eventWinnerRepository.findByEventIdAndMemberId(eventId, query.id)
             ?: return MyEventWinnerStatusResult(isWinner = false, winnerId = null)
 
         return MyEventWinnerStatusResult(isWinner = true, winnerId = myWinner.id.value)

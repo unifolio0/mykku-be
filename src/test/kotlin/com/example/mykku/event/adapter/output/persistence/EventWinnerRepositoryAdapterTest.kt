@@ -12,6 +12,7 @@ import com.example.mykku.event.domain.entity.EventWinner
 import com.example.mykku.event.domain.vo.EventId
 import com.example.mykku.event.domain.vo.EventParticipationId
 import com.example.mykku.event.domain.vo.EventStatusType
+import com.example.mykku.event.exception.EventErrorCode
 import com.example.mykku.event.exception.EventException
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import org.assertj.core.api.Assertions.assertThat
@@ -75,6 +76,8 @@ class EventWinnerRepositoryAdapterTest : BaseRepositoryTest() {
 
             assertThatThrownBy { eventWinnerRepository.save(winner) }
                 .isInstanceOf(EventException::class.java)
+                .extracting("errorCode")
+                .isEqualTo(EventErrorCode.EVENT_NOT_FOUND)
         }
 
         @Test
@@ -89,6 +92,8 @@ class EventWinnerRepositoryAdapterTest : BaseRepositoryTest() {
 
             assertThatThrownBy { eventWinnerRepository.save(winner) }
                 .isInstanceOf(EventException::class.java)
+                .extracting("errorCode")
+                .isEqualTo(EventErrorCode.EVENT_PARTICIPATION_NOT_FOUND)
         }
     }
 

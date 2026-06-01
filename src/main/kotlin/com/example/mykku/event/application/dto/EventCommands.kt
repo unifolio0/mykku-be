@@ -34,10 +34,10 @@ data class SetEventWinnersCommand(
 
 data class GetMyEventWinnerStatusQuery(
     val eventId: Long,
-    val memberId: Long
+    val id: Long
 )
 
 data class GetMyAwardEventsQuery(
-    val memberId: Long,
+    val id: Long,
     val pageable: Pageable
 )

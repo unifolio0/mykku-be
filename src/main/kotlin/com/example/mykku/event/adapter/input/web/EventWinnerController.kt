@@ -31,7 +31,7 @@ class EventWinnerController(
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<PagedMyAwardEventsResponse>> {
         val pageable = PageableValidator.validateAndCreate(page, size)
-        val query = GetMyAwardEventsQuery(memberId = member.id.value, pageable = pageable)
+        val query = GetMyAwardEventsQuery(id = member.id.value, pageable = pageable)
         val result = getMyAwardEventsUseCase.execute(query)
         return ResponseEntity.ok(
             ApiResponse(
@@ -59,7 +59,7 @@ class EventWinnerController(
         @PathVariable eventId: Long,
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<MyEventWinnerStatusResponse>> {
-        val query = GetMyEventWinnerStatusQuery(eventId = eventId, memberId = member.id.value)
+        val query = GetMyEventWinnerStatusQuery(eventId = eventId, id = member.id.value)
         val result = getMyEventWinnerStatusUseCase.execute(query)
         return ResponseEntity.ok(
             ApiResponse(
