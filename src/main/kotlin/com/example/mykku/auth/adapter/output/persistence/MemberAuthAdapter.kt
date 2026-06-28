@@ -1,26 +1,33 @@
 package com.example.mykku.auth.adapter.output.persistence
 
+import com.example.mykku.achievement.application.event.ActivityEvent
+import com.example.mykku.achievement.domain.vo.ActivityType
 import com.example.mykku.auth.application.dto.OAuthMemberInfo
 import com.example.mykku.auth.application.port.output.MemberAuthPort
 import com.example.mykku.member.application.port.output.MemberRepository
 import com.example.mykku.member.domain.entity.Member
 import com.example.mykku.member.domain.vo.MemberPk
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 
 @Component
 class MemberAuthAdapter(
-    private val memberRepository: MemberRepository
+    private val memberRepository: MemberRepository,
+    private val eventPublisher: ApplicationEventPublisher
 ) : MemberAuthPort {
 
     override fun findOrCreate(memberInfo: OAuthMemberInfo): Pair<Member, Boolean> {
         val existingMember = memberRepository.findByProviderAndSocialId(memberInfo.provider, memberInfo.socialId)
 
-        return if (existingMember != null) {
+        val result = if (existingMember != null) {
             Pair(existingMember, true)
         } else {
-            val newMember = createMember(memberInfo)
-            Pair(newMember, false)
+            Pair(createMember(memberInfo), false)
         }
+
+        eventPublisher.publishEvent(ActivityEvent(result.first.id.value, ActivityType.FIRST_LOGIN))
+
+        return result
     }
 
     override fun findById(memberId: Long): Member? {

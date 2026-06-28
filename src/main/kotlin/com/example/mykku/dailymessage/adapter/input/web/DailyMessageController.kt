@@ -1,9 +1,11 @@
 package com.example.mykku.dailymessage.adapter.input.web
 
+import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.common.util.PageableValidator
 import com.example.mykku.dailymessage.application.port.input.GetDailyMessageUseCase
 import com.example.mykku.dailymessage.application.port.input.GetDailyMessagesUseCase
+import com.example.mykku.member.domain.entity.Member
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Sort
 import org.springframework.format.annotation.DateTimeFormat
@@ -45,9 +47,10 @@ class DailyMessageController(
 
     @GetMapping("/{id}")
     fun getDailyMessage(
-        @PathVariable id: Long
+        @PathVariable id: Long,
+        @CurrentMember(required = false) member: Member?
     ): ResponseEntity<ApiResponse<DailyMessageResponse>> {
-        val result = getDailyMessageUseCase.execute(id)
+        val result = getDailyMessageUseCase.execute(id, member?.id?.value)
 
         return ResponseEntity.ok(
             ApiResponse(

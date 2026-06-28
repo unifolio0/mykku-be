@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
@@ -149,7 +150,7 @@ class FanNoteDocumentTest : BaseDocumentTest() {
                 )
             )
 
-            `when`(getFanNoteDetailUseCase.execute(eq(fanNoteId))).thenReturn(fanNoteDetail)
+            `when`(getFanNoteDetailUseCase.execute(eq(fanNoteId), anyOrNull())).thenReturn(fanNoteDetail)
 
             val documentFilter = document("fan-note/detail", 200)
                 .request(request().applyConfig(apiConfig))
@@ -185,7 +186,7 @@ class FanNoteDocumentTest : BaseDocumentTest() {
         fun `존재하지 않는 덕질노트`() {
             val fanNoteId = 999L
 
-            `when`(getFanNoteDetailUseCase.execute(eq(fanNoteId)))
+            `when`(getFanNoteDetailUseCase.execute(eq(fanNoteId), anyOrNull()))
                 .thenThrow(FanNoteException(FanNoteErrorCode.FAN_NOTE_NOT_FOUND))
 
             val documentFilter = document("fan-note/detail", "FAN_NOTE_NOT_FOUND")

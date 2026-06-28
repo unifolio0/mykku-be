@@ -9,7 +9,10 @@ import com.example.mykku.feed.application.port.output.FeedRepository
 import com.example.mykku.feed.domain.entity.FeedComment
 import com.example.mykku.feed.domain.vo.FeedCommentId
 import com.example.mykku.feed.domain.vo.FeedId
+import com.example.mykku.achievement.application.event.ActivityEvent
+import com.example.mykku.achievement.domain.vo.ActivityType
 import com.example.mykku.member.domain.entity.Member
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -17,7 +20,8 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class CreateFeedCommentUseCaseImpl(
     private val feedRepository: FeedRepository,
-    private val feedCommentRepository: FeedCommentRepository
+    private val feedCommentRepository: FeedCommentRepository,
+    private val eventPublisher: ApplicationEventPublisher
 ) : CreateFeedCommentUseCase {
 
     override fun execute(command: CreateFeedCommentCommand, member: Member): SingleFeedCommentResult {
@@ -33,6 +37,8 @@ class CreateFeedCommentUseCaseImpl(
         )
 
         val savedComment = feedCommentRepository.save(comment, feed.id!!, member.id.value)
+
+        eventPublisher.publishEvent(ActivityEvent(member.id.value, ActivityType.COMMENT_CREATE))
 
         return SingleFeedCommentResult(
             id = savedComment.id!!.value,
