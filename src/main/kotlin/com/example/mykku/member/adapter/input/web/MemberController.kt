@@ -2,12 +2,14 @@ package com.example.mykku.member.adapter.input.web
 
 import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
+import com.example.mykku.member.adapter.input.web.dto.ChangeMemberIdRequest
 import com.example.mykku.member.adapter.input.web.dto.ChangePasswordRequest
 import com.example.mykku.member.adapter.input.web.dto.CheckMemberIdRequest
 import com.example.mykku.member.adapter.input.web.dto.CheckMemberIdResponse
 import com.example.mykku.member.adapter.input.web.dto.MemberProfileResponse
 import com.example.mykku.member.adapter.input.web.dto.SetupProfileRequest
 import com.example.mykku.member.adapter.input.web.dto.UpdateProfileRequest
+import com.example.mykku.member.application.port.input.ChangeMemberIdUseCase
 import com.example.mykku.member.application.port.input.ChangePasswordUseCase
 import com.example.mykku.member.application.port.input.CheckMemberIdUseCase
 import com.example.mykku.member.application.port.input.GetMemberProfileUseCase
@@ -34,6 +36,7 @@ class MemberController(
     private val changePasswordUseCase: ChangePasswordUseCase,
     private val setupProfileUseCase: SetupProfileUseCase,
     private val checkMemberIdUseCase: CheckMemberIdUseCase,
+    private val changeMemberIdUseCase: ChangeMemberIdUseCase,
     private val withdrawMemberUseCase: WithdrawMemberUseCase
 ) {
 
@@ -54,6 +57,16 @@ class MemberController(
         val result = updateMemberProfileUseCase.updateProfile(member, request.toCommand())
         val response = MemberProfileResponse.from(result)
         return ResponseEntity.ok(ApiResponse("프로필이 수정되었습니다", response))
+    }
+
+    @PatchMapping("/me/member-id")
+    fun changeMemberId(
+        @CurrentMember member: Member,
+        @Valid @RequestBody request: ChangeMemberIdRequest
+    ): ResponseEntity<ApiResponse<MemberProfileResponse>> {
+        val result = changeMemberIdUseCase.changeMemberId(member, request.toCommand())
+        val response = MemberProfileResponse.from(result)
+        return ResponseEntity.ok(ApiResponse("아이디가 변경되었습니다", response))
     }
 
     @PutMapping("/password")

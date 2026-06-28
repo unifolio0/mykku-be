@@ -134,6 +134,12 @@ class Member private constructor(
         this.updatedAt = LocalDateTime.now()
     }
 
+    fun changeMemberId(newMemberId: String) {
+        validateMemberId(newMemberId)
+        this.memberId = newMemberId
+        this.updatedAt = LocalDateTime.now()
+    }
+
     fun updateProfile(newNickname: String?, newProfileImage: String?) {
         newNickname?.let {
             validateNickname(it)

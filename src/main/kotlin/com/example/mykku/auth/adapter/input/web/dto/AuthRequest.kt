@@ -4,6 +4,7 @@ import com.example.mykku.auth.application.dto.MobileLoginCommand
 import com.example.mykku.auth.application.dto.RefreshTokenCommand
 import com.example.mykku.auth.exception.AuthException
 import com.example.mykku.member.domain.vo.SocialProvider
+import jakarta.validation.constraints.NotBlank
 
 data class MobileLoginRequest(
     val provider: SocialProvider,
@@ -44,3 +45,8 @@ data class RefreshTokenRequest(
         return RefreshTokenCommand(refreshToken = refreshToken)
     }
 }
+
+data class LogoutRequest(
+    @field:NotBlank(message = "deviceId는 필수입니다")
+    val deviceId: String
+)

@@ -4,6 +4,7 @@ import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
 import com.example.mykku.docs.Tag
+import com.example.mykku.member.adapter.input.web.dto.ChangeMemberIdRequest
 import com.example.mykku.member.adapter.input.web.dto.ChangePasswordRequest
 import com.example.mykku.member.adapter.input.web.dto.CheckMemberIdRequest
 import com.example.mykku.member.adapter.input.web.dto.SetupProfileRequest
@@ -360,6 +361,91 @@ class MemberDocumentTest : BaseDocumentTest() {
                 .body(objectMapper.writeValueAsString(request))
                 .`when`()
                 .post("/api/v1/members/setup-profile")
+                .then()
+                .statusCode(409)
+        }
+    }
+
+    @Nested
+    @DisplayName("아이디 변경")
+    inner class ChangeMemberId {
+
+        private val apiConfig = ApiRequestConfig(
+            tag = Tag.MEMBER_API,
+            summary = "아이디 변경",
+            description = "회원 아이디(memberId)를 변경합니다. 중복되지 않은 아이디로 자유롭게 변경할 수 있습니다.",
+            requestBodyFields = listOf(
+                fieldWithPath("memberId").type(JsonFieldType.STRING)
+                    .description("새로운 아이디 (영문/숫자, 최대 16자)")
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
+        )
+
+        @Test
+        fun `성공`() {
+            val request = ChangeMemberIdRequest(memberId = "newuserid")
+            val result = MemberProfileResult(
+                memberId = "newuserid",
+                email = TEST_MEMBER_EMAIL,
+                nickname = "testuser",
+                profileImage = "https://example.com/profile.jpg",
+                role = RoleResult(id = 1L, name = "테스트 칭호", description = "테스트 칭호 설명"),
+                provider = "GOOGLE",
+                emailVerified = true,
+                createdAt = LocalDateTime.now()
+            )
+
+            whenever(changeMemberIdUseCase.changeMemberId(any(), any())).thenReturn(result)
+
+            val documentFilter = document("member/change-member-id", 200)
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                            fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("변경된 회원 ID"),
+                            fieldWithPath("data.email").type(JsonFieldType.STRING).description("이메일"),
+                            fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("닉네임"),
+                            fieldWithPath("data.profileImage").type(JsonFieldType.STRING).description("프로필 이미지 URL"),
+                            fieldWithPath("data.role").type(JsonFieldType.OBJECT).description("역할/칭호").optional(),
+                            fieldWithPath("data.role.id").type(JsonFieldType.NUMBER).description("칭호 ID"),
+                            fieldWithPath("data.role.name").type(JsonFieldType.STRING).description("칭호 이름"),
+                            fieldWithPath("data.role.description").type(JsonFieldType.STRING).description("칭호 설명").optional(),
+                            fieldWithPath("data.provider").type(JsonFieldType.STRING).description("가입 경로").optional(),
+                            fieldWithPath("data.emailVerified").type(JsonFieldType.BOOLEAN).description("이메일 인증 여부"),
+                            fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("가입일시")
+                        )
+                )
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .body(objectMapper.writeValueAsString(request))
+                .`when`()
+                .patch("/api/v1/members/me/member-id")
+                .then()
+                .statusCode(200)
+        }
+
+        @Test
+        fun `아이디 중복`() {
+            val request = ChangeMemberIdRequest(memberId = "takenid")
+
+            doThrow(MemberException(MemberErrorCode.MEMBER_ID_ALREADY_EXISTS))
+                .whenever(changeMemberIdUseCase).changeMemberId(any(), any())
+
+            val documentFilter = document("member/change-member-id", "MEMBER_ID_ALREADY_EXISTS")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .body(objectMapper.writeValueAsString(request))
+                .`when`()
+                .patch("/api/v1/members/me/member-id")
                 .then()
                 .statusCode(409)
         }

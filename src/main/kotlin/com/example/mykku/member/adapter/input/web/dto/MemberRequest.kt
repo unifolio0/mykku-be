@@ -1,5 +1,6 @@
 package com.example.mykku.member.adapter.input.web.dto
 
+import com.example.mykku.member.application.dto.ChangeMemberIdCommand
 import com.example.mykku.member.application.dto.ChangePasswordCommand
 import com.example.mykku.member.application.dto.SetupProfileCommand
 import com.example.mykku.member.application.dto.UpdateProfileCommand
@@ -73,3 +74,17 @@ data class CheckMemberIdRequest(
     )
     val memberId: String
 )
+
+data class ChangeMemberIdRequest(
+    @field:NotBlank(message = "아이디는 필수입니다")
+    @field:Size(max = 16, message = "아이디는 최대 16자까지 가능합니다")
+    @field:Pattern(
+        regexp = "^[a-zA-Z0-9]+$",
+        message = "아이디는 영문과 숫자만 사용 가능합니다"
+    )
+    val memberId: String
+) {
+    fun toCommand(): ChangeMemberIdCommand {
+        return ChangeMemberIdCommand(memberId = memberId)
+    }
+}

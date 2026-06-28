@@ -1,6 +1,7 @@
 package com.example.mykku.member.adapter.input.web
 
 import com.example.mykku.BaseControllerTest
+import com.example.mykku.member.adapter.input.web.dto.ChangeMemberIdRequest
 import com.example.mykku.member.adapter.input.web.dto.ChangePasswordRequest
 import com.example.mykku.member.adapter.input.web.dto.CheckMemberIdRequest
 import com.example.mykku.member.adapter.input.web.dto.SetupProfileRequest
@@ -330,6 +331,72 @@ class MemberControllerTest : BaseControllerTest() {
             .body("message", equalTo("아이디 중복 확인 완료"))
             .body("data.memberId", equalTo("takenid2"))
             .body("data.available", equalTo(false))
+    }
+
+    @Test
+    @DisplayName("아이디 변경 - 정상 케이스")
+    fun `changeMemberId - 정상적으로 아이디를 변경한다`() {
+        val member = createAndSaveMember(
+            memberId = "olduserid",
+            nickname = "아이디변경유저",
+            email = "changeid@example.com",
+            socialId = "changeid123"
+        )
+        val authHeader = getBearerToken(member.id)
+        val request = ChangeMemberIdRequest(memberId = "newuserid")
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .contentType(ContentType.JSON)
+            .body(request)
+            .`when`()
+            .patch("/api/v1/members/me/member-id")
+            .then()
+            .statusCode(200)
+            .body("message", equalTo("아이디가 변경되었습니다"))
+            .body("data.memberId", equalTo("newuserid"))
+    }
+
+    @Test
+    @DisplayName("아이디 변경 - 인증되지 않은 사용자")
+    fun `changeMemberId - 인증되지 않은 사용자는 아이디를 변경할 수 없다`() {
+        val request = ChangeMemberIdRequest(memberId = "newuserid")
+
+        RestAssured.given()
+            .contentType(ContentType.JSON)
+            .body(request)
+            .`when`()
+            .patch("/api/v1/members/me/member-id")
+            .then()
+            .statusCode(401)
+    }
+
+    @Test
+    @DisplayName("아이디 변경 - 아이디 중복")
+    fun `changeMemberId - 이미 사용 중인 아이디로 변경할 수 없다`() {
+        createAndSaveMember(
+            memberId = "takenchangeid",
+            nickname = "기존유저",
+            email = "existingchange@example.com",
+            socialId = "existingchange123"
+        )
+        val member = createAndSaveMember(
+            memberId = "mychangeid",
+            nickname = "변경시도유저",
+            email = "mychange@example.com",
+            socialId = "mychange123"
+        )
+        val authHeader = getBearerToken(member.id)
+        val request = ChangeMemberIdRequest(memberId = "takenchangeid")
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .contentType(ContentType.JSON)
+            .body(request)
+            .`when`()
+            .patch("/api/v1/members/me/member-id")
+            .then()
+            .statusCode(409)
     }
 
     @Test
