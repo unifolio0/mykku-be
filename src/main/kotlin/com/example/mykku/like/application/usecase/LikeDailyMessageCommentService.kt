@@ -7,12 +7,16 @@ import com.example.mykku.like.application.port.input.LikeDailyMessageCommentUseC
 import com.example.mykku.like.application.port.output.LikeDailyMessageCommentPort
 import com.example.mykku.like.domain.entity.LikeDailyMessageCommentEntity
 import com.example.mykku.like.exception.LikeException
+import com.example.mykku.achievement.application.event.ActivityEvent
+import com.example.mykku.achievement.domain.vo.ActivityType
+import com.example.mykku.achievement.application.port.output.ActivityEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class LikeDailyMessageCommentService(
-    private val likeDailyMessageCommentPort: LikeDailyMessageCommentPort
+    private val likeDailyMessageCommentPort: LikeDailyMessageCommentPort,
+    private val activityEventPublisher: ActivityEventPublisher
 ) : LikeDailyMessageCommentUseCase {
 
     @Transactional
@@ -25,6 +29,8 @@ class LikeDailyMessageCommentService(
         )
 
         val saved = likeDailyMessageCommentPort.save(likeDailyMessageComment)
+
+        activityEventPublisher.publish(ActivityEvent(command.memberId, ActivityType.LIKE_PRESS))
 
         return LikeDailyMessageCommentResult(
             id = saved.id!!.value,

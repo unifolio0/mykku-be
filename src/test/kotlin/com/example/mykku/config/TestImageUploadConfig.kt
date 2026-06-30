@@ -65,6 +65,9 @@ class TestImageUploadConfig {
                     imageUrls = imageUrls
                 )
             }
+
+            override fun delete(url: String) {
+            }
         }
     }
 }

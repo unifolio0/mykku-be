@@ -3,6 +3,7 @@ package com.example.mykku
 import com.example.mykku.util.DatabaseCleaner
 import com.example.mykku.admin.service.AdminRoleService
 import com.example.mykku.auth.adapter.output.persistence.JwtTokenProviderAdapter
+import com.example.mykku.auth.application.port.input.LogoutUseCase
 import com.example.mykku.auth.application.port.input.MobileLoginUseCase
 import com.example.mykku.auth.application.port.input.RefreshTokenUseCase
 import com.example.mykku.block.application.port.input.BlockKeywordUseCase
@@ -60,6 +61,7 @@ import com.example.mykku.like.application.port.input.LikeFeedCommentUseCase
 import com.example.mykku.like.application.port.input.LikeFeedUseCase
 import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
+import com.example.mykku.member.application.port.input.ChangeMemberIdUseCase
 import com.example.mykku.member.application.port.input.ChangePasswordUseCase
 import com.example.mykku.member.application.port.input.CheckMemberIdUseCase
 import com.example.mykku.member.application.port.input.WithdrawMemberUseCase
@@ -124,6 +126,9 @@ abstract class BaseDocumentTest {
 
     @MockitoBean
     protected lateinit var refreshTokenUseCase: RefreshTokenUseCase
+
+    @MockitoBean
+    protected lateinit var logoutUseCase: LogoutUseCase
 
     @MockitoBean
     protected lateinit var listBoardsUseCase: ListBoardsUseCase
@@ -211,6 +216,9 @@ abstract class BaseDocumentTest {
 
     @MockitoBean
     protected lateinit var checkMemberIdUseCase: CheckMemberIdUseCase
+
+    @MockitoBean
+    protected lateinit var changeMemberIdUseCase: ChangeMemberIdUseCase
 
     @MockitoBean
     protected lateinit var withdrawMemberUseCase: WithdrawMemberUseCase

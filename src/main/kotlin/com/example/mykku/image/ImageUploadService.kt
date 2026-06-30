@@ -17,4 +17,6 @@ interface ImageUploadService {
         images: List<MultipartFile>?,
         pathPrefix: String
     ): EntityImagesUploadResult
+
+    fun delete(url: String)
 }

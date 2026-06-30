@@ -1,6 +1,7 @@
 package com.example.mykku.auth.adapter.input.web
 
 import com.example.mykku.BaseControllerTest
+import com.example.mykku.auth.adapter.input.web.dto.LogoutRequest
 import com.example.mykku.auth.adapter.input.web.dto.RefreshTokenRequest
 import com.example.mykku.auth.application.port.output.TokenProvider
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
@@ -133,6 +134,48 @@ class AuthControllerTest : BaseControllerTest() {
             .post("/api/v1/auth/refresh")
             .then()
             .statusCode(404)
+    }
+
+    @Test
+    @DisplayName("로그아웃 - 정상 케이스")
+    fun `logout - 인증된 사용자가 로그아웃한다`() {
+        val member = memberJpaRepository.save(
+            MemberJpaEntity(
+                memberId = "logoutuser",
+                socialId = "logout1",
+                provider = SocialProvider.GOOGLE,
+                email = "logout@example.com",
+                nickname = "로그아웃유저",
+                role = null,
+                profileImage = ""
+            )
+        )
+        val authHeader = getBearerToken(member.id)
+        val request = LogoutRequest(deviceId = "device-123")
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .contentType(ContentType.JSON)
+            .body(request)
+            .`when`()
+            .post("/api/v1/auth/logout")
+            .then()
+            .statusCode(200)
+            .body("message", equalTo("로그아웃 되었습니다"))
+    }
+
+    @Test
+    @DisplayName("로그아웃 - 인증되지 않은 사용자")
+    fun `logout - 인증되지 않은 사용자는 로그아웃할 수 없다`() {
+        val request = LogoutRequest(deviceId = "device-123")
+
+        RestAssured.given()
+            .contentType(ContentType.JSON)
+            .body(request)
+            .`when`()
+            .post("/api/v1/auth/logout")
+            .then()
+            .statusCode(401)
     }
 
     // NOTE: AuthController tests are commented out due to external OAuth API dependencies

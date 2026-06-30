@@ -12,12 +12,16 @@ import com.example.mykku.like.exception.LikeException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
+import com.example.mykku.achievement.application.event.ActivityEvent
+import com.example.mykku.achievement.domain.vo.ActivityType
+import com.example.mykku.achievement.application.port.output.ActivityEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class LikeBoardService(
-    private val likeBoardPort: LikeBoardPort
+    private val likeBoardPort: LikeBoardPort,
+    private val activityEventPublisher: ActivityEventPublisher
 ) : LikeBoardUseCase {
 
     @Transactional
@@ -30,6 +34,8 @@ class LikeBoardService(
         )
 
         val saved = likeBoardPort.save(likeBoard)
+
+        activityEventPublisher.publish(ActivityEvent(command.memberId, ActivityType.LIKE_PRESS))
 
         return LikeBoardResult(
             id = saved.id!!.value,

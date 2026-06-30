@@ -14,3 +14,7 @@ data class SetupProfileCommand(
     val memberId: String,
     val nickname: String
 )
+
+data class ChangeMemberIdCommand(
+    val memberId: String
+)

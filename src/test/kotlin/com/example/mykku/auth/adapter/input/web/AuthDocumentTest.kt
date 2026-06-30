@@ -1,6 +1,7 @@
 package com.example.mykku.auth.adapter.input.web
 
 import com.example.mykku.BaseDocumentTest
+import com.example.mykku.auth.adapter.input.web.dto.LogoutRequest
 import com.example.mykku.auth.adapter.input.web.dto.MobileLoginRequest
 import com.example.mykku.auth.adapter.input.web.dto.RefreshTokenRequest
 import com.example.mykku.auth.application.dto.LoginResult
@@ -251,6 +252,47 @@ class AuthDocumentTest : BaseDocumentTest() {
                 .post("/api/v1/auth/refresh")
                 .then()
                 .statusCode(401)
+        }
+    }
+
+    @Nested
+    @DisplayName("로그아웃")
+    inner class Logout {
+
+        private val apiConfig = ApiRequestConfig(
+            tag = Tag.AUTH_API,
+            summary = "로그아웃",
+            description = "로그아웃하고 해당 기기의 FCM 토큰을 삭제합니다. 클라이언트는 저장된 액세스/리프레시 토큰을 폐기해야 합니다.",
+            requestBodyFields = listOf(
+                fieldWithPath("deviceId").type(JsonFieldType.STRING)
+                    .description("FCM 토큰을 삭제할 기기 식별자")
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
+        )
+
+        @Test
+        fun `성공`() {
+            val request = LogoutRequest(deviceId = "device-123")
+
+            val documentFilter = document("auth/logout", 200)
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional()
+                        )
+                )
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .body(objectMapper.writeValueAsString(request))
+                .`when`()
+                .post("/api/v1/auth/logout")
+                .then()
+                .statusCode(200)
         }
     }
 }

@@ -8,7 +8,10 @@ import com.example.mykku.dailymessage.application.port.output.DailyMessageReposi
 import com.example.mykku.dailymessage.domain.entity.DailyMessageComment
 import com.example.mykku.dailymessage.domain.vo.DailyMessageCommentId
 import com.example.mykku.dailymessage.domain.vo.DailyMessageId
+import com.example.mykku.achievement.application.event.ActivityEvent
+import com.example.mykku.achievement.domain.vo.ActivityType
 import com.example.mykku.dailymessage.exception.DailyMessageException
+import com.example.mykku.achievement.application.port.output.ActivityEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -16,7 +19,8 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class CreateCommentUseCaseImpl(
     private val dailyMessageRepository: DailyMessageRepository,
-    private val dailyMessageCommentRepository: DailyMessageCommentRepository
+    private val dailyMessageCommentRepository: DailyMessageCommentRepository,
+    private val activityEventPublisher: ActivityEventPublisher
 ) : CreateCommentUseCase {
 
     override fun execute(command: CreateCommentCommand): CommentResult {
@@ -40,6 +44,8 @@ class CreateCommentUseCaseImpl(
         )
 
         val savedComment = dailyMessageCommentRepository.save(comment)
+
+        activityEventPublisher.publish(ActivityEvent(command.memberId, ActivityType.COMMENT_CREATE))
 
         return CommentResult.from(savedComment, emptyList())
     }

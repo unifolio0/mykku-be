@@ -11,3 +11,8 @@ data class MobileLoginCommand(
 data class RefreshTokenCommand(
     val refreshToken: String
 )
+
+data class LogoutCommand(
+    val memberId: Long,
+    val deviceId: String
+)
