@@ -12,8 +12,7 @@ class MemberActivityCountRepositoryAdapter(
 
     override fun incrementAndGet(memberId: Long, activityType: ActivityType): Long {
         jpaRepository.upsertIncrement(memberId, activityType.name)
-        return jpaRepository.findByMemberIdAndActivityType(memberId, activityType)
-            ?.count
-            ?: 0L
+        return jpaRepository.findByMemberIdAndActivityType(memberId, activityType)?.count
+            ?: error("member_activity_count row missing after upsert: memberId=$memberId, activityType=$activityType")
     }
 }

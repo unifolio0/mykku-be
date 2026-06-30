@@ -19,15 +19,13 @@ class MemberAuthAdapter(
     override fun findOrCreate(memberInfo: OAuthMemberInfo): Pair<Member, Boolean> {
         val existingMember = memberRepository.findByProviderAndSocialId(memberInfo.provider, memberInfo.socialId)
 
-        val result = if (existingMember != null) {
-            Pair(existingMember, true)
-        } else {
-            Pair(createMember(memberInfo), false)
+        if (existingMember != null) {
+            return Pair(existingMember, true)
         }
 
-        eventPublisher.publishEvent(ActivityEvent(result.first.id.value, ActivityType.FIRST_LOGIN))
-
-        return result
+        val newMember = createMember(memberInfo)
+        eventPublisher.publishEvent(ActivityEvent(newMember.id.value, ActivityType.FIRST_LOGIN))
+        return Pair(newMember, false)
     }
 
     override fun findById(memberId: Long): Member? {

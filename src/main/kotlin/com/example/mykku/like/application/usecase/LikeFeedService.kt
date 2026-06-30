@@ -9,14 +9,14 @@ import com.example.mykku.like.domain.entity.LikeFeedEntity
 import com.example.mykku.like.exception.LikeException
 import com.example.mykku.achievement.application.event.ActivityEvent
 import com.example.mykku.achievement.domain.vo.ActivityType
-import org.springframework.context.ApplicationEventPublisher
+import com.example.mykku.achievement.application.port.output.ActivityEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class LikeFeedService(
     private val likeFeedPort: LikeFeedPort,
-    private val eventPublisher: ApplicationEventPublisher
+    private val activityEventPublisher: ActivityEventPublisher
 ) : LikeFeedUseCase {
 
     @Transactional
@@ -30,7 +30,7 @@ class LikeFeedService(
 
         val saved = likeFeedPort.save(likeFeed)
 
-        eventPublisher.publishEvent(ActivityEvent(command.memberId, ActivityType.LIKE_PRESS))
+        activityEventPublisher.publish(ActivityEvent(command.memberId, ActivityType.LIKE_PRESS))
 
         return LikeFeedResult(
             id = saved.id!!.value,

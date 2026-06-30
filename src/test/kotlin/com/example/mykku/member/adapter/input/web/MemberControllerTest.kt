@@ -397,6 +397,7 @@ class MemberControllerTest : BaseControllerTest() {
             .patch("/api/v1/members/me/member-id")
             .then()
             .statusCode(409)
+            .body("code", equalTo("MB302"))
     }
 
     @Test

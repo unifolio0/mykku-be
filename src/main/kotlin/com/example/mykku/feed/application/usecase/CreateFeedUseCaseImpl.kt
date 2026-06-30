@@ -23,7 +23,7 @@ import com.example.mykku.image.dto.ImageUploadResult
 import com.example.mykku.achievement.application.event.ActivityEvent
 import com.example.mykku.achievement.domain.vo.ActivityType
 import com.example.mykku.member.domain.entity.Member
-import org.springframework.context.ApplicationEventPublisher
+import com.example.mykku.achievement.application.port.output.ActivityEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -39,7 +39,7 @@ class CreateFeedUseCaseImpl(
     private val contestRepository: ContestRepository,
     private val contestTagRepository: ContestTagRepository,
     private val contestParticipationRepository: ContestParticipationRepository,
-    private val eventPublisher: ApplicationEventPublisher
+    private val activityEventPublisher: ActivityEventPublisher
 ) : CreateFeedUseCase {
 
     override fun execute(command: CreateFeedCommand, member: Member): CreateFeedResult {
@@ -59,7 +59,7 @@ class CreateFeedUseCaseImpl(
             memberId = member.id.value
         )
         val savedFeed = feedRepository.save(feed, command.boardId, member.id.value)
-        eventPublisher.publishEvent(ActivityEvent(member.id.value, ActivityType.FEED_UPLOAD))
+        activityEventPublisher.publish(ActivityEvent(member.id.value, ActivityType.FEED_UPLOAD))
 
         val feedImages = createFeedImages(imageResults, savedFeed)
         val savedImages = feedImageRepository.saveAll(feedImages, savedFeed.id!!)
@@ -147,7 +147,7 @@ class CreateFeedUseCaseImpl(
                         memberId = memberPk
                     )
                     contestParticipationRepository.save(participation)
-                    eventPublisher.publishEvent(ActivityEvent(memberPk, ActivityType.CONTEST_PARTICIPATE))
+                    activityEventPublisher.publish(ActivityEvent(memberPk, ActivityType.CONTEST_PARTICIPATE))
                 }
             }
         }

@@ -1,6 +1,8 @@
 package com.example.mykku.achievement.application.event
 
 import com.example.mykku.achievement.application.port.input.AwardTitlesUseCase
+import org.slf4j.LoggerFactory
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -12,9 +14,16 @@ class ActivityEventListener(
     private val awardTitlesUseCase: AwardTitlesUseCase
 ) {
 
+    private val log = LoggerFactory.getLogger(javaClass)
+
+    @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun handleActivityEvent(event: ActivityEvent) {
-        awardTitlesUseCase.handleActivity(event.memberId, event.activityType)
+        try {
+            awardTitlesUseCase.handleActivity(event.memberId, event.activityType)
+        } catch (e: Exception) {
+            log.error("칭호 부여 처리 실패: memberId={}, activityType={}", event.memberId, event.activityType, e)
+        }
     }
 }

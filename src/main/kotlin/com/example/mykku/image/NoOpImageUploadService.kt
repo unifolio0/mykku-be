@@ -34,4 +34,7 @@ class NoOpImageUploadService : ImageUploadService {
     ): EntityImagesUploadResult {
         throw ImageException.imageUploadServiceUnavailable()
     }
+
+    override fun delete(url: String) {
+    }
 }

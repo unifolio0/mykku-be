@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.restdocs.payload.JsonFieldType
@@ -134,7 +135,7 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
                 createdAt = LocalDateTime.now()
             )
 
-            `when`(getDailyMessageUseCase.execute(any(), anyOrNull())).thenReturn(dailyMessage)
+            `when`(getDailyMessageUseCase.execute(eq(dailyMessageId), anyOrNull())).thenReturn(dailyMessage)
 
             val documentFilter = document("daily-message/detail", 200)
                 .request(request().applyConfig(apiConfig))
@@ -163,7 +164,7 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
         fun `존재하지 않는 덕담`() {
             val dailyMessageId = 999L
 
-            `when`(getDailyMessageUseCase.execute(any(), anyOrNull()))
+            `when`(getDailyMessageUseCase.execute(eq(dailyMessageId), anyOrNull()))
                 .thenThrow(DailyMessageException(DailyMessageErrorCode.DAILY_MESSAGE_NOT_FOUND))
 
             val documentFilter = document("daily-message/detail", "DAILY_MESSAGE_NOT_FOUND")

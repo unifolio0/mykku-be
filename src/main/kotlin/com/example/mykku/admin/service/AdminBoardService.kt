@@ -7,6 +7,7 @@ import com.example.mykku.board.application.port.input.CreateBoardUseCase
 import com.example.mykku.board.application.port.input.ListBoardsUseCase
 import com.example.mykku.image.ImageUploadService
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 
 @Service
@@ -17,14 +18,19 @@ class AdminBoardService(
     private val imageUploadService: ImageUploadService
 ) {
 
-    @Transactional
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     fun create(request: BoardCreateRequest): BoardResult {
         val logoUrl = imageUploadService.uploadImage(request.logo).url
         val command = CreateBoardCommand(
             title = request.title,
             logo = logoUrl
         )
-        return createBoardUseCase.create(command)
+        return try {
+            createBoardUseCase.create(command)
+        } catch (e: Exception) {
+            imageUploadService.delete(logoUrl)
+            throw e
+        }
     }
 
     fun findAll(): List<BoardResult> {

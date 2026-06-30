@@ -7,6 +7,7 @@ import com.example.mykku.image.dto.ImageUploadResult
 import com.example.mykku.image.exception.ImageException
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
+import java.net.URI
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -245,5 +246,11 @@ class S3ImageUploadService(
             "webp" -> "image/webp"
             else -> "application/octet-stream"
         }
+    }
+
+    override fun delete(url: String) {
+        val key = URI(url).path.removePrefix("/")
+        if (key.isBlank()) return
+        s3Client.deleteObject { it.bucket(s3Properties.bucketName).key(key) }
     }
 }

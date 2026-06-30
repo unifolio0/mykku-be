@@ -8,7 +8,7 @@ import com.example.mykku.fannote.domain.vo.FanNoteId
 import com.example.mykku.achievement.application.event.ActivityEvent
 import com.example.mykku.achievement.domain.vo.ActivityType
 import com.example.mykku.fannote.exception.FanNoteException
-import org.springframework.context.ApplicationEventPublisher
+import com.example.mykku.achievement.application.port.output.ActivityEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional
 class GetFanNoteDetailUseCaseImpl(
     private val fanNoteRepository: FanNoteRepository,
     private val fanNotePageRepository: FanNotePageRepository,
-    private val eventPublisher: ApplicationEventPublisher
+    private val activityEventPublisher: ActivityEventPublisher
 ) : GetFanNoteDetailUseCase {
 
     override fun execute(fanNoteId: Long, memberId: Long?): FanNoteDetailResult {
@@ -26,7 +26,7 @@ class GetFanNoteDetailUseCaseImpl(
 
         val pages = fanNotePageRepository.findByFanNoteIdOrderByPageNumber(FanNoteId.of(fanNoteId))
 
-        memberId?.let { eventPublisher.publishEvent(ActivityEvent(it, ActivityType.FANNOTE_VIEW)) }
+        memberId?.let { activityEventPublisher.publish(ActivityEvent(it, ActivityType.FANNOTE_VIEW)) }
 
         return FanNoteDetailResult.from(fanNote, pages)
     }

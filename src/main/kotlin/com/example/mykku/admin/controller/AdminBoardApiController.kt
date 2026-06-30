@@ -2,7 +2,7 @@ package com.example.mykku.admin.controller
 
 import com.example.mykku.admin.dto.board.BoardCreateRequest
 import com.example.mykku.admin.service.AdminBoardService
-import com.example.mykku.board.application.dto.BoardResult
+import com.example.mykku.board.adapter.input.web.BoardResponse
 import com.example.mykku.common.dto.ApiResponse
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
@@ -20,12 +20,12 @@ class AdminBoardApiController(
     @PostMapping(consumes = ["multipart/form-data"])
     fun create(
         @Valid @ModelAttribute request: BoardCreateRequest
-    ): ResponseEntity<ApiResponse<BoardResult>> {
+    ): ResponseEntity<ApiResponse<BoardResponse>> {
         val created = adminBoardService.create(request)
         return ResponseEntity.ok(
             ApiResponse(
                 message = "게시판이 생성되었습니다",
-                data = created
+                data = BoardResponse.from(created)
             )
         )
     }
