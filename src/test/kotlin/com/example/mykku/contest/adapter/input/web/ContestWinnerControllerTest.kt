@@ -72,6 +72,9 @@ class ContestWinnerControllerTest : BaseControllerTest() {
             .statusCode(200)
             .body("message", equalTo("수상작 상세 정보를 성공적으로 조회했습니다."))
             .body("data.contestId", equalTo(contest.id!!.toInt()))
+            .body("data.winners[0].feedId", equalTo(feed.id!!.toInt()))
+            .body("data.winners[0].feedTitle", equalTo("테스트 피드"))
+            .body("data.winners[0].authorNickname", equalTo("테스트유저"))
     }
 
     @Test

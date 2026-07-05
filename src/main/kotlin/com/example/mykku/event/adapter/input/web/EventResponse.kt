@@ -9,6 +9,7 @@ import com.example.mykku.event.application.dto.MyParticipatedEventResult
 import com.example.mykku.event.application.dto.PagedEventsResult
 import com.example.mykku.event.application.dto.PagedMyParticipatedEventsResult
 import com.example.mykku.event.domain.vo.EventStatusType
+import com.example.mykku.event.domain.vo.EventWinnerStatus
 import java.time.LocalDateTime
 
 data class CreateEventResponse(
@@ -148,7 +149,7 @@ data class MyParticipatedEventResponse(
     val expiredAt: LocalDateTime,
     val status: EventStatusType,
     val thumbnailUrl: String,
-    val isWinner: Boolean
+    val winnerStatus: EventWinnerStatus
 ) {
     companion object {
         fun from(result: MyParticipatedEventResult): MyParticipatedEventResponse {
@@ -159,7 +160,7 @@ data class MyParticipatedEventResponse(
                 expiredAt = result.expiredAt,
                 status = result.status,
                 thumbnailUrl = result.thumbnailUrl,
-                isWinner = result.isWinner
+                winnerStatus = result.winnerStatus
             )
         }
     }

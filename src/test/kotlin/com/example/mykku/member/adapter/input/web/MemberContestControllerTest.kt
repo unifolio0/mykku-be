@@ -3,8 +3,11 @@ package com.example.mykku.member.adapter.input.web
 import com.example.mykku.BaseControllerTest
 import com.example.mykku.contest.adapter.output.persistence.entity.ContestJpaEntity
 import com.example.mykku.contest.adapter.output.persistence.entity.ContestParticipationJpaEntity
+import com.example.mykku.contest.adapter.output.persistence.entity.ContestWinnerJpaEntity
 import com.example.mykku.contest.adapter.output.persistence.repository.ContestJpaRepository
 import com.example.mykku.contest.adapter.output.persistence.repository.ContestParticipationJpaRepository
+import com.example.mykku.contest.adapter.output.persistence.repository.ContestWinnerJpaRepository
+import com.example.mykku.contest.domain.vo.ContestStatusType
 import com.example.mykku.feed.adapter.output.persistence.FeedJpaRepository
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
 import io.restassured.RestAssured
@@ -23,6 +26,9 @@ class MemberContestControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var contestParticipationJpaRepository: ContestParticipationJpaRepository
+
+    @Autowired
+    private lateinit var contestWinnerJpaRepository: ContestWinnerJpaRepository
 
     @Autowired
     private lateinit var feedJpaRepository: FeedJpaRepository
@@ -132,6 +138,118 @@ class MemberContestControllerTest : BaseControllerTest() {
             .body("data.totalElements", equalTo(5))
             .body("data.totalPages", equalTo(3))
             .body("data.size", equalTo(2))
+    }
+
+    @Test
+    @DisplayName("내가 참여한 콘테스트 목록 조회 - 수상 시 winnerStatus가 WON, 미수상 발표완료 시 LOST, 발표 전 PENDING")
+    fun `getMyParticipatedContests - winnerStatus 3상태를 구분한다`() {
+        val member = createAndSaveMember()
+        val board = createAndSaveBoard()
+        val authHeader = getBearerToken(member.id)
+
+        val wonContest = contestJpaRepository.save(
+            ContestJpaEntity(
+                title = "수상 콘테스트",
+                startedAt = LocalDateTime.now().minusDays(7),
+                expiredAt = LocalDateTime.now().minusDays(1),
+                status = ContestStatusType.WINNER_SELECTED,
+                thumbnailUrl = "https://example.com/thumbnail.jpg"
+            )
+        )
+        val feed = feedJpaRepository.save(
+            FeedJpaEntity(title = "수상작", content = "내용", board = board, member = member)
+        )
+        val participation = contestParticipationJpaRepository.save(
+            ContestParticipationJpaEntity(member = member, contest = wonContest, feed = feed)
+        )
+        contestWinnerJpaRepository.save(
+            ContestWinnerJpaEntity(
+                winnerRank = 1,
+                description = "수상 설명",
+                acceptanceSpeech = "",
+                contest = wonContest,
+                participation = participation
+            )
+        )
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .queryParam("page", 0)
+            .queryParam("size", 20)
+        .`when`()
+            .get("/api/v1/members/me/contests")
+        .then()
+            .statusCode(200)
+            .body("data.content[0].winnerStatus", equalTo("WON"))
+            .body("data.content[0].winnerRank", equalTo(1))
+    }
+
+    @Test
+    @DisplayName("내가 참여한 콘테스트 목록 조회 - 발표 완료 미수상이면 winnerStatus가 LOST이다")
+    fun `getMyParticipatedContests - 발표 완료 미수상이면 winnerStatus가 LOST이다`() {
+        val member = createAndSaveMember()
+        val board = createAndSaveBoard()
+        val authHeader = getBearerToken(member.id)
+
+        val contest = contestJpaRepository.save(
+            ContestJpaEntity(
+                title = "낙선 콘테스트",
+                startedAt = LocalDateTime.now().minusDays(7),
+                expiredAt = LocalDateTime.now().minusDays(1),
+                status = ContestStatusType.WINNER_SELECTED,
+                thumbnailUrl = "https://example.com/thumbnail.jpg"
+            )
+        )
+        val feed = feedJpaRepository.save(
+            FeedJpaEntity(title = "참여작", content = "내용", board = board, member = member)
+        )
+        contestParticipationJpaRepository.save(
+            ContestParticipationJpaEntity(member = member, contest = contest, feed = feed)
+        )
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .queryParam("page", 0)
+            .queryParam("size", 20)
+        .`when`()
+            .get("/api/v1/members/me/contests")
+        .then()
+            .statusCode(200)
+            .body("data.content[0].winnerStatus", equalTo("LOST"))
+    }
+
+    @Test
+    @DisplayName("내가 참여한 콘테스트 목록 조회 - 발표 전이면 winnerStatus가 PENDING이다")
+    fun `getMyParticipatedContests - 발표 전이면 winnerStatus가 PENDING이다`() {
+        val member = createAndSaveMember()
+        val board = createAndSaveBoard()
+        val authHeader = getBearerToken(member.id)
+
+        val contest = contestJpaRepository.save(
+            ContestJpaEntity(
+                title = "진행중 콘테스트",
+                startedAt = LocalDateTime.now().minusDays(1),
+                expiredAt = LocalDateTime.now().plusDays(7),
+                status = ContestStatusType.ACTIVE,
+                thumbnailUrl = "https://example.com/thumbnail.jpg"
+            )
+        )
+        val feed = feedJpaRepository.save(
+            FeedJpaEntity(title = "참여작", content = "내용", board = board, member = member)
+        )
+        contestParticipationJpaRepository.save(
+            ContestParticipationJpaEntity(member = member, contest = contest, feed = feed)
+        )
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .queryParam("page", 0)
+            .queryParam("size", 20)
+        .`when`()
+            .get("/api/v1/members/me/contests")
+        .then()
+            .statusCode(200)
+            .body("data.content[0].winnerStatus", equalTo("PENDING"))
     }
 
     @Test

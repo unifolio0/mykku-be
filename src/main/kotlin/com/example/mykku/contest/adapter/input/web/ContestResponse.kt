@@ -19,6 +19,7 @@ import com.example.mykku.contest.application.dto.WinnerDetailResult
 import com.example.mykku.contest.application.dto.WinnerInfoResult
 import com.example.mykku.contest.application.dto.WinnerThumbnailResult
 import com.example.mykku.contest.domain.vo.ContestStatusType
+import com.example.mykku.contest.domain.vo.ContestWinnerStatus
 import java.time.LocalDateTime
 
 data class CreateContestResponse(
@@ -71,7 +72,7 @@ data class ContestListResponse(
     val status: ContestStatusType,
     val thumbnailUrl: String,
     val tags: List<String>,
-    val isWinner: Boolean,
+    val winnerStatus: ContestWinnerStatus,
     val winnerRank: Int?
 ) {
     companion object {
@@ -84,7 +85,7 @@ data class ContestListResponse(
                 status = result.status,
                 thumbnailUrl = result.thumbnailUrl,
                 tags = result.tags,
-                isWinner = result.isWinner,
+                winnerStatus = result.winnerStatus,
                 winnerRank = result.winnerRank
             )
         }

@@ -34,4 +34,13 @@ class LikeDailyMessageCommentPersistenceAdapter(
     override fun deleteByMemberIdAndDailyMessageCommentId(memberId: Long, dailyMessageCommentId: Long) {
         likeDailyMessageCommentJpaRepository.deleteByMemberIdAndDailyMessageCommentId(memberId, dailyMessageCommentId)
     }
+
+    override fun findLikedCommentIds(memberId: Long, dailyMessageCommentIds: List<Long>): Set<Long> {
+        if (dailyMessageCommentIds.isEmpty()) {
+            return emptySet()
+        }
+        return likeDailyMessageCommentJpaRepository
+            .findLikedDailyMessageCommentIds(memberId, dailyMessageCommentIds)
+            .toSet()
+    }
 }

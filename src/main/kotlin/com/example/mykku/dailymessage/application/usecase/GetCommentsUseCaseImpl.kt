@@ -6,8 +6,10 @@ import com.example.mykku.dailymessage.application.dto.ReplyResult
 import com.example.mykku.dailymessage.application.port.input.GetCommentsUseCase
 import com.example.mykku.dailymessage.application.port.output.DailyMessageCommentRepository
 import com.example.mykku.dailymessage.application.port.output.DailyMessageRepository
+import com.example.mykku.dailymessage.domain.entity.DailyMessageComment
 import com.example.mykku.dailymessage.domain.vo.DailyMessageId
 import com.example.mykku.dailymessage.exception.DailyMessageException
+import com.example.mykku.like.application.port.output.LikeDailyMessageCommentPort
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -16,7 +18,8 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 class GetCommentsUseCaseImpl(
     private val dailyMessageRepository: DailyMessageRepository,
-    private val dailyMessageCommentRepository: DailyMessageCommentRepository
+    private val dailyMessageCommentRepository: DailyMessageCommentRepository,
+    private val likeDailyMessageCommentPort: LikeDailyMessageCommentPort
 ) : GetCommentsUseCase {
 
     override fun execute(dailyMessageId: Long, memberId: Long?, pageable: Pageable): DailyMessageCommentsResult {
@@ -35,12 +38,10 @@ class GetCommentsUseCaseImpl(
             emptyList()
         }
 
+        val likedIds = resolveLikedIds(memberId, commentsPage.content, replies)
         val repliesMap = replies.groupBy { it.parentCommentId }
-
         val commentResults = commentsPage.content.map { comment ->
-            val commentReplies = repliesMap[comment.id.value] ?: emptyList()
-            val replyResults = commentReplies.map { ReplyResult.from(it) }
-            CommentResult.from(comment, replyResults)
+            toCommentResult(comment, repliesMap[comment.id.value] ?: emptyList(), likedIds)
         }
 
         return DailyMessageCommentsResult(
@@ -51,5 +52,26 @@ class GetCommentsUseCaseImpl(
             pageSize = commentsPage.size,
             hasNext = commentsPage.hasNext()
         )
+    }
+
+    private fun resolveLikedIds(
+        memberId: Long?,
+        comments: List<DailyMessageComment>,
+        replies: List<DailyMessageComment>
+    ): Set<Long> {
+        if (memberId == null) {
+            return emptySet()
+        }
+        val allCommentIds = comments.map { it.id.value } + replies.map { it.id.value }
+        return likeDailyMessageCommentPort.findLikedCommentIds(memberId, allCommentIds)
+    }
+
+    private fun toCommentResult(
+        comment: DailyMessageComment,
+        replies: List<DailyMessageComment>,
+        likedIds: Set<Long>
+    ): CommentResult {
+        val replyResults = replies.map { ReplyResult.from(it, likedIds.contains(it.id.value)) }
+        return CommentResult.from(comment, likedIds.contains(comment.id.value), replyResults)
     }
 }

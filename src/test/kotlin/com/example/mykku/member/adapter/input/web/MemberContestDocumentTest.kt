@@ -4,6 +4,7 @@ import com.example.mykku.BaseDocumentTest
 import com.example.mykku.contest.application.dto.ContestListResult
 import com.example.mykku.contest.application.dto.PagedContestsResult
 import com.example.mykku.contest.domain.vo.ContestStatusType
+import com.example.mykku.contest.domain.vo.ContestWinnerStatus
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.Tag
 import io.restassured.http.ContentType
@@ -42,10 +43,10 @@ class MemberContestDocumentTest : BaseDocumentTest() {
                     title = "첫 번째 콘테스트",
                     startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                     expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
-                    status = ContestStatusType.ACTIVE,
+                    status = ContestStatusType.WINNER_SELECTED,
                     thumbnailUrl = "https://example.com/thumbnail1.jpg",
                     tags = listOf("디자인", "개발"),
-                    isWinner = true,
+                    winnerStatus = ContestWinnerStatus.WON,
                     winnerRank = 1
                 ),
                 ContestListResult(
@@ -53,10 +54,10 @@ class MemberContestDocumentTest : BaseDocumentTest() {
                     title = "두 번째 콘테스트",
                     startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                     expiredAt = LocalDateTime.of(2025, 11, 30, 23, 59, 59),
-                    status = ContestStatusType.EXPIRED,
+                    status = ContestStatusType.ACTIVE,
                     thumbnailUrl = "https://example.com/thumbnail2.jpg",
                     tags = listOf("기획"),
-                    isWinner = false,
+                    winnerStatus = ContestWinnerStatus.PENDING,
                     winnerRank = null
                 )
             )
@@ -88,7 +89,8 @@ class MemberContestDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.content[].thumbnailUrl").type(JsonFieldType.STRING)
                                 .description("썸네일 이미지 URL").optional(),
                             fieldWithPath("data.content[].tags[]").type(JsonFieldType.ARRAY).description("태그 목록"),
-                            fieldWithPath("data.content[].isWinner").type(JsonFieldType.BOOLEAN).description("수상 여부"),
+                            fieldWithPath("data.content[].winnerStatus").type(JsonFieldType.STRING)
+                                .description("수상 상태 (WON: 수상, LOST: 낙선, PENDING: 발표 전)"),
                             fieldWithPath("data.content[].winnerRank").type(JsonFieldType.NUMBER).description("수상 순위").optional(),
                             fieldWithPath("data.page").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
                             fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),

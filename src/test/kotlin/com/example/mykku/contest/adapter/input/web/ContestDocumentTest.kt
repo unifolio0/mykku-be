@@ -92,7 +92,8 @@ class ContestDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.content[].thumbnailUrl").type(JsonFieldType.STRING)
                                 .description("썸네일 이미지 URL"),
                             fieldWithPath("data.content[].tags[]").type(JsonFieldType.ARRAY).description("태그 목록"),
-                            fieldWithPath("data.content[].isWinner").type(JsonFieldType.BOOLEAN).description("수상 여부"),
+                            fieldWithPath("data.content[].winnerStatus").type(JsonFieldType.STRING)
+                                .description("수상 상태 (WON: 수상, LOST: 낙선, PENDING: 발표 전). 일반 목록에서는 항상 PENDING"),
                             fieldWithPath("data.content[].winnerRank").type(JsonFieldType.NUMBER).description("수상 순위").optional(),
                             fieldWithPath("data.page").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
                             fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),

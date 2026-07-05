@@ -7,6 +7,8 @@ import com.example.mykku.dailymessage.adapter.input.web.CreateCommentRequest
 import com.example.mykku.dailymessage.adapter.input.web.UpdateCommentRequest
 import com.example.mykku.dailymessage.adapter.output.persistence.repository.DailyMessageCommentJpaRepository
 import com.example.mykku.dailymessage.adapter.output.persistence.repository.DailyMessageJpaRepository
+import com.example.mykku.like.adapter.output.persistence.LikeDailyMessageCommentJpaRepository
+import com.example.mykku.like.adapter.output.persistence.entity.LikeDailyMessageCommentJpaEntity
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.member.domain.vo.SocialProvider
 import com.example.mykku.util.TestTokenGenerator
@@ -27,6 +29,9 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var dailyMessageCommentJpaRepository: DailyMessageCommentJpaRepository
+
+    @Autowired
+    private lateinit var likeDailyMessageCommentJpaRepository: LikeDailyMessageCommentJpaRepository
 
     @Test
     @DisplayName("댓글 생성 - 정상 케이스")
@@ -251,5 +256,87 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
             .delete("/api/v1/daily-messages/comments/{commentId}", 1L)
             .then()
             .statusCode(401)
+    }
+
+    @Test
+    @DisplayName("댓글 목록 조회 - 로그인 멤버가 좋아요한 댓글/답글은 isLiked=true로 표시된다")
+    fun `getComments - 내가 좋아요한 댓글과 답글은 isLiked가 true다`() {
+        // given
+        val member = memberJpaRepository.save(
+            MemberJpaEntity(
+                memberId = "likemember1",
+                socialId = "member1",
+                provider = SocialProvider.GOOGLE,
+                email = "member1@example.com",
+                nickname = "Member1",
+                role = null,
+                profileImage = ""
+            )
+        )
+        val dailyMessage = dailyMessageJpaRepository.save(
+            DailyMessageJpaEntity(title = "오늘의 덕담", content = "내용", date = LocalDate.now())
+        )
+        val comment = dailyMessageCommentJpaRepository.save(
+            DailyMessageCommentJpaEntity(content = "좋아요한 댓글", dailyMessage = dailyMessage, member = member)
+        )
+        val reply = dailyMessageCommentJpaRepository.save(
+            DailyMessageCommentJpaEntity(
+                content = "좋아요한 답글",
+                dailyMessage = dailyMessage,
+                parentComment = comment,
+                member = member
+            )
+        )
+        likeDailyMessageCommentJpaRepository.save(
+            LikeDailyMessageCommentJpaEntity(member = member, dailyMessageComment = comment)
+        )
+        likeDailyMessageCommentJpaRepository.save(
+            LikeDailyMessageCommentJpaEntity(member = member, dailyMessageComment = reply)
+        )
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+
+        // when & then
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .`when`()
+            .get("/api/v1/daily-messages/{dailyMessageId}/comments", dailyMessage.id)
+            .then()
+            .statusCode(200)
+            .body("data.comments[0].isLiked", equalTo(true))
+            .body("data.comments[0].replies[0].isLiked", equalTo(true))
+    }
+
+    @Test
+    @DisplayName("댓글 목록 조회 - 비로그인 사용자는 모든 isLiked가 false다")
+    fun `getComments - 비로그인 사용자는 isLiked가 false다`() {
+        // given
+        val member = memberJpaRepository.save(
+            MemberJpaEntity(
+                memberId = "likemember2",
+                socialId = "member2",
+                provider = SocialProvider.GOOGLE,
+                email = "member2@example.com",
+                nickname = "Member2",
+                role = null,
+                profileImage = ""
+            )
+        )
+        val dailyMessage = dailyMessageJpaRepository.save(
+            DailyMessageJpaEntity(title = "오늘의 덕담", content = "내용", date = LocalDate.now())
+        )
+        val comment = dailyMessageCommentJpaRepository.save(
+            DailyMessageCommentJpaEntity(content = "댓글", dailyMessage = dailyMessage, member = member)
+        )
+        likeDailyMessageCommentJpaRepository.save(
+            LikeDailyMessageCommentJpaEntity(member = member, dailyMessageComment = comment)
+        )
+
+        // when & then
+        RestAssured.given()
+            .`when`()
+            .get("/api/v1/daily-messages/{dailyMessageId}/comments", dailyMessage.id)
+            .then()
+            .statusCode(200)
+            .body("data.comments[0].isLiked", equalTo(false))
     }
 }

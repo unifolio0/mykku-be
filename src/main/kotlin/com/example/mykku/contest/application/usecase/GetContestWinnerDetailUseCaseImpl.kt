@@ -6,11 +6,18 @@ import com.example.mykku.contest.application.port.input.GetContestWinnerDetailUs
 import com.example.mykku.contest.application.port.output.ContestParticipationRepository
 import com.example.mykku.contest.application.port.output.ContestRepository
 import com.example.mykku.contest.application.port.output.ContestWinnerRepository
+import com.example.mykku.contest.domain.entity.ContestParticipation
+import com.example.mykku.contest.domain.entity.ContestWinner
 import com.example.mykku.contest.domain.vo.ContestId
 import com.example.mykku.contest.exception.ContestException
 import com.example.mykku.feed.application.port.output.FeedImageRepository
 import com.example.mykku.feed.application.port.output.FeedRepository
+import com.example.mykku.feed.domain.entity.Feed
+import com.example.mykku.feed.domain.entity.FeedImage
+import com.example.mykku.feed.domain.vo.FeedId
 import com.example.mykku.member.application.port.output.MemberRepository
+import com.example.mykku.member.domain.entity.Member
+import com.example.mykku.member.domain.vo.MemberPk
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -30,39 +37,56 @@ class GetContestWinnerDetailUseCaseImpl(
             ?: throw ContestException.contestNotFound()
 
         val winners = contestWinnerRepository.findByContestId(contest.id)
-
         if (winners.isEmpty()) {
-            return ContestWinnerDetailResult(
-                contestId = contest.id.value,
-                contestTitle = contest.title,
-                winners = emptyList()
-            )
+            return ContestWinnerDetailResult(contest.id.value, contest.title, emptyList())
         }
 
-        val participationIds = winners.map { it.participationId }
-        val participations = contestParticipationRepository.findAllByIdIn(participationIds)
-        val participationsMap = participations.associateBy { it.id.value }
+        val context = buildContext(winners)
+        val winnerDetails = winners.sortedBy { it.winnerRank }
+            .mapNotNull { toWinnerDetail(it, context) }
 
-        val winnerDetails = winners.sortedBy { it.winnerRank }.mapNotNull { winner ->
-            val participation = participationsMap[winner.participationId.value] ?: return@mapNotNull null
+        return ContestWinnerDetailResult(contest.id.value, contest.title, winnerDetails)
+    }
 
-            WinnerDetailResult(
-                winnerId = winner.id.value,
-                winnerRank = winner.winnerRank,
-                feedId = participation.feedId,
-                feedTitle = "",
-                feedImageUrl = null,
-                authorNickname = "",
-                authorProfileImage = "",
-                description = winner.description,
-                acceptanceSpeech = winner.acceptanceSpeech
-            )
-        }
+    private fun buildContext(winners: List<ContestWinner>): WinnerContext {
+        val participationsMap = contestParticipationRepository
+            .findAllByIdIn(winners.map { it.participationId })
+            .associateBy { it.id.value }
+        val feedIds = participationsMap.values.map { FeedId(it.feedId) }
+        val feedsMap = feedRepository.findAllByIds(feedIds).associateBy { it.id!!.value }
+        val feedImagesMap = feedImageRepository.findByFeedIds(feedIds).groupBy { it.feedId.value }
+        val membersMap = resolveMembers(participationsMap.values)
+        return WinnerContext(participationsMap, feedsMap, feedImagesMap, membersMap)
+    }
 
-        return ContestWinnerDetailResult(
-            contestId = contest.id.value,
-            contestTitle = contest.title,
-            winners = winnerDetails
+    private fun resolveMembers(participations: Collection<ContestParticipation>): Map<Long, Member> =
+        memberRepository.findByIds(participations.mapNotNull { it.memberId }.map { MemberPk.of(it) })
+            .associateBy { it.id.value }
+
+    private fun toWinnerDetail(winner: ContestWinner, context: WinnerContext): WinnerDetailResult? {
+        val participation = context.participationsMap[winner.participationId.value]
+            ?: return null
+        val feed = context.feedsMap[participation.feedId]
+        val feedImageUrl = feed?.id?.value?.let { context.feedImagesMap[it]?.firstOrNull()?.url }
+        val member = participation.memberId?.let { context.membersMap[it] }
+
+        return WinnerDetailResult(
+            winnerId = winner.id.value,
+            winnerRank = winner.winnerRank,
+            feedId = participation.feedId,
+            feedTitle = feed?.title ?: "",
+            feedImageUrl = feedImageUrl,
+            authorNickname = member?.nickname ?: "",
+            authorProfileImage = member?.profileImage,
+            description = winner.description,
+            acceptanceSpeech = winner.acceptanceSpeech
         )
     }
+
+    private data class WinnerContext(
+        val participationsMap: Map<Long, ContestParticipation>,
+        val feedsMap: Map<Long, Feed>,
+        val feedImagesMap: Map<Long, List<FeedImage>>,
+        val membersMap: Map<Long, Member>
+    )
 }

@@ -7,7 +7,7 @@ import org.springframework.data.domain.Sort
 
 object PageableValidator {
     
-    private const val MAX_PAGE_SIZE = 100
+    private const val MAX_PAGE_SIZE = 1000
     private const val DEFAULT_PAGE_SIZE = 20
     
     fun validateAndCreate(

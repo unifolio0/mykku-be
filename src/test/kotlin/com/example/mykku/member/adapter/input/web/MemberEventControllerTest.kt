@@ -7,6 +7,7 @@ import com.example.mykku.event.adapter.output.persistence.entity.EventWinnerJpaE
 import com.example.mykku.event.adapter.output.persistence.repository.EventJpaRepository
 import com.example.mykku.event.adapter.output.persistence.repository.EventParticipationJpaRepository
 import com.example.mykku.event.adapter.output.persistence.repository.EventWinnerJpaRepository
+import com.example.mykku.event.domain.vo.EventStatusType
 import io.restassured.RestAssured
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
@@ -28,8 +29,8 @@ class MemberEventControllerTest : BaseControllerTest() {
     private lateinit var eventWinnerJpaRepository: EventWinnerJpaRepository
 
     @Test
-    @DisplayName("내가 참여한 이벤트 목록 조회 - 당첨 여부가 포함된다")
-    fun `getMyParticipatedEvents - 당첨된 이벤트는 isWinner가 true이다`() {
+    @DisplayName("내가 참여한 이벤트 목록 조회 - 당첨된 이벤트는 winnerStatus가 WON이다")
+    fun `getMyParticipatedEvents - 당첨된 이벤트는 winnerStatus가 WON이다`() {
         val member = createAndSaveMember()
         val authHeader = getBearerToken(member.id)
 
@@ -38,6 +39,7 @@ class MemberEventControllerTest : BaseControllerTest() {
                 title = "당첨 이벤트",
                 startedAt = LocalDateTime.now().minusDays(7),
                 expiredAt = LocalDateTime.now().minusDays(1),
+                status = EventStatusType.WINNER_SELECTED,
                 thumbnailUrl = "https://example.com/thumbnail.jpg"
             )
         )
@@ -55,7 +57,63 @@ class MemberEventControllerTest : BaseControllerTest() {
         .then()
             .statusCode(200)
             .body("data.content[0].id", equalTo(event.id!!.toInt()))
-            .body("data.content[0].isWinner", equalTo(true))
+            .body("data.content[0].winnerStatus", equalTo("WON"))
+    }
+
+    @Test
+    @DisplayName("내가 참여한 이벤트 목록 조회 - 발표 완료됐지만 미당첨이면 winnerStatus가 LOST이다")
+    fun `getMyParticipatedEvents - 발표 완료 미당첨이면 winnerStatus가 LOST이다`() {
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
+
+        val event = eventJpaRepository.save(
+            EventJpaEntity(
+                title = "낙첨 이벤트",
+                startedAt = LocalDateTime.now().minusDays(7),
+                expiredAt = LocalDateTime.now().minusDays(1),
+                status = EventStatusType.WINNER_SELECTED,
+                thumbnailUrl = "https://example.com/thumbnail.jpg"
+            )
+        )
+        eventParticipationJpaRepository.save(EventParticipationJpaEntity(member = member, event = event))
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .queryParam("page", 0)
+            .queryParam("size", 20)
+        .`when`()
+            .get("/api/v1/members/me/events")
+        .then()
+            .statusCode(200)
+            .body("data.content[0].winnerStatus", equalTo("LOST"))
+    }
+
+    @Test
+    @DisplayName("내가 참여한 이벤트 목록 조회 - 발표 전이면 winnerStatus가 PENDING이다")
+    fun `getMyParticipatedEvents - 발표 전이면 winnerStatus가 PENDING이다`() {
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
+
+        val event = eventJpaRepository.save(
+            EventJpaEntity(
+                title = "진행중 이벤트",
+                startedAt = LocalDateTime.now().minusDays(1),
+                expiredAt = LocalDateTime.now().plusDays(7),
+                status = EventStatusType.ACTIVE,
+                thumbnailUrl = "https://example.com/thumbnail.jpg"
+            )
+        )
+        eventParticipationJpaRepository.save(EventParticipationJpaEntity(member = member, event = event))
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .queryParam("page", 0)
+            .queryParam("size", 20)
+        .`when`()
+            .get("/api/v1/members/me/events")
+        .then()
+            .statusCode(200)
+            .body("data.content[0].winnerStatus", equalTo("PENDING"))
     }
 
     @Test

@@ -7,6 +7,8 @@ import com.example.mykku.event.application.port.input.GetMyParticipatedEventsUse
 import com.example.mykku.event.application.port.output.EventParticipationRepository
 import com.example.mykku.event.application.port.output.EventWinnerRepository
 import com.example.mykku.event.domain.entity.Event
+import com.example.mykku.event.domain.vo.EventStatusType
+import com.example.mykku.event.domain.vo.EventWinnerStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -47,7 +49,15 @@ class GetMyParticipatedEventsUseCaseImpl(
             expiredAt = event.expiredAt,
             status = event.status,
             thumbnailUrl = event.thumbnailUrl,
-            isWinner = wonEventIds.contains(event.id.value)
+            winnerStatus = resolveWinnerStatus(event, wonEventIds)
         )
+    }
+
+    private fun resolveWinnerStatus(event: Event, wonEventIds: Set<Long>): EventWinnerStatus {
+        return when {
+            wonEventIds.contains(event.id.value) -> EventWinnerStatus.WON
+            event.status != EventStatusType.WINNER_SELECTED -> EventWinnerStatus.PENDING
+            else -> EventWinnerStatus.LOST
+        }
     }
 }
