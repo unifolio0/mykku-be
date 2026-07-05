@@ -48,6 +48,7 @@ data class CommentResponse(
     val id: Long,
     val content: String,
     val likeCount: Int,
+    val isLiked: Boolean,
     val memberName: String?,
     val profileImage: String?,
     val createdAt: LocalDateTime,
@@ -59,6 +60,7 @@ data class CommentResponse(
                 id = result.id,
                 content = result.content,
                 likeCount = result.likeCount,
+                isLiked = result.isLiked,
                 memberName = result.memberName,
                 profileImage = result.profileImage,
                 createdAt = result.createdAt,
@@ -72,6 +74,7 @@ data class ReplyResponse(
     val id: Long,
     val content: String,
     val likeCount: Int,
+    val isLiked: Boolean,
     val memberName: String?,
     val profileImage: String?,
     val createdAt: LocalDateTime
@@ -82,6 +85,7 @@ data class ReplyResponse(
                 id = result.id,
                 content = result.content,
                 likeCount = result.likeCount,
+                isLiked = result.isLiked,
                 memberName = result.memberName,
                 profileImage = result.profileImage,
                 createdAt = result.createdAt

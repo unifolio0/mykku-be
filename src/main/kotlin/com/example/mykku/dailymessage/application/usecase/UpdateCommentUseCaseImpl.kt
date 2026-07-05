@@ -6,13 +6,15 @@ import com.example.mykku.dailymessage.application.port.input.UpdateCommentUseCas
 import com.example.mykku.dailymessage.application.port.output.DailyMessageCommentRepository
 import com.example.mykku.dailymessage.domain.vo.DailyMessageCommentId
 import com.example.mykku.dailymessage.exception.DailyMessageException
+import com.example.mykku.like.application.port.output.LikeDailyMessageCommentPort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
 class UpdateCommentUseCaseImpl(
-    private val dailyMessageCommentRepository: DailyMessageCommentRepository
+    private val dailyMessageCommentRepository: DailyMessageCommentRepository,
+    private val likeDailyMessageCommentPort: LikeDailyMessageCommentPort
 ) : UpdateCommentUseCase {
 
     override fun execute(command: UpdateCommentCommand): CommentResult {
@@ -25,7 +27,9 @@ class UpdateCommentUseCaseImpl(
 
         val updatedComment = comment.updateContent(command.content)
         val savedComment = dailyMessageCommentRepository.save(updatedComment)
+        val isLiked = likeDailyMessageCommentPort
+            .existsByMemberIdAndDailyMessageCommentId(command.memberId, savedComment.id.value)
 
-        return CommentResult.from(savedComment, emptyList())
+        return CommentResult.from(savedComment, isLiked = isLiked, replies = emptyList())
     }
 }

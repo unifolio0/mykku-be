@@ -47,6 +47,6 @@ class CreateCommentUseCaseImpl(
 
         activityEventPublisher.publish(ActivityEvent(command.memberId, ActivityType.COMMENT_CREATE))
 
-        return CommentResult.from(savedComment, emptyList())
+        return CommentResult.from(savedComment, replies = emptyList())
     }
 }

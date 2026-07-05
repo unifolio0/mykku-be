@@ -86,6 +86,80 @@ class AdminEventApiControllerTest : BaseControllerTest() {
             .statusCode(400)
     }
 
+    @Test
+    @DisplayName("당첨자 발표 공지 저장 - 정상 케이스(신규 생성)")
+    fun `upsertWinnerAnnouncement - 관리자가 공지를 신규 저장한다`() {
+        val adminSessionId = getAdminSessionId()
+        val event = createAndSaveEvent()
+
+        val request = mapOf(
+            "title" to "[봄맞이 이벤트] 수상자 발표",
+            "content" to "참여해 주신 모든 분들께 감사드립니다.\n대상: OOO",
+            "announcedAt" to "2025-10-10"
+        )
+
+        RestAssured.given()
+            .sessionId(adminSessionId)
+            .contentType(ContentType.JSON)
+            .body(request)
+            .`when`()
+            .put("/admin/api/v1/events/{eventId}/winner-announcement", event.id)
+            .then()
+            .statusCode(200)
+            .body("message", equalTo("당첨자 발표 공지가 성공적으로 저장되었습니다."))
+            .body("data.eventId", equalTo(event.id!!.toInt()))
+            .body("data.title", equalTo("[봄맞이 이벤트] 수상자 발표"))
+            .body("data.announcedAt", equalTo("2025-10-10"))
+    }
+
+    @Test
+    @DisplayName("당첨자 발표 공지 저장 - 재호출 시 수정(upsert)")
+    fun `upsertWinnerAnnouncement - 재호출하면 기존 공지를 수정한다`() {
+        val adminSessionId = getAdminSessionId()
+        val event = createAndSaveEvent()
+
+        RestAssured.given()
+            .sessionId(adminSessionId)
+            .contentType(ContentType.JSON)
+            .body(mapOf("title" to "초안", "content" to "초안 본문", "announcedAt" to "2025-10-10"))
+            .`when`()
+            .put("/admin/api/v1/events/{eventId}/winner-announcement", event.id)
+            .then()
+            .statusCode(200)
+
+        RestAssured.given()
+            .sessionId(adminSessionId)
+            .contentType(ContentType.JSON)
+            .body(mapOf("title" to "수정본", "content" to "수정 본문", "announcedAt" to "2025-10-11"))
+            .`when`()
+            .put("/admin/api/v1/events/{eventId}/winner-announcement", event.id)
+            .then()
+            .statusCode(200)
+            .body("data.title", equalTo("수정본"))
+            .body("data.content", equalTo("수정 본문"))
+            .body("data.announcedAt", equalTo("2025-10-11"))
+    }
+
+    @Test
+    @DisplayName("당첨자 발표 공지 저장 - 관리자 인증 없이 접근 불가")
+    fun `upsertWinnerAnnouncement - 관리자 인증이 없으면 저장할 수 없다`() {
+        val event = createAndSaveEvent()
+
+        val request = mapOf(
+            "title" to "제목",
+            "content" to "본문",
+            "announcedAt" to "2025-10-10"
+        )
+
+        RestAssured.given()
+            .contentType(ContentType.JSON)
+            .body(request)
+            .`when`()
+            .put("/admin/api/v1/events/{eventId}/winner-announcement", event.id)
+            .then()
+            .statusCode(302)
+    }
+
     private fun createAndSaveEvent(
         title: String = "테스트 이벤트",
         expiredAt: LocalDateTime = LocalDateTime.now().minusDays(1)

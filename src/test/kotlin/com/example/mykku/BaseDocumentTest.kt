@@ -15,6 +15,7 @@ import com.example.mykku.block.application.port.input.UnblockMemberUseCase
 import com.example.mykku.board.application.port.input.ListBoardsUseCase
 import com.example.mykku.contest.application.port.input.CreateContestUseCase
 import com.example.mykku.contest.application.port.input.GetContestUseCase
+import com.example.mykku.contest.application.port.input.GetContestWinnerAnnouncementUseCase
 import com.example.mykku.contest.application.port.input.GetContestWinnerDetailUseCase
 import com.example.mykku.contest.application.port.input.GetContestWinnersListUseCase
 import com.example.mykku.contest.application.port.input.GetMyAwardContestsUseCase
@@ -37,6 +38,7 @@ import com.example.mykku.docs.RestDocumentationResponse
 import com.example.mykku.email.EmailAuthService
 import com.example.mykku.event.application.port.input.CreateEventUseCase
 import com.example.mykku.event.application.port.input.GetEventUseCase
+import com.example.mykku.event.application.port.input.GetEventWinnerAnnouncementUseCase
 import com.example.mykku.event.application.port.input.GetEventWinnersUseCase
 import com.example.mykku.event.application.port.input.GetMyAwardEventsUseCase
 import com.example.mykku.event.application.port.input.GetMyEventWinnerStatusUseCase
@@ -147,6 +149,9 @@ abstract class BaseDocumentTest {
 
     @MockitoBean
     protected lateinit var getContestWinnerDetailUseCase: GetContestWinnerDetailUseCase
+
+    @MockitoBean
+    protected lateinit var getContestWinnerAnnouncementUseCase: GetContestWinnerAnnouncementUseCase
 
     @MockitoBean
     protected lateinit var updateAcceptanceSpeechUseCase: UpdateAcceptanceSpeechUseCase
@@ -261,6 +266,9 @@ abstract class BaseDocumentTest {
 
     @MockitoBean
     protected lateinit var getEventWinnersUseCase: GetEventWinnersUseCase
+
+    @MockitoBean
+    protected lateinit var getEventWinnerAnnouncementUseCase: GetEventWinnerAnnouncementUseCase
 
     @MockitoBean
     protected lateinit var getMyEventWinnerStatusUseCase: GetMyEventWinnerStatusUseCase

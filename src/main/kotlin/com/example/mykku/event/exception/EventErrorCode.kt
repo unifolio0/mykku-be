@@ -20,5 +20,6 @@ enum class EventErrorCode(
 
     EMPTY_WINNERS("EV401", HttpStatus.BAD_REQUEST, "당첨자 목록은 비어있을 수 없습니다"),
     DUPLICATE_WINNER("EV402", HttpStatus.BAD_REQUEST, "중복된 당첨자가 있습니다"),
-    WINNER_NOT_ANNOUNCED("EV403", HttpStatus.BAD_REQUEST, "아직 당첨자가 발표되지 않았습니다")
+    WINNER_NOT_ANNOUNCED("EV403", HttpStatus.BAD_REQUEST, "아직 당첨자가 발표되지 않았습니다"),
+    WINNER_ANNOUNCEMENT_NOT_FOUND("EV404", HttpStatus.NOT_FOUND, "이벤트 당첨자 발표 공지를 찾을 수 없습니다")
 }

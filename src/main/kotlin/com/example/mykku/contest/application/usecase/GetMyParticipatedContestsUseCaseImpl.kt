@@ -10,6 +10,8 @@ import com.example.mykku.contest.application.port.output.ContestTagRepository
 import com.example.mykku.contest.application.port.output.ContestWinnerRepository
 import com.example.mykku.contest.domain.entity.Contest
 import com.example.mykku.contest.domain.entity.ContestWinner
+import com.example.mykku.contest.domain.vo.ContestStatusType
+import com.example.mykku.contest.domain.vo.ContestWinnerStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -67,8 +69,16 @@ class GetMyParticipatedContestsUseCaseImpl(
             status = contest.status,
             thumbnailUrl = contest.thumbnailUrl,
             tags = tags.map { it.title },
-            isWinner = winner != null,
+            winnerStatus = resolveWinnerStatus(contest, winner),
             winnerRank = winner?.winnerRank
         )
+    }
+
+    private fun resolveWinnerStatus(contest: Contest, winner: ContestWinner?): ContestWinnerStatus {
+        return when {
+            winner != null -> ContestWinnerStatus.WON
+            contest.status != ContestStatusType.WINNER_SELECTED -> ContestWinnerStatus.PENDING
+            else -> ContestWinnerStatus.LOST
+        }
     }
 }

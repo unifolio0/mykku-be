@@ -45,17 +45,23 @@ data class CommentResult(
     val id: Long,
     val content: String,
     val likeCount: Int,
+    val isLiked: Boolean,
     val memberName: String?,
     val profileImage: String?,
     val createdAt: LocalDateTime,
     val replies: List<ReplyResult>
 ) {
     companion object {
-        fun from(comment: DailyMessageComment, replies: List<ReplyResult> = emptyList()): CommentResult {
+        fun from(
+            comment: DailyMessageComment,
+            isLiked: Boolean = false,
+            replies: List<ReplyResult> = emptyList()
+        ): CommentResult {
             return CommentResult(
                 id = comment.id.value,
                 content = comment.content,
                 likeCount = comment.likeCount,
+                isLiked = isLiked,
                 memberName = comment.memberNickname,
                 profileImage = comment.memberProfileImage,
                 createdAt = comment.createdAt,
@@ -69,16 +75,18 @@ data class ReplyResult(
     val id: Long,
     val content: String,
     val likeCount: Int,
+    val isLiked: Boolean,
     val memberName: String?,
     val profileImage: String?,
     val createdAt: LocalDateTime
 ) {
     companion object {
-        fun from(reply: DailyMessageComment): ReplyResult {
+        fun from(reply: DailyMessageComment, isLiked: Boolean = false): ReplyResult {
             return ReplyResult(
                 id = reply.id.value,
                 content = reply.content,
                 likeCount = reply.likeCount,
+                isLiked = isLiked,
                 memberName = reply.memberNickname,
                 profileImage = reply.memberProfileImage,
                 createdAt = reply.createdAt

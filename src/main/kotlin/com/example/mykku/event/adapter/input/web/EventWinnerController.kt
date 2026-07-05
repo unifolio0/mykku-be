@@ -5,6 +5,7 @@ import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.common.util.PageableValidator
 import com.example.mykku.event.application.dto.GetMyAwardEventsQuery
 import com.example.mykku.event.application.dto.GetMyEventWinnerStatusQuery
+import com.example.mykku.event.application.port.input.GetEventWinnerAnnouncementUseCase
 import com.example.mykku.event.application.port.input.GetEventWinnersUseCase
 import com.example.mykku.event.application.port.input.GetMyAwardEventsUseCase
 import com.example.mykku.event.application.port.input.GetMyEventWinnerStatusUseCase
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v1/events")
 class EventWinnerController(
     private val getEventWinnersUseCase: GetEventWinnersUseCase,
+    private val getEventWinnerAnnouncementUseCase: GetEventWinnerAnnouncementUseCase,
     private val getMyEventWinnerStatusUseCase: GetMyEventWinnerStatusUseCase,
     private val getMyAwardEventsUseCase: GetMyAwardEventsUseCase
 ) {
@@ -50,6 +52,19 @@ class EventWinnerController(
             ApiResponse(
                 message = "이벤트 당첨자 목록을 성공적으로 조회했습니다.",
                 data = EventWinnersResponse.from(result)
+            )
+        )
+    }
+
+    @GetMapping("/{eventId}/winner-announcement")
+    fun getEventWinnerAnnouncement(
+        @PathVariable eventId: Long
+    ): ResponseEntity<ApiResponse<EventWinnerAnnouncementResponse>> {
+        val result = getEventWinnerAnnouncementUseCase.execute(eventId)
+        return ResponseEntity.ok(
+            ApiResponse(
+                message = "당첨자 발표 공지를 성공적으로 조회했습니다.",
+                data = EventWinnerAnnouncementResponse.from(result)
             )
         )
     }

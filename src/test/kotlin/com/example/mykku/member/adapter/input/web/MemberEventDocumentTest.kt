@@ -6,6 +6,7 @@ import com.example.mykku.docs.Tag
 import com.example.mykku.event.application.dto.MyParticipatedEventResult
 import com.example.mykku.event.application.dto.PagedMyParticipatedEventsResult
 import com.example.mykku.event.domain.vo.EventStatusType
+import com.example.mykku.event.domain.vo.EventWinnerStatus
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -44,16 +45,16 @@ class MemberEventDocumentTest : BaseDocumentTest() {
                     expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
                     status = EventStatusType.WINNER_SELECTED,
                     thumbnailUrl = "https://example.com/thumbnail1.jpg",
-                    isWinner = true
+                    winnerStatus = EventWinnerStatus.WON
                 ),
                 MyParticipatedEventResult(
                     id = 2L,
                     title = "두 번째 이벤트",
                     startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                     expiredAt = LocalDateTime.of(2025, 11, 30, 23, 59, 59),
-                    status = EventStatusType.EXPIRED,
+                    status = EventStatusType.ACTIVE,
                     thumbnailUrl = "https://example.com/thumbnail2.jpg",
-                    isWinner = false
+                    winnerStatus = EventWinnerStatus.PENDING
                 )
             )
 
@@ -83,7 +84,8 @@ class MemberEventDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.content[].status").type(JsonFieldType.STRING).description("이벤트 상태"),
                             fieldWithPath("data.content[].thumbnailUrl").type(JsonFieldType.STRING)
                                 .description("썸네일 이미지 URL").optional(),
-                            fieldWithPath("data.content[].isWinner").type(JsonFieldType.BOOLEAN).description("당첨 여부"),
+                            fieldWithPath("data.content[].winnerStatus").type(JsonFieldType.STRING)
+                                .description("당첨 상태 (WON: 당첨, LOST: 낙첨, PENDING: 발표 전)"),
                             fieldWithPath("data.page").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
                             fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
                             fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 요소 수"),

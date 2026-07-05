@@ -40,7 +40,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           submodules: 'recursive'
           token: ${{ secrets.GH_PAT }}
@@ -54,7 +54,7 @@ jobs:
           echo '${{ secrets.FIREBASE_KEY_JSON }}' | base64 -d > ./src/main/resources/firebase/service-account-key-dev.json
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@1bcf9fb12cf4aa7d266a90ae39939e61372fe520 # v5.4.0
         with:
           distribution: 'temurin'
           java-version: '21'
@@ -75,21 +75,25 @@ jobs:
           fi
           cp "$JAR_FILE" ./app.jar
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@96fe6ef7f33517b61c61be40b68a1882f3264fb8 # v4.2.0
+
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
           context: .
           file: ./Dockerfile
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: |
             ${{ env.DOCKER_IMAGE }}:${{ env.IMAGE_TAG }}
             ${{ env.DOCKER_IMAGE }}:latest
@@ -97,28 +101,28 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Upload deploy scripts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: deploy-scripts
           path: ./scripts/dev/
           if-no-files-found: error
 
       - name: Upload docker-compose file
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: docker-compose
           path: ./docker-compose.dev.yml
           if-no-files-found: error
 
       - name: Upload nginx config
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: nginx-config
           path: ./nginx/
           if-no-files-found: error
 
       - name: Upload monitoring config
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: monitoring-config
           path: ./monitoring/
@@ -130,25 +134,25 @@ jobs:
 
     steps:
       - name: Download deploy scripts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         with:
           name: deploy-scripts
           path: ~/app/scripts
 
       - name: Download docker-compose file
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         with:
           name: docker-compose
           path: ~/app
 
       - name: Download nginx config
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         with:
           name: nginx-config
           path: ~/app/nginx
 
       - name: Download monitoring config
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         with:
           name: monitoring-config
           path: ~/app/monitoring
@@ -158,8 +162,12 @@ jobs:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           IMAGE_TAG: ${{ github.sha }}
           LETSENCRYPT_EMAIL: ${{ secrets.LETSENCRYPT_EMAIL }}
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
         run: |
-          export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
-          export IMAGE_TAG=${{ github.sha }}
-          export LETSENCRYPT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }}
+          export DOCKER_USERNAME="$DOCKER_USERNAME"
+          export IMAGE_TAG="$IMAGE_TAG"
+          export LETSENCRYPT_EMAIL="$LETSENCRYPT_EMAIL"
+          export MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD"
+          export MYSQL_DATABASE="$MYSQL_DATABASE"
           sudo -E sh ~/app/scripts/replace-new-version.sh

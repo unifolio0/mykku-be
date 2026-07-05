@@ -1,6 +1,8 @@
 package com.example.mykku.event.application.dto
 
 import com.example.mykku.event.domain.vo.EventStatusType
+import com.example.mykku.event.domain.vo.EventWinnerStatus
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class CreateEventResult(
@@ -63,7 +65,7 @@ data class MyParticipatedEventResult(
     val expiredAt: LocalDateTime,
     val status: EventStatusType,
     val thumbnailUrl: String,
-    val isWinner: Boolean
+    val winnerStatus: EventWinnerStatus
 )
 
 data class PagedMyParticipatedEventsResult(
@@ -103,6 +105,14 @@ data class EventWinnerResult(
 data class MyEventWinnerStatusResult(
     val isWinner: Boolean,
     val winnerId: Long?
+)
+
+data class EventWinnerAnnouncementResult(
+    val eventId: Long,
+    val eventTitle: String,
+    val title: String,
+    val content: String,
+    val announcedAt: LocalDate
 )
 
 data class MyAwardEventResult(
