@@ -56,7 +56,7 @@ spring:
       host: ${secret.redis.host}
       port: ${secret.redis.port}
       ssl:
-        enabled: true
+        enabled: ${secret.redis.ssl-enabled:false}
 
 jwt:
   secret: ${secret.jwt.secret_key}

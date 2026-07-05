@@ -7,6 +7,8 @@ COMPOSE_FILE="$APP_DIR/docker-compose.dev.yml"
 DOCKER_USERNAME="${DOCKER_USERNAME:-}"
 IMAGE_TAG="${IMAGE_TAG:-latest}"
 LETSENCRYPT_EMAIL="${LETSENCRYPT_EMAIL:-admin@mykku.kr}"
+MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD:-}"
+MYSQL_DATABASE="${MYSQL_DATABASE:-mykku}"
 
 echo "=== MyKKU Docker Deployment ==="
 echo "Image: ${DOCKER_USERNAME}/mykku-be:${IMAGE_TAG}"
@@ -14,6 +16,11 @@ echo "Compose file: ${COMPOSE_FILE}"
 
 if [ -z "$DOCKER_USERNAME" ]; then
     echo "Error: DOCKER_USERNAME is not set"
+    exit 1
+fi
+
+if [ -z "$MYSQL_ROOT_PASSWORD" ]; then
+    echo "Error: MYSQL_ROOT_PASSWORD is not set"
     exit 1
 fi
 
@@ -25,6 +32,8 @@ fi
 export DOCKER_USERNAME
 export IMAGE_TAG
 export LETSENCRYPT_EMAIL
+export MYSQL_ROOT_PASSWORD
+export MYSQL_DATABASE
 
 echo "Pulling new app image..."
 docker pull "${DOCKER_USERNAME}/mykku-be:${IMAGE_TAG}"
