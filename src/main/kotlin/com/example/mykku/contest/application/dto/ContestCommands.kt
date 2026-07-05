@@ -3,6 +3,7 @@ package com.example.mykku.contest.application.dto
 import com.example.mykku.contest.domain.vo.ContestSortType
 import com.example.mykku.contest.domain.vo.ContestStatusType
 import org.springframework.data.domain.Pageable
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class CreateContestCommand(
@@ -62,4 +63,11 @@ data class GetMyAwardFeedsQuery(
 
 data class GetMyAwardsPreviewQuery(
     val memberId: Long
+)
+
+data class UpsertContestWinnerAnnouncementCommand(
+    val contestId: Long,
+    val title: String,
+    val content: String,
+    val announcedAt: LocalDate
 )

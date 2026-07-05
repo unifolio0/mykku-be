@@ -1,6 +1,7 @@
 package com.example.mykku.contest.adapter.input.web
 
 import com.example.mykku.BaseDocumentTest
+import com.example.mykku.contest.application.dto.ContestWinnerAnnouncementResult
 import com.example.mykku.contest.application.dto.ContestWinnerDetailResult
 import com.example.mykku.contest.application.dto.ContestWinnerPreviewResult
 import com.example.mykku.contest.application.dto.ContestWinnersListResult
@@ -18,6 +19,7 @@ import com.example.mykku.feed.application.dto.FeedResult
 import com.example.mykku.feed.application.dto.PagedFeedsResult
 import com.example.mykku.feed.application.dto.TagResult
 import com.example.mykku.role.application.dto.RoleResult
+import java.time.LocalDate
 import java.time.LocalDateTime
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
@@ -225,6 +227,77 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                 .contentType(ContentType.JSON)
                 .`when`()
                 .get("/api/v1/contests/{contestId}/winners", contestId)
+                .then()
+                .statusCode(404)
+        }
+    }
+
+    @Nested
+    @DisplayName("수상자 발표 공지 조회")
+    inner class GetContestWinnerAnnouncement {
+
+        private val apiConfig = ApiRequestConfig(
+            tag = Tag.CONTEST_WINNER_API,
+            summary = "수상자 발표 공지 조회",
+            description = "특정 콘테스트의 수상자 발표 공지글(제목/본문/발표일)을 조회합니다.",
+            pathParameters = listOf(
+                parameterWithName("contestId").description("콘테스트 ID")
+            )
+        )
+
+        @Test
+        fun `성공`() {
+            val contestId = 1L
+            val result = ContestWinnerAnnouncementResult(
+                contestId = contestId,
+                contestTitle = "봄맞이 콘테스트",
+                title = "[봄맞이 콘테스트] 수상자 발표",
+                content = "참여해 주신 모든 분들께 감사드립니다.\n대상: OOO\n최우수상: OOO",
+                announcedAt = LocalDate.of(2025, 10, 10)
+            )
+
+            `when`(getContestWinnerAnnouncementUseCase.execute(contestId)).thenReturn(result)
+
+            val documentFilter = document("contest-winner/announcement", 200)
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
+                            fieldWithPath("data.contestId").type(JsonFieldType.NUMBER).description("콘테스트 ID"),
+                            fieldWithPath("data.contestTitle").type(JsonFieldType.STRING).description("콘테스트 제목"),
+                            fieldWithPath("data.title").type(JsonFieldType.STRING).description("공지 제목"),
+                            fieldWithPath("data.content").type(JsonFieldType.STRING).description("공지 본문"),
+                            fieldWithPath("data.announcedAt").type(JsonFieldType.STRING).description("발표일 (yyyy-MM-dd)")
+                        )
+                )
+                .build()
+
+            given(documentFilter)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .get("/api/v1/contests/{contestId}/winner-announcement", contestId)
+                .then()
+                .statusCode(200)
+        }
+
+        @Test
+        fun `공지 없음`() {
+            val contestId = 999L
+
+            `when`(getContestWinnerAnnouncementUseCase.execute(contestId))
+                .thenThrow(ContestException(ContestErrorCode.WINNER_ANNOUNCEMENT_NOT_FOUND))
+
+            val documentFilter = document("contest-winner/announcement", "WINNER_ANNOUNCEMENT_NOT_FOUND")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .get("/api/v1/contests/{contestId}/winner-announcement", contestId)
                 .then()
                 .statusCode(404)
         }

@@ -5,11 +5,13 @@ import com.example.mykku.event.application.dto.EventDetailResult
 import com.example.mykku.event.application.dto.EventImageResult
 import com.example.mykku.event.application.dto.EventListResult
 import com.example.mykku.event.application.dto.EventPreviewResult
+import com.example.mykku.event.application.dto.EventWinnerAnnouncementResult
 import com.example.mykku.event.application.dto.MyParticipatedEventResult
 import com.example.mykku.event.application.dto.PagedEventsResult
 import com.example.mykku.event.application.dto.PagedMyParticipatedEventsResult
 import com.example.mykku.event.domain.vo.EventStatusType
 import com.example.mykku.event.domain.vo.EventWinnerStatus
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class CreateEventResponse(
@@ -183,6 +185,26 @@ data class PagedMyParticipatedEventsResponse(
                 totalElements = result.totalElements,
                 totalPages = result.totalPages,
                 isLast = result.isLast
+            )
+        }
+    }
+}
+
+data class EventWinnerAnnouncementResponse(
+    val eventId: Long,
+    val eventTitle: String,
+    val title: String,
+    val content: String,
+    val announcedAt: LocalDate
+) {
+    companion object {
+        fun from(result: EventWinnerAnnouncementResult): EventWinnerAnnouncementResponse {
+            return EventWinnerAnnouncementResponse(
+                eventId = result.eventId,
+                eventTitle = result.eventTitle,
+                title = result.title,
+                content = result.content,
+                announcedAt = result.announcedAt
             )
         }
     }

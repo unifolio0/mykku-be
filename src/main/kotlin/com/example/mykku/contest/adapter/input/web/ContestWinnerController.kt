@@ -7,6 +7,7 @@ import com.example.mykku.contest.application.dto.GetMyAwardFeedsQuery
 import com.example.mykku.contest.application.dto.GetMyAwardsPreviewQuery
 import com.example.mykku.contest.application.dto.GetMyAwardsQuery
 import com.example.mykku.contest.application.dto.GetMyWinnerStatusQuery
+import com.example.mykku.contest.application.port.input.GetContestWinnerAnnouncementUseCase
 import com.example.mykku.contest.application.port.input.GetContestWinnerDetailUseCase
 import com.example.mykku.contest.application.port.input.GetContestWinnersListUseCase
 import com.example.mykku.contest.application.port.input.GetMyAwardContestsUseCase
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController
 class ContestWinnerController(
     private val getContestWinnersListUseCase: GetContestWinnersListUseCase,
     private val getContestWinnerDetailUseCase: GetContestWinnerDetailUseCase,
+    private val getContestWinnerAnnouncementUseCase: GetContestWinnerAnnouncementUseCase,
     private val updateAcceptanceSpeechUseCase: UpdateAcceptanceSpeechUseCase,
     private val getMyWinnerStatusUseCase: GetMyWinnerStatusUseCase,
     private val getMyAwardContestsUseCase: GetMyAwardContestsUseCase,
@@ -58,6 +60,19 @@ class ContestWinnerController(
             ApiResponse(
                 message = "수상작 상세 정보를 성공적으로 조회했습니다.",
                 data = ContestWinnerDetailResponse.from(result)
+            )
+        )
+    }
+
+    @GetMapping("/{contestId}/winner-announcement")
+    fun getContestWinnerAnnouncement(
+        @PathVariable contestId: Long
+    ): ResponseEntity<ApiResponse<ContestWinnerAnnouncementResponse>> {
+        val result = getContestWinnerAnnouncementUseCase.execute(contestId)
+        return ResponseEntity.ok(
+            ApiResponse(
+                message = "수상자 발표 공지를 성공적으로 조회했습니다.",
+                data = ContestWinnerAnnouncementResponse.from(result)
             )
         )
     }

@@ -4,6 +4,7 @@ import com.example.mykku.contest.application.dto.ContestDetailResult
 import com.example.mykku.contest.application.dto.ContestImageResult
 import com.example.mykku.contest.application.dto.ContestListResult
 import com.example.mykku.contest.application.dto.ContestPreviewResult
+import com.example.mykku.contest.application.dto.ContestWinnerAnnouncementResult
 import com.example.mykku.contest.application.dto.ContestWinnerDetailResult
 import com.example.mykku.contest.application.dto.ContestWinnerPreviewResult
 import com.example.mykku.contest.application.dto.ContestWinnersListResult
@@ -20,6 +21,7 @@ import com.example.mykku.contest.application.dto.WinnerInfoResult
 import com.example.mykku.contest.application.dto.WinnerThumbnailResult
 import com.example.mykku.contest.domain.vo.ContestStatusType
 import com.example.mykku.contest.domain.vo.ContestWinnerStatus
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class CreateContestResponse(
@@ -375,6 +377,26 @@ data class MyAwardPreviewResponse(
             return MyAwardPreviewResponse(
                 contestId = result.contestId,
                 thumbnailUrl = result.thumbnailUrl
+            )
+        }
+    }
+}
+
+data class ContestWinnerAnnouncementResponse(
+    val contestId: Long,
+    val contestTitle: String,
+    val title: String,
+    val content: String,
+    val announcedAt: LocalDate
+) {
+    companion object {
+        fun from(result: ContestWinnerAnnouncementResult): ContestWinnerAnnouncementResponse {
+            return ContestWinnerAnnouncementResponse(
+                contestId = result.contestId,
+                contestTitle = result.contestTitle,
+                title = result.title,
+                content = result.content,
+                announcedAt = result.announcedAt
             )
         }
     }

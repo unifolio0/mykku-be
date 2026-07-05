@@ -3,9 +3,11 @@ package com.example.mykku.event.adapter.input.web
 import com.example.mykku.BaseControllerTest
 import com.example.mykku.event.adapter.output.persistence.entity.EventJpaEntity
 import com.example.mykku.event.adapter.output.persistence.entity.EventParticipationJpaEntity
+import com.example.mykku.event.adapter.output.persistence.entity.EventWinnerAnnouncementJpaEntity
 import com.example.mykku.event.adapter.output.persistence.entity.EventWinnerJpaEntity
 import com.example.mykku.event.adapter.output.persistence.repository.EventJpaRepository
 import com.example.mykku.event.adapter.output.persistence.repository.EventParticipationJpaRepository
+import com.example.mykku.event.adapter.output.persistence.repository.EventWinnerAnnouncementJpaRepository
 import com.example.mykku.event.adapter.output.persistence.repository.EventWinnerJpaRepository
 import com.example.mykku.event.domain.vo.EventStatusType
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
@@ -16,6 +18,7 @@ import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @DisplayName("EventWinnerController 통합 테스트")
@@ -29,6 +32,9 @@ class EventWinnerControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var eventWinnerJpaRepository: EventWinnerJpaRepository
+
+    @Autowired
+    private lateinit var eventWinnerAnnouncementJpaRepository: EventWinnerAnnouncementJpaRepository
 
     @Test
     @DisplayName("이벤트 당첨자 목록 조회 - 정상 케이스")
@@ -160,6 +166,43 @@ class EventWinnerControllerTest : BaseControllerTest() {
             .get("/api/v1/events/my-awards")
             .then()
             .statusCode(401)
+    }
+
+    @Test
+    @DisplayName("당첨자 발표 공지 조회 - 정상 케이스")
+    fun `getEventWinnerAnnouncement - 저장된 공지를 조회한다`() {
+        val event = createAndSaveEvent(status = EventStatusType.WINNER_SELECTED)
+        eventWinnerAnnouncementJpaRepository.save(
+            EventWinnerAnnouncementJpaEntity(
+                event = event,
+                title = "[봄맞이 이벤트] 수상자 발표",
+                content = "감사합니다.\n대상: OOO",
+                announcedAt = LocalDate.of(2025, 10, 10)
+            )
+        )
+
+        RestAssured.given()
+            .`when`()
+            .get("/api/v1/events/{eventId}/winner-announcement", event.id)
+            .then()
+            .statusCode(200)
+            .body("message", equalTo("당첨자 발표 공지를 성공적으로 조회했습니다."))
+            .body("data.eventId", equalTo(event.id!!.toInt()))
+            .body("data.title", equalTo("[봄맞이 이벤트] 수상자 발표"))
+            .body("data.content", equalTo("감사합니다.\n대상: OOO"))
+            .body("data.announcedAt", equalTo("2025-10-10"))
+    }
+
+    @Test
+    @DisplayName("당첨자 발표 공지 조회 - 공지 미작성 시 404")
+    fun `getEventWinnerAnnouncement - 공지가 없으면 404를 반환한다`() {
+        val event = createAndSaveEvent(status = EventStatusType.WINNER_SELECTED)
+
+        RestAssured.given()
+            .`when`()
+            .get("/api/v1/events/{eventId}/winner-announcement", event.id)
+            .then()
+            .statusCode(404)
     }
 
     private fun createAndSaveEvent(

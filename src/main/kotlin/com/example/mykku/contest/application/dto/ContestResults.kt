@@ -2,6 +2,7 @@ package com.example.mykku.contest.application.dto
 
 import com.example.mykku.contest.domain.vo.ContestStatusType
 import com.example.mykku.contest.domain.vo.ContestWinnerStatus
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class CreateContestResult(
@@ -120,6 +121,14 @@ data class MyWinnerStatusResult(
     val isWinner: Boolean,
     val winnerId: Long?,
     val winnerRank: Int?
+)
+
+data class ContestWinnerAnnouncementResult(
+    val contestId: Long,
+    val contestTitle: String,
+    val title: String,
+    val content: String,
+    val announcedAt: LocalDate
 )
 
 data class MyAwardContestResult(

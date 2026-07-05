@@ -21,5 +21,7 @@ class EventException(
         fun emptyWinners(): EventException = EventException(EventErrorCode.EMPTY_WINNERS)
         fun duplicateWinner(): EventException = EventException(EventErrorCode.DUPLICATE_WINNER)
         fun winnerNotAnnounced(): EventException = EventException(EventErrorCode.WINNER_NOT_ANNOUNCED)
+        fun winnerAnnouncementNotFound(): EventException =
+            EventException(EventErrorCode.WINNER_ANNOUNCEMENT_NOT_FOUND)
     }
 }

@@ -3,11 +3,14 @@ package com.example.mykku.contest.adapter.input.web
 import com.example.mykku.BaseControllerTest
 import com.example.mykku.contest.adapter.output.persistence.entity.ContestJpaEntity
 import com.example.mykku.contest.adapter.output.persistence.entity.ContestParticipationJpaEntity
+import com.example.mykku.contest.adapter.output.persistence.entity.ContestWinnerAnnouncementJpaEntity
 import com.example.mykku.contest.adapter.output.persistence.entity.ContestWinnerJpaEntity
 import com.example.mykku.contest.adapter.output.persistence.repository.ContestJpaRepository
 import com.example.mykku.contest.adapter.output.persistence.repository.ContestParticipationJpaRepository
+import com.example.mykku.contest.adapter.output.persistence.repository.ContestWinnerAnnouncementJpaRepository
 import com.example.mykku.contest.adapter.output.persistence.repository.ContestWinnerJpaRepository
 import com.example.mykku.contest.domain.vo.ContestStatusType
+import java.time.LocalDate
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
 import com.example.mykku.feed.adapter.output.persistence.FeedJpaRepository
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
@@ -35,6 +38,9 @@ class ContestWinnerControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var feedJpaRepository: FeedJpaRepository
+
+    @Autowired
+    private lateinit var contestWinnerAnnouncementJpaRepository: ContestWinnerAnnouncementJpaRepository
 
     @Test
     @DisplayName("수상작 목록 조회 - 정상 케이스")
@@ -273,6 +279,43 @@ class ContestWinnerControllerTest : BaseControllerTest() {
             .then()
             .statusCode(200)
             .body("data.size()", equalTo(0))
+    }
+
+    @Test
+    @DisplayName("수상자 발표 공지 조회 - 정상 케이스")
+    fun `getContestWinnerAnnouncement - 저장된 공지를 조회한다`() {
+        val contest = createAndSaveContest(status = ContestStatusType.WINNER_SELECTED)
+        contestWinnerAnnouncementJpaRepository.save(
+            ContestWinnerAnnouncementJpaEntity(
+                contest = contest,
+                title = "[봄맞이 콘테스트] 수상자 발표",
+                content = "감사합니다.\n대상: OOO",
+                announcedAt = LocalDate.of(2025, 10, 10)
+            )
+        )
+
+        RestAssured.given()
+            .`when`()
+            .get("/api/v1/contests/{contestId}/winner-announcement", contest.id)
+            .then()
+            .statusCode(200)
+            .body("message", equalTo("수상자 발표 공지를 성공적으로 조회했습니다."))
+            .body("data.contestId", equalTo(contest.id!!.toInt()))
+            .body("data.title", equalTo("[봄맞이 콘테스트] 수상자 발표"))
+            .body("data.content", equalTo("감사합니다.\n대상: OOO"))
+            .body("data.announcedAt", equalTo("2025-10-10"))
+    }
+
+    @Test
+    @DisplayName("수상자 발표 공지 조회 - 공지 미작성 시 404")
+    fun `getContestWinnerAnnouncement - 공지가 없으면 404를 반환한다`() {
+        val contest = createAndSaveContest(status = ContestStatusType.WINNER_SELECTED)
+
+        RestAssured.given()
+            .`when`()
+            .get("/api/v1/contests/{contestId}/winner-announcement", contest.id)
+            .then()
+            .statusCode(404)
     }
 
     private fun createAndSaveContest(

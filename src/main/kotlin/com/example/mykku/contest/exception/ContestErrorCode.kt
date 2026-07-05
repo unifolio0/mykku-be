@@ -14,6 +14,7 @@ enum class ContestErrorCode(
     CONTEST_NOT_FOUND("CN001", HttpStatus.NOT_FOUND, "콘테스트를 찾을 수 없습니다"),
     CONTEST_WINNER_NOT_FOUND("CN002", HttpStatus.NOT_FOUND, "콘테스트 수상자를 찾을 수 없습니다"),
     PARTICIPATION_NOT_FOUND("CN003", HttpStatus.NOT_FOUND, "콘테스트 참여 정보를 찾을 수 없습니다"),
+    WINNER_ANNOUNCEMENT_NOT_FOUND("CN004", HttpStatus.NOT_FOUND, "콘테스트 수상자 발표 공지를 찾을 수 없습니다"),
 
     CONTEST_IMAGE_LIMIT_EXCEEDED("CN101", HttpStatus.BAD_REQUEST, "콘테스트 이미지는 ${Contest.IMAGE_MAX_COUNT}개 이하여야 합니다"),
     CONTEST_TAG_LIMIT_EXCEEDED("CN102", HttpStatus.BAD_REQUEST, "콘테스트 태그는 ${Contest.TAG_MAX_COUNT}개 이하여야 합니다"),

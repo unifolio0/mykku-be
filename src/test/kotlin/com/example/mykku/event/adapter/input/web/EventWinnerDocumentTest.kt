@@ -4,6 +4,7 @@ import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
 import com.example.mykku.docs.Tag
+import com.example.mykku.event.application.dto.EventWinnerAnnouncementResult
 import com.example.mykku.event.application.dto.EventWinnerResult
 import com.example.mykku.event.application.dto.EventWinnersResult
 import com.example.mykku.event.application.dto.MyAwardEventResult
@@ -20,6 +21,7 @@ import org.mockito.kotlin.any
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 class EventWinnerDocumentTest : BaseDocumentTest() {
@@ -106,6 +108,77 @@ class EventWinnerDocumentTest : BaseDocumentTest() {
                 .contentType(ContentType.JSON)
                 .`when`()
                 .get("/api/v1/events/{eventId}/winners", eventId)
+                .then()
+                .statusCode(404)
+        }
+    }
+
+    @Nested
+    @DisplayName("당첨자 발표 공지 조회")
+    inner class GetEventWinnerAnnouncement {
+
+        private val apiConfig = ApiRequestConfig(
+            tag = Tag.EVENT_WINNER_API,
+            summary = "당첨자 발표 공지 조회",
+            description = "특정 이벤트의 당첨자 발표 공지글(제목/본문/발표일)을 조회합니다.",
+            pathParameters = listOf(
+                parameterWithName("eventId").description("이벤트 ID")
+            )
+        )
+
+        @Test
+        fun `성공`() {
+            val eventId = 1L
+            val result = EventWinnerAnnouncementResult(
+                eventId = eventId,
+                eventTitle = "봄맞이 이벤트",
+                title = "[봄맞이 이벤트] 수상자 발표",
+                content = "참여해 주신 모든 분들께 감사드립니다.\n대상: OOO",
+                announcedAt = LocalDate.of(2025, 10, 10)
+            )
+
+            `when`(getEventWinnerAnnouncementUseCase.execute(eventId)).thenReturn(result)
+
+            val documentFilter = document("event-winner/announcement", 200)
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
+                            fieldWithPath("data.eventId").type(JsonFieldType.NUMBER).description("이벤트 ID"),
+                            fieldWithPath("data.eventTitle").type(JsonFieldType.STRING).description("이벤트 제목"),
+                            fieldWithPath("data.title").type(JsonFieldType.STRING).description("공지 제목"),
+                            fieldWithPath("data.content").type(JsonFieldType.STRING).description("공지 본문"),
+                            fieldWithPath("data.announcedAt").type(JsonFieldType.STRING).description("발표일 (yyyy-MM-dd)")
+                        )
+                )
+                .build()
+
+            given(documentFilter)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .get("/api/v1/events/{eventId}/winner-announcement", eventId)
+                .then()
+                .statusCode(200)
+        }
+
+        @Test
+        fun `공지 없음`() {
+            val eventId = 999L
+
+            `when`(getEventWinnerAnnouncementUseCase.execute(eventId))
+                .thenThrow(EventException(EventErrorCode.WINNER_ANNOUNCEMENT_NOT_FOUND))
+
+            val documentFilter = document("event-winner/announcement", "WINNER_ANNOUNCEMENT_NOT_FOUND")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .get("/api/v1/events/{eventId}/winner-announcement", eventId)
                 .then()
                 .statusCode(404)
         }
