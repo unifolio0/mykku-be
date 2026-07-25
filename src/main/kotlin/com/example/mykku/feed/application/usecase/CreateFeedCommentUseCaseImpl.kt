@@ -23,27 +23,28 @@ class CreateFeedCommentUseCaseImpl(
     override fun execute(command: CreateFeedCommentCommand, member: Member): SingleFeedCommentResult {
         val feed = feedRepository.findByIdOrThrow(FeedId.of(command.feedId))
 
-        val parentCommentId = command.parentCommentId?.let { FeedCommentId.of(it) }
-
         val comment = FeedComment.create(
             content = command.content,
             feedId = feed.id!!,
             memberId = member.id.value,
-            parentCommentId = parentCommentId
+            parentCommentId = command.parentCommentId?.let { FeedCommentId.of(it) }
         )
-
         val savedComment = feedCommentRepository.save(comment, feed.id!!, member.id.value)
 
+        return toSingleResult(savedComment, member)
+    }
+
+    private fun toSingleResult(comment: FeedComment, member: Member): SingleFeedCommentResult {
         return SingleFeedCommentResult(
-            id = savedComment.id!!.value,
-            content = savedComment.content,
+            id = comment.id!!.value,
+            content = comment.content,
             author = CommentAuthorResult(
                 memberId = member.memberId,
                 nickname = member.nickname,
                 profileImage = member.profileImage
             ),
-            likeCount = savedComment.likeCount,
-            createdAt = savedComment.createdAt
+            likeCount = comment.likeCount,
+            createdAt = comment.createdAt
         )
     }
 }

@@ -61,29 +61,27 @@ class BaseExceptionHandler {
     fun handleLockConflictException(exception: Exception): ResponseEntity<ErrorResponse> {
         ExceptionLoggingSupport.logException(logger, exception)
 
-        return ResponseEntity
-            .status(CommonErrorCode.RESOURCE_LOCK_CONFLICT.status)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(ErrorResponse(CommonErrorCode.RESOURCE_LOCK_CONFLICT.code, CommonErrorCode.RESOURCE_LOCK_CONFLICT.message))
+        return errorResponseOf(CommonErrorCode.RESOURCE_LOCK_CONFLICT)
     }
 
     @ExceptionHandler(RedisException::class)
     fun handleRedisException(exception: RedisException): ResponseEntity<ErrorResponse> {
         ExceptionLoggingSupport.logException(logger, exception)
 
-        return ResponseEntity
-            .status(CommonErrorCode.REDIS_CONNECTION_FAILURE.status)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(ErrorResponse(CommonErrorCode.REDIS_CONNECTION_FAILURE.code, CommonErrorCode.REDIS_CONNECTION_FAILURE.message))
+        return errorResponseOf(CommonErrorCode.REDIS_CONNECTION_FAILURE)
     }
 
     @ExceptionHandler(Exception::class)
     fun handleException(exception: Exception): ResponseEntity<ErrorResponse> {
         ExceptionLoggingSupport.logException(logger, exception)
 
+        return errorResponseOf(CommonErrorCode.INTERNAL_SERVER_ERROR)
+    }
+
+    private fun errorResponseOf(errorCode: CommonErrorCode): ResponseEntity<ErrorResponse> {
         return ResponseEntity
-            .status(CommonErrorCode.INTERNAL_SERVER_ERROR.status)
+            .status(errorCode.status)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(ErrorResponse(CommonErrorCode.INTERNAL_SERVER_ERROR.code, CommonErrorCode.INTERNAL_SERVER_ERROR.message))
+            .body(ErrorResponse(errorCode.code, errorCode.message))
     }
 }

@@ -232,16 +232,17 @@ class RoleControllerTest : BaseControllerTest() {
     }
 
     @Test
-    @DisplayName("같은 칭호를 동시에 획득해도 500 없이 한 행만 생성된다")
+    @DisplayName("같은 칭호를 동시에 획득해도 정확히 한 요청만 신규 획득으로 응답한다")
     fun `acquireRole - 동일 칭호 동시 요청은 중복 없이 처리된다`() {
         // given
         val member = createAndSaveMember(nickname = "테스터", role = null)
 
         // when
-        val statuses = acquireConcurrently(member.id, List(8) { role1.id!! })
+        val responses = acquireConcurrently(member.id, List(8) { role1.id!! })
 
         // then
-        assertThat(statuses).containsOnly(200)
+        assertThat(responses).allMatch { it.status == 200 }
+        assertThat(responses.count { it.acquired }).isEqualTo(1)
         assertThat(memberRoleJpaRepository.findByMemberId(member.id)).hasSize(1)
         assertThat(memberJpaRepository.findById(member.id).get().role?.id).isEqualTo(role1.id)
     }
@@ -256,38 +257,49 @@ class RoleControllerTest : BaseControllerTest() {
         val targets = listOf(role1.id!!, role2.id!!, role3.id!!, role4.id!!)
 
         // when
-        val statuses = acquireConcurrently(member.id, targets + targets)
+        val responses = acquireConcurrently(member.id, targets + targets)
 
         // then
-        assertThat(statuses).containsOnly(200)
+        assertThat(responses).allMatch { it.status == 200 }
+        assertThat(responses.count { it.acquired }).isEqualTo(targets.size)
+        assertThat(responses.count { it.isRepresentative }).isEqualTo(1)
         assertThat(memberRoleJpaRepository.findByMemberId(member.id)).hasSize(4)
         assertThat(memberJpaRepository.findById(member.id).get().role?.id).isIn(targets)
     }
 
-    private fun acquireConcurrently(memberPk: Long, roleIds: List<Long>): List<Int> {
+    private data class AcquireOutcome(val status: Int, val acquired: Boolean, val isRepresentative: Boolean)
+
+    private fun acquireConcurrently(memberPk: Long, roleIds: List<Long>): List<AcquireOutcome> {
         val executor = Executors.newFixedThreadPool(roleIds.size)
         val start = CountDownLatch(1)
         try {
             val futures = roleIds.map { roleId ->
-                executor.submit<Int> {
-                    start.await()
-                    RestAssured
-                        .given()
-                        .contentType(ContentType.JSON)
-                        .headers(createAuthHeaders(memberPk))
-                        .body(AcquireRoleRequest(roleId = roleId))
-                        .`when`()
-                        .post("/api/v1/roles/acquire")
-                        .then()
-                        .extract()
-                        .statusCode()
-                }
+                executor.submit<AcquireOutcome> { start.await(); requestAcquire(memberPk, roleId) }
             }
             start.countDown()
             return futures.map { it.get(30, TimeUnit.SECONDS) }
         } finally {
             executor.shutdownNow()
         }
+    }
+
+    private fun requestAcquire(memberPk: Long, roleId: Long): AcquireOutcome {
+        val response = RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .headers(createAuthHeaders(memberPk))
+            .body(AcquireRoleRequest(roleId = roleId))
+            .`when`()
+            .post("/api/v1/roles/acquire")
+            .then()
+            .extract()
+
+        if (response.statusCode() != 200) return AcquireOutcome(response.statusCode(), false, false)
+        return AcquireOutcome(
+            status = response.statusCode(),
+            acquired = response.path("data.acquired"),
+            isRepresentative = response.path("data.memberRole.isRepresentative")
+        )
     }
 
     @Test

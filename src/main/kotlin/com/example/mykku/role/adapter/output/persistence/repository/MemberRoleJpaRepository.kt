@@ -26,5 +26,5 @@ interface MemberRoleJpaRepository : JpaRepository<MemberRoleJpaEntity, Long> {
         """,
         nativeQuery = true
     )
-    fun insertIfAbsent(memberId: Long, roleId: Long)
+    fun insertIfAbsent(memberId: Long, roleId: Long): Int
 }

@@ -31,23 +31,36 @@ class RoleSeedConsistencyTest {
     }
 
     @Test
-    @DisplayName("칭호 시드를 제거하는 후속 마이그레이션이 없다")
+    @DisplayName("칭호 보유 이력을 제거하는 후속 마이그레이션이 없다")
     fun `후속 마이그레이션이 칭호를 제거하지 않는다`() {
-        val migrations = javaClass.classLoader.getResource("db/migration")!!.let { url ->
-            java.io.File(url.toURI()).listFiles()!!.filter { it.name.endsWith(".sql") }
-        }
-
-        val destructive = migrations.filter { file ->
-            val sql = file.readText().uppercase()
-            sql.contains("DELETE FROM ROLE") || sql.contains("TRUNCATE TABLE ROLE") || sql.contains("DROP TABLE ROLE")
-        }
+        val destructive = readMigrations()
+            .filter { (_, sql) -> DESTRUCTIVE_PATTERNS.any { it.containsMatchIn(sql) } }
+            .map { (name, _) -> name }
 
         assertThat(destructive).isEmpty()
+    }
+
+    private fun readMigrations(): List<Pair<String, String>> {
+        val url = javaClass.classLoader.getResource("db/migration")
+        requireNotNull(url) { "db/migration 을 찾을 수 없습니다" }
+        return java.io.File(url.toURI()).listFiles().orEmpty()
+            .filter { it.name.endsWith(".sql") }
+            .map { it.name to it.readText() }
     }
 
     private fun readSeedMigration(): String {
         val stream = javaClass.classLoader.getResourceAsStream(seedMigrationPath)
         requireNotNull(stream) { "$seedMigrationPath 을 찾을 수 없습니다" }
         return stream.bufferedReader().use { it.readText() }
+    }
+
+    companion object {
+        private const val PROTECTED_TABLES = "role|member_role"
+
+        private val DESTRUCTIVE_PATTERNS = listOf(
+            Regex("""\bDELETE\s+FROM\s+`?($PROTECTED_TABLES)`?\b""", RegexOption.IGNORE_CASE),
+            Regex("""\bTRUNCATE\s+(TABLE\s+)?`?($PROTECTED_TABLES)`?\b""", RegexOption.IGNORE_CASE),
+            Regex("""\bDROP\s+TABLE\s+(IF\s+EXISTS\s+)?`?($PROTECTED_TABLES)`?\b""", RegexOption.IGNORE_CASE)
+        )
     }
 }

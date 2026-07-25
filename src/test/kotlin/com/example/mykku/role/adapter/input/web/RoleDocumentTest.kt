@@ -138,8 +138,9 @@ class RoleDocumentTest : BaseDocumentTest() {
         private val apiConfig = ApiRequestConfig(
             tag = Tag.ROLE_API,
             summary = "칭호 획득",
-            description = "지정한 칭호를 획득합니다. 획득 조건 판단은 클라이언트가 담당하며, " +
-                "이미 보유한 칭호를 다시 요청하면 아무 변경 없이 acquired=false로 응답합니다.",
+            description = "지정한 칭호를 획득합니다. 획득 조건 판단은 클라이언트가 담당합니다. " +
+                "이미 보유한 칭호를 다시 요청하면 칭호가 중복 부여되지 않고 acquired=false로 응답하므로 반복 호출이 안전합니다. " +
+                "단 대표 칭호가 비어 있는 회원은 이 요청으로 해당 칭호가 대표 칭호로 지정됩니다.",
             requestBodyFields = listOf(
                 fieldWithPath("roleId").type(JsonFieldType.NUMBER).description("획득할 칭호 ID")
             ),

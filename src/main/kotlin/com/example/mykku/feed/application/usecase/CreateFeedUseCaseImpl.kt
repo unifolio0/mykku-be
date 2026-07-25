@@ -6,6 +6,9 @@ import com.example.mykku.board.exception.BoardException
 import com.example.mykku.contest.application.port.output.ContestParticipationRepository
 import com.example.mykku.contest.application.port.output.ContestRepository
 import com.example.mykku.contest.application.port.output.ContestTagRepository
+import com.example.mykku.contest.domain.entity.ContestParticipation
+import com.example.mykku.contest.domain.entity.ContestTag
+import com.example.mykku.contest.domain.vo.ContestId
 import com.example.mykku.contest.domain.vo.ContestStatusType
 import com.example.mykku.feed.application.dto.CreateFeedCommand
 import com.example.mykku.feed.application.dto.CreateFeedResult
@@ -48,23 +51,23 @@ class CreateFeedUseCaseImpl(
         val normalizedTags = normalizeTags(command.tags)
         validateTagCount(normalizedTags.size)
 
+        val savedFeed = saveFeed(command, member)
+        val savedImages = feedImageRepository.saveAll(createFeedImages(imageResults, savedFeed), savedFeed.id!!)
+        val savedTags = feedTagRepository.saveAll(createFeedTags(normalizedTags, savedFeed), savedFeed.id!!)
+
+        recordContestParticipationIfApplicable(member, savedTags, savedFeed)
+
+        return buildCreateFeedResult(savedFeed, savedImages, savedTags, member, board.title)
+    }
+
+    private fun saveFeed(command: CreateFeedCommand, member: Member): Feed {
         val feed = Feed.create(
             title = command.title,
             content = command.content,
             boardId = command.boardId,
             memberId = member.id.value
         )
-        val savedFeed = feedRepository.save(feed, command.boardId, member.id.value)
-
-        val feedImages = createFeedImages(imageResults, savedFeed)
-        val savedImages = feedImageRepository.saveAll(feedImages, savedFeed.id!!)
-
-        val feedTags = createFeedTags(normalizedTags, savedFeed)
-        val savedTags = feedTagRepository.saveAll(feedTags, savedFeed.id!!)
-
-        recordContestParticipationIfApplicable(member, savedTags, savedFeed)
-
-        return buildCreateFeedResult(savedFeed, savedImages, savedTags, member, board.title)
+        return feedRepository.save(feed, command.boardId, member.id.value)
     }
 
     private fun uploadImages(images: List<org.springframework.web.multipart.MultipartFile>): List<ImageUploadResult> {
@@ -119,32 +122,34 @@ class CreateFeedUseCaseImpl(
     ) {
         if (feedTags.isEmpty()) return
 
-        val feedTagTitles = feedTags.map { it.title }.toSet()
         val activeContests = contestRepository.findByStatusAndExpiredAtAfter(
             ContestStatusType.ACTIVE,
             LocalDateTime.now()
         )
-
         if (activeContests.isEmpty()) return
 
-        val contestIds = activeContests.map { it.id }
-        val contestTags = contestTagRepository.findByContestIds(contestIds)
-        val contestTagsMap = contestTags.groupBy { it.contestId }
+        val feedTagTitles = feedTags.map { it.title }.toSet()
+        val contestTagsMap = contestTagRepository.findByContestIds(activeContests.map { it.id })
+            .groupBy { it.contestId }
 
-        activeContests.forEach { contest ->
-            val requiredTags = contestTagsMap[contest.id]?.map { it.title }?.toSet() ?: emptySet()
-            if (requiredTags.isNotEmpty() && feedTagTitles.containsAll(requiredTags)) {
-                val memberPk = member.id.value
-                if (!contestParticipationRepository.existsByMemberIdAndContestIdAndFeedId(memberPk, contest.id, feed.id!!.value)) {
-                    val participation = com.example.mykku.contest.domain.entity.ContestParticipation.create(
-                        contestId = contest.id,
-                        feedId = feed.id!!.value,
-                        memberId = memberPk
-                    )
-                    contestParticipationRepository.save(participation)
-                }
-            }
+        activeContests
+            .filter { satisfiesContestTags(contestTagsMap[it.id], feedTagTitles) }
+            .forEach { recordParticipation(member.id.value, it.id, feed.id!!.value) }
+    }
+
+    private fun satisfiesContestTags(contestTags: List<ContestTag>?, feedTagTitles: Set<String>): Boolean {
+        val requiredTags = contestTags?.map { it.title }?.toSet() ?: emptySet()
+        return requiredTags.isNotEmpty() && feedTagTitles.containsAll(requiredTags)
+    }
+
+    private fun recordParticipation(memberPk: Long, contestId: ContestId, feedId: Long) {
+        if (contestParticipationRepository.existsByMemberIdAndContestIdAndFeedId(memberPk, contestId, feedId)) {
+            return
         }
+
+        contestParticipationRepository.save(
+            ContestParticipation.create(contestId = contestId, feedId = feedId, memberId = memberPk)
+        )
     }
 
     private fun buildCreateFeedResult(

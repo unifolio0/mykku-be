@@ -50,14 +50,13 @@ class RoleService(
         val member = memberRepository.findById(MemberPk.of(command.memberId))
             ?: throw MemberException.memberNotFound()
 
-        val alreadyOwned = memberRoleRepository.findByMemberIdAndRoleId(command.memberId, role.id) != null
         val representativeRoleId = resolveRepresentativeRoleId(member, role)
-        memberRoleRepository.saveIfAbsent(command.memberId, role.id)
+        val acquired = memberRoleRepository.saveIfAbsent(command.memberId, role.id)
 
         val memberRole = memberRoleRepository.findByMemberIdAndRoleId(command.memberId, role.id)
             ?: throw RoleException.roleNotFound()
 
-        return AcquireRoleResult(!alreadyOwned, toMemberRoleResult(memberRole, role, representativeRoleId))
+        return AcquireRoleResult(acquired, toMemberRoleResult(memberRole, role, representativeRoleId))
     }
 
     @Transactional
