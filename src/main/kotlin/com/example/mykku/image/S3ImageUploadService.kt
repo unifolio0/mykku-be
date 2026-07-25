@@ -35,18 +35,18 @@ class S3ImageUploadService(
         private val FILENAME_DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
     }
 
-    override fun uploadImages(images: List<MultipartFile>): List<ImageUploadResult> {
-        return images.map { uploadImage(it) }
+    override fun uploadImages(images: List<MultipartFile>, pathPrefix: String): List<ImageUploadResult> {
+        return images.map { uploadImage(it, pathPrefix) }
     }
 
-    override fun uploadImage(image: MultipartFile): ImageUploadResult {
+    override fun uploadImage(image: MultipartFile, pathPrefix: String): ImageUploadResult {
         validateImage(image)
 
         val imageBytes = image.bytes
         val dimensions = extractImageDimensions(imageBytes)
 
         val fileName = generateFileName(image.originalFilename)
-        val key = "feed-images/$fileName"
+        val key = "$pathPrefix/$fileName"
 
         val extensionForContentType = getFileExtension(image.originalFilename)
         val contentType = image.contentType ?: when (extensionForContentType) {

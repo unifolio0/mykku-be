@@ -69,7 +69,7 @@ class CreateFeedUseCaseImpl(
 
     private fun uploadImages(images: List<org.springframework.web.multipart.MultipartFile>): List<ImageUploadResult> {
         return if (images.isEmpty()) emptyList()
-        else imageUploadService.uploadImages(images)
+        else imageUploadService.uploadImages(images, "feed-images")
     }
 
     private fun validateImageCount(count: Int) {

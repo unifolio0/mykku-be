@@ -15,19 +15,13 @@ class TestImageUploadConfig {
     @Primary
     fun testImageUploadService(): ImageUploadService {
         return object : ImageUploadService {
-            override fun uploadImages(images: List<MultipartFile>): List<ImageUploadResult> {
-                return images.map {
-                    ImageUploadResult(
-                        url = "https://test-bucket.s3.amazonaws.com/test-image-${System.currentTimeMillis()}.jpg",
-                        width = 800,
-                        height = 600
-                    )
-                }
+            override fun uploadImages(images: List<MultipartFile>, pathPrefix: String): List<ImageUploadResult> {
+                return images.map { uploadImage(it, pathPrefix) }
             }
 
-            override fun uploadImage(image: MultipartFile): ImageUploadResult {
+            override fun uploadImage(image: MultipartFile, pathPrefix: String): ImageUploadResult {
                 return ImageUploadResult(
-                    url = "https://test-bucket.s3.amazonaws.com/test-image-${System.currentTimeMillis()}.jpg",
+                    url = "https://test-bucket.s3.amazonaws.com/$pathPrefix/test-image-${System.currentTimeMillis()}.jpg",
                     width = 800,
                     height = 600
                 )
