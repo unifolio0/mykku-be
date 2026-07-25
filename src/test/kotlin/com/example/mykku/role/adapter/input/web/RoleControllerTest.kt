@@ -262,12 +262,21 @@ class RoleControllerTest : BaseControllerTest() {
         // then
         assertThat(responses).allMatch { it.status == 200 }
         assertThat(responses.count { it.acquired }).isEqualTo(targets.size)
-        assertThat(responses.count { it.isRepresentative }).isEqualTo(1)
         assertThat(memberRoleJpaRepository.findByMemberId(member.id)).hasSize(4)
-        assertThat(memberJpaRepository.findById(member.id).get().role?.id).isIn(targets)
+
+        val representativeRoleId = memberJpaRepository.findById(member.id).get().role?.id
+        assertThat(representativeRoleId).isIn(targets)
+        assertThat(responses.filter { it.isRepresentative })
+            .isNotEmpty
+            .allMatch { it.roleId == representativeRoleId }
     }
 
-    private data class AcquireOutcome(val status: Int, val acquired: Boolean, val isRepresentative: Boolean)
+    private data class AcquireOutcome(
+        val roleId: Long,
+        val status: Int,
+        val acquired: Boolean,
+        val isRepresentative: Boolean
+    )
 
     private fun acquireConcurrently(memberPk: Long, roleIds: List<Long>): List<AcquireOutcome> {
         val executor = Executors.newFixedThreadPool(roleIds.size)
@@ -294,8 +303,9 @@ class RoleControllerTest : BaseControllerTest() {
             .then()
             .extract()
 
-        if (response.statusCode() != 200) return AcquireOutcome(response.statusCode(), false, false)
+        if (response.statusCode() != 200) return AcquireOutcome(roleId, response.statusCode(), false, false)
         return AcquireOutcome(
+            roleId = roleId,
             status = response.statusCode(),
             acquired = response.path("data.acquired"),
             isRepresentative = response.path("data.memberRole.isRepresentative")
