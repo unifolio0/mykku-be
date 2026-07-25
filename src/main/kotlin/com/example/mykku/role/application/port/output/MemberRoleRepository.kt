@@ -6,6 +6,7 @@ import com.example.mykku.role.domain.vo.RoleId
 
 interface MemberRoleRepository {
     fun save(memberRole: MemberRole): MemberRole
+    fun saveIfAbsent(memberId: Long, roleId: RoleId)
     fun findById(id: MemberRoleId): MemberRole?
     fun findByMemberId(memberId: Long): List<MemberRole>
     fun findByMemberIdWithRole(memberId: Long): List<MemberRoleWithRole>

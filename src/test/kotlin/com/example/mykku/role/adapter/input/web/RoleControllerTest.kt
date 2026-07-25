@@ -16,6 +16,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 @DisplayName("RoleController 통합 테스트")
 class RoleControllerTest : BaseControllerTest() {
@@ -147,6 +150,130 @@ class RoleControllerTest : BaseControllerTest() {
             .body("data.memberRole.isRepresentative", equalTo(true))
 
         assertThat(memberRoleJpaRepository.findByMemberId(member.id)).hasSize(1)
+    }
+
+    @Test
+    @DisplayName("이미 보유했지만 대표 칭호가 비어 있으면 대표 칭호를 보정한다")
+    fun `acquireRole - 이미 보유한 칭호로도 비어 있는 대표 칭호를 보정한다`() {
+        // given
+        val member = createAndSaveMember(nickname = "테스터", role = null)
+        memberRoleJpaRepository.save(MemberRoleJpaEntity(memberId = member.id, role = role1))
+
+        // when & then
+        RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .headers(createAuthHeaders(member.id))
+            .body(AcquireRoleRequest(roleId = role1.id!!))
+            .`when`()
+            .post("/api/v1/roles/acquire")
+            .then()
+            .statusCode(200)
+            .body("data.acquired", equalTo(false))
+            .body("data.memberRole.isRepresentative", equalTo(true))
+
+        assertThat(memberJpaRepository.findById(member.id).get().role?.id).isEqualTo(role1.id)
+        assertThat(memberRoleJpaRepository.findByMemberId(member.id)).hasSize(1)
+    }
+
+    @Test
+    @DisplayName("roleId가 없거나 양수가 아니면 400을 반환한다")
+    fun `acquireRole - 잘못된 roleId는 400을 반환한다`() {
+        // given
+        val member = createAndSaveMember(nickname = "테스터")
+        val invalidBodies = listOf("{}", """{"roleId":null}""", """{"roleId":0}""", """{"roleId":-5}""")
+
+        // when & then
+        invalidBodies.forEach { body ->
+            RestAssured
+                .given()
+                .contentType(ContentType.JSON)
+                .headers(createAuthHeaders(member.id))
+                .body(body)
+                .`when`()
+                .post("/api/v1/roles/acquire")
+                .then()
+                .statusCode(400)
+        }
+    }
+
+    @Test
+    @DisplayName("정수가 아닌 roleId는 절삭되지 않고 400을 반환한다")
+    fun `acquireRole - 소수점 roleId는 400을 반환한다`() {
+        // given
+        val member = createAndSaveMember(nickname = "테스터", role = null)
+
+        // when & then
+        RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .headers(createAuthHeaders(member.id))
+            .body("""{"roleId":${role1.id!!}.9}""")
+            .`when`()
+            .post("/api/v1/roles/acquire")
+            .then()
+            .statusCode(400)
+
+        assertThat(memberRoleJpaRepository.findByMemberId(member.id)).isEmpty()
+    }
+
+    @Test
+    @DisplayName("같은 칭호를 동시에 획득해도 500 없이 한 행만 생성된다")
+    fun `acquireRole - 동일 칭호 동시 요청은 중복 없이 처리된다`() {
+        // given
+        val member = createAndSaveMember(nickname = "테스터", role = null)
+
+        // when
+        val statuses = acquireConcurrently(member.id, List(8) { role1.id!! })
+
+        // then
+        assertThat(statuses).containsOnly(200)
+        assertThat(memberRoleJpaRepository.findByMemberId(member.id)).hasSize(1)
+        assertThat(memberJpaRepository.findById(member.id).get().role?.id).isEqualTo(role1.id)
+    }
+
+    @Test
+    @DisplayName("서로 다른 칭호를 동시에 획득해도 데드락 없이 모두 부여된다")
+    fun `acquireRole - 서로 다른 칭호 동시 요청은 데드락 없이 처리된다`() {
+        // given
+        val member = createAndSaveMember(nickname = "테스터", role = null)
+        val role3 = roleJpaRepository.save(RoleJpaEntity(name = "칭호3", description = "설명3"))
+        val role4 = roleJpaRepository.save(RoleJpaEntity(name = "칭호4", description = "설명4"))
+        val targets = listOf(role1.id!!, role2.id!!, role3.id!!, role4.id!!)
+
+        // when
+        val statuses = acquireConcurrently(member.id, targets + targets)
+
+        // then
+        assertThat(statuses).containsOnly(200)
+        assertThat(memberRoleJpaRepository.findByMemberId(member.id)).hasSize(4)
+        assertThat(memberJpaRepository.findById(member.id).get().role?.id).isIn(targets)
+    }
+
+    private fun acquireConcurrently(memberPk: Long, roleIds: List<Long>): List<Int> {
+        val executor = Executors.newFixedThreadPool(roleIds.size)
+        val start = CountDownLatch(1)
+        try {
+            val futures = roleIds.map { roleId ->
+                executor.submit<Int> {
+                    start.await()
+                    RestAssured
+                        .given()
+                        .contentType(ContentType.JSON)
+                        .headers(createAuthHeaders(memberPk))
+                        .body(AcquireRoleRequest(roleId = roleId))
+                        .`when`()
+                        .post("/api/v1/roles/acquire")
+                        .then()
+                        .extract()
+                        .statusCode()
+                }
+            }
+            start.countDown()
+            return futures.map { it.get(30, TimeUnit.SECONDS) }
+        } finally {
+            executor.shutdownNow()
+        }
     }
 
     @Test

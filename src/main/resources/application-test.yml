@@ -1,6 +1,9 @@
 spring:
   main:
     allow-bean-definition-overriding: true
+  jackson:
+    deserialization:
+      accept-float-as-int: false
   config:
     activate:
       on-profile: test

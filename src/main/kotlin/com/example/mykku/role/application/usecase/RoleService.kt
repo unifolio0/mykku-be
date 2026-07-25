@@ -50,14 +50,14 @@ class RoleService(
         val member = memberRepository.findById(MemberPk.of(command.memberId))
             ?: throw MemberException.memberNotFound()
 
-        memberRoleRepository.findByMemberIdAndRoleId(command.memberId, role.id)?.let { alreadyOwned ->
-            return AcquireRoleResult(false, toMemberRoleResult(alreadyOwned, role, member.roleId))
-        }
+        val alreadyOwned = memberRoleRepository.findByMemberIdAndRoleId(command.memberId, role.id) != null
+        val representativeRoleId = resolveRepresentativeRoleId(member, role)
+        memberRoleRepository.saveIfAbsent(command.memberId, role.id)
 
-        val acquired = memberRoleRepository.save(MemberRole.create(command.memberId, role.id))
-        assignAsRepresentativeIfNone(member, role)
+        val memberRole = memberRoleRepository.findByMemberIdAndRoleId(command.memberId, role.id)
+            ?: throw RoleException.roleNotFound()
 
-        return AcquireRoleResult(true, toMemberRoleResult(acquired, role, member.roleId))
+        return AcquireRoleResult(!alreadyOwned, toMemberRoleResult(memberRole, role, representativeRoleId))
     }
 
     @Transactional
@@ -79,10 +79,11 @@ class RoleService(
         memberRepository.save(member)
     }
 
-    private fun assignAsRepresentativeIfNone(member: Member, role: Role) {
-        if (member.roleId != null) return
-        member.assignRole(role.id.value)
-        memberRepository.save(member)
+    private fun resolveRepresentativeRoleId(member: Member, role: Role): Long? {
+        member.roleId?.let { return it }
+
+        if (memberRepository.assignRoleIfAbsent(member.id, role.id.value)) return role.id.value
+        return memberRepository.findById(member.id)?.roleId
     }
 
     private fun toMemberRoleResult(

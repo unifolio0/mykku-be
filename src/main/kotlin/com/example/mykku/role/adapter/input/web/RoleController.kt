@@ -8,6 +8,7 @@ import com.example.mykku.role.application.port.input.AcquireRoleUseCase
 import com.example.mykku.role.application.port.input.ChangeRepresentativeRoleUseCase
 import com.example.mykku.role.application.port.input.GetMyRolesUseCase
 import com.example.mykku.role.application.port.input.GetRolesUseCase
+import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -54,7 +55,7 @@ class RoleController(
     @PostMapping("/acquire")
     fun acquireRole(
         @CurrentMember member: Member,
-        @RequestBody request: AcquireRoleRequest
+        @Valid @RequestBody request: AcquireRoleRequest
     ): ResponseEntity<ApiResponse<AcquireRoleResponse>> {
         val result = acquireRoleUseCase.acquireRole(request.toCommand(member))
         return ResponseEntity.ok(

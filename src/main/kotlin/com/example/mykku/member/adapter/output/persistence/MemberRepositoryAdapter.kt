@@ -33,6 +33,10 @@ class MemberRepositoryAdapter(
         return memberJpaRepository.save(entityToSave).toDomain()
     }
 
+    override fun assignRoleIfAbsent(id: MemberPk, roleId: Long): Boolean {
+        return memberJpaRepository.assignRoleIfAbsent(id.value, roleId) == 1
+    }
+
     override fun findById(id: MemberPk): Member? {
         return memberJpaRepository.findById(id.value).orElse(null)?.toDomain()
     }
