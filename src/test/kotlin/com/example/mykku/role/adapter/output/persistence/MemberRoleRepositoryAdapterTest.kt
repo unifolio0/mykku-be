@@ -134,30 +134,33 @@ class MemberRoleRepositoryAdapterTest : BaseRepositoryTest() {
     }
 
     @Nested
-    @DisplayName("existsByMemberIdAndRoleId 메서드")
-    inner class ExistsByMemberIdAndRoleId {
+    @DisplayName("findByMemberIdAndRoleId 메서드")
+    inner class FindByMemberIdAndRoleId {
 
         @Test
-        @DisplayName("해당 멤버와 역할 조합이 존재하면 true를 반환한다")
-        fun existsByMemberIdAndRoleId() {
+        @DisplayName("해당 멤버와 역할 조합이 존재하면 보유 칭호를 반환한다")
+        fun findByMemberIdAndRoleId() {
             val role = createAndSaveRole(name = "emr_role", description = "존재 확인 역할")
             val member = createAndSaveMember(email = "emr_m1@test.com", socialId = "emr_s1")
 
-            memberRoleRepository.save(createMemberRole(memberId = member.id, roleId = RoleId(role.id!!)))
+            val saved = memberRoleRepository.save(createMemberRole(memberId = member.id, roleId = RoleId(role.id!!)))
 
-            val exists = memberRoleRepository.existsByMemberIdAndRoleId(member.id, RoleId(role.id!!))
+            val found = memberRoleRepository.findByMemberIdAndRoleId(member.id, RoleId(role.id!!))
 
-            assertThat(exists).isTrue()
+            assertThat(found).isNotNull
+            assertThat(found!!.id).isEqualTo(saved.id)
+            assertThat(found.memberId).isEqualTo(member.id)
+            assertThat(found.roleId).isEqualTo(RoleId(role.id!!))
         }
 
         @Test
-        @DisplayName("해당 멤버와 역할 조합이 존재하지 않으면 false를 반환한다")
-        fun notExistsByMemberIdAndRoleId() {
+        @DisplayName("해당 멤버와 역할 조합이 존재하지 않으면 null을 반환한다")
+        fun notFoundByMemberIdAndRoleId() {
             val role = createAndSaveRole(name = "nemr_role", description = "존재하지 않는 역할")
 
-            val exists = memberRoleRepository.existsByMemberIdAndRoleId(999999L, RoleId(role.id!!))
+            val found = memberRoleRepository.findByMemberIdAndRoleId(999999L, RoleId(role.id!!))
 
-            assertThat(exists).isFalse()
+            assertThat(found).isNull()
         }
     }
 

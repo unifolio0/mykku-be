@@ -35,28 +35,28 @@ class S3ImageUploadService(
         private val FILENAME_DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
     }
 
-    override fun uploadImages(images: List<MultipartFile>): List<ImageUploadResult> {
-        return images.map { uploadImage(it) }
+    override fun uploadImages(images: List<MultipartFile>, pathPrefix: String): List<ImageUploadResult> {
+        return images.map { uploadImage(it, pathPrefix) }
     }
 
-    override fun uploadImage(image: MultipartFile): ImageUploadResult {
+    override fun uploadImage(image: MultipartFile, pathPrefix: String): ImageUploadResult {
         validateImage(image)
 
         val imageBytes = image.bytes
         val dimensions = extractImageDimensions(imageBytes)
+        val key = "$pathPrefix/${generateFileName(image.originalFilename)}"
 
-        val fileName = generateFileName(image.originalFilename)
-        val key = "feed-images/$fileName"
+        putObject(key, image, imageBytes)
 
-        val extensionForContentType = getFileExtension(image.originalFilename)
-        val contentType = image.contentType ?: when (extensionForContentType) {
-            "jpg", "jpeg" -> "image/jpeg"
-            "png" -> "image/png"
-            "gif" -> "image/gif"
-            "webp" -> "image/webp"
-            else -> "application/octet-stream"
-        }
+        return ImageUploadResult(
+            url = buildImageUrl(key),
+            width = dimensions.first,
+            height = dimensions.second
+        )
+    }
 
+    private fun putObject(key: String, image: MultipartFile, imageBytes: ByteArray) {
+        val contentType = resolveContentType(image, getFileExtension(image.originalFilename))
         val putObjectRequest = PutObjectRequest.builder()
             .bucket(s3Properties.bucketName)
             .key(key)
@@ -64,17 +64,7 @@ class S3ImageUploadService(
             .contentLength(imageBytes.size.toLong())
             .build()
 
-        s3Client.putObject(
-            putObjectRequest,
-            RequestBody.fromBytes(imageBytes)
-        )
-
-        val url = buildImageUrl(key)
-        return ImageUploadResult(
-            url = url,
-            width = dimensions.first,
-            height = dimensions.second
-        )
+        s3Client.putObject(putObjectRequest, RequestBody.fromBytes(imageBytes))
     }
 
     private fun validateImage(image: MultipartFile) {
@@ -157,30 +147,10 @@ class S3ImageUploadService(
     ): String {
         validateImage(image)
 
-        val imageBytes = image.bytes
         val fileName = generateFanNoteFileName(image.originalFilename, pageNumber)
         val key = "fan-note/$folderName/$fileName"
 
-        val extensionForContentType = getFileExtension(image.originalFilename)
-        val contentType = image.contentType ?: when (extensionForContentType) {
-            "jpg", "jpeg" -> "image/jpeg"
-            "png" -> "image/png"
-            "gif" -> "image/gif"
-            "webp" -> "image/webp"
-            else -> "application/octet-stream"
-        }
-
-        val putObjectRequest = PutObjectRequest.builder()
-            .bucket(s3Properties.bucketName)
-            .key(key)
-            .contentType(contentType)
-            .contentLength(imageBytes.size.toLong())
-            .build()
-
-        s3Client.putObject(
-            putObjectRequest,
-            RequestBody.fromBytes(imageBytes)
-        )
+        putObject(key, image, image.bytes)
 
         return buildImageUrl(key)
     }
@@ -221,19 +191,10 @@ class S3ImageUploadService(
     ): String {
         validateImage(image)
 
-        val imageBytes = image.bytes
         val extension = getFileExtension(image.originalFilename)
         val key = "$pathPrefix/$folderName/$fileLabel.$extension"
-        val contentType = resolveContentType(image, extension)
 
-        val putObjectRequest = PutObjectRequest.builder()
-            .bucket(s3Properties.bucketName)
-            .key(key)
-            .contentType(contentType)
-            .contentLength(imageBytes.size.toLong())
-            .build()
-
-        s3Client.putObject(putObjectRequest, RequestBody.fromBytes(imageBytes))
+        putObject(key, image, image.bytes)
 
         return buildImageUrl(key)
     }

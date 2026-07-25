@@ -1,11 +1,9 @@
 package com.example.mykku.fannote.adapter.input.web
 
-import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.common.util.PageableValidator
 import com.example.mykku.fannote.application.port.input.GetFanNoteDetailUseCase
 import com.example.mykku.fannote.application.port.input.GetFanNoteListUseCase
-import com.example.mykku.member.domain.entity.Member
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Sort
 import org.springframework.web.bind.annotation.GetMapping
@@ -41,10 +39,9 @@ class FanNoteController(
 
     @GetMapping("/{fanNoteId}")
     fun getFanNoteDetail(
-        @PathVariable fanNoteId: Long,
-        @CurrentMember(required = false) member: Member?
+        @PathVariable fanNoteId: Long
     ): ApiResponse<FanNoteDetailResponse> {
-        val result = getFanNoteDetailUseCase.execute(fanNoteId, member?.id?.value)
+        val result = getFanNoteDetailUseCase.execute(fanNoteId)
         return ApiResponse(
             message = "덕질노트 상세 조회 성공",
             data = FanNoteDetailResponse.from(result)

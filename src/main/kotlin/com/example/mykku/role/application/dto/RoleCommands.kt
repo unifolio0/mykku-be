@@ -7,6 +7,16 @@ data class ChangeRepresentativeRoleCommand(
     val memberRoleId: Long
 )
 
+data class AcquireRoleCommand(
+    val memberId: Long,
+    val roleId: Long
+)
+
+data class AcquireRoleResult(
+    val acquired: Boolean,
+    val memberRole: MemberRoleResult
+)
+
 data class RoleResult(
     val id: Long,
     val name: String,

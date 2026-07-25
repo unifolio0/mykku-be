@@ -18,12 +18,20 @@ class MemberRoleRepositoryAdapter(
     private val roleJpaRepository: RoleJpaRepository
 ) : MemberRoleRepository {
 
+    companion object {
+        private const val INSERTED_ROW_COUNT = 1
+    }
+
     override fun save(memberRole: MemberRole): MemberRole {
         val roleEntity = roleJpaRepository.findByIdOrNull(memberRole.roleId.value)
             ?: throw RoleException.roleNotFound()
 
         val entity = MemberRoleJpaEntity.fromDomain(memberRole, roleEntity)
         return jpaRepository.save(entity).toDomain()
+    }
+
+    override fun saveIfAbsent(memberId: Long, roleId: RoleId): Boolean {
+        return jpaRepository.insertIfAbsent(memberId, roleId.value) == INSERTED_ROW_COUNT
     }
 
     override fun findById(id: MemberRoleId): MemberRole? {
@@ -43,8 +51,8 @@ class MemberRoleRepositoryAdapter(
         }
     }
 
-    override fun existsByMemberIdAndRoleId(memberId: Long, roleId: RoleId): Boolean {
-        return jpaRepository.existsByMemberIdAndRoleId(memberId, roleId.value)
+    override fun findByMemberIdAndRoleId(memberId: Long, roleId: RoleId): MemberRole? {
+        return jpaRepository.findByMemberIdAndRoleId(memberId, roleId.value)?.toDomain()
     }
 
     override fun existsByRoleId(roleId: RoleId): Boolean {

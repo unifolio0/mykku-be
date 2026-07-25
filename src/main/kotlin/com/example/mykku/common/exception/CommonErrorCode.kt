@@ -13,6 +13,8 @@ enum class CommonErrorCode(
     INVALID_PAGE_NUMBER("C103", HttpStatus.BAD_REQUEST, "페이지 번호는 0 이상이어야 합니다"),
     INVALID_PAGE_SIZE("C104", HttpStatus.BAD_REQUEST, "페이지 크기는 1 이상 1000 이하여야 합니다"),
 
+    RESOURCE_LOCK_CONFLICT("C301", HttpStatus.CONFLICT, "다른 요청이 처리 중입니다. 잠시 후 다시 시도해주세요"),
+
     REDIS_CONNECTION_FAILURE("C401", HttpStatus.INTERNAL_SERVER_ERROR, "Redis 연결에 실패했습니다. 잠시 후 다시 시도해주세요"),
 
     INTERNAL_SERVER_ERROR("C402", HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다. 관리자에게 문의해주세요")

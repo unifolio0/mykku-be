@@ -12,11 +12,11 @@ import org.springframework.web.multipart.MultipartFile
 @ConditionalOnProperty(name = ["aws.s3.enabled"], havingValue = "false", matchIfMissing = true)
 class NoOpImageUploadService : ImageUploadService {
 
-    override fun uploadImages(images: List<MultipartFile>): List<ImageUploadResult> {
+    override fun uploadImages(images: List<MultipartFile>, pathPrefix: String): List<ImageUploadResult> {
         throw ImageException.imageUploadServiceUnavailable()
     }
 
-    override fun uploadImage(image: MultipartFile): ImageUploadResult {
+    override fun uploadImage(image: MultipartFile, pathPrefix: String): ImageUploadResult {
         throw ImageException.imageUploadServiceUnavailable()
     }
 

@@ -8,6 +8,7 @@ import com.example.mykku.role.application.port.output.MemberRoleRepository
 import com.example.mykku.role.domain.entity.Role
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
+import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.greaterThanOrEqualTo
 import org.hamcrest.Matchers.hasSize
@@ -128,5 +129,45 @@ class AdminRoleApiControllerTest : BaseControllerTest() {
             .statusCode(201)
             .body("message", equalTo("칭호 부여 성공"))
             .body("data.role.name", equalTo(role2.name))
+    }
+
+    @Test
+    @DisplayName("같은 칭호를 두 번 부여해도 실패하지 않는다")
+    fun `assignRoleToMember - 중복 부여는 멱등하게 처리된다`() {
+        // given
+        val member = createAndSaveMember(nickname = "테스터", role = role1)
+
+        // when & then
+        repeat(2) {
+            RestAssured
+                .given()
+                .sessionId(adminSessionId)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .post("/admin/api/v1/roles/${role2.id}/members/${member.id}")
+                .then()
+                .statusCode(201)
+                .body("data.role.name", equalTo(role2.name))
+        }
+    }
+
+    @Test
+    @DisplayName("대표 칭호가 없는 회원에게 부여하면 대표 칭호로 지정된다")
+    fun `assignRoleToMember - 대표 칭호가 없으면 대표로 지정한다`() {
+        // given
+        val member = createAndSaveMember(nickname = "테스터", role = null)
+
+        // when & then
+        RestAssured
+            .given()
+            .sessionId(adminSessionId)
+            .contentType(ContentType.JSON)
+            .`when`()
+            .post("/admin/api/v1/roles/${role1.id}/members/${member.id}")
+            .then()
+            .statusCode(201)
+            .body("data.isRepresentative", equalTo(true))
+
+        assertThat(memberJpaRepository.findById(member.id).get().role?.id).isEqualTo(role1.id)
     }
 }

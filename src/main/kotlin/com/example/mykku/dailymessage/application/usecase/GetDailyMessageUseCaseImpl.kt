@@ -4,25 +4,19 @@ import com.example.mykku.dailymessage.application.dto.DailyMessageResult
 import com.example.mykku.dailymessage.application.port.input.GetDailyMessageUseCase
 import com.example.mykku.dailymessage.application.port.output.DailyMessageRepository
 import com.example.mykku.dailymessage.domain.vo.DailyMessageId
-import com.example.mykku.achievement.application.event.ActivityEvent
-import com.example.mykku.achievement.domain.vo.ActivityType
 import com.example.mykku.dailymessage.exception.DailyMessageException
-import com.example.mykku.achievement.application.port.output.ActivityEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional(readOnly = true)
 class GetDailyMessageUseCaseImpl(
-    private val dailyMessageRepository: DailyMessageRepository,
-    private val activityEventPublisher: ActivityEventPublisher
+    private val dailyMessageRepository: DailyMessageRepository
 ) : GetDailyMessageUseCase {
 
-    override fun execute(id: Long, memberId: Long?): DailyMessageResult {
+    override fun execute(id: Long): DailyMessageResult {
         val dailyMessage = dailyMessageRepository.findById(DailyMessageId.of(id))
             ?: throw DailyMessageException.dailyMessageNotFound()
-
-        memberId?.let { activityEventPublisher.publish(ActivityEvent(it, ActivityType.DAILYMESSAGE_VIEW)) }
 
         return DailyMessageResult.from(dailyMessage)
     }

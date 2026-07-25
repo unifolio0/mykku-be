@@ -20,7 +20,7 @@ class AdminBoardService(
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     fun create(request: BoardCreateRequest): BoardResult {
-        val logoUrl = imageUploadService.uploadImage(request.logo).url
+        val logoUrl = imageUploadService.uploadImage(request.logo, "board-images").url
         val command = CreateBoardCommand(
             title = request.title,
             logo = logoUrl

@@ -83,8 +83,10 @@ import com.example.mykku.preference.application.port.input.GetMoodPreferenceUseC
 import com.example.mykku.preference.application.port.input.UpdateGenrePreferenceUseCase
 import com.example.mykku.preference.application.port.input.UpdateGoodsPreferenceUseCase
 import com.example.mykku.preference.application.port.input.UpdateMoodPreferenceUseCase
+import com.example.mykku.role.application.port.input.AcquireRoleUseCase
 import com.example.mykku.role.application.port.input.ChangeRepresentativeRoleUseCase
 import com.example.mykku.role.application.port.input.GetMyRolesUseCase
+import com.example.mykku.role.application.port.input.GetRolesUseCase
 import com.example.mykku.contest.application.port.input.GetMyParticipatedContestsUseCase
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
@@ -176,6 +178,12 @@ abstract class BaseDocumentTest {
 
     @MockitoBean
     protected lateinit var changeRepresentativeRoleUseCase: ChangeRepresentativeRoleUseCase
+
+    @MockitoBean
+    protected lateinit var acquireRoleUseCase: AcquireRoleUseCase
+
+    @MockitoBean
+    protected lateinit var getRolesUseCase: GetRolesUseCase
 
     @MockitoBean
     protected lateinit var getGenrePreferenceUseCase: GetGenrePreferenceUseCase

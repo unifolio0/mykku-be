@@ -7,9 +7,10 @@ import com.example.mykku.role.adapter.input.web.RoleResponse
 import com.example.mykku.role.adapter.input.web.UpdateRoleRequest
 import com.example.mykku.role.adapter.output.persistence.repository.MemberRoleJpaRepository
 import com.example.mykku.role.adapter.output.persistence.repository.RoleJpaRepository
-import com.example.mykku.role.adapter.output.persistence.entity.MemberRoleJpaEntity
+import com.example.mykku.role.application.dto.AcquireRoleCommand
+import com.example.mykku.role.application.port.input.AcquireRoleUseCase
+import com.example.mykku.role.application.port.input.GetRolesUseCase
 import com.example.mykku.role.exception.RoleException
-import com.example.mykku.member.exception.MemberException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -19,11 +20,12 @@ import org.springframework.transaction.annotation.Transactional
 class AdminRoleService(
     private val roleJpaRepository: RoleJpaRepository,
     private val memberRoleJpaRepository: MemberRoleJpaRepository,
-    private val memberJpaRepository: MemberJpaRepository
+    private val memberJpaRepository: MemberJpaRepository,
+    private val acquireRoleUseCase: AcquireRoleUseCase,
+    private val getRolesUseCase: GetRolesUseCase
 ) {
     fun getAllRoles(): List<RoleResponse> {
-        val roles = roleJpaRepository.findAll()
-        return roles.map { RoleResponse(id = it.id!!, name = it.name, description = it.description) }
+        return getRolesUseCase.getRoles().map { RoleResponse.from(it) }
     }
 
     @Transactional
@@ -64,21 +66,7 @@ class AdminRoleService(
 
     @Transactional
     fun assignRoleToMember(roleId: Long, memberId: Long): MemberRoleResponse {
-        val role = roleJpaRepository.findByIdOrNull(roleId)
-            ?: throw RoleException.roleNotFound()
-        val member = memberJpaRepository.findById(memberId)
-            .orElseThrow { MemberException.memberNotFound() }
-
-        val memberRole = MemberRoleJpaEntity(
-            memberId = memberId,
-            role = role
-        )
-        val savedMemberRole = memberRoleJpaRepository.save(memberRole)
-        return MemberRoleResponse(
-            id = savedMemberRole.id!!,
-            role = RoleResponse(id = role.id!!, name = role.name, description = role.description),
-            isRepresentative = member.role?.id == role.id,
-            earnedAt = savedMemberRole.createdAt
-        )
+        val result = acquireRoleUseCase.acquireRole(AcquireRoleCommand(memberId = memberId, roleId = roleId))
+        return MemberRoleResponse.from(result.memberRole)
     }
 }

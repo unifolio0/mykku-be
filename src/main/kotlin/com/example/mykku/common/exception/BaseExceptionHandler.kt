@@ -4,6 +4,8 @@ import org.redisson.client.RedisException
 import org.slf4j.LoggerFactory
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
+import org.springframework.dao.PessimisticLockingFailureException
+import org.springframework.dao.QueryTimeoutException
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -55,23 +57,31 @@ class BaseExceptionHandler {
             .body(ErrorResponse(exception.errorCode.code, exception.errorCode.message))
     }
 
+    @ExceptionHandler(PessimisticLockingFailureException::class, QueryTimeoutException::class)
+    fun handleLockConflictException(exception: Exception): ResponseEntity<ErrorResponse> {
+        ExceptionLoggingSupport.logException(logger, exception)
+
+        return errorResponseOf(CommonErrorCode.RESOURCE_LOCK_CONFLICT)
+    }
+
     @ExceptionHandler(RedisException::class)
     fun handleRedisException(exception: RedisException): ResponseEntity<ErrorResponse> {
         ExceptionLoggingSupport.logException(logger, exception)
 
-        return ResponseEntity
-            .status(CommonErrorCode.REDIS_CONNECTION_FAILURE.status)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(ErrorResponse(CommonErrorCode.REDIS_CONNECTION_FAILURE.code, CommonErrorCode.REDIS_CONNECTION_FAILURE.message))
+        return errorResponseOf(CommonErrorCode.REDIS_CONNECTION_FAILURE)
     }
 
     @ExceptionHandler(Exception::class)
     fun handleException(exception: Exception): ResponseEntity<ErrorResponse> {
         ExceptionLoggingSupport.logException(logger, exception)
 
+        return errorResponseOf(CommonErrorCode.INTERNAL_SERVER_ERROR)
+    }
+
+    private fun errorResponseOf(errorCode: CommonErrorCode): ResponseEntity<ErrorResponse> {
         return ResponseEntity
-            .status(CommonErrorCode.INTERNAL_SERVER_ERROR.status)
+            .status(errorCode.status)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(ErrorResponse(CommonErrorCode.INTERNAL_SERVER_ERROR.code, CommonErrorCode.INTERNAL_SERVER_ERROR.message))
+            .body(ErrorResponse(errorCode.code, errorCode.message))
     }
 }

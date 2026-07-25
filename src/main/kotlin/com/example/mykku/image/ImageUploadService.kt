@@ -6,8 +6,8 @@ import com.example.mykku.image.dto.ImageUploadResult
 import org.springframework.web.multipart.MultipartFile
 
 interface ImageUploadService {
-    fun uploadImages(images: List<MultipartFile>): List<ImageUploadResult>
-    fun uploadImage(image: MultipartFile): ImageUploadResult
+    fun uploadImages(images: List<MultipartFile>, pathPrefix: String): List<ImageUploadResult>
+    fun uploadImage(image: MultipartFile, pathPrefix: String): ImageUploadResult
     fun uploadFanNoteImages(
         coverImage: MultipartFile?,
         pageImages: List<MultipartFile>?
