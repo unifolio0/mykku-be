@@ -43,8 +43,8 @@ class MemberRoleRepositoryAdapter(
         }
     }
 
-    override fun existsByMemberIdAndRoleId(memberId: Long, roleId: RoleId): Boolean {
-        return jpaRepository.existsByMemberIdAndRoleId(memberId, roleId.value)
+    override fun findByMemberIdAndRoleId(memberId: Long, roleId: RoleId): MemberRole? {
+        return jpaRepository.findByMemberIdAndRoleId(memberId, roleId.value)?.toDomain()
     }
 
     override fun existsByRoleId(roleId: RoleId): Boolean {

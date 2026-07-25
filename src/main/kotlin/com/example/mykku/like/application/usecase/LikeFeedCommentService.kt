@@ -7,16 +7,12 @@ import com.example.mykku.like.application.port.input.LikeFeedCommentUseCase
 import com.example.mykku.like.application.port.output.LikeFeedCommentPort
 import com.example.mykku.like.domain.entity.LikeFeedCommentEntity
 import com.example.mykku.like.exception.LikeException
-import com.example.mykku.achievement.application.event.ActivityEvent
-import com.example.mykku.achievement.domain.vo.ActivityType
-import com.example.mykku.achievement.application.port.output.ActivityEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class LikeFeedCommentService(
-    private val likeFeedCommentPort: LikeFeedCommentPort,
-    private val activityEventPublisher: ActivityEventPublisher
+    private val likeFeedCommentPort: LikeFeedCommentPort
 ) : LikeFeedCommentUseCase {
 
     @Transactional
@@ -29,8 +25,6 @@ class LikeFeedCommentService(
         )
 
         val saved = likeFeedCommentPort.save(likeFeedComment)
-
-        activityEventPublisher.publish(ActivityEvent(command.memberId, ActivityType.LIKE_PRESS))
 
         return LikeFeedCommentResult(
             id = saved.id!!.value,

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository
 @Repository
 interface MemberRoleJpaRepository : JpaRepository<MemberRoleJpaEntity, Long> {
     fun findByMemberId(memberId: Long): List<MemberRoleJpaEntity>
-    fun existsByMemberIdAndRoleId(memberId: Long, roleId: Long): Boolean
+    fun findByMemberIdAndRoleId(memberId: Long, roleId: Long): MemberRoleJpaEntity?
     fun existsByRole(role: RoleJpaEntity): Boolean
     fun existsByRoleId(roleId: Long): Boolean
 
