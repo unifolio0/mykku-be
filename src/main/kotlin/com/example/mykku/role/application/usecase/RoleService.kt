@@ -72,11 +72,10 @@ class RoleService(
         val role = roleRepository.findById(memberRole.roleId)
             ?: throw RoleException.roleNotFound()
 
-        val member = memberRepository.findById(MemberPk.of(command.memberId))
+        memberRepository.findById(MemberPk.of(command.memberId))
             ?: throw MemberException.memberNotFound()
 
-        member.assignRole(role.id.value)
-        memberRepository.save(member)
+        memberRepository.assignRole(MemberPk.of(command.memberId), role.id.value)
     }
 
     private fun resolveRepresentativeRoleId(member: Member, role: Role): Long? {

@@ -12,6 +12,13 @@ import org.springframework.stereotype.Repository
 interface MemberJpaRepository : JpaRepository<MemberJpaEntity, Long> {
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query(
+        value = "UPDATE member SET role_id = :roleId, updated_at = NOW(6) WHERE id = :memberId",
+        nativeQuery = true
+    )
+    fun assignRole(memberId: Long, roleId: Long)
+
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query(
         value = "UPDATE member SET role_id = :roleId, updated_at = NOW(6) WHERE id = :memberId AND role_id IS NULL",
         nativeQuery = true
     )

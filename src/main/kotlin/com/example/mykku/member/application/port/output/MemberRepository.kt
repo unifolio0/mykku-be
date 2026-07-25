@@ -6,6 +6,7 @@ import com.example.mykku.member.domain.vo.SocialProvider
 
 interface MemberRepository {
     fun save(member: Member): Member
+    fun assignRole(id: MemberPk, roleId: Long)
     fun assignRoleIfAbsent(id: MemberPk, roleId: Long): Boolean
     fun findById(id: MemberPk): Member?
     fun findByIds(ids: List<MemberPk>): List<Member>

@@ -4,6 +4,8 @@ import org.redisson.client.RedisException
 import org.slf4j.LoggerFactory
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
+import org.springframework.dao.PessimisticLockingFailureException
+import org.springframework.dao.QueryTimeoutException
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -53,6 +55,16 @@ class BaseExceptionHandler {
             .status(exception.errorCode.status)
             .contentType(MediaType.APPLICATION_JSON)
             .body(ErrorResponse(exception.errorCode.code, exception.errorCode.message))
+    }
+
+    @ExceptionHandler(PessimisticLockingFailureException::class, QueryTimeoutException::class)
+    fun handleLockConflictException(exception: Exception): ResponseEntity<ErrorResponse> {
+        ExceptionLoggingSupport.logException(logger, exception)
+
+        return ResponseEntity
+            .status(CommonErrorCode.RESOURCE_LOCK_CONFLICT.status)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(ErrorResponse(CommonErrorCode.RESOURCE_LOCK_CONFLICT.code, CommonErrorCode.RESOURCE_LOCK_CONFLICT.message))
     }
 
     @ExceptionHandler(RedisException::class)

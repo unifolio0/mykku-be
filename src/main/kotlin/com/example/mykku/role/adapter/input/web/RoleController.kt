@@ -60,7 +60,7 @@ class RoleController(
         val result = acquireRoleUseCase.acquireRole(request.toCommand(member))
         return ResponseEntity.ok(
             ApiResponse(
-                message = "칭호 획득 성공",
+                message = if (result.acquired) "칭호 획득 성공" else "이미 보유한 칭호입니다",
                 data = AcquireRoleResponse.from(result)
             )
         )

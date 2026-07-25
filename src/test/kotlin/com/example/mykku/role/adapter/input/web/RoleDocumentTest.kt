@@ -196,6 +196,56 @@ class RoleDocumentTest : BaseDocumentTest() {
         }
 
         @Test
+        fun `이미 보유한 칭호`() {
+            val request = AcquireRoleRequest(roleId = 11L)
+            val result = AcquireRoleResult(
+                acquired = false,
+                memberRole = MemberRoleResult(
+                    id = 5L,
+                    role = RoleResult(id = 11L, name = "이 몸 등장", description = "게시글 1회 업로드"),
+                    isRepresentative = true,
+                    earnedAt = LocalDateTime.now()
+                )
+            )
+
+            `when`(acquireRoleUseCase.acquireRole(any<AcquireRoleCommand>())).thenReturn(result)
+
+            val documentFilter = document("role/acquire", "ALREADY_ACQUIRED")
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING)
+                                .description("응답 메시지 (이미 보유 시 '이미 보유한 칭호입니다')"),
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
+                            fieldWithPath("data.acquired").type(JsonFieldType.BOOLEAN)
+                                .description("신규 획득 여부 — 이미 보유한 칭호이므로 false"),
+                            fieldWithPath("data.memberRole").type(JsonFieldType.OBJECT).description("보유 칭호 정보"),
+                            fieldWithPath("data.memberRole.id").type(JsonFieldType.NUMBER).description("보유 칭호 ID"),
+                            fieldWithPath("data.memberRole.role").type(JsonFieldType.OBJECT).description("칭호 정보"),
+                            fieldWithPath("data.memberRole.role.id").type(JsonFieldType.NUMBER).description("칭호 ID"),
+                            fieldWithPath("data.memberRole.role.name").type(JsonFieldType.STRING).description("칭호 이름"),
+                            fieldWithPath("data.memberRole.role.description").type(JsonFieldType.STRING)
+                                .description("칭호 설명").optional(),
+                            fieldWithPath("data.memberRole.isRepresentative").type(JsonFieldType.BOOLEAN)
+                                .description("대표 칭호 여부"),
+                            fieldWithPath("data.memberRole.earnedAt").type(JsonFieldType.STRING)
+                                .description("최초 획득 일시 (재호출로 갱신되지 않음)")
+                        )
+                )
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .body(objectMapper.writeValueAsString(request))
+                .`when`()
+                .post("/api/v1/roles/acquire")
+                .then()
+                .statusCode(200)
+        }
+
+        @Test
         fun `존재하지 않는 칭호`() {
             val request = AcquireRoleRequest(roleId = 999L)
 

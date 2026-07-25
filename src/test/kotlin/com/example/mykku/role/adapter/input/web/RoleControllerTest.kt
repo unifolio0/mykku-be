@@ -81,6 +81,19 @@ class RoleControllerTest : BaseControllerTest() {
     }
 
     @Test
+    @DisplayName("인증되지 않은 사용자는 전체 칭호 목록을 조회할 수 없다")
+    fun `getRoles - 인증되지 않은 사용자는 401을 반환한다`() {
+        // when & then
+        RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .`when`()
+            .get("/api/v1/roles")
+            .then()
+            .statusCode(401)
+    }
+
+    @Test
     @DisplayName("칭호를 획득할 수 있다")
     fun `acquireRole - 칭호를 획득한다`() {
         // given
@@ -145,6 +158,7 @@ class RoleControllerTest : BaseControllerTest() {
             .post("/api/v1/roles/acquire")
             .then()
             .statusCode(200)
+            .body("message", equalTo("이미 보유한 칭호입니다"))
             .body("data.acquired", equalTo(false))
             .body("data.memberRole.role.id", equalTo(role1.id!!.toInt()))
             .body("data.memberRole.isRepresentative", equalTo(true))
