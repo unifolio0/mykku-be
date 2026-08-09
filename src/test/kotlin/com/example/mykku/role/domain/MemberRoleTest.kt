@@ -93,6 +93,7 @@ class MemberRoleTest {
                 id = MemberRoleId(1),
                 memberId = 1L,
                 roleId = RoleId(5),
+                checkedAt = null,
                 createdAt = createdAt,
                 updatedAt = updatedAt
             )
@@ -113,6 +114,7 @@ class MemberRoleTest {
                 id = MemberRoleId(999),
                 memberId = 6L,
                 roleId = RoleId(10),
+                checkedAt = null,
                 createdAt = now,
                 updatedAt = now
             )
@@ -130,6 +132,7 @@ class MemberRoleTest {
                 id = MemberRoleId(2),
                 memberId = 7L,
                 roleId = RoleId(6),
+                checkedAt = null,
                 createdAt = createdAt,
                 updatedAt = updatedAt
             )
@@ -148,6 +151,7 @@ class MemberRoleTest {
                 id = MemberRoleId(3),
                 memberId = 0L,
                 roleId = RoleId(7),
+                checkedAt = null,
                 createdAt = now,
                 updatedAt = now
             )
@@ -168,6 +172,7 @@ class MemberRoleTest {
                 id = id,
                 memberId = memberId,
                 roleId = roleId,
+                checkedAt = null,
                 createdAt = createdAt,
                 updatedAt = updatedAt
             )

@@ -13,6 +13,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import java.time.LocalDateTime
 
 @Entity
 @Table(name = "member_role")
@@ -26,7 +27,10 @@ class MemberRoleJpaEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", nullable = false)
-    val role: RoleJpaEntity
+    val role: RoleJpaEntity,
+
+    @Column(name = "checked_at")
+    var checkedAt: LocalDateTime? = null
 ) : BaseJpaEntity() {
 
     fun toDomain(): MemberRole {
@@ -34,6 +38,7 @@ class MemberRoleJpaEntity(
             id = MemberRoleId.of(id!!),
             memberId = memberId,
             roleId = RoleId.of(role.id!!),
+            checkedAt = checkedAt,
             createdAt = createdAt,
             updatedAt = updatedAt
         )
@@ -44,7 +49,8 @@ class MemberRoleJpaEntity(
             return MemberRoleJpaEntity(
                 id = if (domain.id.value == 0L) null else domain.id.value,
                 memberId = domain.memberId,
-                role = role
+                role = role,
+                checkedAt = domain.checkedAt
             )
         }
     }

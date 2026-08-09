@@ -50,7 +50,7 @@ class AdminFanNoteService(
     }
 
     fun findById(id: Long): FanNoteDetailResponse {
-        val result = getFanNoteDetailUseCase.execute(id)
+        val result = getFanNoteDetailUseCase.execute(id, null)
         return FanNoteDetailResponse.from(result)
     }
 

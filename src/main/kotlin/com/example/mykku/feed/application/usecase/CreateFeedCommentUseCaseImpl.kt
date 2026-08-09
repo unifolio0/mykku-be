@@ -1,5 +1,8 @@
 package com.example.mykku.feed.application.usecase
 
+import com.example.mykku.achievement.application.event.ActivityEvent
+import com.example.mykku.achievement.application.port.output.ActivityEventPublisher
+import com.example.mykku.achievement.domain.vo.ActivityType
 import com.example.mykku.feed.application.dto.CommentAuthorResult
 import com.example.mykku.feed.application.dto.CreateFeedCommentCommand
 import com.example.mykku.feed.application.dto.SingleFeedCommentResult
@@ -17,7 +20,8 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class CreateFeedCommentUseCaseImpl(
     private val feedRepository: FeedRepository,
-    private val feedCommentRepository: FeedCommentRepository
+    private val feedCommentRepository: FeedCommentRepository,
+    private val activityEventPublisher: ActivityEventPublisher
 ) : CreateFeedCommentUseCase {
 
     override fun execute(command: CreateFeedCommentCommand, member: Member): SingleFeedCommentResult {
@@ -30,6 +34,8 @@ class CreateFeedCommentUseCaseImpl(
             parentCommentId = command.parentCommentId?.let { FeedCommentId.of(it) }
         )
         val savedComment = feedCommentRepository.save(comment, feed.id!!, member.id.value)
+
+        activityEventPublisher.publish(ActivityEvent(member.id.value, ActivityType.COMMENT_CREATE))
 
         return toSingleResult(savedComment, member)
     }

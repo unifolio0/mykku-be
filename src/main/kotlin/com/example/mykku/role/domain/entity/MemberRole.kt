@@ -8,6 +8,7 @@ class MemberRole private constructor(
     val id: MemberRoleId,
     val memberId: Long,
     val roleId: RoleId,
+    val checkedAt: LocalDateTime?,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 ) {
@@ -21,6 +22,7 @@ class MemberRole private constructor(
                 id = MemberRoleId(0),
                 memberId = memberId,
                 roleId = roleId,
+                checkedAt = null,
                 createdAt = now,
                 updatedAt = now
             )
@@ -30,6 +32,7 @@ class MemberRole private constructor(
             id: MemberRoleId,
             memberId: Long,
             roleId: RoleId,
+            checkedAt: LocalDateTime?,
             createdAt: LocalDateTime,
             updatedAt: LocalDateTime
         ): MemberRole {
@@ -37,6 +40,7 @@ class MemberRole private constructor(
                 id = id,
                 memberId = memberId,
                 roleId = roleId,
+                checkedAt = checkedAt,
                 createdAt = createdAt,
                 updatedAt = updatedAt
             )

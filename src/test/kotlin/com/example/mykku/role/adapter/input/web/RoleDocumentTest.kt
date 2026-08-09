@@ -4,8 +4,6 @@ import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
 import com.example.mykku.docs.Tag
-import com.example.mykku.role.application.dto.AcquireRoleCommand
-import com.example.mykku.role.application.dto.AcquireRoleResult
 import com.example.mykku.role.application.dto.ChangeRepresentativeRoleCommand
 import com.example.mykku.role.application.dto.MemberRoleResult
 import com.example.mykku.role.application.dto.RoleResult
@@ -132,56 +130,48 @@ class RoleDocumentTest : BaseDocumentTest() {
     }
 
     @Nested
-    @DisplayName("칭호 획득")
-    inner class AcquireRole {
+    @DisplayName("새로 획득한 칭호 조회")
+    inner class GetNewRoles {
 
         private val apiConfig = ApiRequestConfig(
             tag = Tag.ROLE_API,
-            summary = "칭호 획득",
-            description = "지정한 칭호를 획득합니다. 획득 조건 판단은 클라이언트가 담당합니다. " +
-                "이미 보유한 칭호를 다시 요청하면 칭호가 중복 부여되지 않고 acquired=false로 응답하므로 반복 호출이 안전합니다. " +
-                "단 대표 칭호가 비어 있는 회원은 이 요청으로 해당 칭호가 대표 칭호로 지정됩니다.",
-            requestBodyFields = listOf(
-                fieldWithPath("roleId").type(JsonFieldType.NUMBER).description("획득할 칭호 ID")
-            ),
+            summary = "새로 획득한 칭호 조회",
+            description = "아직 사용자에게 노출되지 않은 신규 획득 칭호를 조회합니다. " +
+                "칭호는 활동에 따라 서버가 자동으로 부여하므로 클라이언트는 이 API를 폴링해 획득 연출을 띄우면 됩니다. " +
+                "조회하는 순간 확인 처리되어 같은 칭호는 다시 반환되지 않습니다.",
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
         fun `성공`() {
-            val request = AcquireRoleRequest(roleId = 11L)
-            val result = AcquireRoleResult(
-                acquired = true,
-                memberRole = MemberRoleResult(
-                    id = 5L,
+            val newRoles = listOf(
+                MemberRoleResult(
+                    id = 12L,
                     role = RoleResult(id = 11L, name = "이 몸 등장", description = "게시글 1회 업로드"),
                     isRepresentative = true,
                     earnedAt = LocalDateTime.now()
                 )
             )
 
-            `when`(acquireRoleUseCase.acquireRole(any<AcquireRoleCommand>())).thenReturn(result)
+            `when`(getNewRolesUseCase.getNewRoles(any<Long>(), anyOrNull())).thenReturn(newRoles)
 
-            val documentFilter = document("role/acquire", 200)
+            val documentFilter = document("role/new-roles", 200)
                 .request(request().applyConfig(apiConfig))
                 .response(
                     response()
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
-                            fieldWithPath("data.acquired").type(JsonFieldType.BOOLEAN)
-                                .description("신규 획득 여부 (false면 이미 보유한 칭호)"),
-                            fieldWithPath("data.memberRole").type(JsonFieldType.OBJECT).description("보유 칭호 정보"),
-                            fieldWithPath("data.memberRole.id").type(JsonFieldType.NUMBER).description("보유 칭호 ID"),
-                            fieldWithPath("data.memberRole.role").type(JsonFieldType.OBJECT).description("칭호 정보"),
-                            fieldWithPath("data.memberRole.role.id").type(JsonFieldType.NUMBER).description("칭호 ID"),
-                            fieldWithPath("data.memberRole.role.name").type(JsonFieldType.STRING).description("칭호 이름"),
-                            fieldWithPath("data.memberRole.role.description").type(JsonFieldType.STRING)
-                                .description("칭호 설명").optional(),
-                            fieldWithPath("data.memberRole.isRepresentative").type(JsonFieldType.BOOLEAN)
-                                .description("대표 칭호 여부 (대표 칭호가 없던 회원은 이번 획득 칭호가 대표로 지정됨)"),
-                            fieldWithPath("data.memberRole.earnedAt").type(JsonFieldType.STRING)
-                                .description("칭호 획득 일시")
+                            fieldWithPath("data[]").type(JsonFieldType.ARRAY)
+                                .description("새로 획득한 칭호 목록 (없으면 빈 배열)"),
+                            fieldWithPath("data[].id").type(JsonFieldType.NUMBER).description("보유 칭호 ID"),
+                            fieldWithPath("data[].role").type(JsonFieldType.OBJECT).description("칭호 정보"),
+                            fieldWithPath("data[].role.id").type(JsonFieldType.NUMBER).description("칭호 ID"),
+                            fieldWithPath("data[].role.name").type(JsonFieldType.STRING).description("칭호 이름"),
+                            fieldWithPath("data[].role.description").type(JsonFieldType.STRING).description("칭호 설명")
+                                .optional(),
+                            fieldWithPath("data[].earnedAt").type(JsonFieldType.STRING).description("칭호 획득 일시"),
+                            fieldWithPath("data[].isRepresentative").type(JsonFieldType.BOOLEAN)
+                                .description("대표 칭호 여부")
                         )
                 )
                 .build()
@@ -189,83 +179,10 @@ class RoleDocumentTest : BaseDocumentTest() {
             given(documentFilter)
                 .headers(AUTH_HEADER)
                 .contentType(ContentType.JSON)
-                .body(objectMapper.writeValueAsString(request))
                 .`when`()
-                .post("/api/v1/roles/acquire")
+                .get("/api/v1/roles/me/new")
                 .then()
                 .statusCode(200)
-        }
-
-        @Test
-        fun `이미 보유한 칭호`() {
-            val request = AcquireRoleRequest(roleId = 11L)
-            val result = AcquireRoleResult(
-                acquired = false,
-                memberRole = MemberRoleResult(
-                    id = 5L,
-                    role = RoleResult(id = 11L, name = "이 몸 등장", description = "게시글 1회 업로드"),
-                    isRepresentative = true,
-                    earnedAt = LocalDateTime.now()
-                )
-            )
-
-            `when`(acquireRoleUseCase.acquireRole(any<AcquireRoleCommand>())).thenReturn(result)
-
-            val documentFilter = document("role/acquire", "ALREADY_ACQUIRED")
-                .request(request().applyConfig(apiConfig))
-                .response(
-                    response()
-                        .responseBodyField(
-                            fieldWithPath("message").type(JsonFieldType.STRING)
-                                .description("응답 메시지 (이미 보유 시 '이미 보유한 칭호입니다')"),
-                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
-                            fieldWithPath("data.acquired").type(JsonFieldType.BOOLEAN)
-                                .description("신규 획득 여부 — 이미 보유한 칭호이므로 false"),
-                            fieldWithPath("data.memberRole").type(JsonFieldType.OBJECT).description("보유 칭호 정보"),
-                            fieldWithPath("data.memberRole.id").type(JsonFieldType.NUMBER).description("보유 칭호 ID"),
-                            fieldWithPath("data.memberRole.role").type(JsonFieldType.OBJECT).description("칭호 정보"),
-                            fieldWithPath("data.memberRole.role.id").type(JsonFieldType.NUMBER).description("칭호 ID"),
-                            fieldWithPath("data.memberRole.role.name").type(JsonFieldType.STRING).description("칭호 이름"),
-                            fieldWithPath("data.memberRole.role.description").type(JsonFieldType.STRING)
-                                .description("칭호 설명").optional(),
-                            fieldWithPath("data.memberRole.isRepresentative").type(JsonFieldType.BOOLEAN)
-                                .description("대표 칭호 여부"),
-                            fieldWithPath("data.memberRole.earnedAt").type(JsonFieldType.STRING)
-                                .description("최초 획득 일시 (재호출로 갱신되지 않음)")
-                        )
-                )
-                .build()
-
-            given(documentFilter)
-                .headers(AUTH_HEADER)
-                .contentType(ContentType.JSON)
-                .body(objectMapper.writeValueAsString(request))
-                .`when`()
-                .post("/api/v1/roles/acquire")
-                .then()
-                .statusCode(200)
-        }
-
-        @Test
-        fun `존재하지 않는 칭호`() {
-            val request = AcquireRoleRequest(roleId = 999L)
-
-            `when`(acquireRoleUseCase.acquireRole(any<AcquireRoleCommand>()))
-                .thenThrow(RoleException(RoleErrorCode.ROLE_NOT_FOUND))
-
-            val documentFilter = document("role/acquire", "ROLE_NOT_FOUND")
-                .request(request().applyConfig(apiConfig))
-                .response(RestDocumentationResponse.ERROR_RESPONSE)
-                .build()
-
-            given(documentFilter)
-                .headers(AUTH_HEADER)
-                .contentType(ContentType.JSON)
-                .body(objectMapper.writeValueAsString(request))
-                .`when`()
-                .post("/api/v1/roles/acquire")
-                .then()
-                .statusCode(404)
         }
     }
 

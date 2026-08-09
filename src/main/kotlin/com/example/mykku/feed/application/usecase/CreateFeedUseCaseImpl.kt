@@ -1,5 +1,8 @@
 package com.example.mykku.feed.application.usecase
 
+import com.example.mykku.achievement.application.event.ActivityEvent
+import com.example.mykku.achievement.application.port.output.ActivityEventPublisher
+import com.example.mykku.achievement.domain.vo.ActivityType
 import com.example.mykku.board.application.port.output.BoardRepository
 import com.example.mykku.board.domain.vo.BoardId
 import com.example.mykku.board.exception.BoardException
@@ -38,7 +41,8 @@ class CreateFeedUseCaseImpl(
     private val imageUploadService: ImageUploadService,
     private val contestRepository: ContestRepository,
     private val contestTagRepository: ContestTagRepository,
-    private val contestParticipationRepository: ContestParticipationRepository
+    private val contestParticipationRepository: ContestParticipationRepository,
+    private val activityEventPublisher: ActivityEventPublisher
 ) : CreateFeedUseCase {
 
     override fun execute(command: CreateFeedCommand, member: Member): CreateFeedResult {
@@ -67,7 +71,11 @@ class CreateFeedUseCaseImpl(
             boardId = command.boardId,
             memberId = member.id.value
         )
-        return feedRepository.save(feed, command.boardId, member.id.value)
+        val savedFeed = feedRepository.save(feed, command.boardId, member.id.value)
+
+        activityEventPublisher.publish(ActivityEvent(member.id.value, ActivityType.FEED_UPLOAD))
+
+        return savedFeed
     }
 
     private fun uploadImages(images: List<org.springframework.web.multipart.MultipartFile>): List<ImageUploadResult> {
@@ -150,6 +158,7 @@ class CreateFeedUseCaseImpl(
         contestParticipationRepository.save(
             ContestParticipation.create(contestId = contestId, feedId = feedId, memberId = memberPk)
         )
+        activityEventPublisher.publish(ActivityEvent(memberPk, ActivityType.CONTEST_PARTICIPATE))
     }
 
     private fun buildCreateFeedResult(

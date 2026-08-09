@@ -11,6 +11,7 @@ import com.example.mykku.role.domain.vo.RoleId
 import com.example.mykku.role.exception.RoleException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
+import java.time.LocalDateTime
 
 @Component
 class MemberRoleRepositoryAdapter(
@@ -63,5 +64,19 @@ class MemberRoleRepositoryAdapter(
         jpaRepository.findByIdOrNull(memberRole.id.value)?.let {
             jpaRepository.delete(it)
         }
+    }
+
+    override fun findUncheckedByMemberIdWithRole(memberId: Long): List<MemberRoleWithRole> {
+        return jpaRepository.findUncheckedByMemberIdWithRole(memberId).map { entity ->
+            MemberRoleWithRole(
+                memberRole = entity.toDomain(),
+                role = entity.role.toDomain()
+            )
+        }
+    }
+
+    override fun markChecked(ids: List<MemberRoleId>) {
+        if (ids.isEmpty()) return
+        jpaRepository.markChecked(ids.map { it.value }, LocalDateTime.now())
     }
 }

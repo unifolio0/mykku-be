@@ -2,6 +2,7 @@ package com.example.mykku
 
 import com.example.mykku.board.adapter.output.persistence.BoardJpaRepository
 import com.example.mykku.board.adapter.output.persistence.entity.BoardJpaEntity
+import com.example.mykku.config.TestAsyncConfig
 import com.example.mykku.config.TestEmailConfig
 import com.example.mykku.config.TestEmailSenderConfig
 import com.example.mykku.config.TestImageUploadConfig
@@ -23,7 +24,7 @@ import org.springframework.test.context.ActiveProfiles
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-@Import(TestEmailConfig::class, TestEmailSenderConfig::class, TestImageUploadConfig::class)
+@Import(TestEmailConfig::class, TestEmailSenderConfig::class, TestImageUploadConfig::class, TestAsyncConfig::class)
 @ExtendWith(DatabaseCleaner::class)
 abstract class BaseControllerTest {
 
