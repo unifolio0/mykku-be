@@ -92,6 +92,22 @@ class AwardTitlesServiceTest : BaseControllerTest() {
     }
 
     @Test
+    @DisplayName("이미 대표 칭호가 있으면 새 칭호를 부여해도 대표 칭호는 유지된다")
+    fun keepsRepresentativeWhenAlreadySet() {
+        ensureRole("이 몸 등장")
+        ensureRole("영역전개")
+        val member = createAndSaveMember(email = "award_keeprep@test.com", socialId = "award_keeprep")
+
+        awardTitlesUseCase.handleActivity(member.id, ActivityType.FEED_UPLOAD)
+        val representativeRoleId = memberRepository.findById(MemberPk.of(member.id))!!.roleId
+        repeat(4) { awardTitlesUseCase.handleActivity(member.id, ActivityType.FEED_UPLOAD) }
+
+        assertThat(representativeRoleId).isNotNull()
+        assertThat(earnedTitleNames(member.id)).containsExactlyInAnyOrder("이 몸 등장", "영역전개")
+        assertThat(memberRepository.findById(MemberPk.of(member.id))!!.roleId).isEqualTo(representativeRoleId)
+    }
+
+    @Test
     @DisplayName("새로 부여된 칭호는 미확인 상태로 저장된다")
     fun awardedTitleIsUnchecked() {
         ensureRole("여름이었다")
