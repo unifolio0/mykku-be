@@ -43,8 +43,8 @@ interface MemberRoleJpaRepository : JpaRepository<MemberRoleJpaEntity, Long> {
     @Query(
         """
         UPDATE MemberRoleJpaEntity mr SET mr.checkedAt = :now
-        WHERE mr.id IN :ids AND mr.checkedAt IS NULL
+        WHERE mr.id = :id AND mr.checkedAt IS NULL
         """
     )
-    fun markChecked(@Param("ids") ids: List<Long>, @Param("now") now: LocalDateTime): Int
+    fun markChecked(@Param("id") id: Long, @Param("now") now: LocalDateTime): Int
 }

@@ -223,7 +223,7 @@ class MemberRoleRepositoryAdapterTest : BaseRepositoryTest() {
 
             val target = memberRoleRepository.save(createMemberRole(member.id, RoleId(role1.id!!)))
             val checked = memberRoleRepository.save(createMemberRole(member.id, RoleId(role2.id!!)))
-            memberRoleRepository.markChecked(listOf(checked.id))
+            memberRoleRepository.markChecked(checked.id)
 
             val unchecked = memberRoleRepository.findUncheckedByMemberIdWithRole(member.id)
 
@@ -239,7 +239,7 @@ class MemberRoleRepositoryAdapterTest : BaseRepositoryTest() {
             val member = createAndSaveMember(email = "mark_m1@test.com", socialId = "mark_s1")
             val saved = memberRoleRepository.save(createMemberRole(member.id, RoleId(role.id!!)))
 
-            memberRoleRepository.markChecked(listOf(saved.id))
+            memberRoleRepository.markChecked(saved.id)
 
             assertThat(memberRoleRepository.findUncheckedByMemberIdWithRole(member.id)).isEmpty()
         }
@@ -251,18 +251,23 @@ class MemberRoleRepositoryAdapterTest : BaseRepositoryTest() {
             val member = createAndSaveMember(email = "idem_m1@test.com", socialId = "idem_s1")
             val saved = memberRoleRepository.save(createMemberRole(member.id, RoleId(role.id!!)))
 
-            memberRoleRepository.markChecked(listOf(saved.id))
+            memberRoleRepository.markChecked(saved.id)
             val firstCheckedAt = memberRoleRepository.findById(saved.id)!!.checkedAt
-            memberRoleRepository.markChecked(listOf(saved.id))
+            memberRoleRepository.markChecked(saved.id)
 
             assertThat(firstCheckedAt).isNotNull()
             assertThat(memberRoleRepository.findById(saved.id)!!.checkedAt).isEqualTo(firstCheckedAt)
         }
 
         @Test
-        @DisplayName("빈 목록으로 markChecked를 호출해도 예외가 발생하지 않는다")
-        fun markCheckedWithEmptyList() {
-            memberRoleRepository.markChecked(emptyList())
+        @DisplayName("markChecked는 미확인 칭호를 처음 확인할 때만 true를 반환한다")
+        fun markCheckedReturnsTrueOnlyOnFirstCall() {
+            val role = createAndSaveRole(name = "rowcount_role", description = "행수")
+            val member = createAndSaveMember(email = "rowcount_m1@test.com", socialId = "rowcount_s1")
+            val saved = memberRoleRepository.save(createMemberRole(member.id, RoleId(role.id!!)))
+
+            assertThat(memberRoleRepository.markChecked(saved.id)).isTrue()
+            assertThat(memberRoleRepository.markChecked(saved.id)).isFalse()
         }
 
         @Test

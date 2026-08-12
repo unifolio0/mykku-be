@@ -46,11 +46,9 @@ class RoleService(
 
     @Transactional
     override fun getNewRoles(memberId: Long, representativeRoleId: Long?): List<MemberRoleResult> {
-        val unchecked = memberRoleRepository.findUncheckedByMemberIdWithRole(memberId)
-        if (unchecked.isEmpty()) return emptyList()
-
-        memberRoleRepository.markChecked(unchecked.map { it.memberRole.id })
-        return unchecked.map { toMemberRoleResult(it.memberRole, it.role, representativeRoleId) }
+        return memberRoleRepository.findUncheckedByMemberIdWithRole(memberId)
+            .filter { memberRoleRepository.markChecked(it.memberRole.id) }
+            .map { toMemberRoleResult(it.memberRole, it.role, representativeRoleId) }
     }
 
     @Transactional

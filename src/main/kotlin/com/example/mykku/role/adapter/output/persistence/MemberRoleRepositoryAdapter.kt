@@ -75,8 +75,7 @@ class MemberRoleRepositoryAdapter(
         }
     }
 
-    override fun markChecked(ids: List<MemberRoleId>) {
-        if (ids.isEmpty()) return
-        jpaRepository.markChecked(ids.map { it.value }, LocalDateTime.now())
+    override fun markChecked(id: MemberRoleId): Boolean {
+        return jpaRepository.markChecked(id.value, LocalDateTime.now()) == 1
     }
 }
