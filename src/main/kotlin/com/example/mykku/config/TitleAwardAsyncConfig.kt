@@ -17,7 +17,7 @@ class TitleAwardAsyncConfig {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
-    @Bean(name = ["titleAwardExecutor"])
+    @Bean(name = ["titleAwardExecutor"], defaultCandidate = false)
     @ConditionalOnMissingBean(name = ["titleAwardExecutor"])
     fun titleAwardExecutor(): TaskExecutor {
         val executor = ThreadPoolTaskExecutor()

@@ -16,7 +16,7 @@ class FcmNotificationSender(
 
     private val logger = LoggerFactory.getLogger(FcmNotificationSender::class.java)
 
-    @Async
+    @Async("applicationTaskExecutor")
     fun send(command: CreateNotificationCommand) {
         val tokens = fcmTokenRepository.findAllByMemberId(command.receiverId)
         if (tokens.isEmpty()) {
