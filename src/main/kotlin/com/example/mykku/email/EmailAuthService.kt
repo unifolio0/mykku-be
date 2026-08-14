@@ -1,5 +1,8 @@
 package com.example.mykku.email
 
+import com.example.mykku.achievement.application.event.ActivityEvent
+import com.example.mykku.achievement.application.port.output.ActivityEventPublisher
+import com.example.mykku.achievement.domain.vo.ActivityType
 import com.example.mykku.auth.adapter.input.web.dto.LoginResponse
 import com.example.mykku.auth.adapter.output.persistence.JwtTokenProviderAdapter
 import com.example.mykku.email.domain.VerificationPurpose
@@ -19,7 +22,8 @@ class EmailAuthService(
     private val redisVerificationCodeManager: RedisVerificationCodeManager,
     private val memberRepository: MemberRepository,
     private val passwordEncoder: PasswordEncoder,
-    private val jwtTokenProvider: JwtTokenProviderAdapter
+    private val jwtTokenProvider: JwtTokenProviderAdapter,
+    private val activityEventPublisher: ActivityEventPublisher
 ) {
 
     @Transactional
@@ -59,17 +63,20 @@ class EmailAuthService(
             throw EmailAuthException.emailAlreadyExists()
         }
 
-        val encodedPassword = passwordEncoder.encode(password)
-
-        val member = Member.createEmailMember(
-            email = email,
-            password = encodedPassword
-        )
-
-        val savedMember = memberRepository.save(member)
+        val savedMember = createEmailMember(email, password)
+        activityEventPublisher.publish(ActivityEvent(savedMember.id.value, ActivityType.FIRST_LOGIN))
 
         val result = jwtTokenProvider.createLoginResult(savedMember, email, false)
         return LoginResponse.from(result)
+    }
+
+    private fun createEmailMember(email: String, password: String): Member {
+        val member = Member.createEmailMember(
+            email = email,
+            password = passwordEncoder.encode(password)
+        )
+
+        return memberRepository.save(member)
     }
 
     @Transactional(readOnly = true)

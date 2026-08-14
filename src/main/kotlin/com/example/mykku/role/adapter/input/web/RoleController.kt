@@ -4,17 +4,14 @@ import com.example.mykku.auth.config.CurrentMember
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.member.domain.entity.Member
 import com.example.mykku.role.application.dto.ChangeRepresentativeRoleCommand
-import com.example.mykku.role.application.port.input.AcquireRoleUseCase
 import com.example.mykku.role.application.port.input.ChangeRepresentativeRoleUseCase
 import com.example.mykku.role.application.port.input.GetMyRolesUseCase
+import com.example.mykku.role.application.port.input.GetNewRolesUseCase
 import com.example.mykku.role.application.port.input.GetRolesUseCase
-import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -23,8 +20,8 @@ import org.springframework.web.bind.annotation.RestController
 class RoleController(
     private val getMyRolesUseCase: GetMyRolesUseCase,
     private val changeRepresentativeRoleUseCase: ChangeRepresentativeRoleUseCase,
-    private val acquireRoleUseCase: AcquireRoleUseCase,
-    private val getRolesUseCase: GetRolesUseCase
+    private val getRolesUseCase: GetRolesUseCase,
+    private val getNewRolesUseCase: GetNewRolesUseCase
 ) {
     @GetMapping
     fun getRoles(
@@ -52,16 +49,15 @@ class RoleController(
         )
     }
 
-    @PostMapping("/acquire")
-    fun acquireRole(
-        @CurrentMember member: Member,
-        @Valid @RequestBody request: AcquireRoleRequest
-    ): ResponseEntity<ApiResponse<AcquireRoleResponse>> {
-        val result = acquireRoleUseCase.acquireRole(request.toCommand(member))
+    @GetMapping("/me/new")
+    fun getNewRoles(
+        @CurrentMember member: Member
+    ): ResponseEntity<ApiResponse<List<MemberRoleResponse>>> {
+        val results = getNewRolesUseCase.getNewRoles(member.id.value, member.roleId)
         return ResponseEntity.ok(
             ApiResponse(
-                message = if (result.acquired) "칭호 획득 성공" else "이미 보유한 칭호입니다",
-                data = AcquireRoleResponse.from(result)
+                message = "새로 획득한 칭호 조회 성공",
+                data = results.map { MemberRoleResponse.from(it) }
             )
         )
     }

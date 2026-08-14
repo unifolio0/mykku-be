@@ -12,6 +12,7 @@ import com.example.mykku.role.application.dto.RoleResult
 import com.example.mykku.role.application.port.input.AcquireRoleUseCase
 import com.example.mykku.role.application.port.input.ChangeRepresentativeRoleUseCase
 import com.example.mykku.role.application.port.input.GetMyRolesUseCase
+import com.example.mykku.role.application.port.input.GetNewRolesUseCase
 import com.example.mykku.role.application.port.input.GetRolesUseCase
 import com.example.mykku.role.application.port.output.MemberRoleRepository
 import com.example.mykku.role.application.port.output.RoleRepository
@@ -29,7 +30,7 @@ class RoleService(
     private val memberRoleRepository: MemberRoleRepository,
     private val roleRepository: RoleRepository,
     private val memberRepository: MemberRepository
-) : GetMyRolesUseCase, ChangeRepresentativeRoleUseCase, AcquireRoleUseCase, GetRolesUseCase {
+) : GetMyRolesUseCase, ChangeRepresentativeRoleUseCase, AcquireRoleUseCase, GetRolesUseCase, GetNewRolesUseCase {
 
     override fun getMyRoles(memberId: Long, representativeRoleId: Long?): List<MemberRoleResult> {
         val memberRolesWithRole = memberRoleRepository.findByMemberIdWithRole(memberId)
@@ -41,6 +42,13 @@ class RoleService(
 
     override fun getRoles(): List<RoleResult> {
         return roleRepository.findAll().map { toRoleResult(it) }
+    }
+
+    @Transactional
+    override fun getNewRoles(memberId: Long, representativeRoleId: Long?): List<MemberRoleResult> {
+        return memberRoleRepository.findUncheckedByMemberIdWithRole(memberId)
+            .filter { memberRoleRepository.markChecked(it.memberRole.id) }
+            .map { toMemberRoleResult(it.memberRole, it.role, representativeRoleId) }
     }
 
     @Transactional

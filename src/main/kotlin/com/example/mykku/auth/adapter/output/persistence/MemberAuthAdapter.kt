@@ -1,5 +1,8 @@
 package com.example.mykku.auth.adapter.output.persistence
 
+import com.example.mykku.achievement.application.event.ActivityEvent
+import com.example.mykku.achievement.application.port.output.ActivityEventPublisher
+import com.example.mykku.achievement.domain.vo.ActivityType
 import com.example.mykku.auth.application.dto.OAuthMemberInfo
 import com.example.mykku.auth.application.port.output.MemberAuthPort
 import com.example.mykku.member.application.port.output.MemberRepository
@@ -9,7 +12,8 @@ import org.springframework.stereotype.Component
 
 @Component
 class MemberAuthAdapter(
-    private val memberRepository: MemberRepository
+    private val memberRepository: MemberRepository,
+    private val activityEventPublisher: ActivityEventPublisher
 ) : MemberAuthPort {
 
     override fun findOrCreate(memberInfo: OAuthMemberInfo): Pair<Member, Boolean> {
@@ -19,7 +23,9 @@ class MemberAuthAdapter(
             return Pair(existingMember, true)
         }
 
-        return Pair(createMember(memberInfo), false)
+        val newMember = createMember(memberInfo)
+        activityEventPublisher.publish(ActivityEvent(newMember.id.value, ActivityType.FIRST_LOGIN))
+        return Pair(newMember, false)
     }
 
     override fun findById(memberId: Long): Member? {

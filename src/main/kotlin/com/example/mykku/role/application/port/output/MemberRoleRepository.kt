@@ -13,6 +13,8 @@ interface MemberRoleRepository {
     fun findByMemberIdAndRoleId(memberId: Long, roleId: RoleId): MemberRole?
     fun existsByRoleId(roleId: RoleId): Boolean
     fun delete(memberRole: MemberRole)
+    fun findUncheckedByMemberIdWithRole(memberId: Long): List<MemberRoleWithRole>
+    fun markChecked(id: MemberRoleId): Boolean
 }
 
 data class MemberRoleWithRole(

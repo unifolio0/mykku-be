@@ -195,6 +195,35 @@ class EmailAuthControllerTest : BaseControllerTest() {
     }
 
     @Test
+    @DisplayName("회원가입 - 첫 만남 칭호가 자동 부여된다")
+    fun `signup - 첫 만남 칭호가 자동 부여된다`() {
+        roleJpaRepository.save(RoleJpaEntity(name = "첫 만남", description = "로그인 하면 무조건 줌"))
+        val request = SignupRequest(
+            email = "firstmeeting@example.com",
+            password = "password123!"
+        )
+
+        RestAssured.given()
+            .contentType(ContentType.JSON)
+            .body(request)
+            .`when`()
+            .post("/api/v1/email-auth/signup")
+            .then()
+            .statusCode(200)
+
+        val member = memberJpaRepository.findByEmail("firstmeeting@example.com")!!
+        RestAssured.given()
+            .contentType(ContentType.JSON)
+            .headers(createAuthHeaders(member.id))
+            .`when`()
+            .get("/api/v1/roles/me/new")
+            .then()
+            .statusCode(200)
+            .body("data[0].role.name", equalTo("첫 만남"))
+            .body("data[0].isRepresentative", equalTo(true))
+    }
+
+    @Test
     @DisplayName("회원가입 - 이미 존재하는 이메일")
     fun `signup - 이미 존재하는 이메일로 회원가입 시 실패`() {
         val existingEmail = "existing@example.com"

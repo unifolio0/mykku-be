@@ -1,5 +1,8 @@
 package com.example.mykku.dailymessage.application.usecase
 
+import com.example.mykku.achievement.application.event.ActivityEvent
+import com.example.mykku.achievement.application.port.output.ActivityEventPublisher
+import com.example.mykku.achievement.domain.vo.ActivityType
 import com.example.mykku.dailymessage.application.dto.CommentResult
 import com.example.mykku.dailymessage.application.dto.CreateCommentCommand
 import com.example.mykku.dailymessage.application.port.input.CreateCommentUseCase
@@ -16,21 +19,37 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class CreateCommentUseCaseImpl(
     private val dailyMessageRepository: DailyMessageRepository,
-    private val dailyMessageCommentRepository: DailyMessageCommentRepository
+    private val dailyMessageCommentRepository: DailyMessageCommentRepository,
+    private val activityEventPublisher: ActivityEventPublisher
 ) : CreateCommentUseCase {
 
     override fun execute(command: CreateCommentCommand): CommentResult {
-        dailyMessageRepository.findById(DailyMessageId.of(command.dailyMessageId))
+        validateDailyMessageExists(command.dailyMessageId)
+        validateParentCommentExists(command)
+
+        val savedComment = dailyMessageCommentRepository.save(newComment(command))
+
+        activityEventPublisher.publish(ActivityEvent(command.memberId, ActivityType.COMMENT_CREATE))
+
+        return CommentResult.from(savedComment, replies = emptyList())
+    }
+
+    private fun validateDailyMessageExists(dailyMessageId: Long) {
+        dailyMessageRepository.findById(DailyMessageId.of(dailyMessageId))
             ?: throw DailyMessageException.dailyMessageNotFound()
+    }
 
-        if (command.parentCommentId != null) {
-            dailyMessageCommentRepository.findByIdAndDailyMessageId(
-                DailyMessageCommentId.of(command.parentCommentId),
-                DailyMessageId.of(command.dailyMessageId)
-            ) ?: throw DailyMessageException.dailyMessageCommentNotFound()
-        }
+    private fun validateParentCommentExists(command: CreateCommentCommand) {
+        val parentCommentId = command.parentCommentId ?: return
 
-        val comment = DailyMessageComment.create(
+        dailyMessageCommentRepository.findByIdAndDailyMessageId(
+            DailyMessageCommentId.of(parentCommentId),
+            DailyMessageId.of(command.dailyMessageId)
+        ) ?: throw DailyMessageException.dailyMessageCommentNotFound()
+    }
+
+    private fun newComment(command: CreateCommentCommand): DailyMessageComment {
+        return DailyMessageComment.create(
             dailyMessageId = command.dailyMessageId,
             memberId = command.memberId,
             memberNickname = command.memberNickname,
@@ -38,9 +57,5 @@ class CreateCommentUseCaseImpl(
             content = command.content,
             parentCommentId = command.parentCommentId
         )
-
-        val savedComment = dailyMessageCommentRepository.save(comment)
-
-        return CommentResult.from(savedComment, replies = emptyList())
     }
 }

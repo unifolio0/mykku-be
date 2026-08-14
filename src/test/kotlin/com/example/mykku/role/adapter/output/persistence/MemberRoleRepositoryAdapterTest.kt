@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDateTime
 
 @DisplayName("MemberRoleRepository 통합 테스트")
 class MemberRoleRepositoryAdapterTest : BaseRepositoryTest() {
@@ -206,6 +207,106 @@ class MemberRoleRepositoryAdapterTest : BaseRepositoryTest() {
 
             val foundMemberRole = memberRoleRepository.findById(savedMemberRole.id)
             assertThat(foundMemberRole).isNull()
+        }
+    }
+
+    @Nested
+    @DisplayName("findUncheckedByMemberIdWithRole / markChecked 메서드")
+    inner class UncheckedRoles {
+
+        @Test
+        @DisplayName("확인 처리되지 않은 보유 칭호만 역할 정보와 함께 반환한다")
+        fun findsOnlyUnchecked() {
+            val role1 = createAndSaveRole(name = "unchecked_role1", description = "미확인1")
+            val role2 = createAndSaveRole(name = "unchecked_role2", description = "미확인2")
+            val member = createAndSaveMember(email = "unchecked_m1@test.com", socialId = "unchecked_s1")
+
+            val target = memberRoleRepository.save(createMemberRole(member.id, RoleId(role1.id!!)))
+            val checked = memberRoleRepository.save(createMemberRole(member.id, RoleId(role2.id!!)))
+            memberRoleRepository.markChecked(checked.id)
+
+            val unchecked = memberRoleRepository.findUncheckedByMemberIdWithRole(member.id)
+
+            assertThat(unchecked).hasSize(1)
+            assertThat(unchecked.first().memberRole.id).isEqualTo(target.id)
+            assertThat(unchecked.first().role.name).isEqualTo("unchecked_role1")
+        }
+
+        @Test
+        @DisplayName("markChecked 후에는 미확인 목록이 비어 있다")
+        fun markCheckedEmptiesUnchecked() {
+            val role = createAndSaveRole(name = "mark_role", description = "마킹")
+            val member = createAndSaveMember(email = "mark_m1@test.com", socialId = "mark_s1")
+            val saved = memberRoleRepository.save(createMemberRole(member.id, RoleId(role.id!!)))
+
+            memberRoleRepository.markChecked(saved.id)
+
+            assertThat(memberRoleRepository.findUncheckedByMemberIdWithRole(member.id)).isEmpty()
+        }
+
+        @Test
+        @DisplayName("이미 확인된 칭호는 markChecked를 재호출해도 checkedAt이 갱신되지 않는다")
+        fun markCheckedIsIdempotent() {
+            val role = createAndSaveRole(name = "idem_role", description = "멱등")
+            val member = createAndSaveMember(email = "idem_m1@test.com", socialId = "idem_s1")
+            val saved = memberRoleRepository.save(createMemberRole(member.id, RoleId(role.id!!)))
+
+            memberRoleRepository.markChecked(saved.id)
+            val firstCheckedAt = memberRoleRepository.findById(saved.id)!!.checkedAt
+            memberRoleRepository.markChecked(saved.id)
+
+            assertThat(firstCheckedAt).isNotNull()
+            assertThat(memberRoleRepository.findById(saved.id)!!.checkedAt).isEqualTo(firstCheckedAt)
+        }
+
+        @Test
+        @DisplayName("markChecked는 checkedAt과 함께 updatedAt도 갱신한다")
+        fun markCheckedRefreshesUpdatedAt() {
+            val role = createAndSaveRole(name = "audit_role", description = "감사")
+            val member = createAndSaveMember(email = "audit_m1@test.com", socialId = "audit_s1")
+            val saved = memberRoleRepository.save(createMemberRole(member.id, RoleId(role.id!!)))
+            val updatedAtBeforeCheck = memberRoleRepository.findById(saved.id)!!.updatedAt
+
+            memberRoleRepository.markChecked(saved.id)
+
+            val reloaded = memberRoleRepository.findById(saved.id)!!
+            assertThat(reloaded.checkedAt).isNotNull()
+            assertThat(reloaded.updatedAt).isEqualTo(reloaded.checkedAt)
+            assertThat(reloaded.updatedAt).isAfterOrEqualTo(updatedAtBeforeCheck)
+        }
+
+        @Test
+        @DisplayName("markChecked는 미확인 칭호를 처음 확인할 때만 true를 반환한다")
+        fun markCheckedReturnsTrueOnlyOnFirstCall() {
+            val role = createAndSaveRole(name = "rowcount_role", description = "행수")
+            val member = createAndSaveMember(email = "rowcount_m1@test.com", socialId = "rowcount_s1")
+            val saved = memberRoleRepository.save(createMemberRole(member.id, RoleId(role.id!!)))
+
+            assertThat(memberRoleRepository.markChecked(saved.id)).isTrue()
+            assertThat(memberRoleRepository.markChecked(saved.id)).isFalse()
+        }
+
+        @Test
+        @DisplayName("새로 저장한 보유 칭호의 checkedAt은 null이다")
+        fun newMemberRoleIsUnchecked() {
+            val role = createAndSaveRole(name = "fresh_role", description = "신규")
+            val member = createAndSaveMember(email = "fresh_m1@test.com", socialId = "fresh_s1")
+
+            val saved = memberRoleRepository.save(createMemberRole(member.id, RoleId(role.id!!)))
+
+            assertThat(memberRoleRepository.findById(saved.id)!!.checkedAt).isNull()
+        }
+
+        @Test
+        @DisplayName("saveIfAbsent로 넣은 보유 칭호도 미확인 상태로 조회된다")
+        fun saveIfAbsentLeavesUnchecked() {
+            val role = createAndSaveRole(name = "absent_role", description = "멱등 저장")
+            val member = createAndSaveMember(email = "absent_m1@test.com", socialId = "absent_s1")
+
+            val inserted = memberRoleRepository.saveIfAbsent(member.id, RoleId(role.id!!))
+
+            assertThat(inserted).isTrue()
+            assertThat(memberRoleRepository.findUncheckedByMemberIdWithRole(member.id)).hasSize(1)
         }
     }
 }
