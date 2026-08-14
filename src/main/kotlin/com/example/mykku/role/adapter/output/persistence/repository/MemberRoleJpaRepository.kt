@@ -42,7 +42,7 @@ interface MemberRoleJpaRepository : JpaRepository<MemberRoleJpaEntity, Long> {
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query(
         """
-        UPDATE MemberRoleJpaEntity mr SET mr.checkedAt = :now
+        UPDATE MemberRoleJpaEntity mr SET mr.checkedAt = :now, mr.updatedAt = :now
         WHERE mr.id = :id AND mr.checkedAt IS NULL
         """
     )

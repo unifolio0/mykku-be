@@ -260,6 +260,22 @@ class MemberRoleRepositoryAdapterTest : BaseRepositoryTest() {
         }
 
         @Test
+        @DisplayName("markChecked는 checkedAt과 함께 updatedAt도 갱신한다")
+        fun markCheckedRefreshesUpdatedAt() {
+            val role = createAndSaveRole(name = "audit_role", description = "감사")
+            val member = createAndSaveMember(email = "audit_m1@test.com", socialId = "audit_s1")
+            val saved = memberRoleRepository.save(createMemberRole(member.id, RoleId(role.id!!)))
+            val updatedAtBeforeCheck = memberRoleRepository.findById(saved.id)!!.updatedAt
+
+            memberRoleRepository.markChecked(saved.id)
+
+            val reloaded = memberRoleRepository.findById(saved.id)!!
+            assertThat(reloaded.checkedAt).isNotNull()
+            assertThat(reloaded.updatedAt).isEqualTo(reloaded.checkedAt)
+            assertThat(reloaded.updatedAt).isAfterOrEqualTo(updatedAtBeforeCheck)
+        }
+
+        @Test
         @DisplayName("markChecked는 미확인 칭호를 처음 확인할 때만 true를 반환한다")
         fun markCheckedReturnsTrueOnlyOnFirstCall() {
             val role = createAndSaveRole(name = "rowcount_role", description = "행수")

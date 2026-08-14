@@ -9,6 +9,7 @@ import com.example.mykku.dailymessage.domain.vo.DailyMessageId
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
@@ -28,10 +29,12 @@ class GetDailyMessageActivityPublishTest {
     @Mock
     private lateinit var activityEventPublisher: ActivityEventPublisher
 
+    @InjectMocks
+    private lateinit var useCase: GetDailyMessageUseCaseImpl
+
     @Test
     @DisplayName("로그인한 회원이 열람하면 DAILYMESSAGE_VIEW 이벤트를 발행한다")
     fun publishesForLoggedInMember() {
-        val useCase = GetDailyMessageUseCaseImpl(dailyMessageRepository, activityEventPublisher)
         whenever(dailyMessageRepository.findById(DailyMessageId.of(3L))).thenReturn(stubDailyMessage())
 
         useCase.execute(3L, 1L)
@@ -42,7 +45,6 @@ class GetDailyMessageActivityPublishTest {
     @Test
     @DisplayName("비로그인 열람은 이벤트를 발행하지 않는다")
     fun doesNotPublishForAnonymous() {
-        val useCase = GetDailyMessageUseCaseImpl(dailyMessageRepository, activityEventPublisher)
         whenever(dailyMessageRepository.findById(DailyMessageId.of(3L))).thenReturn(stubDailyMessage())
 
         useCase.execute(3L, null)

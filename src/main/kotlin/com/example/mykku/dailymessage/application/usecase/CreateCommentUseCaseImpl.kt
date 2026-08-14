@@ -24,17 +24,32 @@ class CreateCommentUseCaseImpl(
 ) : CreateCommentUseCase {
 
     override fun execute(command: CreateCommentCommand): CommentResult {
-        dailyMessageRepository.findById(DailyMessageId.of(command.dailyMessageId))
+        validateDailyMessageExists(command.dailyMessageId)
+        validateParentCommentExists(command)
+
+        val savedComment = dailyMessageCommentRepository.save(newComment(command))
+
+        activityEventPublisher.publish(ActivityEvent(command.memberId, ActivityType.COMMENT_CREATE))
+
+        return CommentResult.from(savedComment, replies = emptyList())
+    }
+
+    private fun validateDailyMessageExists(dailyMessageId: Long) {
+        dailyMessageRepository.findById(DailyMessageId.of(dailyMessageId))
             ?: throw DailyMessageException.dailyMessageNotFound()
+    }
 
-        if (command.parentCommentId != null) {
-            dailyMessageCommentRepository.findByIdAndDailyMessageId(
-                DailyMessageCommentId.of(command.parentCommentId),
-                DailyMessageId.of(command.dailyMessageId)
-            ) ?: throw DailyMessageException.dailyMessageCommentNotFound()
-        }
+    private fun validateParentCommentExists(command: CreateCommentCommand) {
+        val parentCommentId = command.parentCommentId ?: return
 
-        val comment = DailyMessageComment.create(
+        dailyMessageCommentRepository.findByIdAndDailyMessageId(
+            DailyMessageCommentId.of(parentCommentId),
+            DailyMessageId.of(command.dailyMessageId)
+        ) ?: throw DailyMessageException.dailyMessageCommentNotFound()
+    }
+
+    private fun newComment(command: CreateCommentCommand): DailyMessageComment {
+        return DailyMessageComment.create(
             dailyMessageId = command.dailyMessageId,
             memberId = command.memberId,
             memberNickname = command.memberNickname,
@@ -42,11 +57,5 @@ class CreateCommentUseCaseImpl(
             content = command.content,
             parentCommentId = command.parentCommentId
         )
-
-        val savedComment = dailyMessageCommentRepository.save(comment)
-
-        activityEventPublisher.publish(ActivityEvent(command.memberId, ActivityType.COMMENT_CREATE))
-
-        return CommentResult.from(savedComment, replies = emptyList())
     }
 }

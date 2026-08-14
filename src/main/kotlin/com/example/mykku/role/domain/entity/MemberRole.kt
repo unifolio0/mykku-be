@@ -35,15 +35,6 @@ class MemberRole private constructor(
             checkedAt: LocalDateTime?,
             createdAt: LocalDateTime,
             updatedAt: LocalDateTime
-        ): MemberRole {
-            return MemberRole(
-                id = id,
-                memberId = memberId,
-                roleId = roleId,
-                checkedAt = checkedAt,
-                createdAt = createdAt,
-                updatedAt = updatedAt
-            )
-        }
+        ): MemberRole = MemberRole(id, memberId, roleId, checkedAt, createdAt, updatedAt)
     }
 }

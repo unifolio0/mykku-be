@@ -165,6 +165,7 @@ class MemberRoleTest {
             val id = MemberRoleId(100)
             val memberId = 100L
             val roleId = RoleId(200)
+            val checkedAt = LocalDateTime.of(2023, 11, 1, 9, 15, 30)
             val createdAt = LocalDateTime.of(2023, 5, 15, 12, 30, 45)
             val updatedAt = LocalDateTime.of(2023, 10, 20, 18, 0, 0)
 
@@ -172,7 +173,7 @@ class MemberRoleTest {
                 id = id,
                 memberId = memberId,
                 roleId = roleId,
-                checkedAt = null,
+                checkedAt = checkedAt,
                 createdAt = createdAt,
                 updatedAt = updatedAt
             )
@@ -180,8 +181,32 @@ class MemberRoleTest {
             assertThat(memberRole.id).isEqualTo(id)
             assertThat(memberRole.memberId).isEqualTo(memberId)
             assertThat(memberRole.roleId).isEqualTo(roleId)
+            assertThat(memberRole.checkedAt).isEqualTo(checkedAt)
             assertThat(memberRole.createdAt).isEqualTo(createdAt)
             assertThat(memberRole.updatedAt).isEqualTo(updatedAt)
+        }
+
+        @Test
+        @DisplayName("확인되지 않은 상태는 checkedAt이 null로 복원된다")
+        fun `복원 - 미확인 상태`() {
+            val memberRole = MemberRole.reconstitute(
+                id = MemberRoleId(101),
+                memberId = 101L,
+                roleId = RoleId(201),
+                checkedAt = null,
+                createdAt = LocalDateTime.now(),
+                updatedAt = LocalDateTime.now()
+            )
+
+            assertThat(memberRole.checkedAt).isNull()
+        }
+
+        @Test
+        @DisplayName("create로 생성한 MemberRole의 checkedAt은 null이다")
+        fun `생성 - checkedAt 초기값`() {
+            val memberRole = MemberRole.create(memberId = 102L, roleId = RoleId(202))
+
+            assertThat(memberRole.checkedAt).isNull()
         }
     }
 }

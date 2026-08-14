@@ -10,6 +10,7 @@ import com.example.mykku.fannote.domain.vo.FanNoteId
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
@@ -32,10 +33,12 @@ class GetFanNoteDetailActivityPublishTest {
     @Mock
     private lateinit var activityEventPublisher: ActivityEventPublisher
 
+    @InjectMocks
+    private lateinit var useCase: GetFanNoteDetailUseCaseImpl
+
     @Test
     @DisplayName("로그인한 회원이 열람하면 FANNOTE_VIEW 이벤트를 발행한다")
     fun publishesForLoggedInMember() {
-        val useCase = GetFanNoteDetailUseCaseImpl(fanNoteRepository, fanNotePageRepository, activityEventPublisher)
         whenever(fanNoteRepository.findById(FanNoteId.of(7L))).thenReturn(stubFanNote())
         whenever(fanNotePageRepository.findByFanNoteIdOrderByPageNumber(FanNoteId.of(7L))).thenReturn(emptyList())
 
@@ -47,7 +50,6 @@ class GetFanNoteDetailActivityPublishTest {
     @Test
     @DisplayName("비로그인 열람은 이벤트를 발행하지 않는다")
     fun doesNotPublishForAnonymous() {
-        val useCase = GetFanNoteDetailUseCaseImpl(fanNoteRepository, fanNotePageRepository, activityEventPublisher)
         whenever(fanNoteRepository.findById(FanNoteId.of(7L))).thenReturn(stubFanNote())
         whenever(fanNotePageRepository.findByFanNoteIdOrderByPageNumber(FanNoteId.of(7L))).thenReturn(emptyList())
 

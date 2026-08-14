@@ -13,6 +13,7 @@ import com.example.mykku.dailymessage.domain.vo.DailyMessageId
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
@@ -34,14 +35,12 @@ class CreateCommentActivityPublishTest {
     @Mock
     private lateinit var activityEventPublisher: ActivityEventPublisher
 
+    @InjectMocks
+    private lateinit var useCase: CreateCommentUseCaseImpl
+
     @Test
     @DisplayName("하루덕담 댓글을 작성하면 COMMENT_CREATE 이벤트를 발행한다")
     fun publishesCommentCreate() {
-        val useCase = CreateCommentUseCaseImpl(
-            dailyMessageRepository,
-            dailyMessageCommentRepository,
-            activityEventPublisher
-        )
         whenever(dailyMessageRepository.findById(DailyMessageId.of(3L))).thenReturn(stubDailyMessage())
         whenever(dailyMessageCommentRepository.save(any())).thenReturn(stubSavedComment())
 

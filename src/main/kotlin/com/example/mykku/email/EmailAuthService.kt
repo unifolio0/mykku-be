@@ -63,18 +63,20 @@ class EmailAuthService(
             throw EmailAuthException.emailAlreadyExists()
         }
 
-        val encodedPassword = passwordEncoder.encode(password)
-
-        val member = Member.createEmailMember(
-            email = email,
-            password = encodedPassword
-        )
-
-        val savedMember = memberRepository.save(member)
+        val savedMember = createEmailMember(email, password)
         activityEventPublisher.publish(ActivityEvent(savedMember.id.value, ActivityType.FIRST_LOGIN))
 
         val result = jwtTokenProvider.createLoginResult(savedMember, email, false)
         return LoginResponse.from(result)
+    }
+
+    private fun createEmailMember(email: String, password: String): Member {
+        val member = Member.createEmailMember(
+            email = email,
+            password = passwordEncoder.encode(password)
+        )
+
+        return memberRepository.save(member)
     }
 
     @Transactional(readOnly = true)
