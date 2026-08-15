@@ -20,6 +20,8 @@ data class MemberInfoResult(
 
 data class RefreshTokenResult(
     val accessToken: String,
+    val refreshToken: String,
     val tokenType: String = "Bearer",
-    val expiresIn: Long
+    val expiresIn: Long,
+    val refreshTokenExpiresIn: Long
 )

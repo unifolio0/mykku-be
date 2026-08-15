@@ -211,6 +211,28 @@ class ContestWinnerControllerTest : BaseControllerTest() {
             .body("message", equalTo("내 수상 콘테스트 목록을 성공적으로 조회했습니다."))
             .body("data.content[0].contestId", equalTo(contest.id!!.toInt()))
             .body("data.content[0].winnerRank", equalTo(1))
+            .body("data.content[0].awardTitle", equalTo("최우수상"))
+    }
+
+    @Test
+    @DisplayName("내 수상 콘테스트 목록 조회 - 수상명이 없으면 null을 반환한다")
+    fun `getMyAwardContests - 수상명이 없으면 null을 반환한다`() {
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
+        val board = createAndSaveBoard()
+        val contest = createAndSaveContest(status = ContestStatusType.WINNER_SELECTED)
+        val feed = createAndSaveFeed(member, board)
+        val participation = createAndSaveParticipation(member, contest, feed)
+        createAndSaveWinner(contest, participation, winnerRank = 1, awardTitle = null)
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .`when`()
+            .get("/api/v1/contests/my-awards")
+            .then()
+            .statusCode(200)
+            .body("data.content[0].winnerRank", equalTo(1))
+            .body("data.content[0].awardTitle", equalTo(null))
     }
 
     @Test
@@ -362,10 +384,12 @@ class ContestWinnerControllerTest : BaseControllerTest() {
     private fun createAndSaveWinner(
         contest: ContestJpaEntity,
         participation: ContestParticipationJpaEntity,
-        winnerRank: Int
+        winnerRank: Int,
+        awardTitle: String? = "최우수상"
     ): ContestWinnerJpaEntity {
         val winner = ContestWinnerJpaEntity(
             winnerRank = winnerRank,
+            awardTitle = awardTitle,
             description = "수상 설명",
             acceptanceSpeech = "",
             contest = contest,

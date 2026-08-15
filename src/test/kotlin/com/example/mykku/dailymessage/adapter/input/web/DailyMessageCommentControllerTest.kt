@@ -7,10 +7,12 @@ import com.example.mykku.dailymessage.adapter.input.web.CreateCommentRequest
 import com.example.mykku.dailymessage.adapter.input.web.UpdateCommentRequest
 import com.example.mykku.dailymessage.adapter.output.persistence.repository.DailyMessageCommentJpaRepository
 import com.example.mykku.dailymessage.adapter.output.persistence.repository.DailyMessageJpaRepository
+import com.example.mykku.dailymessage.exception.DailyMessageErrorCode
 import com.example.mykku.like.adapter.output.persistence.LikeDailyMessageCommentJpaRepository
 import com.example.mykku.like.adapter.output.persistence.entity.LikeDailyMessageCommentJpaEntity
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.member.domain.vo.SocialProvider
+import com.example.mykku.role.adapter.output.persistence.entity.RoleJpaEntity
 import com.example.mykku.util.TestTokenGenerator
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
@@ -338,5 +340,119 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
             .then()
             .statusCode(200)
             .body("data.comments[0].isLiked", equalTo(false))
+    }
+
+    @Test
+    @DisplayName("댓글 목록 조회 - 작성자 아이디와 칭호를 포함한다")
+    fun `getComments - 작성자 memberId와 칭호를 반환한다`() {
+        val role = roleJpaRepository.save(RoleJpaEntity(name = "덕담왕", description = "덕담을 많이 남긴 사람"))
+        val commentAuthor = memberJpaRepository.save(
+            MemberJpaEntity(
+                memberId = "commentauthor",
+                socialId = "commentauthor",
+                provider = SocialProvider.GOOGLE,
+                email = "commentauthor@example.com",
+                nickname = "댓글작성자",
+                role = role,
+                profileImage = ""
+            )
+        )
+        val replyAuthor = memberJpaRepository.save(
+            MemberJpaEntity(
+                memberId = "replyauthor",
+                socialId = "replyauthor",
+                provider = SocialProvider.GOOGLE,
+                email = "replyauthor@example.com",
+                nickname = "답글작성자",
+                role = null,
+                profileImage = ""
+            )
+        )
+        val dailyMessage = dailyMessageJpaRepository.save(
+            DailyMessageJpaEntity(title = "오늘의 덕담", content = "좋은 하루!", date = LocalDate.now())
+        )
+        val comment = dailyMessageCommentJpaRepository.save(
+            DailyMessageCommentJpaEntity(content = "댓글", dailyMessage = dailyMessage, member = commentAuthor)
+        )
+        dailyMessageCommentJpaRepository.save(
+            DailyMessageCommentJpaEntity(
+                content = "답글",
+                dailyMessage = dailyMessage,
+                member = replyAuthor,
+                parentComment = comment
+            )
+        )
+
+        RestAssured.given()
+            .`when`()
+            .get("/api/v1/daily-messages/{dailyMessageId}/comments", dailyMessage.id)
+            .then()
+            .statusCode(200)
+            .body("data.comments[0].memberId", equalTo("commentauthor"))
+            .body("data.comments[0].role.name", equalTo("덕담왕"))
+            .body("data.comments[0].replies[0].memberId", equalTo("replyauthor"))
+            .body("data.comments[0].replies[0].role", equalTo(null))
+    }
+
+    @Test
+    @DisplayName("댓글 목록 조회 - 작성자가 없는 댓글도 조회된다")
+    fun `getComments - 작성자가 삭제된 댓글도 목록에 포함된다`() {
+        val dailyMessage = dailyMessageJpaRepository.save(
+            DailyMessageJpaEntity(title = "오늘의 덕담", content = "좋은 하루!", date = LocalDate.now())
+        )
+        dailyMessageCommentJpaRepository.save(
+            DailyMessageCommentJpaEntity(content = "탈퇴자 댓글", dailyMessage = dailyMessage, member = null)
+        )
+
+        RestAssured.given()
+            .`when`()
+            .get("/api/v1/daily-messages/{dailyMessageId}/comments", dailyMessage.id)
+            .then()
+            .statusCode(200)
+            .body("data.comments.size()", equalTo(1))
+            .body("data.comments[0].memberId", equalTo(null))
+            .body("data.totalElements", equalTo(1))
+    }
+
+    @Test
+    @DisplayName("답글에 답글을 작성할 수 없다")
+    fun `createComment - 답글에는 답글을 달 수 없다`() {
+        val member = memberJpaRepository.save(
+            MemberJpaEntity(
+                memberId = "depthuser",
+                socialId = "depthuser",
+                provider = SocialProvider.GOOGLE,
+                email = "depthuser@example.com",
+                nickname = "깊이유저",
+                role = null,
+                profileImage = ""
+            )
+        )
+        val dailyMessage = dailyMessageJpaRepository.save(
+            DailyMessageJpaEntity(title = "오늘의 덕담", content = "좋은 하루!", date = LocalDate.now())
+        )
+        val comment = dailyMessageCommentJpaRepository.save(
+            DailyMessageCommentJpaEntity(content = "댓글", dailyMessage = dailyMessage, member = member)
+        )
+        val reply = dailyMessageCommentJpaRepository.save(
+            DailyMessageCommentJpaEntity(
+                content = "답글",
+                dailyMessage = dailyMessage,
+                member = member,
+                parentComment = comment
+            )
+        )
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val request = CreateCommentRequest(content = "답글의 답글", parentCommentId = reply.id)
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .contentType(ContentType.JSON)
+            .body(request)
+            .`when`()
+            .post("/api/v1/daily-messages/{dailyMessageId}/comments", dailyMessage.id)
+            .then()
+            .statusCode(400)
+            .body("code", equalTo(DailyMessageErrorCode.REPLY_DEPTH_EXCEEDED.code))
     }
 }

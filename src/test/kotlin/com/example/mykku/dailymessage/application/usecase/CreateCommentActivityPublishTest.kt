@@ -35,6 +35,9 @@ class CreateCommentActivityPublishTest {
     @Mock
     private lateinit var activityEventPublisher: ActivityEventPublisher
 
+    @Mock
+    private lateinit var commentAuthorResolver: CommentAuthorResolver
+
     @InjectMocks
     private lateinit var useCase: CreateCommentUseCaseImpl
 

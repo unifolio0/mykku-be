@@ -70,6 +70,10 @@ class MemberRepositoryAdapter(
         return memberJpaRepository.existsByMemberId(memberId)
     }
 
+    override fun existsByMemberIdExcludingId(memberId: String, id: MemberPk): Boolean {
+        return memberJpaRepository.existsByMemberIdAndIdNot(memberId, id.value)
+    }
+
     override fun findByMemberId(memberId: String): Member? {
         return memberJpaRepository.findByMemberId(memberId)?.toDomain()
     }

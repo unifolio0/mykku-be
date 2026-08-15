@@ -30,6 +30,7 @@ interface MemberJpaRepository : JpaRepository<MemberJpaEntity, Long> {
     fun existsByRole(role: RoleJpaEntity): Boolean
     fun existsByRoleId(roleId: Long): Boolean
     fun existsByMemberId(memberId: String): Boolean
+    fun existsByMemberIdAndIdNot(memberId: String, id: Long): Boolean
     fun findByMemberId(memberId: String): MemberJpaEntity?
     fun findByProviderAndSocialId(provider: SocialProvider, socialId: String): MemberJpaEntity?
 }

@@ -25,6 +25,9 @@ class ContestWinnerJpaEntity(
     @Column(name = "winner_rank")
     var winnerRank: Int,
 
+    @Column(name = "award_title", length = 50)
+    var awardTitle: String? = null,
+
     @Column(name = "description")
     var description: String = "",
 
@@ -44,6 +47,7 @@ class ContestWinnerJpaEntity(
         return ContestWinner.reconstitute(
             id = ContestWinnerId.of(id!!),
             winnerRank = winnerRank,
+            awardTitle = awardTitle,
             description = description,
             acceptanceSpeech = acceptanceSpeech,
             contestId = ContestId.of(contest.id!!),
@@ -66,6 +70,7 @@ class ContestWinnerJpaEntity(
             return ContestWinnerJpaEntity(
                 id = if (winner.id.value == 0L) null else winner.id.value,
                 winnerRank = winner.winnerRank,
+                awardTitle = winner.awardTitle,
                 description = winner.description,
                 acceptanceSpeech = winner.acceptanceSpeech,
                 contest = contestJpaEntity,

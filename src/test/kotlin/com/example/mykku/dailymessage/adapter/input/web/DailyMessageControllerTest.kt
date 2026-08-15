@@ -47,11 +47,12 @@ class DailyMessageControllerTest : BaseControllerTest() {
     @DisplayName("하루 덕담 상세 조회 - 정상 케이스")
     fun `getDailyMessage - 정상적으로 하루 덕담을 조회한다`() {
         // given
+        val date = LocalDate.now()
         val dailyMessage = dailyMessageJpaRepository.save(
             DailyMessageJpaEntity(
                 title = "오늘의 덕담",
                 content = "오늘도 좋은 하루 되세요!",
-                date = LocalDate.now()
+                date = date
             )
         )
 
@@ -63,6 +64,7 @@ class DailyMessageControllerTest : BaseControllerTest() {
             .statusCode(200)
             .body("message", equalTo("하루 덕담 데이터 불러오기에 성공했습니다."))
             .body("data", notNullValue())
+            .body("data.date", equalTo(date.toString()))
     }
 
     @Test

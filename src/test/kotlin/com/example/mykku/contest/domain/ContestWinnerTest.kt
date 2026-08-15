@@ -21,18 +21,21 @@ class ContestWinnerTest {
         @DisplayName("정상적으로 콘테스트 수상자를 생성한다")
         fun `콘테스트 수상자 생성 - 정상 케이스`() {
             val winnerRank = 1
+            val awardTitle = "최우수상"
             val description = "1등 수상자"
             val contestId = ContestId(10L)
             val participationId = ContestParticipationId(100L)
 
             val winner = ContestWinner.create(
                 winnerRank = winnerRank,
+                awardTitle = awardTitle,
                 description = description,
                 contestId = contestId,
                 participationId = participationId
             )
 
             assertThat(winner.winnerRank).isEqualTo(winnerRank)
+            assertThat(winner.awardTitle).isEqualTo(awardTitle)
             assertThat(winner.description).isEqualTo(description)
             assertThat(winner.contestId).isEqualTo(contestId)
             assertThat(winner.participationId).isEqualTo(participationId)
@@ -76,6 +79,7 @@ class ContestWinnerTest {
         fun `콘테스트 수상자 생성 - 다양한 순위`() {
             val firstPlace = ContestWinner.create(
                 winnerRank = 1,
+                awardTitle = "최우수상",
                 description = "1등",
                 contestId = ContestId(10L),
                 participationId = ContestParticipationId(100L)
@@ -83,6 +87,7 @@ class ContestWinnerTest {
 
             val secondPlace = ContestWinner.create(
                 winnerRank = 2,
+                awardTitle = "우수상",
                 description = "2등",
                 contestId = ContestId(10L),
                 participationId = ContestParticipationId(101L)
@@ -90,6 +95,7 @@ class ContestWinnerTest {
 
             val thirdPlace = ContestWinner.create(
                 winnerRank = 3,
+                awardTitle = "장려상",
                 description = "3등",
                 contestId = ContestId(10L),
                 participationId = ContestParticipationId(102L)
@@ -153,6 +159,7 @@ class ContestWinnerTest {
             val now = LocalDateTime.now()
             val id = ContestWinnerId(1L)
             val winnerRank = 1
+            val awardTitle = "최우수상"
             val description = "1등 수상자"
             val acceptanceSpeech = "감사합니다"
             val contestId = ContestId(10L)
@@ -161,6 +168,7 @@ class ContestWinnerTest {
             val winner = ContestWinner.reconstitute(
                 id = id,
                 winnerRank = winnerRank,
+                awardTitle = awardTitle,
                 description = description,
                 acceptanceSpeech = acceptanceSpeech,
                 contestId = contestId,
@@ -171,6 +179,7 @@ class ContestWinnerTest {
 
             assertThat(winner.id).isEqualTo(id)
             assertThat(winner.winnerRank).isEqualTo(winnerRank)
+            assertThat(winner.awardTitle).isEqualTo(awardTitle)
             assertThat(winner.description).isEqualTo(description)
             assertThat(winner.acceptanceSpeech).isEqualTo(acceptanceSpeech)
             assertThat(winner.contestId).isEqualTo(contestId)
@@ -188,6 +197,7 @@ class ContestWinnerTest {
             val winner = ContestWinner.reconstitute(
                 id = ContestWinnerId(1L),
                 winnerRank = 1,
+                awardTitle = "최우수상",
                 description = "설명",
                 acceptanceSpeech = "소감",
                 contestId = ContestId(10L),
@@ -210,6 +220,7 @@ class ContestWinnerTest {
             val winner = ContestWinner.reconstitute(
                 id = ContestWinnerId(1L),
                 winnerRank = 1,
+                awardTitle = "최우수상",
                 description = "1등",
                 acceptanceSpeech = speech,
                 contestId = ContestId(10L),
@@ -229,6 +240,7 @@ class ContestWinnerTest {
             val winner = ContestWinner.reconstitute(
                 id = ContestWinnerId(1L),
                 winnerRank = 1,
+                awardTitle = "최우수상",
                 description = "1등",
                 acceptanceSpeech = "기존 소감",
                 contestId = ContestId(10L),
@@ -246,6 +258,7 @@ class ContestWinnerTest {
     private fun createWinner(): ContestWinner {
         return ContestWinner.create(
             winnerRank = 1,
+            awardTitle = "최우수상",
             description = "1등 수상자",
             contestId = ContestId(10L),
             participationId = ContestParticipationId(100L)

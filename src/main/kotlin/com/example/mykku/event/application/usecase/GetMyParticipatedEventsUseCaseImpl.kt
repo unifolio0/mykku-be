@@ -11,6 +11,7 @@ import com.example.mykku.event.domain.vo.EventStatusType
 import com.example.mykku.event.domain.vo.EventWinnerStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 class GetMyParticipatedEventsUseCaseImpl(
@@ -29,7 +30,8 @@ class GetMyParticipatedEventsUseCaseImpl(
             .map { it.eventId.value }
             .toSet()
 
-        val results = eventPage.content.map { toResult(it, wonEventIds) }
+        val now = LocalDateTime.now()
+        val results = eventPage.content.map { toResult(it, wonEventIds, now) }
 
         return PagedMyParticipatedEventsResult(
             content = results,
@@ -41,13 +43,17 @@ class GetMyParticipatedEventsUseCaseImpl(
         )
     }
 
-    private fun toResult(event: Event, wonEventIds: Set<Long>): MyParticipatedEventResult {
+    private fun toResult(
+        event: Event,
+        wonEventIds: Set<Long>,
+        now: LocalDateTime
+    ): MyParticipatedEventResult {
         return MyParticipatedEventResult(
             id = event.id.value,
             title = event.title,
             startedAt = event.startedAt,
             expiredAt = event.expiredAt,
-            status = event.status,
+            status = event.resolveStatus(now),
             thumbnailUrl = event.thumbnailUrl,
             winnerStatus = resolveWinnerStatus(event, wonEventIds)
         )

@@ -10,9 +10,16 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.web.HttpMediaTypeNotSupportedException
+import org.springframework.web.HttpRequestMethodNotSupportedException
 import org.springframework.web.bind.MethodArgumentNotValidException
+import org.springframework.web.bind.MissingServletRequestParameterException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
+import org.springframework.web.multipart.support.MissingServletRequestPartException
+import org.springframework.web.servlet.NoHandlerFoundException
+import org.springframework.web.servlet.resource.NoResourceFoundException
 
 @RestControllerAdvice
 @Order(Ordered.LOWEST_PRECEDENCE)
@@ -55,6 +62,50 @@ class BaseExceptionHandler {
             .status(exception.errorCode.status)
             .contentType(MediaType.APPLICATION_JSON)
             .body(ErrorResponse(exception.errorCode.code, exception.errorCode.message))
+    }
+
+    @ExceptionHandler(NoResourceFoundException::class, NoHandlerFoundException::class)
+    fun handleEndpointNotFoundException(exception: Exception): ResponseEntity<ErrorResponse> {
+        ExceptionLoggingSupport.logException(logger, exception)
+
+        return errorResponseOf(CommonErrorCode.ENDPOINT_NOT_FOUND)
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException::class)
+    fun handleMethodNotAllowedException(
+        exception: HttpRequestMethodNotSupportedException
+    ): ResponseEntity<ErrorResponse> {
+        ExceptionLoggingSupport.logException(logger, exception)
+
+        return errorResponseOf(CommonErrorCode.METHOD_NOT_ALLOWED)
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException::class)
+    fun handleUnsupportedMediaTypeException(
+        exception: HttpMediaTypeNotSupportedException
+    ): ResponseEntity<ErrorResponse> {
+        ExceptionLoggingSupport.logException(logger, exception)
+
+        return errorResponseOf(CommonErrorCode.UNSUPPORTED_MEDIA_TYPE)
+    }
+
+    @ExceptionHandler(
+        MissingServletRequestParameterException::class,
+        MissingServletRequestPartException::class
+    )
+    fun handleMissingRequestValueException(exception: Exception): ResponseEntity<ErrorResponse> {
+        ExceptionLoggingSupport.logException(logger, exception)
+
+        return errorResponseOf(CommonErrorCode.MISSING_REQUEST_PARAMETER)
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException::class)
+    fun handleParameterTypeMismatchException(
+        exception: MethodArgumentTypeMismatchException
+    ): ResponseEntity<ErrorResponse> {
+        ExceptionLoggingSupport.logException(logger, exception)
+
+        return errorResponseOf(CommonErrorCode.INVALID_PARAMETER_TYPE)
     }
 
     @ExceptionHandler(PessimisticLockingFailureException::class, QueryTimeoutException::class)

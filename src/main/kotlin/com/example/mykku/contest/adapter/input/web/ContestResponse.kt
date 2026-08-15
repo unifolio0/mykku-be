@@ -265,6 +265,7 @@ data class ContestWinnerDetailResponse(
 data class WinnerDetailResponse(
     val winnerId: Long,
     val winnerRank: Int,
+    val awardTitle: String?,
     val feedId: Long,
     val feedTitle: String,
     val feedImageUrl: String?,
@@ -278,6 +279,7 @@ data class WinnerDetailResponse(
             return WinnerDetailResponse(
                 winnerId = result.winnerId,
                 winnerRank = result.winnerRank,
+                awardTitle = result.awardTitle,
                 feedId = result.feedId,
                 feedTitle = result.feedTitle,
                 feedImageUrl = result.feedImageUrl,
@@ -325,6 +327,7 @@ data class MyAwardContestResponse(
     val contestTitle: String,
     val thumbnailUrl: String,
     val winnerRank: Int,
+    val awardTitle: String?,
     val acceptanceSpeech: String,
     val feedId: Long,
     val feedTitle: String,
@@ -337,6 +340,7 @@ data class MyAwardContestResponse(
                 contestTitle = result.contestTitle,
                 thumbnailUrl = result.thumbnailUrl,
                 winnerRank = result.winnerRank,
+                awardTitle = result.awardTitle,
                 acceptanceSpeech = result.acceptanceSpeech,
                 feedId = result.feedId,
                 feedTitle = result.feedTitle,

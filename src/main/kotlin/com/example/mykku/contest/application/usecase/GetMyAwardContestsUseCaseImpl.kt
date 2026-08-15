@@ -52,6 +52,7 @@ class GetMyAwardContestsUseCaseImpl(
                 contestTitle = contest?.title ?: "",
                 thumbnailUrl = contest?.thumbnailUrl ?: "",
                 winnerRank = winner.winnerRank,
+                awardTitle = winner.awardTitle,
                 acceptanceSpeech = winner.acceptanceSpeech,
                 feedId = participation?.feedId ?: 0L,
                 feedTitle = feed?.title ?: "",

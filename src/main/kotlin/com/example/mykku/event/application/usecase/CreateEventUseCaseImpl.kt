@@ -37,6 +37,7 @@ class CreateEventUseCaseImpl(
     private fun createAndSaveEvent(command: CreateEventCommand): Event {
         val event = Event.create(
             title = command.title,
+            subTitle = command.subTitle,
             description = command.description,
             startedAt = command.startedAt,
             expiredAt = command.expiredAt,
@@ -63,6 +64,7 @@ class CreateEventUseCaseImpl(
         return CreateEventResult(
             id = event.id.value,
             title = event.title,
+            subTitle = event.subTitle,
             description = event.description,
             startedAt = event.startedAt,
             expiredAt = event.expiredAt,

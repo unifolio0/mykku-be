@@ -1,5 +1,6 @@
 package com.example.mykku.dailymessage.application.usecase
 
+import com.example.mykku.dailymessage.application.dto.CommentAuthorInfo
 import com.example.mykku.dailymessage.application.dto.CommentResult
 import com.example.mykku.dailymessage.application.dto.DailyMessageCommentsResult
 import com.example.mykku.dailymessage.application.dto.ReplyResult
@@ -19,7 +20,8 @@ import org.springframework.transaction.annotation.Transactional
 class GetCommentsUseCaseImpl(
     private val dailyMessageRepository: DailyMessageRepository,
     private val dailyMessageCommentRepository: DailyMessageCommentRepository,
-    private val likeDailyMessageCommentPort: LikeDailyMessageCommentPort
+    private val likeDailyMessageCommentPort: LikeDailyMessageCommentPort,
+    private val commentAuthorResolver: CommentAuthorResolver
 ) : GetCommentsUseCase {
 
     override fun execute(dailyMessageId: Long, memberId: Long?, pageable: Pageable): DailyMessageCommentsResult {
@@ -39,9 +41,12 @@ class GetCommentsUseCaseImpl(
         }
 
         val likedIds = resolveLikedIds(memberId, commentsPage.content, replies)
+        val authors = commentAuthorResolver.resolve(
+            (commentsPage.content + replies).mapNotNull { it.memberId }
+        )
         val repliesMap = replies.groupBy { it.parentCommentId }
         val commentResults = commentsPage.content.map { comment ->
-            toCommentResult(comment, repliesMap[comment.id.value] ?: emptyList(), likedIds)
+            toCommentResult(comment, repliesMap[comment.id.value] ?: emptyList(), likedIds, authors)
         }
 
         return DailyMessageCommentsResult(
@@ -69,9 +74,24 @@ class GetCommentsUseCaseImpl(
     private fun toCommentResult(
         comment: DailyMessageComment,
         replies: List<DailyMessageComment>,
-        likedIds: Set<Long>
+        likedIds: Set<Long>,
+        authors: Map<Long, CommentAuthorInfo>
     ): CommentResult {
-        val replyResults = replies.map { ReplyResult.from(it, likedIds.contains(it.id.value)) }
-        return CommentResult.from(comment, likedIds.contains(comment.id.value), replyResults)
+        val replyResults = replies.map {
+            ReplyResult.from(it, authorOf(it, authors), likedIds.contains(it.id.value))
+        }
+        return CommentResult.from(
+            comment,
+            authorOf(comment, authors),
+            likedIds.contains(comment.id.value),
+            replyResults
+        )
+    }
+
+    private fun authorOf(
+        comment: DailyMessageComment,
+        authors: Map<Long, CommentAuthorInfo>
+    ): CommentAuthorInfo? {
+        return comment.memberId?.let { authors[it] }
     }
 }

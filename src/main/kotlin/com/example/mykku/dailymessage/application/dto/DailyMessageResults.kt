@@ -2,6 +2,7 @@ package com.example.mykku.dailymessage.application.dto
 
 import com.example.mykku.dailymessage.domain.entity.DailyMessage
 import com.example.mykku.dailymessage.domain.entity.DailyMessageComment
+import com.example.mykku.role.application.dto.RoleResult
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -27,6 +28,7 @@ data class DailyMessageResult(
     val id: Long,
     val title: String,
     val content: String,
+    val date: LocalDate,
     val createdAt: LocalDateTime
 ) {
     companion object {
@@ -35,18 +37,26 @@ data class DailyMessageResult(
                 id = dailyMessage.id.value,
                 title = dailyMessage.title,
                 content = dailyMessage.content,
+                date = dailyMessage.date,
                 createdAt = dailyMessage.createdAt
             )
         }
     }
 }
 
+data class CommentAuthorInfo(
+    val memberId: String?,
+    val role: RoleResult?
+)
+
 data class CommentResult(
     val id: Long,
     val content: String,
     val likeCount: Int,
     val isLiked: Boolean,
+    val memberId: String?,
     val memberName: String?,
+    val role: RoleResult?,
     val profileImage: String?,
     val createdAt: LocalDateTime,
     val replies: List<ReplyResult>
@@ -54,6 +64,7 @@ data class CommentResult(
     companion object {
         fun from(
             comment: DailyMessageComment,
+            author: CommentAuthorInfo?,
             isLiked: Boolean = false,
             replies: List<ReplyResult> = emptyList()
         ): CommentResult {
@@ -62,7 +73,9 @@ data class CommentResult(
                 content = comment.content,
                 likeCount = comment.likeCount,
                 isLiked = isLiked,
+                memberId = author?.memberId,
                 memberName = comment.memberNickname,
+                role = author?.role,
                 profileImage = comment.memberProfileImage,
                 createdAt = comment.createdAt,
                 replies = replies
@@ -76,18 +89,26 @@ data class ReplyResult(
     val content: String,
     val likeCount: Int,
     val isLiked: Boolean,
+    val memberId: String?,
     val memberName: String?,
+    val role: RoleResult?,
     val profileImage: String?,
     val createdAt: LocalDateTime
 ) {
     companion object {
-        fun from(reply: DailyMessageComment, isLiked: Boolean = false): ReplyResult {
+        fun from(
+            reply: DailyMessageComment,
+            author: CommentAuthorInfo?,
+            isLiked: Boolean = false
+        ): ReplyResult {
             return ReplyResult(
                 id = reply.id.value,
                 content = reply.content,
                 likeCount = reply.likeCount,
                 isLiked = isLiked,
+                memberId = author?.memberId,
                 memberName = reply.memberNickname,
+                role = author?.role,
                 profileImage = reply.memberProfileImage,
                 createdAt = reply.createdAt
             )

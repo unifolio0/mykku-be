@@ -9,6 +9,7 @@ import com.example.mykku.member.domain.vo.SocialProvider
 import com.example.mykku.role.adapter.output.persistence.entity.RoleJpaEntity
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
+import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.DisplayName
@@ -42,7 +43,7 @@ class AuthControllerTest : BaseControllerTest() {
         val request = RefreshTokenRequest(refreshToken = refreshToken)
 
         // when & then
-        RestAssured.given()
+        val response = RestAssured.given()
             .contentType(ContentType.JSON)
             .body(request)
             .`when`()
@@ -51,8 +52,16 @@ class AuthControllerTest : BaseControllerTest() {
             .statusCode(200)
             .body("message", equalTo("토큰 갱신 성공"))
             .body("data.accessToken", notNullValue())
+            .body("data.refreshToken", notNullValue())
             .body("data.tokenType", equalTo("Bearer"))
             .body("data.expiresIn", equalTo(86400000))
+            .body("data.refreshTokenExpiresIn", equalTo(1209600000))
+            .extract()
+
+        val rotatedRefreshToken = response.path<String>("data.refreshToken")
+        assertThat(tokenProvider.isRefreshToken(rotatedRefreshToken)).isTrue()
+        assertThat(tokenProvider.getMemberIdFromToken(rotatedRefreshToken)).isEqualTo(member.id)
+        assertThat(tokenProvider.isRefreshToken(response.path<String>("data.accessToken"))).isFalse()
     }
 
     @Test

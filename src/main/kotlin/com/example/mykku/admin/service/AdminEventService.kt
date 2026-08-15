@@ -32,6 +32,7 @@ class AdminEventService(
 
         val command = CreateEventCommand(
             title = request.title,
+            subTitle = request.subTitle,
             description = request.description,
             startedAt = request.startedAt,
             expiredAt = request.expiredAt,

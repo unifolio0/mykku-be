@@ -152,6 +152,7 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                     WinnerDetailResult(
                         winnerId = 1L,
                         winnerRank = 1,
+                        awardTitle = "최우수상",
                         feedId = 10L,
                         feedTitle = "1등 작품",
                         feedImageUrl = "https://example.com/image1.jpg",
@@ -163,6 +164,7 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                     WinnerDetailResult(
                         winnerId = 2L,
                         winnerRank = 2,
+                        awardTitle = "우수상",
                         feedId = 20L,
                         feedTitle = "2등 작품",
                         feedImageUrl = "https://example.com/image2.jpg",
@@ -188,6 +190,8 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.winners[]").type(JsonFieldType.ARRAY).description("수상자 목록"),
                             fieldWithPath("data.winners[].winnerId").type(JsonFieldType.NUMBER).description("수상자 ID"),
                             fieldWithPath("data.winners[].winnerRank").type(JsonFieldType.NUMBER).description("순위"),
+                            fieldWithPath("data.winners[].awardTitle").type(JsonFieldType.STRING)
+                                .description("수상명 (예: 최우수상, 미입력 시 null)").optional(),
                             fieldWithPath("data.winners[].feedId").type(JsonFieldType.NUMBER).description("피드 ID"),
                             fieldWithPath("data.winners[].feedTitle").type(JsonFieldType.STRING).description("피드 제목"),
                             fieldWithPath("data.winners[].feedImageUrl").type(JsonFieldType.STRING)
@@ -418,6 +422,7 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                         contestTitle = "첫 번째 콘테스트",
                         thumbnailUrl = "https://example.com/thumbnail1.jpg",
                         winnerRank = 1,
+                        awardTitle = "최우수상",
                         acceptanceSpeech = "감사합니다!",
                         feedId = 101L,
                         feedTitle = "수상작 피드 제목",
@@ -428,6 +433,7 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                         contestTitle = "두 번째 콘테스트",
                         thumbnailUrl = "https://example.com/thumbnail2.jpg",
                         winnerRank = 2,
+                        awardTitle = "우수상",
                         acceptanceSpeech = "",
                         feedId = 102L,
                         feedTitle = "두 번째 수상작",
@@ -455,6 +461,8 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.content[].contestTitle").type(JsonFieldType.STRING).description("콘테스트 제목"),
                             fieldWithPath("data.content[].thumbnailUrl").type(JsonFieldType.STRING).description("콘테스트 썸네일 URL"),
                             fieldWithPath("data.content[].winnerRank").type(JsonFieldType.NUMBER).description("수상 순위"),
+                            fieldWithPath("data.content[].awardTitle").type(JsonFieldType.STRING)
+                                .description("수상명 (예: 최우수상, 미입력 시 null)").optional(),
                             fieldWithPath("data.content[].acceptanceSpeech").type(JsonFieldType.STRING).description("수상 소감"),
                             fieldWithPath("data.content[].feedId").type(JsonFieldType.NUMBER).description("피드 ID"),
                             fieldWithPath("data.content[].feedTitle").type(JsonFieldType.STRING).description("피드 제목"),

@@ -7,6 +7,7 @@ import java.time.LocalDateTime
 class Event private constructor(
     val id: EventId,
     val title: String,
+    val subTitle: String?,
     val description: String?,
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
@@ -22,11 +23,18 @@ class Event private constructor(
         _status = status
     }
 
+    fun resolveStatus(now: LocalDateTime): EventStatusType {
+        if (_status == EventStatusType.WINNER_SELECTED) return EventStatusType.WINNER_SELECTED
+        if (!expiredAt.isAfter(now)) return EventStatusType.EXPIRED
+        return EventStatusType.ACTIVE
+    }
+
     companion object {
         const val IMAGE_MAX_COUNT = 10
 
         fun create(
             title: String,
+            subTitle: String?,
             description: String?,
             startedAt: LocalDateTime,
             expiredAt: LocalDateTime,
@@ -36,6 +44,7 @@ class Event private constructor(
             return Event(
                 id = EventId(0),
                 title = title,
+                subTitle = subTitle,
                 description = description,
                 startedAt = startedAt,
                 expiredAt = expiredAt,
@@ -49,6 +58,7 @@ class Event private constructor(
         fun reconstitute(
             id: EventId,
             title: String,
+            subTitle: String?,
             description: String?,
             startedAt: LocalDateTime,
             expiredAt: LocalDateTime,
@@ -60,6 +70,7 @@ class Event private constructor(
             return Event(
                 id = id,
                 title = title,
+                subTitle = subTitle,
                 description = description,
                 startedAt = startedAt,
                 expiredAt = expiredAt,

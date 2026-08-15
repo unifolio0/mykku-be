@@ -99,6 +99,10 @@ class JwtTokenProviderAdapter(
         return jwtProperties.accessTokenExpiration
     }
 
+    override fun getRefreshTokenExpiration(): Long {
+        return jwtProperties.refreshTokenExpiration
+    }
+
     private fun getTokenType(token: String): String? {
         val claims = parseToken(token)
         return claims.get("tokenType", String::class.java)

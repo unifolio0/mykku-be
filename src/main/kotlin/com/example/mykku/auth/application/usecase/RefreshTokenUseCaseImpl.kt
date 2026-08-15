@@ -26,7 +26,9 @@ class RefreshTokenUseCaseImpl(
 
         return RefreshTokenResult(
             accessToken = tokenProvider.generateAccessToken(member.id.value, member.email),
-            expiresIn = tokenProvider.getAccessTokenExpiration()
+            refreshToken = tokenProvider.generateRefreshToken(member.id.value),
+            expiresIn = tokenProvider.getAccessTokenExpiration(),
+            refreshTokenExpiresIn = tokenProvider.getRefreshTokenExpiration()
         )
     }
 
