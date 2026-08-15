@@ -8,6 +8,7 @@ import com.example.mykku.member.adapter.input.web.dto.SetupProfileRequest
 import com.example.mykku.member.adapter.input.web.dto.UpdateProfileRequest
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.member.domain.vo.SocialProvider
+import com.example.mykku.member.exception.MemberErrorCode
 import com.example.mykku.role.adapter.output.persistence.entity.RoleJpaEntity
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
@@ -421,6 +422,54 @@ class MemberControllerTest : BaseControllerTest() {
             .then()
             .statusCode(200)
             .body("data.memberId", equalTo("CaseUser"))
+    }
+
+    @Test
+    @DisplayName("아이디 변경 - 현재와 동일한 아이디")
+    fun `changeMemberId - 현재와 동일한 아이디로 요청해도 성공한다`() {
+        val member = createAndSaveMember(
+            memberId = "sameuserid",
+            nickname = "동일유저",
+            email = "sameuser@example.com",
+            socialId = "sameuser123"
+        )
+
+        RestAssured.given()
+            .header("Authorization", getBearerToken(member.id))
+            .contentType(ContentType.JSON)
+            .body(ChangeMemberIdRequest(memberId = "sameuserid"))
+            .`when`()
+            .patch("/api/v1/members/me/member-id")
+            .then()
+            .statusCode(200)
+            .body("data.memberId", equalTo("sameuserid"))
+    }
+
+    @Test
+    @DisplayName("아이디 변경 - 타 회원 아이디의 대소문자 변형")
+    fun `changeMemberId - 다른 회원 아이디의 대소문자 변형으로는 변경할 수 없다`() {
+        createAndSaveMember(
+            memberId = "otheruser",
+            nickname = "다른유저",
+            email = "otheruser@example.com",
+            socialId = "otheruser123"
+        )
+        val member = createAndSaveMember(
+            memberId = "myuserid",
+            nickname = "내유저",
+            email = "myuser@example.com",
+            socialId = "myuser123"
+        )
+
+        RestAssured.given()
+            .header("Authorization", getBearerToken(member.id))
+            .contentType(ContentType.JSON)
+            .body(ChangeMemberIdRequest(memberId = "OtherUser"))
+            .`when`()
+            .patch("/api/v1/members/me/member-id")
+            .then()
+            .statusCode(409)
+            .body("code", equalTo(MemberErrorCode.MEMBER_ID_ALREADY_EXISTS.code))
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.example.mykku.admin.adapter.input.web
 
 import com.example.mykku.BaseControllerTest
+import com.example.mykku.common.exception.CommonErrorCode
 import com.example.mykku.event.adapter.output.persistence.entity.EventJpaEntity
 import com.example.mykku.event.adapter.output.persistence.entity.EventParticipationJpaEntity
 import com.example.mykku.event.adapter.output.persistence.repository.EventJpaRepository
@@ -45,6 +46,26 @@ class AdminEventApiControllerTest : BaseControllerTest() {
             .statusCode(200)
             .body("data.title", equalTo("New Event"))
             .body("data.subTitle", equalTo("Event Sub Title"))
+    }
+
+    @Test
+    @DisplayName("이벤트 생성 - 부제목이 255자를 초과하면 실패한다")
+    fun `create - 부제목 길이 초과 시 400을 반환한다`() {
+        val adminSessionId = getAdminSessionId()
+
+        RestAssured.given()
+            .sessionId(adminSessionId)
+            .contentType("multipart/form-data")
+            .multiPart("title", "New Event")
+            .multiPart("subTitle", "a".repeat(256))
+            .multiPart("startedAt", "2026-08-01T00:00:00")
+            .multiPart("expiredAt", "2026-09-01T00:00:00")
+            .multiPart("thumbnailImage", "thumbnail.jpg", ByteArray(10), "image/jpeg")
+            .`when`()
+            .post("/admin/api/v1/events")
+            .then()
+            .statusCode(400)
+            .body("code", equalTo(CommonErrorCode.INVALID_INPUT.code))
     }
 
     @Test

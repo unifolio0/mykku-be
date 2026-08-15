@@ -30,7 +30,8 @@ class GetMyParticipatedEventsUseCaseImpl(
             .map { it.eventId.value }
             .toSet()
 
-        val results = eventPage.content.map { toResult(it, wonEventIds) }
+        val now = LocalDateTime.now()
+        val results = eventPage.content.map { toResult(it, wonEventIds, now) }
 
         return PagedMyParticipatedEventsResult(
             content = results,
@@ -42,13 +43,17 @@ class GetMyParticipatedEventsUseCaseImpl(
         )
     }
 
-    private fun toResult(event: Event, wonEventIds: Set<Long>): MyParticipatedEventResult {
+    private fun toResult(
+        event: Event,
+        wonEventIds: Set<Long>,
+        now: LocalDateTime
+    ): MyParticipatedEventResult {
         return MyParticipatedEventResult(
             id = event.id.value,
             title = event.title,
             startedAt = event.startedAt,
             expiredAt = event.expiredAt,
-            status = event.resolveStatus(LocalDateTime.now()),
+            status = event.resolveStatus(now),
             thumbnailUrl = event.thumbnailUrl,
             winnerStatus = resolveWinnerStatus(event, wonEventIds)
         )

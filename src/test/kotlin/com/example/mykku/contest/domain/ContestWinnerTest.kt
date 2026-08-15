@@ -35,6 +35,7 @@ class ContestWinnerTest {
             )
 
             assertThat(winner.winnerRank).isEqualTo(winnerRank)
+            assertThat(winner.awardTitle).isEqualTo(awardTitle)
             assertThat(winner.description).isEqualTo(description)
             assertThat(winner.contestId).isEqualTo(contestId)
             assertThat(winner.participationId).isEqualTo(participationId)
@@ -178,6 +179,7 @@ class ContestWinnerTest {
 
             assertThat(winner.id).isEqualTo(id)
             assertThat(winner.winnerRank).isEqualTo(winnerRank)
+            assertThat(winner.awardTitle).isEqualTo(awardTitle)
             assertThat(winner.description).isEqualTo(description)
             assertThat(winner.acceptanceSpeech).isEqualTo(acceptanceSpeech)
             assertThat(winner.contestId).isEqualTo(contestId)

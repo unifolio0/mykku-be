@@ -128,6 +128,7 @@ class ContestWinnerRepositoryAdapterTest : BaseRepositoryTest() {
 
             assertThat(saved.id.value).isGreaterThan(0)
             assertThat(saved.winnerRank).isEqualTo(1)
+            assertThat(saved.awardTitle).isEqualTo("최우수상")
             assertThat(saved.description).isEqualTo("1등 상품")
             assertThat(saved.contestId.value).isEqualTo(contest.id)
             assertThat(saved.participationId.value).isEqualTo(participation.id)
@@ -207,6 +208,7 @@ class ContestWinnerRepositoryAdapterTest : BaseRepositoryTest() {
 
             assertThat(savedWinners).hasSize(2)
             assertThat(savedWinners.map { it.winnerRank }).containsExactlyInAnyOrder(1, 2)
+            assertThat(savedWinners.map { it.awardTitle }).containsExactlyInAnyOrder("최우수상", "우수상")
         }
 
         @Test

@@ -19,15 +19,16 @@ class ListEventsUseCaseImpl(
     @Transactional(readOnly = true)
     override fun execute(query: EventListQuery): PagedEventsResult {
         val pageable = PageableValidator.validateAndCreate(query.page, query.size)
+        val now = LocalDateTime.now()
 
         val eventPage = eventRepository.findWithPagination(
             query.status,
             query.sortType,
             pageable,
-            LocalDateTime.now()
+            now
         )
 
-        val eventListResults = eventPage.content.map { toEventListResult(it) }
+        val eventListResults = eventPage.content.map { toEventListResult(it, now) }
 
         return PagedEventsResult(
             content = eventListResults,
@@ -39,7 +40,7 @@ class ListEventsUseCaseImpl(
         )
     }
 
-    private fun toEventListResult(event: Event): EventListResult {
+    private fun toEventListResult(event: Event, now: LocalDateTime): EventListResult {
         return EventListResult(
             id = event.id.value,
             title = event.title,
@@ -47,7 +48,7 @@ class ListEventsUseCaseImpl(
             description = event.description,
             startedAt = event.startedAt,
             expiredAt = event.expiredAt,
-            status = event.resolveStatus(LocalDateTime.now()),
+            status = event.resolveStatus(now),
             thumbnailUrl = event.thumbnailUrl
         )
     }

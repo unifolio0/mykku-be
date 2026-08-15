@@ -345,7 +345,6 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("댓글 목록 조회 - 작성자 아이디와 칭호를 포함한다")
     fun `getComments - 작성자 memberId와 칭호를 반환한다`() {
-        // given
         val role = roleJpaRepository.save(RoleJpaEntity(name = "덕담왕", description = "덕담을 많이 남긴 사람"))
         val commentAuthor = memberJpaRepository.save(
             MemberJpaEntity(
@@ -384,7 +383,6 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
             )
         )
 
-        // when & then
         RestAssured.given()
             .`when`()
             .get("/api/v1/daily-messages/{dailyMessageId}/comments", dailyMessage.id)
@@ -399,7 +397,6 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("댓글 목록 조회 - 작성자가 없는 댓글도 조회된다")
     fun `getComments - 작성자가 삭제된 댓글도 목록에 포함된다`() {
-        // given
         val dailyMessage = dailyMessageJpaRepository.save(
             DailyMessageJpaEntity(title = "오늘의 덕담", content = "좋은 하루!", date = LocalDate.now())
         )
@@ -407,7 +404,6 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
             DailyMessageCommentJpaEntity(content = "탈퇴자 댓글", dailyMessage = dailyMessage, member = null)
         )
 
-        // when & then
         RestAssured.given()
             .`when`()
             .get("/api/v1/daily-messages/{dailyMessageId}/comments", dailyMessage.id)
@@ -421,7 +417,6 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("답글에 답글을 작성할 수 없다")
     fun `createComment - 답글에는 답글을 달 수 없다`() {
-        // given
         val member = memberJpaRepository.save(
             MemberJpaEntity(
                 memberId = "depthuser",
@@ -450,7 +445,6 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
         val authHeader = TestTokenGenerator.getBearerToken(member.id)
         val request = CreateCommentRequest(content = "답글의 답글", parentCommentId = reply.id)
 
-        // when & then
         RestAssured.given()
             .header("Authorization", authHeader)
             .contentType(ContentType.JSON)

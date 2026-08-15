@@ -215,6 +215,27 @@ class ContestWinnerControllerTest : BaseControllerTest() {
     }
 
     @Test
+    @DisplayName("내 수상 콘테스트 목록 조회 - 수상명이 없으면 null을 반환한다")
+    fun `getMyAwardContests - 수상명이 없으면 null을 반환한다`() {
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
+        val board = createAndSaveBoard()
+        val contest = createAndSaveContest(status = ContestStatusType.WINNER_SELECTED)
+        val feed = createAndSaveFeed(member, board)
+        val participation = createAndSaveParticipation(member, contest, feed)
+        createAndSaveWinner(contest, participation, winnerRank = 1, awardTitle = null)
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .`when`()
+            .get("/api/v1/contests/my-awards")
+            .then()
+            .statusCode(200)
+            .body("data.content[0].winnerRank", equalTo(1))
+            .body("data.content[0].awardTitle", equalTo(null))
+    }
+
+    @Test
     @DisplayName("내 수상 콘테스트 목록 조회 - 인증되지 않은 사용자")
     fun `getMyAwardContests - 인증되지 않은 사용자는 조회할 수 없다`() {
         RestAssured.given()

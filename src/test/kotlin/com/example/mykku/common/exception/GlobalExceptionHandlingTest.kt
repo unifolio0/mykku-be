@@ -19,7 +19,7 @@ class GlobalExceptionHandlingTest : BaseControllerTest() {
             .get("/api/v1/not-exist-endpoint")
             .then()
             .statusCode(404)
-            .body("code", equalTo("C201"))
+            .body("code", equalTo(CommonErrorCode.ENDPOINT_NOT_FOUND.code))
     }
 
     @Test
@@ -40,7 +40,20 @@ class GlobalExceptionHandlingTest : BaseControllerTest() {
             .put("/api/v1/members/me/member-id")
             .then()
             .statusCode(405)
-            .body("code", equalTo("C202"))
+            .body("code", equalTo(CommonErrorCode.METHOD_NOT_ALLOWED.code))
+    }
+
+    @Test
+    @DisplayName("지원하지 않는 Content-Type은 415를 반환한다")
+    fun `지원하지 않는 컨텐츠 타입은 415를 반환한다`() {
+        RestAssured.given()
+            .contentType(ContentType.TEXT)
+            .body("memberId=testid")
+            .`when`()
+            .post("/api/v1/members/check-id")
+            .then()
+            .statusCode(415)
+            .body("code", equalTo(CommonErrorCode.UNSUPPORTED_MEDIA_TYPE.code))
     }
 
     @Test
@@ -51,7 +64,7 @@ class GlobalExceptionHandlingTest : BaseControllerTest() {
             .get("/api/v1/daily-messages")
             .then()
             .statusCode(400)
-            .body("code", equalTo("C105"))
+            .body("code", equalTo(CommonErrorCode.MISSING_REQUEST_PARAMETER.code))
     }
 
     @Test
@@ -63,6 +76,6 @@ class GlobalExceptionHandlingTest : BaseControllerTest() {
             .get("/api/v1/daily-messages")
             .then()
             .statusCode(400)
-            .body("code", equalTo("C106"))
+            .body("code", equalTo(CommonErrorCode.INVALID_PARAMETER_TYPE.code))
     }
 }

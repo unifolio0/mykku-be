@@ -214,6 +214,48 @@ class EventTest {
         }
     }
 
+    @Nested
+    @DisplayName("상태 계산")
+    inner class ResolveStatus {
+
+        @Test
+        @DisplayName("만료 시각이 남아있으면 ACTIVE다")
+        fun `상태 계산 - 진행 중`() {
+            val now = LocalDateTime.now()
+            val event = createEvent(expiredAt = now.plusDays(1))
+
+            assertThat(event.resolveStatus(now)).isEqualTo(EventStatusType.ACTIVE)
+        }
+
+        @Test
+        @DisplayName("만료 시각과 같은 시각이면 EXPIRED다")
+        fun `상태 계산 - 만료 경계`() {
+            val now = LocalDateTime.now()
+            val event = createEvent(expiredAt = now)
+
+            assertThat(event.resolveStatus(now)).isEqualTo(EventStatusType.EXPIRED)
+        }
+
+        @Test
+        @DisplayName("만료 시각이 지나면 EXPIRED다")
+        fun `상태 계산 - 만료`() {
+            val now = LocalDateTime.now()
+            val event = createEvent(expiredAt = now.minusDays(1))
+
+            assertThat(event.resolveStatus(now)).isEqualTo(EventStatusType.EXPIRED)
+        }
+
+        @Test
+        @DisplayName("당첨자가 선정되면 만료 여부와 무관하게 WINNER_SELECTED를 유지한다")
+        fun `상태 계산 - 당첨자 선정 완료`() {
+            val now = LocalDateTime.now()
+            val event = createEvent(expiredAt = now.minusDays(1))
+            event.updateStatus(EventStatusType.WINNER_SELECTED)
+
+            assertThat(event.resolveStatus(now)).isEqualTo(EventStatusType.WINNER_SELECTED)
+        }
+    }
+
     private fun createEvent(): Event {
         return Event.create(
             title = "테스트 이벤트",
@@ -221,6 +263,17 @@ class EventTest {
             description = "이벤트 설명",
             startedAt = LocalDateTime.now().plusDays(1),
             expiredAt = LocalDateTime.now().plusDays(7),
+            thumbnailUrl = "https://example.com/thumbnail.jpg"
+        )
+    }
+
+    private fun createEvent(expiredAt: LocalDateTime): Event {
+        return Event.create(
+            title = "테스트 이벤트",
+            subTitle = null,
+            description = "이벤트 설명",
+            startedAt = LocalDateTime.now().minusDays(1),
+            expiredAt = expiredAt,
             thumbnailUrl = "https://example.com/thumbnail.jpg"
         )
     }

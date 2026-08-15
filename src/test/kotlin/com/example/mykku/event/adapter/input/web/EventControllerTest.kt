@@ -89,6 +89,8 @@ class EventControllerTest : BaseControllerTest() {
             .body("message", equalTo("이벤트 상세 정보를 성공적으로 조회했습니다."))
             .body("data.id", equalTo(event.id!!.toInt()))
             .body("data.title", equalTo("상세 조회 테스트 이벤트"))
+            .body("data.subTitle", equalTo("테스트 부제목"))
+            .body("data.description", equalTo("테스트 이벤트 설명"))
     }
 
     @Test
