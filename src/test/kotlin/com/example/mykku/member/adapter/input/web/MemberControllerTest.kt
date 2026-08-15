@@ -1,6 +1,7 @@
 package com.example.mykku.member.adapter.input.web
 
 import com.example.mykku.BaseControllerTest
+import com.example.mykku.common.exception.CommonErrorCode
 import com.example.mykku.member.adapter.input.web.dto.ChangeMemberIdRequest
 import com.example.mykku.member.adapter.input.web.dto.ChangePasswordRequest
 import com.example.mykku.member.adapter.input.web.dto.CheckMemberIdRequest
@@ -11,14 +12,21 @@ import com.example.mykku.member.domain.vo.SocialProvider
 import com.example.mykku.member.exception.MemberErrorCode
 import com.example.mykku.role.adapter.output.persistence.entity.RoleJpaEntity
 import io.restassured.RestAssured
+import io.restassured.builder.MultiPartSpecBuilder
 import io.restassured.http.ContentType
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.startsWith
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 
 @DisplayName("MemberController 통합 테스트")
 class MemberControllerTest : BaseControllerTest() {
+
+    companion object {
+        private const val UPLOADED_PROFILE_IMAGE_URL_PREFIX =
+            "https://test-bucket.s3.amazonaws.com/profile-images/test-image"
+    }
 
     private val passwordEncoder = BCryptPasswordEncoder()
 
@@ -40,6 +48,13 @@ class MemberControllerTest : BaseControllerTest() {
         )
         return memberJpaRepository.save(member)
     }
+
+    private fun nicknamePart(nickname: String) =
+        MultiPartSpecBuilder("""{"nickname":"$nickname"}""")
+            .controlName("request")
+            .mimeType("application/json")
+            .charset("UTF-8")
+            .build()
 
     @Test
     @DisplayName("내 프로필 조회 - 정상 케이스")
@@ -144,6 +159,167 @@ class MemberControllerTest : BaseControllerTest() {
             .patch("/api/v1/members/me")
             .then()
             .statusCode(409)
+    }
+
+    @Test
+    @DisplayName("프로필 수정(multipart) - 닉네임과 이미지 파일 동시 수정")
+    fun `updateProfileWithImage - multipart로 닉네임과 프로필 이미지를 함께 수정한다`() {
+        val member = createAndSaveMember(
+            memberId = "multipart1",
+            nickname = "멀티하나",
+            email = "multipart1@example.com",
+            socialId = "multipart1",
+            profileImage = "https://example.com/old-image.jpg"
+        )
+
+        RestAssured.given()
+            .header("Authorization", getBearerToken(member.id))
+            .contentType(ContentType.MULTIPART)
+            .multiPart(nicknamePart("멀티새닉"))
+            .multiPart("profileImage", "dummy.jpg", "image data".toByteArray(), "image/jpeg")
+            .`when`()
+            .patch("/api/v1/members/me")
+            .then()
+            .statusCode(200)
+            .body("message", equalTo("프로필이 수정되었습니다"))
+            .body("data.nickname", equalTo("멀티새닉"))
+            .body("data.profileImage", startsWith(UPLOADED_PROFILE_IMAGE_URL_PREFIX))
+    }
+
+    @Test
+    @DisplayName("프로필 수정(multipart) - 이미지 파일만 전송")
+    fun `updateProfileWithImage - request 파트 없이 이미지 파일만 전송하면 닉네임은 유지된다`() {
+        val member = createAndSaveMember(
+            memberId = "multipart2",
+            nickname = "멀티둘",
+            email = "multipart2@example.com",
+            socialId = "multipart2",
+            profileImage = "https://example.com/old-image.jpg"
+        )
+
+        RestAssured.given()
+            .header("Authorization", getBearerToken(member.id))
+            .contentType(ContentType.MULTIPART)
+            .multiPart("profileImage", "dummy.jpg", "image data".toByteArray(), "image/jpeg")
+            .`when`()
+            .patch("/api/v1/members/me")
+            .then()
+            .statusCode(200)
+            .body("data.nickname", equalTo("멀티둘"))
+            .body("data.profileImage", startsWith(UPLOADED_PROFILE_IMAGE_URL_PREFIX))
+    }
+
+    @Test
+    @DisplayName("프로필 수정(multipart) - 닉네임만 전송")
+    fun `updateProfileWithImage - 파일 없이 닉네임만 전송하면 기존 프로필 이미지가 유지된다`() {
+        val member = createAndSaveMember(
+            memberId = "multipart3",
+            nickname = "멀티셋",
+            email = "multipart3@example.com",
+            socialId = "multipart3",
+            profileImage = "https://example.com/keep-image.jpg"
+        )
+
+        RestAssured.given()
+            .header("Authorization", getBearerToken(member.id))
+            .contentType(ContentType.MULTIPART)
+            .multiPart(nicknamePart("닉만변경"))
+            .`when`()
+            .patch("/api/v1/members/me")
+            .then()
+            .statusCode(200)
+            .body("data.nickname", equalTo("닉만변경"))
+            .body("data.profileImage", equalTo("https://example.com/keep-image.jpg"))
+    }
+
+    @Test
+    @DisplayName("프로필 수정(multipart) - 인증되지 않은 사용자")
+    fun `updateProfileWithImage - 인증되지 않은 사용자는 multipart로 프로필을 수정할 수 없다`() {
+        RestAssured.given()
+            .contentType(ContentType.MULTIPART)
+            .multiPart(nicknamePart("새닉네임"))
+            .multiPart("profileImage", "dummy.jpg", "image data".toByteArray(), "image/jpeg")
+            .`when`()
+            .patch("/api/v1/members/me")
+            .then()
+            .statusCode(401)
+    }
+
+    @Test
+    @DisplayName("프로필 수정 - 프로필 이미지 URL 길이 초과")
+    fun `updateProfile - 프로필 이미지 URL이 255자를 초과하면 수정할 수 없다`() {
+        val member = createAndSaveMember(
+            memberId = "longurl",
+            nickname = "긴유알엘",
+            email = "longurl@example.com",
+            socialId = "longurl"
+        )
+        val request = UpdateProfileRequest(
+            nickname = null,
+            profileImage = "https://example.com/" + "a".repeat(240)
+        )
+
+        RestAssured.given()
+            .header("Authorization", getBearerToken(member.id))
+            .contentType(ContentType.JSON)
+            .body(request)
+            .`when`()
+            .patch("/api/v1/members/me")
+            .then()
+            .statusCode(400)
+            .body("code", equalTo(CommonErrorCode.INVALID_INPUT.code))
+    }
+
+    @Test
+    @DisplayName("프로필 수정 - 프로필 이미지가 URL 형식이 아님")
+    fun `updateProfile - 프로필 이미지가 http로 시작하지 않으면 수정할 수 없다`() {
+        val member = createAndSaveMember(
+            memberId = "notaurl",
+            nickname = "형식오류",
+            email = "notaurl@example.com",
+            socialId = "notaurl"
+        )
+        val request = UpdateProfileRequest(
+            nickname = null,
+            profileImage = "dummy.jpg"
+        )
+
+        RestAssured.given()
+            .header("Authorization", getBearerToken(member.id))
+            .contentType(ContentType.JSON)
+            .body(request)
+            .`when`()
+            .patch("/api/v1/members/me")
+            .then()
+            .statusCode(400)
+            .body("code", equalTo(CommonErrorCode.INVALID_INPUT.code))
+    }
+
+    @Test
+    @DisplayName("프로필 수정 - 프로필 이미지 빈 문자열 허용")
+    fun `updateProfile - 프로필 이미지에 빈 문자열을 보내면 기본 이미지로 비운다`() {
+        val member = createAndSaveMember(
+            memberId = "emptyimg",
+            nickname = "빈이미지",
+            email = "emptyimg@example.com",
+            socialId = "emptyimg",
+            profileImage = "https://example.com/old-image.jpg"
+        )
+        val request = UpdateProfileRequest(
+            nickname = null,
+            profileImage = ""
+        )
+
+        RestAssured.given()
+            .header("Authorization", getBearerToken(member.id))
+            .contentType(ContentType.JSON)
+            .body(request)
+            .`when`()
+            .patch("/api/v1/members/me")
+            .then()
+            .statusCode(200)
+            .body("data.nickname", equalTo("빈이미지"))
+            .body("data.profileImage", equalTo(""))
     }
 
     @Test

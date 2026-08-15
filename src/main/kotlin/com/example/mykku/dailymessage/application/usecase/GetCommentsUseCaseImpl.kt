@@ -40,13 +40,15 @@ class GetCommentsUseCaseImpl(
             emptyList()
         }
 
-        val likedIds = resolveLikedIds(memberId, commentsPage.content, replies)
+        val allCommentIds = (commentsPage.content + replies).map { it.id.value }
+        val likedIds = resolveLikedIds(memberId, allCommentIds)
+        val likeCounts = likeDailyMessageCommentPort.countByCommentIdIn(allCommentIds)
         val authors = commentAuthorResolver.resolve(
             (commentsPage.content + replies).mapNotNull { it.memberId }
         )
         val repliesMap = replies.groupBy { it.parentCommentId }
         val commentResults = commentsPage.content.map { comment ->
-            toCommentResult(comment, repliesMap[comment.id.value] ?: emptyList(), likedIds, authors)
+            toCommentResult(comment, repliesMap[comment.id.value] ?: emptyList(), likedIds, likeCounts, authors)
         }
 
         return DailyMessageCommentsResult(
@@ -59,15 +61,10 @@ class GetCommentsUseCaseImpl(
         )
     }
 
-    private fun resolveLikedIds(
-        memberId: Long?,
-        comments: List<DailyMessageComment>,
-        replies: List<DailyMessageComment>
-    ): Set<Long> {
+    private fun resolveLikedIds(memberId: Long?, allCommentIds: List<Long>): Set<Long> {
         if (memberId == null) {
             return emptySet()
         }
-        val allCommentIds = comments.map { it.id.value } + replies.map { it.id.value }
         return likeDailyMessageCommentPort.findLikedCommentIds(memberId, allCommentIds)
     }
 
@@ -75,15 +72,22 @@ class GetCommentsUseCaseImpl(
         comment: DailyMessageComment,
         replies: List<DailyMessageComment>,
         likedIds: Set<Long>,
+        likeCounts: Map<Long, Int>,
         authors: Map<Long, CommentAuthorInfo>
     ): CommentResult {
         val replyResults = replies.map {
-            ReplyResult.from(it, authorOf(it, authors), likedIds.contains(it.id.value))
+            ReplyResult.from(
+                it,
+                authorOf(it, authors),
+                likedIds.contains(it.id.value),
+                likeCounts[it.id.value] ?: 0
+            )
         }
         return CommentResult.from(
             comment,
             authorOf(comment, authors),
             likedIds.contains(comment.id.value),
+            likeCounts[comment.id.value] ?: 0,
             replyResults
         )
     }

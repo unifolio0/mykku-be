@@ -20,7 +20,7 @@ class WebConfig(
     }
 
     override fun addViewControllers(registry: ViewControllerRegistry) {
-        registry.addRedirectViewController("/docs", "/docs/index.html")
+        registry.addRedirectViewController("/docs", "/docs/swagger")
     }
 
     override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {

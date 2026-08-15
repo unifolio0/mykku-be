@@ -1,5 +1,6 @@
 package com.example.mykku.like.adapter.output.persistence
 
+import com.example.mykku.common.adapter.persistence.toCountMap
 import com.example.mykku.feed.adapter.output.persistence.FeedJpaRepository
 import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.like.adapter.output.persistence.entity.LikeFeedJpaEntity
@@ -42,5 +43,14 @@ class LikeFeedPersistenceAdapter(
 
     override fun deleteAllByFeedId(feedId: Long) {
         likeFeedJpaRepository.deleteAllByFeedId(feedId)
+    }
+
+    override fun countByFeedId(feedId: Long): Int {
+        return likeFeedJpaRepository.countByFeedId(feedId).toInt()
+    }
+
+    override fun countByFeedIdIn(feedIds: List<Long>): Map<Long, Int> {
+        if (feedIds.isEmpty()) return emptyMap()
+        return likeFeedJpaRepository.countGroupedByFeedIdIn(feedIds).toCountMap()
     }
 }

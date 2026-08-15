@@ -25,6 +25,7 @@ import org.mockito.kotlin.whenever
 import org.mockito.kotlin.eq
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
+import org.springframework.restdocs.request.RequestDocumentation
 import java.time.LocalDateTime
 
 class MemberDocumentTest : BaseDocumentTest() {
@@ -273,6 +274,99 @@ class MemberDocumentTest : BaseDocumentTest() {
                 .patch("/api/v1/members/me")
                 .then()
                 .statusCode(400)
+        }
+    }
+
+    @Nested
+    @DisplayName("프로필 수정 (이미지 업로드)")
+    inner class UpdateProfileWithImage {
+
+        private val apiConfig = ApiRequestConfig(
+            tag = Tag.MEMBER_API,
+            summary = "프로필 수정 (이미지 업로드)",
+            description = """
+                |닉네임과 프로필 이미지 파일을 함께 수정합니다.
+                |
+                |## Request Parts (multipart/form-data)
+                |
+                |### request (application/json, 선택)
+                |```json
+                |{
+                |  "nickname": "새닉네임"
+                |}
+                |```
+                |
+                || 필드 | 타입 | 필수 | 설명 |
+                ||------|------|------|------|
+                || nickname | string | X | 새로운 닉네임 (최대 10자, 한글/영문/숫자만 허용) |
+                |
+                |### profileImage (multipart/form-data, 선택)
+                |업로드할 프로필 이미지 파일. 전달하면 업로드된 이미지 URL로 프로필 이미지가 변경됩니다.
+                |
+                |JSON(application/json)으로 요청하면 기존과 동일하게 profileImage URL 문자열로 수정할 수 있습니다.
+            """.trimMargin(),
+            requestParts = listOf(
+                RequestDocumentation.partWithName("request")
+                    .description("프로필 수정 요청 정보 (JSON, 선택사항)").optional(),
+                RequestDocumentation.partWithName("profileImage")
+                    .description("업로드할 프로필 이미지 파일 (선택사항)").optional()
+            ),
+            requestPartFields = mapOf(
+                "request" to listOf(
+                    fieldWithPath("nickname").type(JsonFieldType.STRING)
+                        .description("새로운 닉네임 (최대 10자, 한글/영문/숫자만 허용)").optional()
+                )
+            ),
+            headerDescriptors = AUTH_HEADER_DESCRIPTOR
+        )
+
+        @Test
+        fun `성공`() {
+            val result = MemberProfileResult(
+                memberId = "testmemberid",
+                email = TEST_MEMBER_EMAIL,
+                nickname = "새닉네임",
+                profileImage = "https://cdn.mykku.kr/profile-images/uploaded-image.jpg",
+                role = RoleResult(id = 1L, name = "테스트 칭호", description = "테스트 칭호 설명"),
+                provider = "GOOGLE",
+                emailVerified = true,
+                createdAt = LocalDateTime.now()
+            )
+
+            whenever(updateMemberProfileUseCase.updateProfile(any(), any())).thenReturn(result)
+
+            val documentFilter = document("member/update-profile-multipart", 200)
+                .request(request().applyConfig(apiConfig))
+                .response(
+                    response()
+                        .responseBodyField(
+                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                            fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("회원 ID"),
+                            fieldWithPath("data.email").type(JsonFieldType.STRING).description("이메일"),
+                            fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("닉네임"),
+                            fieldWithPath("data.profileImage").type(JsonFieldType.STRING)
+                                .description("업로드된 프로필 이미지 URL"),
+                            fieldWithPath("data.role").type(JsonFieldType.OBJECT).description("역할/칭호").optional(),
+                            fieldWithPath("data.role.id").type(JsonFieldType.NUMBER).description("칭호 ID"),
+                            fieldWithPath("data.role.name").type(JsonFieldType.STRING).description("칭호 이름"),
+                            fieldWithPath("data.role.description").type(JsonFieldType.STRING)
+                                .description("칭호 설명").optional(),
+                            fieldWithPath("data.provider").type(JsonFieldType.STRING).description("가입 경로").optional(),
+                            fieldWithPath("data.emailVerified").type(JsonFieldType.BOOLEAN)
+                                .description("이메일 인증 여부"),
+                            fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("가입일시")
+                        )
+                )
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .multiPart("request", """{"nickname":"새닉네임"}""", "application/json")
+                .multiPart("profileImage", "profile.jpg", "image data".toByteArray(), "image/jpeg")
+                .`when`()
+                .patch("/api/v1/members/me")
+                .then()
+                .statusCode(200)
         }
     }
 

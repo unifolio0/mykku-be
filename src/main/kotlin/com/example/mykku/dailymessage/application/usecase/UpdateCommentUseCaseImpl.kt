@@ -37,6 +37,12 @@ class UpdateCommentUseCaseImpl(
             .existsByMemberIdAndDailyMessageCommentId(memberId, comment.id.value)
         val author = commentAuthorResolver.resolveOne(comment.memberId)
 
-        return CommentResult.from(comment, author, isLiked = isLiked, replies = emptyList())
+        return CommentResult.from(
+            comment,
+            author,
+            isLiked = isLiked,
+            likeCount = likeDailyMessageCommentPort.countByCommentId(comment.id.value),
+            replies = emptyList()
+        )
     }
 }

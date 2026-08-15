@@ -7,16 +7,43 @@ import com.example.mykku.member.application.dto.UpdateProfileCommand
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
+import org.springframework.web.multipart.MultipartFile
 
 data class UpdateProfileRequest(
     @field:Size(max = 10, message = "닉네임은 10자 이하여야 합니다")
     val nickname: String?,
+
+    @field:Size(max = 255, message = "프로필 이미지 URL은 255자 이하여야 합니다")
+    @field:Pattern(
+        regexp = "^$|^https?://.+$",
+        message = "프로필 이미지는 http 또는 https로 시작하는 URL이어야 합니다"
+    )
     val profileImage: String?
 ) {
     fun toCommand(): UpdateProfileCommand {
         return UpdateProfileCommand(
             nickname = nickname,
             profileImage = profileImage
+        )
+    }
+}
+
+data class UpdateProfileWithImageRequest(
+    @field:Size(max = 10, message = "닉네임은 10자 이하여야 합니다")
+    val nickname: String?,
+
+    @field:Size(max = 255, message = "프로필 이미지 URL은 255자 이하여야 합니다")
+    @field:Pattern(
+        regexp = "^$|^https?://.+$",
+        message = "프로필 이미지는 http 또는 https로 시작하는 URL이어야 합니다"
+    )
+    val profileImage: String? = null
+) {
+    fun toCommand(profileImageFile: MultipartFile?): UpdateProfileCommand {
+        return UpdateProfileCommand(
+            nickname = nickname,
+            profileImage = profileImage,
+            profileImageFile = profileImageFile
         )
     }
 }

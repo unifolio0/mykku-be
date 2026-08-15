@@ -66,12 +66,13 @@ data class CommentResult(
             comment: DailyMessageComment,
             author: CommentAuthorInfo?,
             isLiked: Boolean = false,
+            likeCount: Int = 0,
             replies: List<ReplyResult> = emptyList()
         ): CommentResult {
             return CommentResult(
                 id = comment.id.value,
                 content = comment.content,
-                likeCount = comment.likeCount,
+                likeCount = likeCount,
                 isLiked = isLiked,
                 memberId = author?.memberId,
                 memberName = comment.memberNickname,
@@ -99,12 +100,13 @@ data class ReplyResult(
         fun from(
             reply: DailyMessageComment,
             author: CommentAuthorInfo?,
-            isLiked: Boolean = false
+            isLiked: Boolean = false,
+            likeCount: Int = 0
         ): ReplyResult {
             return ReplyResult(
                 id = reply.id.value,
                 content = reply.content,
-                likeCount = reply.likeCount,
+                likeCount = likeCount,
                 isLiked = isLiked,
                 memberId = author?.memberId,
                 memberName = reply.memberNickname,

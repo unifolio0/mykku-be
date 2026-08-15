@@ -25,6 +25,8 @@ class CreateFeedCommentUseCaseImpl(
 ) : CreateFeedCommentUseCase {
 
     override fun execute(command: CreateFeedCommentCommand, member: Member): SingleFeedCommentResult {
+        member.requireProfileCompleted()
+
         val feed = feedRepository.findByIdOrThrow(FeedId.of(command.feedId))
 
         val comment = FeedComment.create(

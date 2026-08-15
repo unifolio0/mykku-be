@@ -1,5 +1,6 @@
 package com.example.mykku.like.adapter.output.persistence
 
+import com.example.mykku.common.adapter.persistence.toCountMap
 import com.example.mykku.dailymessage.adapter.output.persistence.repository.DailyMessageCommentJpaRepository
 import com.example.mykku.dailymessage.exception.DailyMessageException
 import com.example.mykku.like.adapter.output.persistence.entity.LikeDailyMessageCommentJpaEntity
@@ -42,5 +43,18 @@ class LikeDailyMessageCommentPersistenceAdapter(
         return likeDailyMessageCommentJpaRepository
             .findLikedDailyMessageCommentIds(memberId, dailyMessageCommentIds)
             .toSet()
+    }
+
+    override fun countByCommentIdIn(dailyMessageCommentIds: List<Long>): Map<Long, Int> {
+        if (dailyMessageCommentIds.isEmpty()) return emptyMap()
+        return likeDailyMessageCommentJpaRepository
+            .countGroupedByDailyMessageCommentIdIn(dailyMessageCommentIds)
+            .toCountMap()
+    }
+
+    override fun countByCommentId(dailyMessageCommentId: Long): Int {
+        return likeDailyMessageCommentJpaRepository
+            .countByDailyMessageCommentId(dailyMessageCommentId)
+            .toInt()
     }
 }

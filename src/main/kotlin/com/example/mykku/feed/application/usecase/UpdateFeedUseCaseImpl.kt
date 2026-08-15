@@ -11,6 +11,7 @@ import com.example.mykku.feed.application.dto.TagResult
 import com.example.mykku.feed.application.dto.UpdateFeedCommand
 import com.example.mykku.role.application.dto.RoleResult
 import com.example.mykku.feed.application.port.input.UpdateFeedUseCase
+import com.example.mykku.feed.application.port.output.FeedCommentRepository
 import com.example.mykku.feed.application.port.output.FeedImageRepository
 import com.example.mykku.feed.application.port.output.FeedRepository
 import com.example.mykku.feed.application.port.output.FeedTagRepository
@@ -34,6 +35,7 @@ class UpdateFeedUseCaseImpl(
     private val feedRepository: FeedRepository,
     private val feedImageRepository: FeedImageRepository,
     private val feedTagRepository: FeedTagRepository,
+    private val feedCommentRepository: FeedCommentRepository,
     private val boardRepository: BoardRepository,
     private val roleRepository: RoleRepository,
     private val contestTagRepository: ContestTagRepository,
@@ -81,9 +83,9 @@ class UpdateFeedUseCaseImpl(
             content = savedFeed.content,
             images = remainingImages.map { FeedImageResult(it.id!!.value, it.url, it.width, it.height) },
             tags = updatedTags.map { TagResult(it.title, contestTagTitles.contains(it.title)) },
-            likeCount = savedFeed.likeCount,
+            likeCount = likeFeedPort.countByFeedId(savedFeed.id!!.value),
             isLiked = isLiked,
-            commentCount = savedFeed.commentCount
+            commentCount = feedCommentRepository.countByFeedId(savedFeed.id!!).toInt()
         )
     }
 

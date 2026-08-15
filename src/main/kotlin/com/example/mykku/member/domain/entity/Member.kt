@@ -22,6 +22,12 @@ class Member private constructor(
     val isProfileComplete: Boolean
         get() = memberId != null && nickname != null
 
+    fun requireProfileCompleted() {
+        if (!isProfileComplete) {
+            throw MemberException.profileNotCompleted()
+        }
+    }
+
     companion object {
         const val NICKNAME_MAX_LENGTH = 10
         val VALID_NICKNAME_PATTERN = Regex("^[가-힣a-zA-Z0-9\\s]+$")

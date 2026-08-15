@@ -12,6 +12,7 @@ import com.example.mykku.like.adapter.output.persistence.LikeDailyMessageComment
 import com.example.mykku.like.adapter.output.persistence.entity.LikeDailyMessageCommentJpaEntity
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.member.domain.vo.SocialProvider
+import com.example.mykku.member.exception.MemberErrorCode
 import com.example.mykku.role.adapter.output.persistence.entity.RoleJpaEntity
 import com.example.mykku.util.TestTokenGenerator
 import io.restassured.RestAssured
@@ -94,6 +95,80 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
             .post("/api/v1/daily-messages/{dailyMessageId}/comments", dailyMessage.id)
             .then()
             .statusCode(401)
+    }
+
+    @Test
+    @DisplayName("댓글 생성 - 아이디를 설정하지 않은 회원")
+    fun `createComment - memberId가 없는 회원은 댓글을 생성할 수 없다`() {
+        // given
+        val member = memberJpaRepository.save(
+            MemberJpaEntity(
+                memberId = null,
+                socialId = "incomplete-member-id",
+                provider = SocialProvider.GOOGLE,
+                email = "incomplete-member-id@example.com",
+                nickname = "미완성유저",
+                role = null,
+                profileImage = ""
+            )
+        )
+        val dailyMessage = dailyMessageJpaRepository.save(
+            DailyMessageJpaEntity(
+                title = "오늘의 덕담",
+                content = "오늘도 좋은 하루!",
+                date = LocalDate.now()
+            )
+        )
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val request = CreateCommentRequest(content = "좋은 글이네요!")
+
+        // when & then
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .contentType(ContentType.JSON)
+            .body(request)
+            .`when`()
+            .post("/api/v1/daily-messages/{dailyMessageId}/comments", dailyMessage.id)
+            .then()
+            .statusCode(403)
+            .body("code", equalTo(MemberErrorCode.PROFILE_NOT_COMPLETED.code))
+    }
+
+    @Test
+    @DisplayName("댓글 생성 - 닉네임을 설정하지 않은 회원")
+    fun `createComment - nickname이 없는 회원은 댓글을 생성할 수 없다`() {
+        // given
+        val member = memberJpaRepository.save(
+            MemberJpaEntity(
+                memberId = "incompletenick",
+                socialId = "incomplete-nickname",
+                provider = SocialProvider.GOOGLE,
+                email = "incomplete-nickname@example.com",
+                nickname = null,
+                role = null,
+                profileImage = ""
+            )
+        )
+        val dailyMessage = dailyMessageJpaRepository.save(
+            DailyMessageJpaEntity(
+                title = "오늘의 덕담",
+                content = "오늘도 좋은 하루!",
+                date = LocalDate.now()
+            )
+        )
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val request = CreateCommentRequest(content = "좋은 글이네요!")
+
+        // when & then
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .contentType(ContentType.JSON)
+            .body(request)
+            .`when`()
+            .post("/api/v1/daily-messages/{dailyMessageId}/comments", dailyMessage.id)
+            .then()
+            .statusCode(403)
+            .body("code", equalTo(MemberErrorCode.PROFILE_NOT_COMPLETED.code))
     }
 
     @Test

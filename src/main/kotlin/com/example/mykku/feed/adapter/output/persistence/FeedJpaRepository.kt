@@ -51,7 +51,7 @@ interface FeedJpaRepository : JpaRepository<FeedJpaEntity, Long> {
         SELECT f FROM FeedJpaEntity f
         WHERE f.board = :board
         AND f.createdAt >= :since
-        ORDER BY f.likeCount DESC
+        ORDER BY (SELECT COUNT(l) FROM LikeFeedJpaEntity l WHERE l.feed = f) DESC, f.createdAt DESC
     """)
     fun findPopularFeedsByBoardSince(
         @Param("board") board: BoardJpaEntity,

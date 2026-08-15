@@ -3,9 +3,14 @@ package com.example.mykku.common.exception
 import com.example.mykku.BaseControllerTest
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
+import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 
 @DisplayName("전역 예외 처리 통합 테스트")
 class GlobalExceptionHandlingTest : BaseControllerTest() {
@@ -77,5 +82,98 @@ class GlobalExceptionHandlingTest : BaseControllerTest() {
             .then()
             .statusCode(400)
             .body("code", equalTo(CommonErrorCode.INVALID_PARAMETER_TYPE.code))
+    }
+
+    @Test
+    @DisplayName("프로필 수정에 JSON도 multipart도 아닌 Content-Type을 보내면 415를 반환한다")
+    fun `프로필 수정에 지원하지 않는 컨텐츠 타입은 415를 반환한다`() {
+        val member = createAndSaveMember(
+            memberId = "mediatype",
+            nickname = "미디어타입",
+            email = "mediatype@example.com",
+            socialId = "mediatype"
+        )
+
+        RestAssured.given()
+            .header("Authorization", getBearerToken(member.id))
+            .contentType(ContentType.TEXT)
+            .body("nickname=newname")
+            .`when`()
+            .patch("/api/v1/members/me")
+            .then()
+            .statusCode(415)
+            .body("code", equalTo(CommonErrorCode.UNSUPPORTED_MEDIA_TYPE.code))
+    }
+
+    @Test
+    @DisplayName("multipart 필수 파트가 누락되면 400을 반환한다")
+    fun `multipart 필수 파트가 누락되면 400을 반환한다`() {
+        val member = createAndSaveMember(
+            memberId = "partmissing",
+            nickname = "파트누락",
+            email = "partmissing@example.com",
+            socialId = "partmissing"
+        )
+
+        RestAssured.given()
+            .header("Authorization", getBearerToken(member.id))
+            .contentType(ContentType.MULTIPART)
+            .multiPart("images", "dummy.jpg", "image data".toByteArray(), "image/jpeg")
+            .`when`()
+            .post("/api/v1/feeds")
+            .then()
+            .statusCode(400)
+            .body("code", equalTo(CommonErrorCode.MISSING_REQUEST_PARAMETER.code))
+    }
+
+    @Test
+    @DisplayName("boundary가 없는 multipart 요청은 400을 반환한다")
+    fun `boundary가 없는 multipart 요청은 400을 반환한다`() {
+        val member = createAndSaveMember(
+            memberId = "brokenpart",
+            nickname = "깨진멀티",
+            email = "brokenpart@example.com",
+            socialId = "brokenpart"
+        )
+
+        val request = HttpRequest.newBuilder()
+            .uri(URI.create("http://localhost:$port/api/v1/members/me"))
+            .header("Authorization", getBearerToken(member.id))
+            .header("Content-Type", "multipart/form-data")
+            .method("PATCH", HttpRequest.BodyPublishers.ofString("boundary-less-multipart-body"))
+            .build()
+
+        val response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString())
+
+        assertThat(response.statusCode()).isEqualTo(400)
+        assertThat(response.body()).contains(CommonErrorCode.INVALID_MULTIPART_REQUEST.code)
+    }
+
+    @Test
+    @DisplayName("업로드 파일이 최대 크기를 초과하면 413을 반환한다")
+    fun `업로드 파일이 최대 크기를 초과하면 413을 반환한다`() {
+        val member = createAndSaveMember(
+            memberId = "toolarge",
+            nickname = "용량초과",
+            email = "toolarge@example.com",
+            socialId = "toolarge"
+        )
+        val board = createAndSaveBoard()
+        val oversizedImage = ByteArray(OVERSIZED_IMAGE_BYTES)
+
+        RestAssured.given()
+            .header("Authorization", getBearerToken(member.id))
+            .contentType(ContentType.MULTIPART)
+            .multiPart("request", """{"title":"제목","content":"내용","boardId":${board.id},"tags":[]}""", "application/json")
+            .multiPart("images", "oversized.jpg", oversizedImage, "image/jpeg")
+            .`when`()
+            .post("/api/v1/feeds")
+            .then()
+            .statusCode(413)
+            .body("code", equalTo(CommonErrorCode.PAYLOAD_TOO_LARGE.code))
+    }
+
+    companion object {
+        private const val OVERSIZED_IMAGE_BYTES = 2 * 1024 * 1024
     }
 }

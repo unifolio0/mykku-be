@@ -10,6 +10,7 @@ import com.example.mykku.feed.adapter.output.persistence.entity.FeedCommentJpaEn
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.member.domain.vo.SocialProvider
+import com.example.mykku.member.exception.MemberErrorCode
 import com.example.mykku.util.TestTokenGenerator
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.restassured.RestAssured
@@ -174,6 +175,120 @@ class FeedCommentControllerTest : BaseControllerTest() {
             .post("/api/v1/feeds/{feedId}/comments", feed.id)
         .then()
             .statusCode(401)
+    }
+
+    @Test
+    @DisplayName("댓글 생성 - 아이디를 설정하지 않은 회원")
+    fun `createComment - memberId가 없는 회원은 댓글을 생성할 수 없다`() {
+        val feedAuthor = memberJpaRepository.save(
+            MemberJpaEntity(
+                memberId = "feedauthor",
+                socialId = "feedauthor",
+                provider = SocialProvider.GOOGLE,
+                email = "feedauthor@example.com",
+                nickname = "피드작성자",
+                role = null,
+                profileImage = ""
+            )
+        )
+        val incompleteMember = memberJpaRepository.save(
+            MemberJpaEntity(
+                memberId = null,
+                socialId = "incomplete-member-id",
+                provider = SocialProvider.GOOGLE,
+                email = "incomplete-member-id@example.com",
+                nickname = "미완성유저",
+                role = null,
+                profileImage = ""
+            )
+        )
+        val board = boardJpaRepository.save(
+            BoardJpaEntity(
+                title = "테스트 게시판",
+                logo = "test_logo.png"
+            )
+        )
+        val feed = feedJpaRepository.save(
+            FeedJpaEntity(
+                title = "테스트 피드",
+                content = "테스트 내용",
+                member = feedAuthor,
+                board = board
+            )
+        )
+        val authHeader = TestTokenGenerator.getBearerToken(incompleteMember.id)
+        val request = CreateFeedCommentRequest(
+            content = "테스트 댓글",
+            parentCommentId = null
+        )
+        val requestJson = objectMapper.writeValueAsString(request)
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .contentType(ContentType.JSON)
+            .body(requestJson)
+        .`when`()
+            .post("/api/v1/feeds/{feedId}/comments", feed.id)
+        .then()
+            .statusCode(403)
+            .body("code", equalTo(MemberErrorCode.PROFILE_NOT_COMPLETED.code))
+    }
+
+    @Test
+    @DisplayName("댓글 생성 - 닉네임을 설정하지 않은 회원")
+    fun `createComment - nickname이 없는 회원은 댓글을 생성할 수 없다`() {
+        val feedAuthor = memberJpaRepository.save(
+            MemberJpaEntity(
+                memberId = "feedauthor2",
+                socialId = "feedauthor2",
+                provider = SocialProvider.GOOGLE,
+                email = "feedauthor2@example.com",
+                nickname = "피드작성자",
+                role = null,
+                profileImage = ""
+            )
+        )
+        val incompleteMember = memberJpaRepository.save(
+            MemberJpaEntity(
+                memberId = "incompletenick",
+                socialId = "incomplete-nickname",
+                provider = SocialProvider.GOOGLE,
+                email = "incomplete-nickname@example.com",
+                nickname = null,
+                role = null,
+                profileImage = ""
+            )
+        )
+        val board = boardJpaRepository.save(
+            BoardJpaEntity(
+                title = "테스트 게시판",
+                logo = "test_logo.png"
+            )
+        )
+        val feed = feedJpaRepository.save(
+            FeedJpaEntity(
+                title = "테스트 피드",
+                content = "테스트 내용",
+                member = feedAuthor,
+                board = board
+            )
+        )
+        val authHeader = TestTokenGenerator.getBearerToken(incompleteMember.id)
+        val request = CreateFeedCommentRequest(
+            content = "테스트 댓글",
+            parentCommentId = null
+        )
+        val requestJson = objectMapper.writeValueAsString(request)
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .contentType(ContentType.JSON)
+            .body(requestJson)
+        .`when`()
+            .post("/api/v1/feeds/{feedId}/comments", feed.id)
+        .then()
+            .statusCode(403)
+            .body("code", equalTo(MemberErrorCode.PROFILE_NOT_COMPLETED.code))
     }
 
     @Test

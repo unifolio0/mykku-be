@@ -1,5 +1,6 @@
 package com.example.mykku.member.application.usecase
 
+import com.example.mykku.image.ImageUploadService
 import com.example.mykku.member.application.dto.MemberProfileResult
 import com.example.mykku.member.application.dto.UpdateProfileCommand
 import com.example.mykku.member.application.port.input.UpdateMemberProfileUseCase
@@ -16,21 +17,37 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class UpdateMemberProfileUseCaseImpl(
     private val memberRepository: MemberRepository,
-    private val roleRepository: RoleRepository
+    private val roleRepository: RoleRepository,
+    private val imageUploadService: ImageUploadService
 ) : UpdateMemberProfileUseCase {
 
     override fun updateProfile(member: Member, command: UpdateProfileCommand): MemberProfileResult {
-        command.nickname?.let { newNickname ->
-            if (newNickname != member.nickname && memberRepository.existsByNickname(newNickname)) {
-                throw MemberException.nicknameAlreadyExists()
-            }
-        }
+        validateNicknameNotDuplicated(member, command.nickname)
 
-        member.updateProfile(command.nickname, command.profileImage)
+        member.updateProfile(command.nickname, resolveProfileImageUrl(command))
         val savedMember = memberRepository.save(member)
 
-        val role = savedMember.roleId?.let { roleRepository.findById(RoleId.of(it)) }
-        val roleResult = role?.let { RoleResult(it.id.value, it.name, it.description) }
-        return MemberProfileResult.from(savedMember, roleResult)
+        return MemberProfileResult.from(savedMember, resolveRole(savedMember))
+    }
+
+    private fun validateNicknameNotDuplicated(member: Member, newNickname: String?) {
+        if (newNickname == null || newNickname == member.nickname) return
+        if (memberRepository.existsByNickname(newNickname)) {
+            throw MemberException.nicknameAlreadyExists()
+        }
+    }
+
+    private fun resolveProfileImageUrl(command: UpdateProfileCommand): String? {
+        val file = command.profileImageFile?.takeIf { !it.isEmpty } ?: return command.profileImage
+        return imageUploadService.uploadImage(file, PROFILE_IMAGE_PATH_PREFIX).url
+    }
+
+    private fun resolveRole(member: Member): RoleResult? {
+        val role = member.roleId?.let { roleRepository.findById(RoleId.of(it)) } ?: return null
+        return RoleResult(role.id.value, role.name, role.description)
+    }
+
+    companion object {
+        private const val PROFILE_IMAGE_PATH_PREFIX = "profile-images"
     }
 }
