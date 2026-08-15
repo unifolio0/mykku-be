@@ -63,6 +63,7 @@ class DailyMessageControllerTest : BaseControllerTest() {
             .statusCode(200)
             .body("message", equalTo("하루 덕담 데이터 불러오기에 성공했습니다."))
             .body("data", notNullValue())
+            .body("data.date", equalTo(LocalDate.now().toString()))
     }
 
     @Test

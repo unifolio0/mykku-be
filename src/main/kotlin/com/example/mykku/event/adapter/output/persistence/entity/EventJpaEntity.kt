@@ -24,6 +24,9 @@ class EventJpaEntity(
     @Column(name = "title")
     var title: String,
 
+    @Column(name = "sub_title")
+    var subTitle: String? = null,
+
     @Column(name = "description", columnDefinition = "TEXT")
     var description: String? = null,
 
@@ -45,6 +48,7 @@ class EventJpaEntity(
         return Event.reconstitute(
             id = EventId.of(id!!),
             title = title,
+            subTitle = subTitle,
             description = description,
             startedAt = startedAt,
             expiredAt = expiredAt,
@@ -62,6 +66,7 @@ class EventJpaEntity(
             return EventJpaEntity(
                 id = if (event.id.value == 0L) null else event.id.value,
                 title = event.title,
+                subTitle = event.subTitle,
                 description = event.description,
                 startedAt = event.startedAt,
                 expiredAt = event.expiredAt,

@@ -12,4 +12,5 @@ interface TokenProvider {
     fun isRefreshToken(token: String): Boolean
     fun createLoginResult(member: Member, userEmail: String, isExistingUser: Boolean): LoginResult
     fun getAccessTokenExpiration(): Long
+    fun getRefreshTokenExpiration(): Long
 }

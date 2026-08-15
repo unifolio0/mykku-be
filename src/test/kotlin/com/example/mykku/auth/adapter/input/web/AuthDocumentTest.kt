@@ -200,8 +200,10 @@ class AuthDocumentTest : BaseDocumentTest() {
 
             val result = RefreshTokenResult(
                 accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.new.access.token",
+                refreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.new.refresh.token",
                 tokenType = "Bearer",
-                expiresIn = 86400000
+                expiresIn = 86400000,
+                refreshTokenExpiresIn = 1209600000
             )
 
             whenever(refreshTokenUseCase.refresh(any())).thenReturn(result)
@@ -215,9 +217,13 @@ class AuthDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("토큰 갱신 응답 데이터"),
                             fieldWithPath("data.accessToken").type(JsonFieldType.STRING)
                                 .description("새로운 JWT 액세스 토큰"),
+                            fieldWithPath("data.refreshToken").type(JsonFieldType.STRING)
+                                .description("새로 재발급된 리프레시 토큰 (클라이언트는 저장값을 갱신해야 함)"),
                             fieldWithPath("data.tokenType").type(JsonFieldType.STRING).description("토큰 타입"),
                             fieldWithPath("data.expiresIn").type(JsonFieldType.NUMBER)
-                                .description("액세스 토큰 만료 시간 (밀리초)")
+                                .description("액세스 토큰 만료 시간 (밀리초)"),
+                            fieldWithPath("data.refreshTokenExpiresIn").type(JsonFieldType.NUMBER)
+                                .description("리프레시 토큰 만료 시간 (밀리초)")
                         )
                 )
                 .build()

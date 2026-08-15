@@ -103,6 +103,7 @@ data class ContestWinnerDetailResult(
 data class WinnerDetailResult(
     val winnerId: Long,
     val winnerRank: Int,
+    val awardTitle: String?,
     val feedId: Long,
     val feedTitle: String,
     val feedImageUrl: String?,
@@ -136,6 +137,7 @@ data class MyAwardContestResult(
     val contestTitle: String,
     val thumbnailUrl: String,
     val winnerRank: Int,
+    val awardTitle: String?,
     val acceptanceSpeech: String,
     val feedId: Long,
     val feedTitle: String,

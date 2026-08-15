@@ -10,6 +10,7 @@ import com.example.mykku.event.domain.vo.EventId
 import com.example.mykku.event.exception.EventException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 class GetEventUseCaseImpl(
@@ -29,10 +30,11 @@ class GetEventUseCaseImpl(
         return EventDetailResult(
             id = event.id.value,
             title = event.title,
+            subTitle = event.subTitle,
             description = event.description,
             startedAt = event.startedAt,
             expiredAt = event.expiredAt,
-            status = event.status,
+            status = event.resolveStatus(LocalDateTime.now()),
             thumbnailUrl = event.thumbnailUrl,
             images = images.sortedBy { it.orderIndex }.map {
                 EventImageResult(url = it.url, orderIndex = it.orderIndex)

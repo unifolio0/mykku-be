@@ -132,6 +132,7 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
                 id = dailyMessageId,
                 title = "오늘의 덕담",
                 content = "좋은 하루 되세요! 올 한해도 건강하시길 바랍니다.",
+                date = LocalDate.of(2026, 8, 14),
                 createdAt = LocalDateTime.now()
             )
 
@@ -147,6 +148,7 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("덕담 ID"),
                             fieldWithPath("data.title").type(JsonFieldType.STRING).description("덕담 제목"),
                             fieldWithPath("data.content").type(JsonFieldType.STRING).description("덕담 내용"),
+                            fieldWithPath("data.date").type(JsonFieldType.STRING).description("게시일 (yyyy-MM-dd)"),
                             fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성 일시")
                         )
                 )

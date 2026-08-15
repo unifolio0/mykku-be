@@ -11,6 +11,7 @@ import com.example.mykku.event.domain.vo.EventStatusType
 import com.example.mykku.event.domain.vo.EventWinnerStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 class GetMyParticipatedEventsUseCaseImpl(
@@ -47,7 +48,7 @@ class GetMyParticipatedEventsUseCaseImpl(
             title = event.title,
             startedAt = event.startedAt,
             expiredAt = event.expiredAt,
-            status = event.status,
+            status = event.resolveStatus(LocalDateTime.now()),
             thumbnailUrl = event.thumbnailUrl,
             winnerStatus = resolveWinnerStatus(event, wonEventIds)
         )

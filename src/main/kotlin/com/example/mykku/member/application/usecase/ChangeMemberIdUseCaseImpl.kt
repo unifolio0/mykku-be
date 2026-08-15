@@ -20,7 +20,7 @@ class ChangeMemberIdUseCaseImpl(
 ) : ChangeMemberIdUseCase {
 
     override fun changeMemberId(member: Member, command: ChangeMemberIdCommand): MemberProfileResult {
-        if (command.memberId != member.memberId && memberRepository.existsByMemberId(command.memberId)) {
+        if (memberRepository.existsByMemberIdExcludingId(command.memberId, member.id)) {
             throw MemberException.memberIdAlreadyExists()
         }
 

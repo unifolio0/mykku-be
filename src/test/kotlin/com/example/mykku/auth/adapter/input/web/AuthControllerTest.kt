@@ -51,8 +51,10 @@ class AuthControllerTest : BaseControllerTest() {
             .statusCode(200)
             .body("message", equalTo("토큰 갱신 성공"))
             .body("data.accessToken", notNullValue())
+            .body("data.refreshToken", notNullValue())
             .body("data.tokenType", equalTo("Bearer"))
             .body("data.expiresIn", equalTo(86400000))
+            .body("data.refreshTokenExpiresIn", equalTo(1209600000))
     }
 
     @Test

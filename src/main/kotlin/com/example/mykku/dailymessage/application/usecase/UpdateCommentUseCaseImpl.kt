@@ -14,7 +14,8 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class UpdateCommentUseCaseImpl(
     private val dailyMessageCommentRepository: DailyMessageCommentRepository,
-    private val likeDailyMessageCommentPort: LikeDailyMessageCommentPort
+    private val likeDailyMessageCommentPort: LikeDailyMessageCommentPort,
+    private val commentAuthorResolver: CommentAuthorResolver
 ) : UpdateCommentUseCase {
 
     override fun execute(command: UpdateCommentCommand): CommentResult {
@@ -30,6 +31,8 @@ class UpdateCommentUseCaseImpl(
         val isLiked = likeDailyMessageCommentPort
             .existsByMemberIdAndDailyMessageCommentId(command.memberId, savedComment.id.value)
 
-        return CommentResult.from(savedComment, isLiked = isLiked, replies = emptyList())
+        val author = commentAuthorResolver.resolveOne(savedComment.memberId)
+
+        return CommentResult.from(savedComment, author, isLiked = isLiked, replies = emptyList())
     }
 }

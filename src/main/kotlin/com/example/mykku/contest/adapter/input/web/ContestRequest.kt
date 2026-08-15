@@ -23,6 +23,7 @@ data class SetContestWinnersRequest(
                 WinnerSelectionCommand(
                     participationId = it.participationId,
                     winnerRank = it.winnerRank,
+                    awardTitle = it.awardTitle,
                     description = it.description
                 )
             }
@@ -36,6 +37,9 @@ data class WinnerSelectionRequest(
     @field:Min(value = 1, message = "순위는 1 이상이어야 합니다")
     @field:Max(value = 3, message = "순위는 3 이하여야 합니다")
     val winnerRank: Int,
+
+    @field:Size(max = 50, message = "수상명은 50자 이하여야 합니다")
+    val awardTitle: String? = null,
 
     val description: String = ""
 )

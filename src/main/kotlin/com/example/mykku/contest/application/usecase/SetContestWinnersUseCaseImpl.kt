@@ -38,6 +38,7 @@ class SetContestWinnersUseCaseImpl(
         val winners = command.winners.map { selection ->
             ContestWinner.create(
                 winnerRank = selection.winnerRank,
+                awardTitle = selection.awardTitle,
                 description = selection.description,
                 contestId = contestId,
                 participationId = ContestParticipationId.of(selection.participationId)

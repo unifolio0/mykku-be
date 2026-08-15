@@ -5,7 +5,6 @@ import com.example.mykku.event.application.dto.EventListQuery
 import com.example.mykku.event.application.dto.EventListResult
 import com.example.mykku.event.application.dto.PagedEventsResult
 import com.example.mykku.event.application.port.input.ListEventsUseCase
-import com.example.mykku.event.application.port.output.EventImageRepository
 import com.example.mykku.event.application.port.output.EventRepository
 import com.example.mykku.event.domain.entity.Event
 import org.springframework.stereotype.Service
@@ -14,8 +13,7 @@ import java.time.LocalDateTime
 
 @Service
 class ListEventsUseCaseImpl(
-    private val eventRepository: EventRepository,
-    private val eventImageRepository: EventImageRepository
+    private val eventRepository: EventRepository
 ) : ListEventsUseCase {
 
     @Transactional(readOnly = true)
@@ -29,13 +27,7 @@ class ListEventsUseCaseImpl(
             LocalDateTime.now()
         )
 
-        val eventIds = eventPage.content.map { it.id }
-        val imagesByEventId = eventImageRepository.findByEventIds(eventIds)
-            .groupBy { it.eventId.value }
-
-        val eventListResults = eventPage.content.map { event ->
-            toEventListResult(event, imagesByEventId)
-        }
+        val eventListResults = eventPage.content.map { toEventListResult(it) }
 
         return PagedEventsResult(
             content = eventListResults,
@@ -47,16 +39,15 @@ class ListEventsUseCaseImpl(
         )
     }
 
-    private fun toEventListResult(
-        event: Event,
-        imagesByEventId: Map<Long, List<com.example.mykku.event.domain.entity.EventImage>>
-    ): EventListResult {
+    private fun toEventListResult(event: Event): EventListResult {
         return EventListResult(
             id = event.id.value,
             title = event.title,
+            subTitle = event.subTitle,
+            description = event.description,
             startedAt = event.startedAt,
             expiredAt = event.expiredAt,
-            status = event.status,
+            status = event.resolveStatus(LocalDateTime.now()),
             thumbnailUrl = event.thumbnailUrl
         )
     }

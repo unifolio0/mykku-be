@@ -9,6 +9,7 @@ import com.example.mykku.dailymessage.application.dto.DailyMessageCommentsResult
 import com.example.mykku.dailymessage.application.dto.ReplyResult
 import com.example.mykku.dailymessage.exception.DailyMessageErrorCode
 import com.example.mykku.dailymessage.exception.DailyMessageException
+import com.example.mykku.role.application.dto.RoleResult
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -51,7 +52,9 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                         content = "좋은 덕담이네요!",
                         likeCount = 5,
                         isLiked = true,
+                        memberId = "honggildong",
                         memberName = "홍길동",
+                        role = RoleResult(1L, "덕담왕", "덕담을 많이 남긴 사람"),
                         profileImage = "https://example.com/profile1.jpg",
                         createdAt = LocalDateTime.now(),
                         replies = listOf(
@@ -60,7 +63,9 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                                 content = "저도 동감합니다!",
                                 likeCount = 2,
                                 isLiked = false,
+                                memberId = "kimchulsoo",
                                 memberName = "김철수",
+                                role = null,
                                 profileImage = "https://example.com/profile2.jpg",
                                 createdAt = LocalDateTime.now()
                             )
@@ -71,7 +76,9 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                         content = "오늘 하루도 힘내세요!",
                         likeCount = 3,
                         isLiked = false,
+                        memberId = "leeyounghee",
                         memberName = "이영희",
+                        role = null,
                         profileImage = "https://example.com/profile3.jpg",
                         createdAt = LocalDateTime.now(),
                         replies = emptyList()
@@ -98,7 +105,12 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.comments[].content").type(JsonFieldType.STRING).description("댓글 내용"),
                             fieldWithPath("data.comments[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                             fieldWithPath("data.comments[].isLiked").type(JsonFieldType.BOOLEAN).description("현재 로그인 멤버의 좋아요 여부 (비로그인 시 false)"),
+                            fieldWithPath("data.comments[].memberId").type(JsonFieldType.STRING).description("작성자 아이디 (탈퇴 시 null)").optional(),
                             fieldWithPath("data.comments[].memberName").type(JsonFieldType.STRING).description("작성자 이름"),
+                            fieldWithPath("data.comments[].role").type(JsonFieldType.OBJECT).description("작성자 대표 칭호 (없으면 null)").optional(),
+                            fieldWithPath("data.comments[].role.id").type(JsonFieldType.NUMBER).description("칭호 ID").optional(),
+                            fieldWithPath("data.comments[].role.name").type(JsonFieldType.STRING).description("칭호 이름").optional(),
+                            fieldWithPath("data.comments[].role.description").type(JsonFieldType.STRING).description("칭호 설명").optional(),
                             fieldWithPath("data.comments[].profileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지 URL"),
                             fieldWithPath("data.comments[].createdAt").type(JsonFieldType.STRING).description("작성 일시"),
                             fieldWithPath("data.comments[].replies[]").type(JsonFieldType.ARRAY).description("답글 목록"),
@@ -106,7 +118,12 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.comments[].replies[].content").type(JsonFieldType.STRING).description("답글 내용"),
                             fieldWithPath("data.comments[].replies[].likeCount").type(JsonFieldType.NUMBER).description("답글 좋아요 수"),
                             fieldWithPath("data.comments[].replies[].isLiked").type(JsonFieldType.BOOLEAN).description("현재 로그인 멤버의 답글 좋아요 여부 (비로그인 시 false)"),
+                            fieldWithPath("data.comments[].replies[].memberId").type(JsonFieldType.STRING).description("답글 작성자 아이디 (탈퇴 시 null)").optional(),
                             fieldWithPath("data.comments[].replies[].memberName").type(JsonFieldType.STRING).description("답글 작성자 이름"),
+                            fieldWithPath("data.comments[].replies[].role").type(JsonFieldType.OBJECT).description("답글 작성자 대표 칭호 (없으면 null)").optional(),
+                            fieldWithPath("data.comments[].replies[].role.id").type(JsonFieldType.NUMBER).description("칭호 ID").optional(),
+                            fieldWithPath("data.comments[].replies[].role.name").type(JsonFieldType.STRING).description("칭호 이름").optional(),
+                            fieldWithPath("data.comments[].replies[].role.description").type(JsonFieldType.STRING).description("칭호 설명").optional(),
                             fieldWithPath("data.comments[].replies[].profileImage").type(JsonFieldType.STRING).description("답글 작성자 프로필 이미지 URL"),
                             fieldWithPath("data.comments[].replies[].createdAt").type(JsonFieldType.STRING).description("답글 작성 일시"),
                             fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 댓글 수"),
@@ -160,7 +177,9 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                 content = "좋은 덕담 감사합니다!",
                 likeCount = 0,
                 isLiked = false,
+                memberId = "honggildong",
                 memberName = "홍길동",
+                role = RoleResult(1L, "덕담왕", "덕담을 많이 남긴 사람"),
                 profileImage = "https://example.com/profile.jpg",
                 createdAt = LocalDateTime.now(),
                 replies = emptyList()
@@ -179,7 +198,12 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.content").type(JsonFieldType.STRING).description("댓글 내용"),
                             fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                             fieldWithPath("data.isLiked").type(JsonFieldType.BOOLEAN).description("현재 로그인 멤버의 좋아요 여부 (비로그인 시 false)"),
+                            fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("작성자 아이디 (탈퇴 시 null)").optional(),
                             fieldWithPath("data.memberName").type(JsonFieldType.STRING).description("작성자 이름"),
+                            fieldWithPath("data.role").type(JsonFieldType.OBJECT).description("작성자 대표 칭호 (없으면 null)").optional(),
+                            fieldWithPath("data.role.id").type(JsonFieldType.NUMBER).description("칭호 ID").optional(),
+                            fieldWithPath("data.role.name").type(JsonFieldType.STRING).description("칭호 이름").optional(),
+                            fieldWithPath("data.role.description").type(JsonFieldType.STRING).description("칭호 설명").optional(),
                             fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성 일시"),
                             fieldWithPath("data.profileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지 URL"),
                             fieldWithPath("data.replies[]").type(JsonFieldType.ARRAY).description("답글 목록")
@@ -254,7 +278,9 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                 content = "저도 동감합니다!",
                 likeCount = 0,
                 isLiked = false,
+                memberId = "kimchulsoo",
                 memberName = "김철수",
+                role = null,
                 profileImage = "https://example.com/profile2.jpg",
                 createdAt = LocalDateTime.now(),
                 replies = emptyList()
@@ -273,7 +299,12 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.content").type(JsonFieldType.STRING).description("답글 내용"),
                             fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                             fieldWithPath("data.isLiked").type(JsonFieldType.BOOLEAN).description("현재 로그인 멤버의 좋아요 여부 (비로그인 시 false)"),
+                            fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("작성자 아이디 (탈퇴 시 null)").optional(),
                             fieldWithPath("data.memberName").type(JsonFieldType.STRING).description("작성자 이름"),
+                            fieldWithPath("data.role").type(JsonFieldType.OBJECT).description("작성자 대표 칭호 (없으면 null)").optional(),
+                            fieldWithPath("data.role.id").type(JsonFieldType.NUMBER).description("칭호 ID").optional(),
+                            fieldWithPath("data.role.name").type(JsonFieldType.STRING).description("칭호 이름").optional(),
+                            fieldWithPath("data.role.description").type(JsonFieldType.STRING).description("칭호 설명").optional(),
                             fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성 일시"),
                             fieldWithPath("data.replies[]").type(JsonFieldType.ARRAY).description("답글 목록 (항상 빈 배열)"),
                             fieldWithPath("data.profileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지 URL")
@@ -318,7 +349,9 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                 content = "수정된 댓글 내용입니다!",
                 likeCount = 5,
                 isLiked = false,
+                memberId = "honggildong",
                 memberName = "홍길동",
+                role = RoleResult(1L, "덕담왕", "덕담을 많이 남긴 사람"),
                 profileImage = "https://example.com/profile.jpg",
                 createdAt = LocalDateTime.now(),
                 replies = emptyList()
@@ -337,7 +370,12 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.content").type(JsonFieldType.STRING).description("댓글 내용"),
                             fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                             fieldWithPath("data.isLiked").type(JsonFieldType.BOOLEAN).description("현재 로그인 멤버의 좋아요 여부 (비로그인 시 false)"),
+                            fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("작성자 아이디 (탈퇴 시 null)").optional(),
                             fieldWithPath("data.memberName").type(JsonFieldType.STRING).description("작성자 이름"),
+                            fieldWithPath("data.role").type(JsonFieldType.OBJECT).description("작성자 대표 칭호 (없으면 null)").optional(),
+                            fieldWithPath("data.role.id").type(JsonFieldType.NUMBER).description("칭호 ID").optional(),
+                            fieldWithPath("data.role.name").type(JsonFieldType.STRING).description("칭호 이름").optional(),
+                            fieldWithPath("data.role.description").type(JsonFieldType.STRING).description("칭호 설명").optional(),
                             fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("작성 일시"),
                             fieldWithPath("data.profileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지 URL"),
                             fieldWithPath("data.replies[]").type(JsonFieldType.ARRAY).description("답글 목록")

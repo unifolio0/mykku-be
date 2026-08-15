@@ -211,6 +211,7 @@ class ContestWinnerControllerTest : BaseControllerTest() {
             .body("message", equalTo("내 수상 콘테스트 목록을 성공적으로 조회했습니다."))
             .body("data.content[0].contestId", equalTo(contest.id!!.toInt()))
             .body("data.content[0].winnerRank", equalTo(1))
+            .body("data.content[0].awardTitle", equalTo("최우수상"))
     }
 
     @Test
@@ -362,10 +363,12 @@ class ContestWinnerControllerTest : BaseControllerTest() {
     private fun createAndSaveWinner(
         contest: ContestJpaEntity,
         participation: ContestParticipationJpaEntity,
-        winnerRank: Int
+        winnerRank: Int,
+        awardTitle: String? = "최우수상"
     ): ContestWinnerJpaEntity {
         val winner = ContestWinnerJpaEntity(
             winnerRank = winnerRank,
+            awardTitle = awardTitle,
             description = "수상 설명",
             acceptanceSpeech = "",
             contest = contest,

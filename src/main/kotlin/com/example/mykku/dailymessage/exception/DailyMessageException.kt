@@ -23,5 +23,8 @@ class DailyMessageException(
 
         fun dailyMessageCommentContentTooLong(): DailyMessageException =
             DailyMessageException(DailyMessageErrorCode.DAILY_MESSAGE_COMMENT_CONTENT_TOO_LONG)
+
+        fun replyDepthExceeded(): DailyMessageException =
+            DailyMessageException(DailyMessageErrorCode.REPLY_DEPTH_EXCEEDED)
     }
 }

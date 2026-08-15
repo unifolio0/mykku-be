@@ -15,6 +15,7 @@ interface MemberRepository {
     fun existsByEmail(email: String): Boolean
     fun findByEmail(email: String): Member?
     fun existsByMemberId(memberId: String): Boolean
+    fun existsByMemberIdExcludingId(memberId: String, id: MemberPk): Boolean
     fun findByMemberId(memberId: String): Member?
     fun deleteById(id: MemberPk)
 }

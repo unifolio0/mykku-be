@@ -8,6 +8,7 @@ import java.time.LocalDateTime
 data class CreateEventResult(
     val id: Long,
     val title: String,
+    val subTitle: String?,
     val description: String?,
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
@@ -24,6 +25,8 @@ data class EventImageResult(
 data class EventListResult(
     val id: Long,
     val title: String,
+    val subTitle: String?,
+    val description: String?,
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
     val status: EventStatusType,
@@ -42,6 +45,7 @@ data class PagedEventsResult(
 data class EventDetailResult(
     val id: Long,
     val title: String,
+    val subTitle: String?,
     val description: String?,
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,

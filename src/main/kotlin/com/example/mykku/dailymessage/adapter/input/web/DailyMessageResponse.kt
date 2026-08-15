@@ -5,6 +5,7 @@ import com.example.mykku.dailymessage.application.dto.DailyMessageCommentsResult
 import com.example.mykku.dailymessage.application.dto.DailyMessageResult
 import com.example.mykku.dailymessage.application.dto.DailyMessageSummaryResult
 import com.example.mykku.dailymessage.application.dto.ReplyResult
+import com.example.mykku.role.adapter.input.web.RoleResponse
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -30,6 +31,7 @@ data class DailyMessageResponse(
     val id: Long,
     val title: String,
     val content: String,
+    val date: LocalDate,
     val createdAt: LocalDateTime
 ) {
     companion object {
@@ -38,6 +40,7 @@ data class DailyMessageResponse(
                 id = result.id,
                 title = result.title,
                 content = result.content,
+                date = result.date,
                 createdAt = result.createdAt
             )
         }
@@ -49,7 +52,9 @@ data class CommentResponse(
     val content: String,
     val likeCount: Int,
     val isLiked: Boolean,
+    val memberId: String?,
     val memberName: String?,
+    val role: RoleResponse?,
     val profileImage: String?,
     val createdAt: LocalDateTime,
     val replies: List<ReplyResponse>
@@ -61,7 +66,9 @@ data class CommentResponse(
                 content = result.content,
                 likeCount = result.likeCount,
                 isLiked = result.isLiked,
+                memberId = result.memberId,
                 memberName = result.memberName,
+                role = result.role?.let { RoleResponse(it.id, it.name, it.description) },
                 profileImage = result.profileImage,
                 createdAt = result.createdAt,
                 replies = result.replies.map { ReplyResponse.from(it) }
@@ -75,7 +82,9 @@ data class ReplyResponse(
     val content: String,
     val likeCount: Int,
     val isLiked: Boolean,
+    val memberId: String?,
     val memberName: String?,
+    val role: RoleResponse?,
     val profileImage: String?,
     val createdAt: LocalDateTime
 ) {
@@ -86,7 +95,9 @@ data class ReplyResponse(
                 content = result.content,
                 likeCount = result.likeCount,
                 isLiked = result.isLiked,
+                memberId = result.memberId,
                 memberName = result.memberName,
+                role = result.role?.let { RoleResponse(it.id, it.name, it.description) },
                 profileImage = result.profileImage,
                 createdAt = result.createdAt
             )

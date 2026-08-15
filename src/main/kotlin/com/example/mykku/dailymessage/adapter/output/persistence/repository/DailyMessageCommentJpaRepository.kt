@@ -13,7 +13,7 @@ interface DailyMessageCommentJpaRepository : JpaRepository<DailyMessageCommentJp
     fun findByIdAndDailyMessageId(commentId: Long, dailyMessageId: Long): DailyMessageCommentJpaEntity?
 
     @Query(
-        value = "SELECT c FROM DailyMessageCommentJpaEntity c JOIN FETCH c.member WHERE c.dailyMessage.id = :dailyMessageId AND c.parentComment IS NULL",
+        value = "SELECT c FROM DailyMessageCommentJpaEntity c LEFT JOIN FETCH c.member WHERE c.dailyMessage.id = :dailyMessageId AND c.parentComment IS NULL",
         countQuery = "SELECT COUNT(c) FROM DailyMessageCommentJpaEntity c WHERE c.dailyMessage.id = :dailyMessageId AND c.parentComment IS NULL"
     )
     fun findByDailyMessageIdAndParentCommentIsNull(
@@ -21,6 +21,6 @@ interface DailyMessageCommentJpaRepository : JpaRepository<DailyMessageCommentJp
         pageable: Pageable
     ): Page<DailyMessageCommentJpaEntity>
 
-    @Query("SELECT c FROM DailyMessageCommentJpaEntity c JOIN FETCH c.member WHERE c.parentComment.id IN :parentCommentIds")
+    @Query("SELECT c FROM DailyMessageCommentJpaEntity c LEFT JOIN FETCH c.member WHERE c.parentComment.id IN :parentCommentIds")
     fun findByParentCommentIdIn(parentCommentIds: List<Long>): List<DailyMessageCommentJpaEntity>
 }

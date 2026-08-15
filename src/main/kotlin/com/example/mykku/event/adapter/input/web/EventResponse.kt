@@ -17,6 +17,7 @@ import java.time.LocalDateTime
 data class CreateEventResponse(
     val id: Long,
     val title: String,
+    val subTitle: String?,
     val description: String?,
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
@@ -29,6 +30,7 @@ data class CreateEventResponse(
             return CreateEventResponse(
                 id = result.id,
                 title = result.title,
+                subTitle = result.subTitle,
                 description = result.description,
                 startedAt = result.startedAt,
                 expiredAt = result.expiredAt,
@@ -57,6 +59,8 @@ data class EventImageResponse(
 data class EventListResponse(
     val id: Long,
     val title: String,
+    val subTitle: String?,
+    val description: String?,
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
     val status: EventStatusType,
@@ -67,6 +71,8 @@ data class EventListResponse(
             return EventListResponse(
                 id = result.id,
                 title = result.title,
+                subTitle = result.subTitle,
+                description = result.description,
                 startedAt = result.startedAt,
                 expiredAt = result.expiredAt,
                 status = result.status,
@@ -101,6 +107,7 @@ data class PagedEventsResponse(
 data class EventDetailResponse(
     val id: Long,
     val title: String,
+    val subTitle: String?,
     val description: String?,
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
@@ -115,6 +122,7 @@ data class EventDetailResponse(
             return EventDetailResponse(
                 id = result.id,
                 title = result.title,
+                subTitle = result.subTitle,
                 description = result.description,
                 startedAt = result.startedAt,
                 expiredAt = result.expiredAt,

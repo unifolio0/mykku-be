@@ -26,6 +26,28 @@ class AdminEventApiControllerTest : BaseControllerTest() {
     private lateinit var eventParticipationJpaRepository: EventParticipationJpaRepository
 
     @Test
+    @DisplayName("이벤트 생성 - 부제목을 함께 저장한다")
+    fun `create - 부제목과 함께 이벤트를 생성한다`() {
+        val adminSessionId = getAdminSessionId()
+
+        RestAssured.given()
+            .sessionId(adminSessionId)
+            .contentType("multipart/form-data")
+            .multiPart("title", "New Event")
+            .multiPart("subTitle", "Event Sub Title")
+            .multiPart("description", "Event Description")
+            .multiPart("startedAt", "2026-08-01T00:00:00")
+            .multiPart("expiredAt", "2026-09-01T00:00:00")
+            .multiPart("thumbnailImage", "thumbnail.jpg", ByteArray(10), "image/jpeg")
+            .`when`()
+            .post("/admin/api/v1/events")
+            .then()
+            .statusCode(200)
+            .body("data.title", equalTo("New Event"))
+            .body("data.subTitle", equalTo("Event Sub Title"))
+    }
+
+    @Test
     @DisplayName("당첨자 선정 - 정상 케이스")
     fun `setWinners - 관리자가 정상적으로 당첨자를 선정한다`() {
         val adminSessionId = getAdminSessionId()

@@ -29,7 +29,6 @@ class AuthController(
 
     @PostMapping("/mobile/login")
     fun mobileLogin(@RequestBody request: MobileLoginRequest): ResponseEntity<ApiResponse<LoginResponse>> {
-        println("로그인 요청 들어옴")
         val result = mobileLoginUseCase.login(request.toCommand())
         val response = LoginResponse.from(result)
         return ResponseEntity.ok(ApiResponse("로그인 성공", response))

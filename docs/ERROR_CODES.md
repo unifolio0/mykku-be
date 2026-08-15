@@ -52,6 +52,11 @@
 | C102 | INVALID_SORT_DIRECTION | 400 | 잘못된 정렬 방향입니다. 'asc' 또는 'desc'를 사용해주세요 |
 | C103 | INVALID_PAGE_NUMBER | 400 | 페이지 번호는 0 이상이어야 합니다 |
 | C104 | INVALID_PAGE_SIZE | 400 | 페이지 크기는 1 이상 100 이하여야 합니다 |
+| C105 | MISSING_REQUEST_PARAMETER | 400 | 필수 요청 값이 누락되었습니다 |
+| C106 | INVALID_PARAMETER_TYPE | 400 | 요청 값의 형식이 올바르지 않습니다 |
+| C201 | ENDPOINT_NOT_FOUND | 404 | 요청한 API를 찾을 수 없습니다 |
+| C202 | METHOD_NOT_ALLOWED | 405 | 지원하지 않는 HTTP 메서드입니다 |
+| C203 | UNSUPPORTED_MEDIA_TYPE | 415 | 지원하지 않는 Content-Type입니다 |
 | C301 | RESOURCE_LOCK_CONFLICT | 409 | 다른 요청이 처리 중입니다. 잠시 후 다시 시도해주세요 |
 | C401 | REDIS_CONNECTION_FAILURE | 500 | Redis 연결에 실패했습니다. 잠시 후 다시 시도해주세요 |
 | C402 | INTERNAL_SERVER_ERROR | 500 | 서버 오류가 발생했습니다. 관리자에게 문의해주세요 |

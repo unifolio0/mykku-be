@@ -401,6 +401,29 @@ class MemberControllerTest : BaseControllerTest() {
     }
 
     @Test
+    @DisplayName("아이디 변경 - 대소문자만 변경")
+    fun `changeMemberId - 자신의 아이디를 대소문자만 바꿔 변경할 수 있다`() {
+        val member = createAndSaveMember(
+            memberId = "caseuser",
+            nickname = "케이스유저",
+            email = "caseuser@example.com",
+            socialId = "caseuser123"
+        )
+        val authHeader = getBearerToken(member.id)
+        val request = ChangeMemberIdRequest(memberId = "CaseUser")
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .contentType(ContentType.JSON)
+            .body(request)
+            .`when`()
+            .patch("/api/v1/members/me/member-id")
+            .then()
+            .statusCode(200)
+            .body("data.memberId", equalTo("CaseUser"))
+    }
+
+    @Test
     @DisplayName("회원 탈퇴 - 정상 케이스")
     fun `withdraw - 정상적으로 회원을 탈퇴한다`() {
         val member = createAndSaveMember(

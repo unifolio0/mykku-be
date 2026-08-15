@@ -73,6 +73,7 @@ class GetContestWinnerDetailUseCaseImpl(
         return WinnerDetailResult(
             winnerId = winner.id.value,
             winnerRank = winner.winnerRank,
+            awardTitle = winner.awardTitle,
             feedId = participation.feedId,
             feedTitle = feed?.title ?: "",
             feedImageUrl = feedImageUrl,

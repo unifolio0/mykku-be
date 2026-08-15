@@ -47,6 +47,7 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
         fun `이벤트 저장 - description null`() {
             val event = Event.create(
                 title = "테스트 이벤트",
+                subTitle = null,
                 description = null,
                 startedAt = LocalDateTime.now(),
                 expiredAt = LocalDateTime.now().plusDays(7),
@@ -297,6 +298,7 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
     private fun createEvent(): Event {
         return Event.create(
             title = "테스트 이벤트",
+            subTitle = null,
             description = "테스트 이벤트 설명",
             startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7),
@@ -307,6 +309,7 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
     private fun createEventWithExpiredAt(expiredAt: LocalDateTime): Event {
         return Event.create(
             title = "테스트 이벤트",
+            subTitle = null,
             description = "테스트 이벤트 설명",
             startedAt = LocalDateTime.now().minusDays(1),
             expiredAt = expiredAt,

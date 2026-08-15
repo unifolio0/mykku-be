@@ -24,6 +24,7 @@ class EventTest {
 
             val event = Event.create(
                 title = "테스트 이벤트",
+                subTitle = null,
                 description = "이벤트 설명",
                 startedAt = startedAt,
                 expiredAt = expiredAt,
@@ -59,6 +60,7 @@ class EventTest {
         fun `이벤트 생성 - 설명 없음`() {
             val event = Event.create(
                 title = "테스트 이벤트",
+                subTitle = null,
                 description = null,
                 startedAt = LocalDateTime.now().plusDays(1),
                 expiredAt = LocalDateTime.now().plusDays(7),
@@ -129,6 +131,7 @@ class EventTest {
             val event = Event.reconstitute(
                 id = EventId(1L),
                 title = "복원된 이벤트",
+                subTitle = null,
                 description = "설명",
                 startedAt = startedAt,
                 expiredAt = expiredAt,
@@ -151,6 +154,7 @@ class EventTest {
             val activeEvent = Event.reconstitute(
                 id = EventId(1L),
                 title = "활성 이벤트",
+                subTitle = null,
                 description = null,
                 startedAt = now,
                 expiredAt = now.plusDays(7),
@@ -163,6 +167,7 @@ class EventTest {
             val winnerSelectedEvent = Event.reconstitute(
                 id = EventId(2L),
                 title = "수상자 선정 완료 이벤트",
+                subTitle = null,
                 description = null,
                 startedAt = now,
                 expiredAt = now.plusDays(7),
@@ -184,6 +189,7 @@ class EventTest {
             val event = Event.reconstitute(
                 id = EventId(1L),
                 title = "설명 없는 이벤트",
+                subTitle = null,
                 description = null,
                 startedAt = now,
                 expiredAt = now.plusDays(7),
@@ -211,6 +217,7 @@ class EventTest {
     private fun createEvent(): Event {
         return Event.create(
             title = "테스트 이벤트",
+            subTitle = null,
             description = "이벤트 설명",
             startedAt = LocalDateTime.now().plusDays(1),
             expiredAt = LocalDateTime.now().plusDays(7),

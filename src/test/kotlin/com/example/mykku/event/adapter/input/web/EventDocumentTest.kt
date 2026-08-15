@@ -49,6 +49,8 @@ class EventDocumentTest : BaseDocumentTest() {
                 EventListResult(
                     id = 1L,
                     title = "첫 번째 이벤트",
+                    subTitle = "부제목입니다.",
+                    description = "첫 번째 이벤트 설명입니다.",
                     startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                     expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
                     status = EventStatusType.ACTIVE,
@@ -57,6 +59,8 @@ class EventDocumentTest : BaseDocumentTest() {
                 EventListResult(
                     id = 2L,
                     title = "두 번째 이벤트",
+                    subTitle = "부제목입니다.",
+                    description = "두 번째 이벤트 설명입니다.",
                     startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                     expiredAt = LocalDateTime.of(2025, 11, 30, 23, 59, 59),
                     status = EventStatusType.ACTIVE,
@@ -85,6 +89,10 @@ class EventDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.content[]").type(JsonFieldType.ARRAY).description("이벤트 목록"),
                             fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("이벤트 ID"),
                             fieldWithPath("data.content[].title").type(JsonFieldType.STRING).description("이벤트 제목"),
+                            fieldWithPath("data.content[].subTitle").type(JsonFieldType.STRING)
+                                .description("이벤트 부제목").optional(),
+                            fieldWithPath("data.content[].description").type(JsonFieldType.STRING)
+                                .description("이벤트 설명").optional(),
                             fieldWithPath("data.content[].expiredAt").type(JsonFieldType.STRING).description("만료일"),
                             fieldWithPath("data.content[].thumbnailUrl").type(JsonFieldType.STRING)
                                 .description("썸네일 이미지 URL"),
@@ -131,6 +139,7 @@ class EventDocumentTest : BaseDocumentTest() {
             val response = EventDetailResult(
                 id = eventId,
                 title = "이벤트 제목",
+                subTitle = "부제목입니다.",
                 description = "이벤트 상세 설명입니다.",
                 startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                 expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
@@ -155,6 +164,8 @@ class EventDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
                             fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("이벤트 ID"),
                             fieldWithPath("data.title").type(JsonFieldType.STRING).description("이벤트 제목"),
+                            fieldWithPath("data.subTitle").type(JsonFieldType.STRING).description("이벤트 부제목")
+                                .optional(),
                             fieldWithPath("data.description").type(JsonFieldType.STRING).description("이벤트 설명")
                                 .optional(),
                             fieldWithPath("data.expiredAt").type(JsonFieldType.STRING).description("만료일"),

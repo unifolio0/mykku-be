@@ -37,6 +37,7 @@ data class SetContestWinnersCommand(
 data class WinnerSelectionCommand(
     val participationId: Long,
     val winnerRank: Int,
+    val awardTitle: String?,
     val description: String
 )
 

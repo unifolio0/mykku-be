@@ -20,7 +20,8 @@ import org.springframework.transaction.annotation.Transactional
 class CreateCommentUseCaseImpl(
     private val dailyMessageRepository: DailyMessageRepository,
     private val dailyMessageCommentRepository: DailyMessageCommentRepository,
-    private val activityEventPublisher: ActivityEventPublisher
+    private val activityEventPublisher: ActivityEventPublisher,
+    private val commentAuthorResolver: CommentAuthorResolver
 ) : CreateCommentUseCase {
 
     override fun execute(command: CreateCommentCommand): CommentResult {
@@ -31,7 +32,9 @@ class CreateCommentUseCaseImpl(
 
         activityEventPublisher.publish(ActivityEvent(command.memberId, ActivityType.COMMENT_CREATE))
 
-        return CommentResult.from(savedComment, replies = emptyList())
+        val author = commentAuthorResolver.resolveOne(command.memberId)
+
+        return CommentResult.from(savedComment, author, replies = emptyList())
     }
 
     private fun validateDailyMessageExists(dailyMessageId: Long) {
@@ -42,10 +45,14 @@ class CreateCommentUseCaseImpl(
     private fun validateParentCommentExists(command: CreateCommentCommand) {
         val parentCommentId = command.parentCommentId ?: return
 
-        dailyMessageCommentRepository.findByIdAndDailyMessageId(
+        val parentComment = dailyMessageCommentRepository.findByIdAndDailyMessageId(
             DailyMessageCommentId.of(parentCommentId),
             DailyMessageId.of(command.dailyMessageId)
         ) ?: throw DailyMessageException.dailyMessageCommentNotFound()
+
+        if (parentComment.parentCommentId != null) {
+            throw DailyMessageException.replyDepthExceeded()
+        }
     }
 
     private fun newComment(command: CreateCommentCommand): DailyMessageComment {

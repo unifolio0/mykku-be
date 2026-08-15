@@ -50,15 +50,19 @@ data class MemberInfo(
 
 data class RefreshTokenResponse(
     val accessToken: String,
+    val refreshToken: String,
     val tokenType: String = "Bearer",
-    val expiresIn: Long
+    val expiresIn: Long,
+    val refreshTokenExpiresIn: Long
 ) {
     companion object {
         fun from(result: RefreshTokenResult): RefreshTokenResponse {
             return RefreshTokenResponse(
                 accessToken = result.accessToken,
+                refreshToken = result.refreshToken,
                 tokenType = result.tokenType,
-                expiresIn = result.expiresIn
+                expiresIn = result.expiresIn,
+                refreshTokenExpiresIn = result.refreshTokenExpiresIn
             )
         }
     }

@@ -42,6 +42,30 @@ class EventControllerTest : BaseControllerTest() {
             .statusCode(200)
             .body("message", equalTo("이벤트 목록을 성공적으로 조회했습니다."))
             .body("data.content", notNullValue())
+            .body("data.content[0].description", equalTo("테스트 이벤트 설명"))
+            .body("data.content[0].subTitle", equalTo("테스트 부제목"))
+    }
+
+    @Test
+    @DisplayName("이벤트 목록 조회 - 종료된 이벤트는 EXPIRED로 응답한다")
+    fun `getEvents - 종료된 이벤트의 상태는 EXPIRED다`() {
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
+
+        createAndSaveEvent(
+            title = "종료된 이벤트",
+            startedAt = LocalDateTime.now().minusDays(10),
+            expiredAt = LocalDateTime.now().minusDays(1)
+        )
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .param("status", "EXPIRED")
+            .`when`()
+            .get("/api/v1/events")
+            .then()
+            .statusCode(200)
+            .body("data.content[0].status", equalTo("EXPIRED"))
     }
 
     @Test
@@ -96,6 +120,7 @@ class EventControllerTest : BaseControllerTest() {
 
     private fun createAndSaveEvent(
         title: String,
+        subTitle: String? = "테스트 부제목",
         description: String? = "테스트 이벤트 설명",
         startedAt: LocalDateTime,
         expiredAt: LocalDateTime,
@@ -103,6 +128,7 @@ class EventControllerTest : BaseControllerTest() {
     ): EventJpaEntity {
         val event = EventJpaEntity(
             title = title,
+            subTitle = subTitle,
             description = description,
             startedAt = startedAt,
             expiredAt = expiredAt,

@@ -118,6 +118,7 @@ class ContestWinnerRepositoryAdapterTest : BaseRepositoryTest() {
 
             val winner = ContestWinner.create(
                 winnerRank = 1,
+                awardTitle = "최우수상",
                 description = "1등 상품",
                 contestId = ContestId(contest.id!!),
                 participationId = ContestParticipationId(participation.id!!)
@@ -142,6 +143,7 @@ class ContestWinnerRepositoryAdapterTest : BaseRepositoryTest() {
 
             val winner = ContestWinner.create(
                 winnerRank = 1,
+                awardTitle = "최우수상",
                 description = "1등 상품",
                 contestId = ContestId(999999L),
                 participationId = ContestParticipationId(participation.id!!)
@@ -158,6 +160,7 @@ class ContestWinnerRepositoryAdapterTest : BaseRepositoryTest() {
 
             val winner = ContestWinner.create(
                 winnerRank = 1,
+                awardTitle = "최우수상",
                 description = "1등 상품",
                 contestId = ContestId(contest.id!!),
                 participationId = ContestParticipationId(999999L)
@@ -186,12 +189,14 @@ class ContestWinnerRepositoryAdapterTest : BaseRepositoryTest() {
             val winners = listOf(
                 ContestWinner.create(
                     winnerRank = 1,
+                    awardTitle = "최우수상",
                     description = "1등 상품",
                     contestId = ContestId(contest.id!!),
                     participationId = ContestParticipationId(participation1.id!!)
                 ),
                 ContestWinner.create(
                     winnerRank = 2,
+                    awardTitle = "우수상",
                     description = "2등 상품",
                     contestId = ContestId(contest.id!!),
                     participationId = ContestParticipationId(participation2.id!!)

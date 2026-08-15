@@ -8,6 +8,7 @@ import java.time.LocalDateTime
 class ContestWinner private constructor(
     val id: ContestWinnerId,
     val winnerRank: Int,
+    val awardTitle: String?,
     val description: String,
     private var _acceptanceSpeech: String,
     val contestId: ContestId,
@@ -25,6 +26,7 @@ class ContestWinner private constructor(
     companion object {
         fun create(
             winnerRank: Int,
+            awardTitle: String?,
             description: String,
             contestId: ContestId,
             participationId: ContestParticipationId
@@ -33,6 +35,7 @@ class ContestWinner private constructor(
             return ContestWinner(
                 id = ContestWinnerId(0),
                 winnerRank = winnerRank,
+                awardTitle = awardTitle,
                 description = description,
                 _acceptanceSpeech = "",
                 contestId = contestId,
@@ -45,6 +48,7 @@ class ContestWinner private constructor(
         fun reconstitute(
             id: ContestWinnerId,
             winnerRank: Int,
+            awardTitle: String?,
             description: String,
             acceptanceSpeech: String,
             contestId: ContestId,
@@ -55,6 +59,7 @@ class ContestWinner private constructor(
             return ContestWinner(
                 id = id,
                 winnerRank = winnerRank,
+                awardTitle = awardTitle,
                 description = description,
                 _acceptanceSpeech = acceptanceSpeech,
                 contestId = contestId,
