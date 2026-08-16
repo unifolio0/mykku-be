@@ -188,6 +188,112 @@ class LikeFeedPersistenceAdapterTest : BaseRepositoryTest() {
         }
     }
 
+    @Nested
+    @DisplayName("countByFeedId 메서드")
+    inner class CountByFeedId {
+
+        @Test
+        @DisplayName("피드의 좋아요 개수를 정확히 반환한다")
+        fun `좋아요 개수 조회 - 정상 케이스`() {
+            val member2 = createAndSaveMember(
+                memberId = "countMember1",
+                email = "count1@example.com",
+                socialId = "31111"
+            )
+            val member3 = createAndSaveMember(
+                memberId = "countMember2",
+                email = "count2@example.com",
+                socialId = "32222"
+            )
+            likeFeedPort.save(LikeFeedEntity.create(savedMember.id, savedFeed.id!!))
+            likeFeedPort.save(LikeFeedEntity.create(member2.id, savedFeed.id!!))
+            likeFeedPort.save(LikeFeedEntity.create(member3.id, savedFeed.id!!))
+
+            val count = likeFeedPort.countByFeedId(savedFeed.id!!)
+
+            assertThat(count).isEqualTo(3)
+        }
+
+        @Test
+        @DisplayName("좋아요가 없는 피드는 0을 반환한다")
+        fun `좋아요 개수 조회 - 좋아요 없음`() {
+            val count = likeFeedPort.countByFeedId(savedFeed.id!!)
+
+            assertThat(count).isEqualTo(0)
+        }
+
+        @Test
+        @DisplayName("다른 피드의 좋아요는 개수에 포함되지 않는다")
+        fun `좋아요 개수 조회 - 다른 피드 좋아요 제외`() {
+            val otherFeed = feedJpaRepository.save(createFeedJpaEntity(savedBoard, savedMember))
+            likeFeedPort.save(LikeFeedEntity.create(savedMember.id, otherFeed.id!!))
+
+            assertThat(likeFeedPort.countByFeedId(savedFeed.id!!)).isEqualTo(0)
+            assertThat(likeFeedPort.countByFeedId(otherFeed.id!!)).isEqualTo(1)
+        }
+    }
+
+    @Nested
+    @DisplayName("countByFeedIdIn 메서드")
+    inner class CountByFeedIdIn {
+
+        @Test
+        @DisplayName("피드별 좋아요 개수를 맵으로 반환한다")
+        fun `좋아요 개수 일괄 조회 - 정상 케이스`() {
+            val feed2 = feedJpaRepository.save(createFeedJpaEntity(savedBoard, savedMember))
+            val feed3 = feedJpaRepository.save(createFeedJpaEntity(savedBoard, savedMember))
+            val member2 = createAndSaveMember(
+                memberId = "countMember3",
+                email = "count3@example.com",
+                socialId = "33333"
+            )
+            likeFeedPort.save(LikeFeedEntity.create(savedMember.id, savedFeed.id!!))
+            likeFeedPort.save(LikeFeedEntity.create(member2.id, savedFeed.id!!))
+            likeFeedPort.save(LikeFeedEntity.create(savedMember.id, feed2.id!!))
+
+            val counts = likeFeedPort.countByFeedIdIn(listOf(savedFeed.id!!, feed2.id!!, feed3.id!!))
+
+            assertThat(counts).containsEntry(savedFeed.id!!, 2)
+            assertThat(counts).containsEntry(feed2.id!!, 1)
+            assertThat(counts).doesNotContainKey(feed3.id!!)
+        }
+
+        @Test
+        @DisplayName("좋아요가 없는 피드는 맵에 키가 존재하지 않는다")
+        fun `좋아요 개수 일괄 조회 - 좋아요 없는 피드는 키 없음`() {
+            val feedWithoutLike = feedJpaRepository.save(createFeedJpaEntity(savedBoard, savedMember))
+            likeFeedPort.save(LikeFeedEntity.create(savedMember.id, savedFeed.id!!))
+
+            val counts = likeFeedPort.countByFeedIdIn(listOf(savedFeed.id!!, feedWithoutLike.id!!))
+
+            assertThat(counts).hasSize(1)
+            assertThat(counts).containsEntry(savedFeed.id!!, 1)
+            assertThat(counts).doesNotContainKey(feedWithoutLike.id!!)
+        }
+
+        @Test
+        @DisplayName("빈 피드 ID 목록으로 조회하면 빈 맵을 반환한다")
+        fun `좋아요 개수 일괄 조회 - 빈 목록`() {
+            val counts = likeFeedPort.countByFeedIdIn(emptyList())
+
+            assertThat(counts).isEmpty()
+        }
+
+        @Test
+        @DisplayName("조회 대상에 포함되지 않은 피드의 좋아요는 맵에 포함되지 않는다")
+        fun `좋아요 개수 일괄 조회 - 조회 대상 외 피드 제외`() {
+            val otherFeed = feedJpaRepository.save(createFeedJpaEntity(savedBoard, savedMember))
+            likeFeedPort.save(LikeFeedEntity.create(savedMember.id, savedFeed.id!!))
+            likeFeedPort.save(LikeFeedEntity.create(savedMember.id, otherFeed.id!!))
+
+            val counts = likeFeedPort.countByFeedIdIn(listOf(savedFeed.id!!))
+
+            assertThat(counts).hasSize(1)
+            assertThat(counts).containsEntry(savedFeed.id!!, 1)
+            assertThat(counts).doesNotContainKey(otherFeed.id!!)
+        }
+    }
+
     private fun createFeedJpaEntity(board: BoardJpaEntity, member: MemberJpaEntity): FeedJpaEntity {
         return FeedJpaEntity(
             title = "테스트 피드",

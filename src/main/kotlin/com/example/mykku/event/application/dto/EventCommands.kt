@@ -25,8 +25,7 @@ data class EventListQuery(
     val status: EventStatusType,
     val sortType: EventSortType,
     val page: Int,
-    val size: Int,
-    val memberId: Long
+    val size: Int
 )
 
 data class SetEventWinnersCommand(

@@ -18,6 +18,12 @@ enum class MemberErrorCode(
     MEMBER_ID_INVALID_FORMAT("MB105", HttpStatus.BAD_REQUEST, "아이디는 영문과 숫자만 사용할 수 있습니다"),
     MEMBER_ID_EMPTY("MB106", HttpStatus.BAD_REQUEST, "아이디를 입력해주세요"),
 
+    PROFILE_NOT_COMPLETED(
+        "MB201",
+        HttpStatus.FORBIDDEN,
+        "아이디와 닉네임을 설정한 후에 이용할 수 있습니다"
+    ),
+
     NICKNAME_ALREADY_EXISTS("MB301", HttpStatus.CONFLICT, "이미 사용 중인 닉네임입니다"),
     MEMBER_ID_ALREADY_EXISTS("MB302", HttpStatus.CONFLICT, "이미 사용 중인 아이디입니다")
 }

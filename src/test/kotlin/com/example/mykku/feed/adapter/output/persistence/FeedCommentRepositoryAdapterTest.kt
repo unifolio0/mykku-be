@@ -48,6 +48,27 @@ class FeedCommentRepositoryAdapterTest : BaseRepositoryTest() {
         )
     }
 
+    private fun createAndSaveFeed(title: String): FeedJpaEntity {
+        return feedJpaRepository.save(
+            FeedJpaEntity(
+                title = title,
+                content = "테스트 내용",
+                board = board,
+                member = member
+            )
+        )
+    }
+
+    private fun saveComments(feedId: FeedId, count: Int) {
+        repeat(count) { index ->
+            feedCommentRepository.save(
+                FeedComment.create(content = "댓글 $index", feedId = feedId, memberId = member.id),
+                feedId,
+                member.id
+            )
+        }
+    }
+
     @Nested
     @DisplayName("save 메서드")
     inner class Save {
@@ -427,6 +448,106 @@ class FeedCommentRepositoryAdapterTest : BaseRepositoryTest() {
             val count = feedCommentRepository.countByFeedId(nonExistentFeedId)
 
             assertThat(count).isEqualTo(0)
+        }
+    }
+
+    @Nested
+    @DisplayName("countByFeedIdIn 메서드")
+    inner class CountByFeedIdIn {
+
+        @Test
+        @DisplayName("여러 피드의 댓글 수를 피드별로 집계한다")
+        fun `댓글 수 일괄 조회 - 정상 케이스`() {
+            val feed2 = createAndSaveFeed("테스트 피드 2")
+            val feed3 = createAndSaveFeed("테스트 피드 3")
+            val feedId1 = FeedId.of(feed.id!!)
+            val feedId2 = FeedId.of(feed2.id!!)
+            val feedId3 = FeedId.of(feed3.id!!)
+            saveComments(feedId1, 3)
+            saveComments(feedId2, 1)
+
+            val counts = feedCommentRepository.countByFeedIdIn(listOf(feedId1, feedId2, feedId3))
+
+            assertThat(counts).containsEntry(feed.id!!, 3)
+            assertThat(counts).containsEntry(feed2.id!!, 1)
+        }
+
+        @Test
+        @DisplayName("댓글이 없는 피드는 맵에 키가 존재하지 않는다")
+        fun `댓글 수 일괄 조회 - 댓글 없는 피드는 키 없음`() {
+            val feedWithoutComment = createAndSaveFeed("댓글 없는 피드")
+            val feedId1 = FeedId.of(feed.id!!)
+            saveComments(feedId1, 2)
+
+            val counts = feedCommentRepository.countByFeedIdIn(
+                listOf(feedId1, FeedId.of(feedWithoutComment.id!!))
+            )
+
+            assertThat(counts).hasSize(1)
+            assertThat(counts).containsEntry(feed.id!!, 2)
+            assertThat(counts).doesNotContainKey(feedWithoutComment.id!!)
+        }
+
+        @Test
+        @DisplayName("대댓글도 댓글 수에 포함된다")
+        fun `댓글 수 일괄 조회 - 대댓글 포함`() {
+            val feed2 = createAndSaveFeed("테스트 피드 2")
+            val feedId1 = FeedId.of(feed.id!!)
+            val feedId2 = FeedId.of(feed2.id!!)
+            val parentComment = feedCommentRepository.save(
+                FeedComment.create(content = "부모 댓글", feedId = feedId1, memberId = member.id),
+                feedId1,
+                member.id
+            )
+            feedCommentRepository.save(
+                FeedComment.create(
+                    content = "대댓글 1",
+                    feedId = feedId1,
+                    memberId = member.id,
+                    parentCommentId = parentComment.id
+                ),
+                feedId1,
+                member.id
+            )
+            feedCommentRepository.save(
+                FeedComment.create(
+                    content = "대댓글 2",
+                    feedId = feedId1,
+                    memberId = member.id,
+                    parentCommentId = parentComment.id
+                ),
+                feedId1,
+                member.id
+            )
+            saveComments(feedId2, 1)
+
+            val counts = feedCommentRepository.countByFeedIdIn(listOf(feedId1, feedId2))
+
+            assertThat(counts).containsEntry(feed.id!!, 3)
+            assertThat(counts).containsEntry(feed2.id!!, 1)
+        }
+
+        @Test
+        @DisplayName("조회 대상에 포함되지 않은 피드의 댓글은 집계되지 않는다")
+        fun `댓글 수 일괄 조회 - 조회 대상 외 피드 제외`() {
+            val otherFeed = createAndSaveFeed("다른 피드")
+            val feedId1 = FeedId.of(feed.id!!)
+            saveComments(feedId1, 1)
+            saveComments(FeedId.of(otherFeed.id!!), 2)
+
+            val counts = feedCommentRepository.countByFeedIdIn(listOf(feedId1))
+
+            assertThat(counts).hasSize(1)
+            assertThat(counts).containsEntry(feed.id!!, 1)
+            assertThat(counts).doesNotContainKey(otherFeed.id!!)
+        }
+
+        @Test
+        @DisplayName("빈 피드 ID 목록으로 조회하면 빈 맵을 반환한다")
+        fun `댓글 수 일괄 조회 - 빈 목록`() {
+            val counts = feedCommentRepository.countByFeedIdIn(emptyList())
+
+            assertThat(counts).isEmpty()
         }
     }
 

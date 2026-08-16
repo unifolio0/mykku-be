@@ -32,6 +32,7 @@
 | NF | Notification | 알림 에러 |
 | PR | Preference | 취향 에러 |
 | RL | Role | 칭호 에러 |
+| RP | Report | 신고 에러 |
 
 ### 번호 체계
 
@@ -54,10 +55,14 @@
 | C104 | INVALID_PAGE_SIZE | 400 | 페이지 크기는 1 이상 100 이하여야 합니다 |
 | C105 | MISSING_REQUEST_PARAMETER | 400 | 필수 요청 값이 누락되었습니다 |
 | C106 | INVALID_PARAMETER_TYPE | 400 | 요청 값의 형식이 올바르지 않습니다 |
+| C107 | INVALID_MULTIPART_REQUEST | 400 | multipart 요청 형식이 올바르지 않습니다 |
 | C201 | ENDPOINT_NOT_FOUND | 404 | 요청한 API를 찾을 수 없습니다 |
 | C202 | METHOD_NOT_ALLOWED | 405 | 지원하지 않는 HTTP 메서드입니다 |
 | C203 | UNSUPPORTED_MEDIA_TYPE | 415 | 지원하지 않는 Content-Type입니다 |
+| C204 | NOT_ACCEPTABLE | 406 | 지원하지 않는 Accept 형식입니다 |
+| C205 | PAYLOAD_TOO_LARGE | 413 | 업로드 가능한 파일 크기를 초과했습니다 |
 | C301 | RESOURCE_LOCK_CONFLICT | 409 | 다른 요청이 처리 중입니다. 잠시 후 다시 시도해주세요 |
+| C302 | DATA_INTEGRITY_VIOLATION | 409 | 이미 존재하는 값이거나 참조할 수 없는 값입니다 |
 | C401 | REDIS_CONNECTION_FAILURE | 500 | Redis 연결에 실패했습니다. 잠시 후 다시 시도해주세요 |
 | C402 | INTERNAL_SERVER_ERROR | 500 | 서버 오류가 발생했습니다. 관리자에게 문의해주세요 |
 
@@ -135,6 +140,7 @@
 | DM101 | DAILY_MESSAGE_CONTENT_TOO_LONG | 400 | 일상 메시지 내용은 1000자 이하여야 합니다 |
 | DM102 | DAILY_MESSAGE_COMMENT_CONTENT_TOO_LONG | 400 | 일상 메시지 댓글은 300자 이하여야 합니다 |
 | DM201 | COMMENT_FORBIDDEN_ACCESS | 403 | 댓글에 접근할 권한이 없습니다 |
+| DM301 | DAILY_MESSAGE_DATE_ALREADY_EXISTS | 409 | 해당 날짜의 일상 메시지가 이미 존재합니다 |
 
 ## Email (EM)
 
@@ -216,6 +222,7 @@
 | MB104 | MEMBER_ID_TOO_LONG | 400 | 아이디는 20자 이하여야 합니다 |
 | MB105 | MEMBER_ID_INVALID_FORMAT | 400 | 아이디는 영문과 숫자만 사용할 수 있습니다 |
 | MB106 | MEMBER_ID_EMPTY | 400 | 아이디를 입력해주세요 |
+| MB201 | PROFILE_NOT_COMPLETED | 403 | 아이디와 닉네임을 설정한 후에 이용할 수 있습니다 |
 | MB301 | NICKNAME_ALREADY_EXISTS | 409 | 이미 사용 중인 닉네임입니다 |
 | MB302 | MEMBER_ID_ALREADY_EXISTS | 409 | 이미 사용 중인 아이디입니다 |
 
@@ -248,11 +255,25 @@
 | RL002 | MEMBER_ROLE_NOT_FOUND | 404 | 보유하지 않은 칭호입니다 |
 | RL101 | ROLE_NAME_DUPLICATE | 400 | 이미 존재하는 칭호 이름입니다 |
 | RL102 | ROLE_IN_USE | 400 | 사용 중인 칭호는 삭제할 수 없습니다 |
+| RL105 | ROLE_NAME_IS_AWARD_CONDITION_KEY | 400 | 자동 획득 조건이 걸린 칭호는 이름을 변경하거나 삭제할 수 없습니다 |
 | RL103 | MEMBER_ROLE_ALREADY_EXISTS | 400 | 이미 보유한 칭호입니다 |
 | RL104 | REPRESENTATIVE_ROLE_REQUIRED | 400 | 대표 칭호는 필수입니다 |
 | RL201 | MEMBER_ROLE_UNAUTHORIZED | 403 | 해당 칭호에 접근할 권한이 없습니다 |
 
 ---
+
+## Report (RP)
+
+| 코드 | 이름 | HTTP 상태 | 메시지 |
+|------|------|-----------|--------|
+| RP001 | REPORT_NOT_FOUND | 404 | 신고 내역을 찾을 수 없습니다 |
+| RP002 | REPORT_TARGET_NOT_FOUND | 404 | 신고 대상을 찾을 수 없습니다 |
+| RP101 | CANNOT_REPORT_OWN_CONTENT | 400 | 자신의 콘텐츠는 신고할 수 없습니다 |
+| RP102 | REPORT_DETAIL_REQUIRED | 400 | 기타 사유는 상세 내용을 입력해주세요 |
+| RP103 | REPORT_DETAIL_TOO_LONG | 400 | 상세 내용은 500자 이하여야 합니다 |
+| RP104 | REPORT_STATUS_NOT_PROCESSABLE | 400 | 처리 상태는 RESOLVED 또는 REJECTED만 가능합니다 |
+| RP301 | ALREADY_REPORTED | 409 | 이미 신고한 콘텐츠입니다 |
+| RP302 | REPORT_ALREADY_PROCESSED | 409 | 이미 처리된 신고입니다 |
 
 ## API 엔드포인트
 

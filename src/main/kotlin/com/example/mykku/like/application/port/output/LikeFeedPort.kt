@@ -8,4 +8,6 @@ interface LikeFeedPort {
     fun deleteByMemberIdAndFeedId(memberId: Long, feedId: Long)
     fun findByMemberIdAndFeedIdIn(memberId: Long, feedIds: List<Long>): List<LikeFeedEntity>
     fun deleteAllByFeedId(feedId: Long)
+    fun countByFeedId(feedId: Long): Int
+    fun countByFeedIdIn(feedIds: List<Long>): Map<Long, Int>
 }

@@ -11,6 +11,7 @@ import com.example.mykku.feed.application.dto.GetFeedDetailQuery
 import com.example.mykku.feed.application.dto.TagResult
 import com.example.mykku.role.application.dto.RoleResult
 import com.example.mykku.feed.application.port.input.GetFeedDetailUseCase
+import com.example.mykku.feed.application.port.output.FeedCommentRepository
 import com.example.mykku.feed.application.port.output.FeedImageRepository
 import com.example.mykku.feed.application.port.output.FeedRepository
 import com.example.mykku.feed.application.port.output.FeedTagRepository
@@ -29,6 +30,7 @@ class GetFeedDetailUseCaseImpl(
     private val feedRepository: FeedRepository,
     private val feedImageRepository: FeedImageRepository,
     private val feedTagRepository: FeedTagRepository,
+    private val feedCommentRepository: FeedCommentRepository,
     private val boardRepository: BoardRepository,
     private val memberRepository: MemberRepository,
     private val roleRepository: RoleRepository,
@@ -71,9 +73,9 @@ class GetFeedDetailUseCaseImpl(
             content = feed.content,
             images = feedImages.map { FeedImageResult(it.id!!.value, it.url, it.width, it.height) },
             tags = feedTags.map { TagResult(it.title, contestTagTitles.contains(it.title)) },
-            likeCount = feed.likeCount,
+            likeCount = likeFeedPort.countByFeedId(feed.id!!.value),
             isLiked = isLiked,
-            commentCount = feed.commentCount
+            commentCount = feedCommentRepository.countByFeedId(feed.id!!).toInt()
         )
     }
 

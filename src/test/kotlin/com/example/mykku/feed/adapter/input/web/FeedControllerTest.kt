@@ -7,6 +7,7 @@ import com.example.mykku.feed.adapter.output.persistence.FeedJpaRepository
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.member.domain.vo.SocialProvider
+import com.example.mykku.member.exception.MemberErrorCode
 import com.example.mykku.util.TestTokenGenerator
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.restassured.RestAssured
@@ -95,6 +96,90 @@ class FeedControllerTest : BaseControllerTest() {
             .post("/api/v1/feeds")
             .then()
             .statusCode(401)
+    }
+
+    @Test
+    @DisplayName("피드 생성 - 아이디를 설정하지 않은 회원")
+    fun `createFeed - memberId가 없는 회원은 피드를 생성할 수 없다`() {
+        // given
+        val member = memberJpaRepository.save(
+            MemberJpaEntity(
+                memberId = null,
+                socialId = "incomplete-member-id",
+                provider = SocialProvider.GOOGLE,
+                email = "incomplete-member-id@example.com",
+                nickname = "Member1",
+                role = null,
+                profileImage = ""
+            )
+        )
+        val board = boardJpaRepository.save(
+            BoardJpaEntity(
+                title = "테스트 게시판",
+                logo = "test_logo.png"
+            )
+        )
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val request = CreateFeedRequestDto(
+            title = "테스트 피드",
+            content = "테스트 내용",
+            boardId = board.id!!,
+            tags = listOf("tag1", "tag2")
+        )
+        val requestJson = ObjectMapper().writeValueAsString(request)
+
+        // when & then
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .contentType(ContentType.MULTIPART)
+            .multiPart("request", requestJson, "application/json")
+            .`when`()
+            .post("/api/v1/feeds")
+            .then()
+            .statusCode(403)
+            .body("code", equalTo(MemberErrorCode.PROFILE_NOT_COMPLETED.code))
+    }
+
+    @Test
+    @DisplayName("피드 생성 - 닉네임을 설정하지 않은 회원")
+    fun `createFeed - nickname이 없는 회원은 피드를 생성할 수 없다`() {
+        // given
+        val member = memberJpaRepository.save(
+            MemberJpaEntity(
+                memberId = "incompletenick",
+                socialId = "incomplete-nickname",
+                provider = SocialProvider.GOOGLE,
+                email = "incomplete-nickname@example.com",
+                nickname = null,
+                role = null,
+                profileImage = ""
+            )
+        )
+        val board = boardJpaRepository.save(
+            BoardJpaEntity(
+                title = "테스트 게시판",
+                logo = "test_logo.png"
+            )
+        )
+        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val request = CreateFeedRequestDto(
+            title = "테스트 피드",
+            content = "테스트 내용",
+            boardId = board.id!!,
+            tags = listOf("tag1", "tag2")
+        )
+        val requestJson = ObjectMapper().writeValueAsString(request)
+
+        // when & then
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .contentType(ContentType.MULTIPART)
+            .multiPart("request", requestJson, "application/json")
+            .`when`()
+            .post("/api/v1/feeds")
+            .then()
+            .statusCode(403)
+            .body("code", equalTo(MemberErrorCode.PROFILE_NOT_COMPLETED.code))
     }
 
     @Test

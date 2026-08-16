@@ -10,7 +10,8 @@ data class DailyMessageSummaryResult(
     val id: Long,
     val title: String,
     val content: String,
-    val date: LocalDate
+    val date: LocalDate,
+    val createdAt: LocalDateTime
 ) {
     companion object {
         fun from(dailyMessage: DailyMessage): DailyMessageSummaryResult {
@@ -18,7 +19,8 @@ data class DailyMessageSummaryResult(
                 id = dailyMessage.id.value,
                 title = dailyMessage.title,
                 content = dailyMessage.content,
-                date = dailyMessage.date
+                date = dailyMessage.date,
+                createdAt = dailyMessage.createdAt
             )
         }
     }
@@ -66,12 +68,13 @@ data class CommentResult(
             comment: DailyMessageComment,
             author: CommentAuthorInfo?,
             isLiked: Boolean = false,
+            likeCount: Int = 0,
             replies: List<ReplyResult> = emptyList()
         ): CommentResult {
             return CommentResult(
                 id = comment.id.value,
                 content = comment.content,
-                likeCount = comment.likeCount,
+                likeCount = likeCount,
                 isLiked = isLiked,
                 memberId = author?.memberId,
                 memberName = comment.memberNickname,
@@ -99,12 +102,13 @@ data class ReplyResult(
         fun from(
             reply: DailyMessageComment,
             author: CommentAuthorInfo?,
-            isLiked: Boolean = false
+            isLiked: Boolean = false,
+            likeCount: Int = 0
         ): ReplyResult {
             return ReplyResult(
                 id = reply.id.value,
                 content = reply.content,
-                likeCount = reply.likeCount,
+                likeCount = likeCount,
                 isLiked = isLiked,
                 memberId = author?.memberId,
                 memberName = reply.memberNickname,

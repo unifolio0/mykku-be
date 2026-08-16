@@ -83,6 +83,7 @@ import com.example.mykku.preference.application.port.input.GetMoodPreferenceUseC
 import com.example.mykku.preference.application.port.input.UpdateGenrePreferenceUseCase
 import com.example.mykku.preference.application.port.input.UpdateGoodsPreferenceUseCase
 import com.example.mykku.preference.application.port.input.UpdateMoodPreferenceUseCase
+import com.example.mykku.report.application.port.input.CreateReportUseCase
 import com.example.mykku.role.application.port.input.AcquireRoleUseCase
 import com.example.mykku.role.application.port.input.ChangeRepresentativeRoleUseCase
 import com.example.mykku.role.application.port.input.GetMyRolesUseCase
@@ -362,6 +363,9 @@ abstract class BaseDocumentTest {
 
     @MockitoBean
     protected lateinit var deleteFeedCommentUseCase: DeleteFeedCommentUseCase
+
+    @MockitoBean
+    protected lateinit var createReportUseCase: CreateReportUseCase
 
     companion object {
         const val TEST_MEMBER_EMAIL = "test@example.com"

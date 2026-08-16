@@ -1,11 +1,13 @@
 package com.example.mykku.admin.adapter.input.web
 
 import com.example.mykku.BaseControllerTest
+import com.example.mykku.achievement.domain.TitleThreshold
 import com.example.mykku.role.adapter.input.web.CreateRoleRequest
 import com.example.mykku.role.adapter.input.web.UpdateRoleRequest
 import com.example.mykku.role.adapter.output.persistence.entity.RoleJpaEntity
 import com.example.mykku.role.application.port.output.MemberRoleRepository
 import com.example.mykku.role.domain.entity.Role
+import com.example.mykku.role.exception.RoleErrorCode
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import org.assertj.core.api.Assertions.assertThat
@@ -89,6 +91,64 @@ class AdminRoleApiControllerTest : BaseControllerTest() {
             .statusCode(200)
             .body("message", equalTo("칭호 수정 성공"))
             .body("data.name", equalTo("수정된칭호"))
+    }
+
+    @Test
+    @DisplayName("자동 획득 조건이 걸린 칭호는 이름을 변경할 수 없다")
+    fun `updateRole - 자동 획득 조건 칭호의 이름은 변경할 수 없다`() {
+        val awardRole = roleJpaRepository.save(
+            RoleJpaEntity(name = TitleThreshold.FEED_FIRST.roleName, description = "게시글 1회 업로드")
+        )
+        val request = UpdateRoleRequest(name = "바뀐이름", description = "설명")
+
+        RestAssured
+            .given()
+            .sessionId(adminSessionId)
+            .contentType(ContentType.JSON)
+            .body(request)
+            .`when`()
+            .put("/admin/api/v1/roles/${awardRole.id}")
+            .then()
+            .statusCode(400)
+            .body("code", equalTo(RoleErrorCode.ROLE_NAME_IS_AWARD_CONDITION_KEY.code))
+    }
+
+    @Test
+    @DisplayName("자동 획득 조건이 걸린 칭호는 이름을 유지하면 설명만 수정할 수 있다")
+    fun `updateRole - 자동 획득 조건 칭호도 설명은 수정할 수 있다`() {
+        val awardRole = roleJpaRepository.save(
+            RoleJpaEntity(name = TitleThreshold.LIKE_FIRST.roleName, description = "이전 설명")
+        )
+        val request = UpdateRoleRequest(name = TitleThreshold.LIKE_FIRST.roleName, description = "새 설명")
+
+        RestAssured
+            .given()
+            .sessionId(adminSessionId)
+            .contentType(ContentType.JSON)
+            .body(request)
+            .`when`()
+            .put("/admin/api/v1/roles/${awardRole.id}")
+            .then()
+            .statusCode(200)
+            .body("data.description", equalTo("새 설명"))
+    }
+
+    @Test
+    @DisplayName("자동 획득 조건이 걸린 칭호는 삭제할 수 없다")
+    fun `deleteRole - 자동 획득 조건 칭호는 삭제할 수 없다`() {
+        val awardRole = roleJpaRepository.save(
+            RoleJpaEntity(name = TitleThreshold.COMMENT_FIRST.roleName, description = "설명")
+        )
+
+        RestAssured
+            .given()
+            .sessionId(adminSessionId)
+            .contentType(ContentType.JSON)
+            .`when`()
+            .delete("/admin/api/v1/roles/${awardRole.id}")
+            .then()
+            .statusCode(400)
+            .body("code", equalTo(RoleErrorCode.ROLE_NAME_IS_AWARD_CONDITION_KEY.code))
     }
 
     @Test

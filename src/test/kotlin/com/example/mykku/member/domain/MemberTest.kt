@@ -243,6 +243,65 @@ class MemberTest {
     }
 
     @Nested
+    @DisplayName("requireProfileCompleted 메서드")
+    inner class RequireProfileCompleted {
+
+        @Test
+        @DisplayName("memberId와 nickname이 모두 있으면 예외가 발생하지 않는다")
+        fun `프로필 완성 검증 - 정상 케이스`() {
+            val member = createMemberWith(memberId = "testuser1", nickname = "테스트닉네임")
+
+            member.requireProfileCompleted()
+        }
+
+        @Test
+        @DisplayName("memberId가 null이면 예외가 발생한다")
+        fun `프로필 완성 검증 - memberId null`() {
+            val member = createMemberWith(memberId = null, nickname = "테스트닉네임")
+
+            val exception = assertThrows<MemberException> {
+                member.requireProfileCompleted()
+            }
+
+            assertThat(exception.errorCode).isEqualTo(MemberErrorCode.PROFILE_NOT_COMPLETED)
+        }
+
+        @Test
+        @DisplayName("nickname이 null이면 예외가 발생한다")
+        fun `프로필 완성 검증 - nickname null`() {
+            val member = createMemberWith(memberId = "testuser1", nickname = null)
+
+            val exception = assertThrows<MemberException> {
+                member.requireProfileCompleted()
+            }
+
+            assertThat(exception.errorCode).isEqualTo(MemberErrorCode.PROFILE_NOT_COMPLETED)
+        }
+
+        @Test
+        @DisplayName("memberId와 nickname이 모두 null이면 예외가 발생한다")
+        fun `프로필 완성 검증 - 모두 null`() {
+            val member = createSocialMember()
+
+            val exception = assertThrows<MemberException> {
+                member.requireProfileCompleted()
+            }
+
+            assertThat(exception.errorCode).isEqualTo(MemberErrorCode.PROFILE_NOT_COMPLETED)
+        }
+
+        @Test
+        @DisplayName("프로필 설정을 완료하면 예외가 발생하지 않는다")
+        fun `프로필 완성 검증 - 프로필 설정 후 통과`() {
+            val member = createSocialMember()
+
+            member.setupProfile("newuser1", "새닉네임")
+
+            member.requireProfileCompleted()
+        }
+    }
+
+    @Nested
     @DisplayName("닉네임 검증")
     inner class NicknameValidation {
 
@@ -467,6 +526,23 @@ class MemberTest {
             email = "test@example.com",
             password = "encodedPassword",
             emailVerified = false,
+            createdAt = LocalDateTime.now(),
+            updatedAt = LocalDateTime.now()
+        )
+    }
+
+    private fun createMemberWith(memberId: String?, nickname: String?): Member {
+        return Member.reconstitute(
+            id = 1L,
+            memberId = memberId,
+            nickname = nickname,
+            roleId = null,
+            profileImage = "",
+            provider = SocialProvider.GOOGLE,
+            socialId = "google-12345",
+            email = "test@example.com",
+            password = null,
+            emailVerified = true,
             createdAt = LocalDateTime.now(),
             updatedAt = LocalDateTime.now()
         )

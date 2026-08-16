@@ -1,5 +1,6 @@
 package com.example.mykku.feed.adapter.output.persistence
 
+import com.example.mykku.common.adapter.persistence.toCountMap
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedCommentJpaEntity
 import com.example.mykku.feed.application.port.output.FeedCommentRepository
 import com.example.mykku.feed.domain.entity.FeedComment
@@ -69,8 +70,12 @@ class FeedCommentRepositoryAdapter(
     }
 
     override fun countByFeedId(feedId: FeedId): Long {
-        val feed = feedJpaRepository.findById(feedId.value).orElse(null) ?: return 0
-        return feedCommentJpaRepository.countByFeed(feed)
+        return feedCommentJpaRepository.countByFeedId(feedId.value)
+    }
+
+    override fun countByFeedIdIn(feedIds: List<FeedId>): Map<Long, Int> {
+        if (feedIds.isEmpty()) return emptyMap()
+        return feedCommentJpaRepository.countGroupedByFeedIdIn(feedIds.map { it.value }).toCountMap()
     }
 
     override fun findIdsByFeedId(feedId: FeedId): List<Long> {

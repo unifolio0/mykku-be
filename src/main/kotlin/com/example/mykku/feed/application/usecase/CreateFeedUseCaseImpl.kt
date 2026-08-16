@@ -46,6 +46,8 @@ class CreateFeedUseCaseImpl(
 ) : CreateFeedUseCase {
 
     override fun execute(command: CreateFeedCommand, member: Member): CreateFeedResult {
+        member.requireProfileCompleted()
+
         val board = boardRepository.findById(BoardId(command.boardId))
             ?: throw BoardException.boardNotFound()
 

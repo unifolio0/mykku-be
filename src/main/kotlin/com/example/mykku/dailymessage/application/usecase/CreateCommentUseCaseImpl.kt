@@ -12,6 +12,9 @@ import com.example.mykku.dailymessage.domain.entity.DailyMessageComment
 import com.example.mykku.dailymessage.domain.vo.DailyMessageCommentId
 import com.example.mykku.dailymessage.domain.vo.DailyMessageId
 import com.example.mykku.dailymessage.exception.DailyMessageException
+import com.example.mykku.member.application.port.output.MemberRepository
+import com.example.mykku.member.domain.vo.MemberPk
+import com.example.mykku.member.exception.MemberException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -21,10 +24,12 @@ class CreateCommentUseCaseImpl(
     private val dailyMessageRepository: DailyMessageRepository,
     private val dailyMessageCommentRepository: DailyMessageCommentRepository,
     private val activityEventPublisher: ActivityEventPublisher,
-    private val commentAuthorResolver: CommentAuthorResolver
+    private val commentAuthorResolver: CommentAuthorResolver,
+    private val memberRepository: MemberRepository
 ) : CreateCommentUseCase {
 
     override fun execute(command: CreateCommentCommand): CommentResult {
+        validateProfileCompleted(command.memberId)
         validateDailyMessageExists(command.dailyMessageId)
         validateParentCommentExists(command)
 
@@ -35,6 +40,12 @@ class CreateCommentUseCaseImpl(
         val author = commentAuthorResolver.resolveOne(command.memberId)
 
         return CommentResult.from(savedComment, author, replies = emptyList())
+    }
+
+    private fun validateProfileCompleted(memberId: Long) {
+        val member = memberRepository.findById(MemberPk.of(memberId))
+            ?: throw MemberException.memberNotFound()
+        member.requireProfileCompleted()
     }
 
     private fun validateDailyMessageExists(dailyMessageId: Long) {

@@ -1,5 +1,6 @@
 package com.example.mykku.feed.adapter.output.persistence
 
+import com.example.mykku.common.adapter.persistence.IdCountRow
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedCommentJpaEntity
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
 import org.springframework.data.domain.Page
@@ -36,6 +37,16 @@ interface FeedCommentJpaRepository : JpaRepository<FeedCommentJpaEntity, Long> {
     fun findByParentCommentIn(@Param("parentComments") parentComments: List<FeedCommentJpaEntity>): List<FeedCommentJpaEntity>
 
     fun countByFeed(feed: FeedJpaEntity): Long
+
+    fun countByFeedId(feedId: Long): Long
+
+    @Query("""
+        SELECT fc.feed.id AS entityId, COUNT(fc) AS countValue
+        FROM FeedCommentJpaEntity fc
+        WHERE fc.feed.id IN :feedIds
+        GROUP BY fc.feed.id
+    """)
+    fun countGroupedByFeedIdIn(@Param("feedIds") feedIds: List<Long>): List<IdCountRow>
 
     fun findAllByFeed(feed: FeedJpaEntity): List<FeedCommentJpaEntity>
 

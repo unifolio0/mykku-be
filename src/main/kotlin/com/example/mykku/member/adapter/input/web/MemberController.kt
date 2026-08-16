@@ -9,6 +9,8 @@ import com.example.mykku.member.adapter.input.web.dto.CheckMemberIdResponse
 import com.example.mykku.member.adapter.input.web.dto.MemberProfileResponse
 import com.example.mykku.member.adapter.input.web.dto.SetupProfileRequest
 import com.example.mykku.member.adapter.input.web.dto.UpdateProfileRequest
+import com.example.mykku.member.adapter.input.web.dto.UpdateProfileWithImageRequest
+import com.example.mykku.member.application.dto.MemberProfileResult
 import com.example.mykku.member.application.port.input.ChangeMemberIdUseCase
 import com.example.mykku.member.application.port.input.ChangePasswordUseCase
 import com.example.mykku.member.application.port.input.CheckMemberIdUseCase
@@ -18,6 +20,7 @@ import com.example.mykku.member.application.port.input.UpdateMemberProfileUseCas
 import com.example.mykku.member.application.port.input.WithdrawMemberUseCase
 import com.example.mykku.member.domain.entity.Member
 import jakarta.validation.Valid
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -26,7 +29,9 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("/api/v1/members")
@@ -49,14 +54,22 @@ class MemberController(
         return ResponseEntity.ok(ApiResponse("프로필 조회 성공", response))
     }
 
-    @PatchMapping("/me")
+    @PatchMapping("/me", consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun updateProfile(
         @CurrentMember member: Member,
         @Valid @RequestBody request: UpdateProfileRequest
     ): ResponseEntity<ApiResponse<MemberProfileResponse>> {
-        val result = updateMemberProfileUseCase.updateProfile(member, request.toCommand())
-        val response = MemberProfileResponse.from(result)
-        return ResponseEntity.ok(ApiResponse("프로필이 수정되었습니다", response))
+        return respondProfileUpdated(updateMemberProfileUseCase.updateProfile(member, request.toCommand()))
+    }
+
+    @PatchMapping("/me", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun updateProfileWithImage(
+        @CurrentMember member: Member,
+        @RequestPart("request", required = false) @Valid request: UpdateProfileWithImageRequest?,
+        @RequestPart("profileImage", required = false) profileImage: MultipartFile?
+    ): ResponseEntity<ApiResponse<MemberProfileResponse>> {
+        val command = (request ?: UpdateProfileWithImageRequest(nickname = null)).toCommand(profileImage)
+        return respondProfileUpdated(updateMemberProfileUseCase.updateProfile(member, command))
     }
 
     @PatchMapping("/me/member-id")
@@ -106,5 +119,11 @@ class MemberController(
             available = available
         )
         return ResponseEntity.ok(ApiResponse("아이디 중복 확인 완료", response))
+    }
+
+    private fun respondProfileUpdated(
+        result: MemberProfileResult
+    ): ResponseEntity<ApiResponse<MemberProfileResponse>> {
+        return ResponseEntity.ok(ApiResponse("프로필이 수정되었습니다", MemberProfileResponse.from(result)))
     }
 }

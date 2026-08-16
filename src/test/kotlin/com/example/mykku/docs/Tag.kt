@@ -25,5 +25,6 @@ enum class Tag(val displayName: String) {
     NOTIFICATION_SETTING_API("알림 설정 API"),
     ROLE_API("칭호 API"),
     ADMIN_ROLE_API("관리자 칭호 API"),
-    BLOCK_API("차단 API")
+    BLOCK_API("차단 API"),
+    REPORT_API("신고 API")
 }

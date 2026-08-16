@@ -15,6 +15,7 @@ interface FeedCommentRepository {
     fun findByParentCommentId(parentCommentId: FeedCommentId): List<FeedComment>
     fun findByParentCommentIds(parentCommentIds: List<FeedCommentId>): List<FeedComment>
     fun countByFeedId(feedId: FeedId): Long
+    fun countByFeedIdIn(feedIds: List<FeedId>): Map<Long, Int>
     fun findIdsByFeedId(feedId: FeedId): List<Long>
     fun delete(feedComment: FeedComment)
     fun deleteAllByFeedId(feedId: FeedId)

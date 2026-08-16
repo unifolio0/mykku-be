@@ -7,6 +7,7 @@ import com.example.mykku.feed.application.port.input.UpdateFeedCommentUseCase
 import com.example.mykku.feed.application.port.output.FeedCommentRepository
 import com.example.mykku.feed.domain.vo.FeedCommentId
 import com.example.mykku.feed.exception.FeedException
+import com.example.mykku.like.application.port.output.LikeFeedCommentPort
 import com.example.mykku.member.domain.entity.Member
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -14,7 +15,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 class UpdateFeedCommentUseCaseImpl(
-    private val feedCommentRepository: FeedCommentRepository
+    private val feedCommentRepository: FeedCommentRepository,
+    private val likeFeedCommentPort: LikeFeedCommentPort
 ) : UpdateFeedCommentUseCase {
 
     override fun execute(command: UpdateFeedCommentCommand, member: Member): SingleFeedCommentResult {
@@ -35,7 +37,7 @@ class UpdateFeedCommentUseCaseImpl(
                 nickname = member.nickname,
                 profileImage = member.profileImage
             ),
-            likeCount = savedComment.likeCount,
+            likeCount = likeFeedCommentPort.countByFeedCommentId(savedComment.id!!.value),
             createdAt = savedComment.createdAt
         )
     }

@@ -26,5 +26,7 @@ class MemberException(
         fun memberIdInvalidFormat(): MemberException = MemberException(MemberErrorCode.MEMBER_ID_INVALID_FORMAT)
 
         fun memberIdEmpty(): MemberException = MemberException(MemberErrorCode.MEMBER_ID_EMPTY)
+
+        fun profileNotCompleted(): MemberException = MemberException(MemberErrorCode.PROFILE_NOT_COMPLETED)
     }
 }
