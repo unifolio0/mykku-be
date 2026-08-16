@@ -34,8 +34,7 @@ class ContestController(
             status = status,
             sortType = sortType,
             page = page,
-            size = size,
-            memberId = member.id.value
+            size = size
         )
         val result = listContestsUseCase.execute(query)
         return ResponseEntity.ok(

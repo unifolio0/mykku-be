@@ -49,13 +49,15 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
                     id = 1L,
                     title = "오늘의 덕담",
                     content = "좋은 하루 되세요!",
-                    date = date
+                    date = date,
+                    createdAt = LocalDateTime.now()
                 ),
                 DailyMessageSummaryResult(
                     id = 2L,
                     title = "희망찬 하루",
                     content = "모든 소망이 이루어지길!",
-                    date = date
+                    date = date,
+                    createdAt = LocalDateTime.now()
                 )
             )
             val pageable = PageRequest.of(0, 20)

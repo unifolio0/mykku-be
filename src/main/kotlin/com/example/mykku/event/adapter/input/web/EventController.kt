@@ -34,8 +34,7 @@ class EventController(
             status = status,
             sortType = sortType,
             page = page,
-            size = size,
-            memberId = member.id.value
+            size = size
         )
         val result = listEventsUseCase.execute(query)
         return ResponseEntity.ok(

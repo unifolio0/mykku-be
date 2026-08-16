@@ -1,5 +1,6 @@
 package com.example.mykku.admin.service
 
+import com.example.mykku.achievement.domain.TitleThreshold
 import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
 import com.example.mykku.role.adapter.input.web.CreateRoleRequest
 import com.example.mykku.role.adapter.input.web.MemberRoleResponse
@@ -42,6 +43,9 @@ class AdminRoleService(
     fun updateRole(roleId: Long, request: UpdateRoleRequest): RoleResponse {
         val role = roleJpaRepository.findByIdOrNull(roleId)
             ?: throw RoleException.roleNotFound()
+        if (role.name != request.name) {
+            validateNotAwardConditionKey(role.name)
+        }
         role.name = request.name
         role.description = request.description
         val savedRole = roleJpaRepository.save(role)
@@ -53,6 +57,8 @@ class AdminRoleService(
         val role = roleJpaRepository.findByIdOrNull(roleId)
             ?: throw RoleException.roleNotFound()
 
+        validateNotAwardConditionKey(role.name)
+
         if (memberJpaRepository.existsByRole(role)) {
             throw RoleException.roleInUse()
         }
@@ -62,6 +68,12 @@ class AdminRoleService(
         }
 
         roleJpaRepository.delete(role)
+    }
+
+    private fun validateNotAwardConditionKey(roleName: String) {
+        if (TitleThreshold.entries.any { it.roleName == roleName }) {
+            throw RoleException.roleNameIsAwardConditionKey()
+        }
     }
 
     @Transactional

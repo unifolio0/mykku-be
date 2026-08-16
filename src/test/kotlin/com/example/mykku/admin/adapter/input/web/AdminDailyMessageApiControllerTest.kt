@@ -2,10 +2,13 @@ package com.example.mykku.admin.adapter.input.web
 
 import com.example.mykku.BaseControllerTest
 import com.example.mykku.admin.dto.dailymessage.DailyMessageCreateRequest
+import com.example.mykku.common.exception.CommonErrorCode
 import com.example.mykku.dailymessage.adapter.output.persistence.entity.DailyMessageJpaEntity
 import com.example.mykku.dailymessage.adapter.output.persistence.repository.DailyMessageJpaRepository
+import com.example.mykku.dailymessage.exception.DailyMessageErrorCode
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
+import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.BeforeEach
@@ -13,6 +16,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @DisplayName("AdminDailyMessageApiController 통합 테스트")
 class AdminDailyMessageApiControllerTest : BaseControllerTest() {
@@ -123,5 +127,62 @@ class AdminDailyMessageApiControllerTest : BaseControllerTest() {
             .delete("/admin/api/v1/dailymessages/$nonExistentId")
             .then()
             .statusCode(404)
+    }
+
+    @Test
+    @DisplayName("데일리 메시지 생성 - 같은 날짜로 두 번 생성할 수 없다")
+    fun `create - 같은 날짜의 메시지가 이미 있으면 실패한다`() {
+        val date = LocalDate.of(2026, 8, 20)
+        createDailyMessage(date = date)
+        val request = DailyMessageCreateRequest(title = "중복 날짜", content = "내용", date = date)
+
+        RestAssured.given()
+            .sessionId(adminSessionId)
+            .contentType(ContentType.JSON)
+            .body(request)
+            .`when`()
+            .post("/admin/api/v1/dailymessages")
+            .then()
+            .statusCode(409)
+            .body("code", equalTo(DailyMessageErrorCode.DAILY_MESSAGE_DATE_ALREADY_EXISTS.code))
+    }
+
+    @Test
+    @DisplayName("데일리 메시지 생성 - 제목이 255자를 넘으면 실패한다")
+    fun `create - 제목이 컬럼 길이를 넘으면 400을 반환한다`() {
+        val request = DailyMessageCreateRequest(
+            title = "가".repeat(256),
+            content = "내용",
+            date = LocalDate.of(2026, 8, 21)
+        )
+
+        RestAssured.given()
+            .sessionId(adminSessionId)
+            .contentType(ContentType.JSON)
+            .body(request)
+            .`when`()
+            .post("/admin/api/v1/dailymessages")
+            .then()
+            .statusCode(400)
+            .body("code", equalTo(CommonErrorCode.INVALID_INPUT.code))
+    }
+
+    @Test
+    @DisplayName("데일리 메시지 목록 화면 - 생성일시가 조회 시각이 아니라 실제 생성 시각으로 표시된다")
+    fun `listPage - 생성일시가 실제 생성 시각을 반영한다`() {
+        val saved = createDailyMessage(date = LocalDate.of(2026, 8, 22))
+        val expected = saved.createdAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+
+        val html = RestAssured.given()
+            .sessionId(adminSessionId)
+            .`when`()
+            .get("/admin/dailymessage?page=0&size=10")
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString()
+
+        assertThat(html).contains(expected)
     }
 }

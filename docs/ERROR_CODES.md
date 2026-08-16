@@ -140,6 +140,7 @@
 | DM101 | DAILY_MESSAGE_CONTENT_TOO_LONG | 400 | 일상 메시지 내용은 1000자 이하여야 합니다 |
 | DM102 | DAILY_MESSAGE_COMMENT_CONTENT_TOO_LONG | 400 | 일상 메시지 댓글은 300자 이하여야 합니다 |
 | DM201 | COMMENT_FORBIDDEN_ACCESS | 403 | 댓글에 접근할 권한이 없습니다 |
+| DM301 | DAILY_MESSAGE_DATE_ALREADY_EXISTS | 409 | 해당 날짜의 일상 메시지가 이미 존재합니다 |
 
 ## Email (EM)
 
@@ -254,6 +255,7 @@
 | RL002 | MEMBER_ROLE_NOT_FOUND | 404 | 보유하지 않은 칭호입니다 |
 | RL101 | ROLE_NAME_DUPLICATE | 400 | 이미 존재하는 칭호 이름입니다 |
 | RL102 | ROLE_IN_USE | 400 | 사용 중인 칭호는 삭제할 수 없습니다 |
+| RL105 | ROLE_NAME_IS_AWARD_CONDITION_KEY | 400 | 자동 획득 조건이 걸린 칭호는 이름을 변경하거나 삭제할 수 없습니다 |
 | RL103 | MEMBER_ROLE_ALREADY_EXISTS | 400 | 이미 보유한 칭호입니다 |
 | RL104 | REPRESENTATIVE_ROLE_REQUIRED | 400 | 대표 칭호는 필수입니다 |
 | RL201 | MEMBER_ROLE_UNAUTHORIZED | 403 | 해당 칭호에 접근할 권한이 없습니다 |

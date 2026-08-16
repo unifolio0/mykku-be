@@ -9,6 +9,7 @@ import com.example.mykku.fannote.application.port.input.DeleteFanNoteUseCase
 import com.example.mykku.fannote.application.port.input.GetFanNoteDetailUseCase
 import com.example.mykku.fannote.application.port.input.GetFanNoteListUseCase
 import com.example.mykku.image.ImageUploadService
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -56,6 +57,22 @@ class AdminFanNoteService(
 
     @Transactional
     fun deleteById(id: Long) {
+        val imageUrls = collectImageUrls(id)
         deleteFanNoteUseCase.execute(id)
+        imageUrls.forEach { deleteImageQuietly(it) }
+    }
+
+    private fun collectImageUrls(id: Long): List<String> {
+        val detail = getFanNoteDetailUseCase.execute(id, null)
+        return listOfNotNull(detail.coverImageUrl) + detail.pages.map { it.imageUrl }
+    }
+
+    private fun deleteImageQuietly(url: String) {
+        runCatching { s3ImageUploadService.delete(url) }
+            .onFailure { log.warn("덕질노트 이미지 삭제에 실패했습니다: {}", url, it) }
+    }
+
+    companion object {
+        private val log = LoggerFactory.getLogger(AdminFanNoteService::class.java)
     }
 }

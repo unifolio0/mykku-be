@@ -10,7 +10,8 @@ data class DailyMessageSummaryResult(
     val id: Long,
     val title: String,
     val content: String,
-    val date: LocalDate
+    val date: LocalDate,
+    val createdAt: LocalDateTime
 ) {
     companion object {
         fun from(dailyMessage: DailyMessage): DailyMessageSummaryResult {
@@ -18,7 +19,8 @@ data class DailyMessageSummaryResult(
                 id = dailyMessage.id.value,
                 title = dailyMessage.title,
                 content = dailyMessage.content,
-                date = dailyMessage.date
+                date = dailyMessage.date,
+                createdAt = dailyMessage.createdAt
             )
         }
     }

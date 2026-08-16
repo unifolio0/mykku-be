@@ -13,6 +13,11 @@ enum class RoleErrorCode(
 
     ROLE_NAME_DUPLICATE("RL101", HttpStatus.BAD_REQUEST, "이미 존재하는 칭호 이름입니다"),
     ROLE_IN_USE("RL102", HttpStatus.BAD_REQUEST, "사용 중인 칭호는 삭제할 수 없습니다"),
+    ROLE_NAME_IS_AWARD_CONDITION_KEY(
+        "RL105",
+        HttpStatus.BAD_REQUEST,
+        "자동 획득 조건이 걸린 칭호는 이름을 변경하거나 삭제할 수 없습니다"
+    ),
     MEMBER_ROLE_ALREADY_EXISTS("RL103", HttpStatus.BAD_REQUEST, "이미 보유한 칭호입니다"),
     REPRESENTATIVE_ROLE_REQUIRED("RL104", HttpStatus.BAD_REQUEST, "대표 칭호는 필수입니다"),
 

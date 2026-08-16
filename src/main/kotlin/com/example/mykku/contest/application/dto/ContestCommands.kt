@@ -25,8 +25,7 @@ data class ContestListQuery(
     val status: ContestStatusType,
     val sortType: ContestSortType,
     val page: Int,
-    val size: Int,
-    val memberId: Long
+    val size: Int
 )
 
 data class SetContestWinnersCommand(

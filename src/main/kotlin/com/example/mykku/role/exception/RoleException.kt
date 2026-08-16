@@ -13,6 +13,9 @@ class RoleException(
         fun roleNameDuplicate(): RoleException = RoleException(RoleErrorCode.ROLE_NAME_DUPLICATE)
         fun roleInUse(): RoleException = RoleException(RoleErrorCode.ROLE_IN_USE)
 
+        fun roleNameIsAwardConditionKey(): RoleException =
+            RoleException(RoleErrorCode.ROLE_NAME_IS_AWARD_CONDITION_KEY)
+
         fun memberRoleNotFound(): RoleException = RoleException(RoleErrorCode.MEMBER_ROLE_NOT_FOUND)
         fun memberRoleAlreadyExists(): RoleException = RoleException(RoleErrorCode.MEMBER_ROLE_ALREADY_EXISTS)
         fun memberRoleUnauthorized(): RoleException = RoleException(RoleErrorCode.MEMBER_ROLE_UNAUTHORIZED)
