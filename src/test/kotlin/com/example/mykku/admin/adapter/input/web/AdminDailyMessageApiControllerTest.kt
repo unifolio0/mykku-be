@@ -2,6 +2,7 @@ package com.example.mykku.admin.adapter.input.web
 
 import com.example.mykku.BaseControllerTest
 import com.example.mykku.admin.dto.dailymessage.DailyMessageCreateRequest
+import com.example.mykku.admin.service.AdminDailyMessageService
 import com.example.mykku.common.exception.CommonErrorCode
 import com.example.mykku.dailymessage.adapter.output.persistence.entity.DailyMessageJpaEntity
 import com.example.mykku.dailymessage.adapter.output.persistence.repository.DailyMessageJpaRepository
@@ -15,14 +16,17 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.PageRequest
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 @DisplayName("AdminDailyMessageApiController 통합 테스트")
 class AdminDailyMessageApiControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var dailyMessageJpaRepository: DailyMessageJpaRepository
+
+    @Autowired
+    private lateinit var adminDailyMessageService: AdminDailyMessageService
 
     private lateinit var adminSessionId: String
 
@@ -168,21 +172,27 @@ class AdminDailyMessageApiControllerTest : BaseControllerTest() {
     }
 
     @Test
-    @DisplayName("데일리 메시지 목록 화면 - 생성일시가 조회 시각이 아니라 실제 생성 시각으로 표시된다")
-    fun `listPage - 생성일시가 실제 생성 시각을 반영한다`() {
+    @DisplayName("데일리 메시지 목록 - createdAt이 조회 시각이 아니라 저장된 생성 시각이다")
+    fun `findAll - createdAt이 저장된 생성 시각을 반환한다`() {
         val saved = createDailyMessage(date = LocalDate.of(2026, 8, 22))
-        val expected = saved.createdAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+        val persistedCreatedAt = dailyMessageJpaRepository.findById(saved.id!!).orElseThrow().createdAt
 
-        val html = RestAssured.given()
-            .sessionId(adminSessionId)
-            .`when`()
-            .get("/admin/dailymessage?page=0&size=10")
-            .then()
-            .statusCode(200)
-            .extract()
-            .body()
-            .asString()
+        val found = adminDailyMessageService.findAll(PageRequest.of(0, 10)).content.single()
 
-        assertThat(html).contains(expected)
+        assertThat(found.createdAt).isEqualTo(persistedCreatedAt)
+    }
+
+    @Test
+    @DisplayName("데일리 메시지 목록 - 항목마다 각자의 생성 시각을 가진다")
+    fun `findAll - 여러 항목의 createdAt이 서로 다르다`() {
+        createDailyMessage(title = "먼저", date = LocalDate.of(2026, 8, 23))
+        createDailyMessage(title = "나중", date = LocalDate.of(2026, 8, 24))
+
+        val createdAts = adminDailyMessageService.findAll(PageRequest.of(0, 10))
+            .content
+            .map { it.createdAt }
+
+        assertThat(createdAts).hasSize(2)
+        assertThat(createdAts[0]).isNotEqualTo(createdAts[1])
     }
 }
